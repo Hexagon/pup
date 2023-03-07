@@ -1,35 +1,45 @@
-import { createSubprocess } from "./subprocess.ts";
-import { Cron } from "https://deno.land/x/croner@6.0.2/dist/croner.js";
+import { createSubprocess } from "./subprocess.ts"
+import { Cron } from "../deps.ts"
+import { logger } from "./result.ts"
 
-function cronSubprocess(processConfig: undefined) {
-    console.log(`Creating cron task ${processConfig.startPattern}`)
-    new Cron(processConfig.startPattern, async () => {
-        console.log(`Creating ${processConfig.name} subprocess by cron`)
-        const code = await createSubprocess(processConfig.cwd, processConfig.cmd)
-        console.log(`Subprocess ${processConfig.name} finished with code ${code.code}`)
-    });
+interface ProcessConfiguration {
+  name: string
+  cmd: string[]
+  cwd?: string
+  autostart?: boolean
+  startPattern?: string
+  restart?: string
+  restartDelayMs?: number
 }
 
-async function autostartSubprocess(processConfig: undefined) {
-    console.log(`Starting ${processConfig.name} subprocess by autostart`)
-    const code = await createSubprocess(processConfig.cwd, processConfig.cmd)
-    console.log(`Subprocess ${processConfig.name} exited with code ${code.code}`)
-    if (processConfig.restart === "always") {
-        const delay = processConfig.restartDelayMs || 10000;
-        console.log(`Subprocess ${processConfig.name} will restart in ${delay} ms`)
-        setTimeout(() => autostartSubprocess(processConfig), delay );
-    }
+function cronSubprocess(processConfig: ProcessConfiguration) {
+  new Cron(processConfig.startPattern as string, async () => {
+    console.log(logger(`${processConfig.name}`, "starting", `Process started accoring to cron pattern '${processConfig.startPattern}'`));
+    const code = await createSubprocess(processConfig)
+    console.log(logger(`${processConfig.name}`, "finished", `Process finished with code ${code.code}`));
+  })
+  console.log(logger(`${processConfig.name}`, "scheduled", `Process scheduled using cron pattern '${processConfig.startPattern}'`));
 }
 
-async function pup (config: unknown[]) {
-    for(const process of config) {
-
-        // Start using cron pattern
-        if (process.startPattern) cronSubprocess(process)
-
-        // Start instantly
-        if (process.autostart) autostartSubprocess(process)
-    }
+async function autostartSubprocess(processConfig: ProcessConfiguration) {
+  console.log(logger(`${processConfig.name}`, "starting", `Process autostarting`));
+  const code = await createSubprocess(processConfig)
+  console.log(logger(`${processConfig.name}`, "finished", `Process finished with code ${code.code}`));
+  if (processConfig.restart === "always") {
+    const delay = processConfig.restartDelayMs || 10000
+    console.log(logger(`${processConfig.name}`, "scheduled", `Process scheduled to auto restart after ${delay}`));
+    setTimeout(() => autostartSubprocess(processConfig), delay)
+  }
 }
 
-export { pup };
+function pup(config: ProcessConfiguration[]) {
+  for (const process of config) {
+    // Start using cron pattern
+    if (process.startPattern) cronSubprocess(process)
+    // Start instantly
+    if (process.autostart) autostartSubprocess(process)
+  }
+}
+
+export { pup }
+export type { ProcessConfiguration }

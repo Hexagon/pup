@@ -1,0 +1,8 @@
+{
+  "fmt": {
+    "options": {
+      "lineWidth": 200,
+      "semiColons": false
+    }
+  }
+}

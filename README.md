@@ -6,12 +6,12 @@ Work in progress!
 
 ## Features
 
-* Keep your processes alive
-* Define one or multiple processes in a configuration file `pup.json`
-* Start instantly, or according to a cron-pattern
-* Restart according to a cron pattern
-* Restart autmatically if a process exits
-* Single stdout logging multiple processes
+- Keep your processes alive
+- Define one or multiple processes in a configuration file `pup.json`
+- Start instantly, or according to a cron-pattern
+- Restart according to a cron pattern
+- Restart autmatically if a process exits
+- Single stdout logging multiple processes
 
 ## Example
 
@@ -31,8 +31,7 @@ Start pup
 deno run -A ../../pup-cli.ts
 ```
 
-test.js will start instantly, and will restart automatically 10 seconds after exiting.
-test2.js will start every fifth second according to cron pattern `*/5 * * * * *`
+test.js will start instantly, and will restart automatically 10 seconds after exiting. test2.js will start every fifth second according to cron pattern `*/5 * * * * *`
 
 ### Output
 
@@ -62,17 +61,17 @@ Subprocess Kept-alive task will restart in 10000 ms
 
 ```json
 [
-    {
-        "name": "Periodic example task",
-        "cmd": ["deno","run","--allow-read","./task2.js"],
-        "startPattern": "*/5 * * * * *"
-    },
-    {
-        "name": "Kept-alive task",
-        "cmd": ["deno","run","--allow-read","./task1.js"],
-        "autostart": true,
-        "restart": "always",
-        "restartDelayMs": 10000
-    }
+  {
+    "name": "Periodic example task",
+    "cmd": ["deno", "run", "--allow-read", "./task2.js"],
+    "startPattern": "*/5 * * * * *"
+  },
+  {
+    "name": "Kept-alive task",
+    "cmd": ["deno", "run", "--allow-read", "./task1.js"],
+    "autostart": true,
+    "restart": "always",
+    "restartDelayMs": 10000
+  }
 ]
 ```

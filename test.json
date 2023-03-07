@@ -1,0 +1,18 @@
+[
+
+    {
+      "name": "Periodic example task",
+      "cmd": ["deno", "run", "--allow-read", "./examples/basic/task2.js"],
+      "startPattern": "*/20 * * * * *"
+    },
+
+    {
+      "name": "Kept-alive task",
+      "cmd": ["deno", "run", "--allow-read", "./examples/basic/task1.js"],
+      "autostart": true,
+      "restart": "always",
+      "restartDelayMs": 30000
+    }
+
+  ]
+  
