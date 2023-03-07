@@ -1,17 +1,14 @@
 import { readLines } from "https://deno.land/std@0.104.0/io/mod.ts";
-import { writeAll } from "https://deno.land/std@0.104.0/io/util.ts";
 import { ProcessConfiguration } from "./pup.ts";
-import { logger } from "./result.ts";
+import { logger } from "./logger.ts";
 
-async function pipeThrough(
+async function pipeToLogger(
   prefix: string,
   category: string,
-  reader: Deno.Reader,
-  writer: Deno.Writer,
+  reader: Deno.Reader
 ) {
-  const encoder = new TextEncoder();
   for await (const line of readLines(reader)) {
-    await writeAll(writer, encoder.encode(logger(prefix, category, line) + "\n"));
+    logger("log",prefix, category, line);
   }
 }
 
@@ -23,13 +20,13 @@ async function createSubprocess(processConfig: ProcessConfiguration) {
     stderr: "piped",
   })
 
-  pipeThrough(processConfig.name, "stdout", cat.stdout, Deno.stdout);
-  pipeThrough(processConfig.name, "stderr",  cat.stderr, Deno.stderr);
+  pipeToLogger(processConfig.name, "stdout", cat.stdout);
+  pipeToLogger(processConfig.name, "stderr",  cat.stderr);
 
   const status = await cat.status()
 
-  //cat.stderr.close()
-  //cat.stdout.close()
+  cat.stderr.close()
+  cat.stdout.close()
 
   return status
 }

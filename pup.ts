@@ -7,7 +7,6 @@
 import { pup } from "./lib/pup.ts"
 import { checkArguments } from "./lib/checks.ts"
 import { parseArguments } from "./lib/args.ts"
-import { fatal } from "./lib/result.ts"
 
 // Parse arguments, null from parseArguments indicate that the program is already done, happens in case of --help
 try {

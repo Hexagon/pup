@@ -1,5 +1,4 @@
 import { application } from "../meta.ts"
-import { fatal } from "./result.ts"
 import { Args } from "../deps.ts"
 
 function printHeader() {
@@ -8,7 +7,7 @@ function printHeader() {
 }
 
 function printUsage() {
-  console.log(`Usage: ${application.name} [OPTIONS...] [FILE]`)
+  console.log(`Usage: ${application.name} [OPTIONS...]`)
 }
 
 function printFlags() {
@@ -42,7 +41,7 @@ function checkArguments(args: Args): Args | null {
     return null
   } else {
     if (!args._) {
-      fatal("Missing argument")
+      console.error("Missing argument");
     }
 
     return args

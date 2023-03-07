@@ -1,6 +1,6 @@
 import { createSubprocess } from "./subprocess.ts"
 import { Cron } from "../deps.ts"
-import { logger } from "./result.ts"
+import { logger } from "./logger.ts"
 
 interface ProcessConfiguration {
   name: string
@@ -14,20 +14,20 @@ interface ProcessConfiguration {
 
 function cronSubprocess(processConfig: ProcessConfiguration) {
   new Cron(processConfig.startPattern as string, async () => {
-    console.log(logger(`${processConfig.name}`, "starting", `Process started accoring to cron pattern '${processConfig.startPattern}'`));
+    logger("log","core", "starting", `Process started on cron pattern '${processConfig.startPattern}'`);
     const code = await createSubprocess(processConfig)
-    console.log(logger(`${processConfig.name}`, "finished", `Process finished with code ${code.code}`));
+    logger("log","core", "finished", `Process finished with code ${code.code}`);
   })
-  console.log(logger(`${processConfig.name}`, "scheduled", `Process scheduled using cron pattern '${processConfig.startPattern}'`));
+  logger("log","core", "scheduled", `Process scheduled using cron pattern '${processConfig.startPattern}'`);
 }
 
 async function autostartSubprocess(processConfig: ProcessConfiguration) {
-  console.log(logger(`${processConfig.name}`, "starting", `Process autostarting`));
+  logger("log","core", "starting", `Process autostarting`);
   const code = await createSubprocess(processConfig)
-  console.log(logger(`${processConfig.name}`, "finished", `Process finished with code ${code.code}`));
+  logger("log","core", "finished", `Process finished with code ${code.code}`);
   if (processConfig.restart === "always") {
     const delay = processConfig.restartDelayMs || 10000
-    console.log(logger(`${processConfig.name}`, "scheduled", `Process scheduled to auto restart after ${delay}`));
+    logger("log","core", "scheduled", `Process scheduled to auto restart after ${delay}`);
     setTimeout(() => autostartSubprocess(processConfig), delay)
   }
 }
