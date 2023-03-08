@@ -11,7 +11,7 @@ function printUsage() {
 }
 
 function printFlags() {
-  console.log(" -c\t--config\t\tUse specific configuration file")
+  console.log(" -c\t--config\tUse specific configuration file")
   console.log("")
   console.log(" -h\t--help\t\tDisplay this help and exit")
   console.log(" -v\t--version\tOutput version information and exit")

@@ -11,7 +11,7 @@ Pup is centered around a single configuration file called `pup.json`. This file 
 
 Pup can be installed using Deno with the following command:
 
-`deno install -A -n pup https://deno.land/x/pup@0.0.1-dev.0`
+`deno install -A -n pup https://deno.land/x/pup@0.0.2`
 
 The -A flag grants all permissions needed for Pup to work properly. In case of Deno subprocesses, you can specify individual permissions for each process with the usual command line flags.
 
@@ -34,33 +34,31 @@ Pup is centered around a single configuration file called `pup.json`. This file 
 
 Here's an example of a basic `pup.json` file:
 
-```
+```json
 {
   "processes": [
     {
-      "name": "periodic-example-task",
-      "cmd": ["deno", "run", "--allow-read", "./task2.js"],
-      "startPattern": "*/5 * * * * *"
-    },
-    {
       "name": "server-task",
-      "cmd": ["deno", "run", "--allow-read", "./task1.js"],
+      "cmd": ["deno", "run", "--allow-read", "./server.js"],
       "autostart": true,
       "restart": "always",
       "restartDelayMs": 10000
+    },
+    {
+      "name": "periodic-example-task",
+      "cmd": ["deno", "run", "--allow-read", "./task.js"],
+      "startPattern": "*/10 * * * * *"
     }
-  ]   
+  ]
 }
 ```
 
-In this example, we define a single process called myapp. We specify the command to start the process using an array of strings. We also define a cron pattern to automatically restart the process
-every day at midnight.
+In this example, we define a process called `server-task`. We specify the command to start the process using an array of strings. We set it to start immediately, and to restart after 10 seconds after
+quitting for whatever reason.
 
-For more details on how to configure Pup, please refer to the official documentation.
+We also define a complementary process which is launched every 10 seconds using a cron pattern.
 
-## Example
-
-A basic example with a main process and a scheduled task is available in [/examples/basic](/examples/basic)
+Full example available at [/examples/basic](/examples/basic)
 
 **Running the example**
 
@@ -84,4 +82,5 @@ server.js will start instantly, and will restart automatically 10 seconds after 
 
 ## Contributions
 
-Contributions to Pup are very welcome! Please read [CONTRIBUTING.md](/docs/CONTRIBUTING.md), fork the repository, make your changes, and submit a pull request. We appreciate all feedback and contributions that help make Pup better.
+Contributions to Pup are very welcome! Please read [CONTRIBUTING.md](/docs/CONTRIBUTING.md), fork the repository, make your changes, and submit a pull request. We appreciate all feedback and
+contributions that help make Pup better.
