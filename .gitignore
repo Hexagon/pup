@@ -1,4 +1,12 @@
-test/*
+# VSCode files
 .vscode
-test.json
+
+# Deno files
 deno.lock
+
+# Files and folders used for quick tests while developing
+test.json
+test/*
+
+# Logs
+*.log

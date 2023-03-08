@@ -1,18 +1,26 @@
-import { readLines } from "https://deno.land/std@0.104.0/io/mod.ts"
+import { readLines } from "../deps.ts"
 import { ProcessConfiguration } from "./pup.ts"
-import { logger } from "./logger.ts"
+import { Logger } from "./logger.ts"
+import { Configuration } from "./configuration.ts"
 
 async function pipeToLogger(
-  prefix: string,
+  logger: Logger,
   category: string,
   reader: Deno.Reader,
 ) {
   for await (const line of readLines(reader)) {
-    logger("log", prefix, category, line)
+    if (category === "stderr") {
+      logger.error(category, line)
+    } else {
+      logger.log(category, line)
+    }
   }
 }
 
-async function createSubprocess(processConfig: ProcessConfiguration) {
+async function createSubprocess(globalConfig: Configuration, processConfig: ProcessConfiguration) {
+  const logger = new Logger(globalConfig.logger)
+  logger.setProcess(processConfig)
+
   const cat = Deno.run({
     cmd: processConfig.cmd,
     cwd: processConfig.cwd,
@@ -20,8 +28,8 @@ async function createSubprocess(processConfig: ProcessConfiguration) {
     stderr: "piped",
   })
 
-  pipeToLogger(processConfig.name, "stdout", cat.stdout)
-  pipeToLogger(processConfig.name, "stderr", cat.stderr)
+  pipeToLogger(logger, "stdout", cat.stdout)
+  pipeToLogger(logger, "stderr", cat.stderr)
 
   const status = await cat.status()
 

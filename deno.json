@@ -4,5 +4,8 @@
       "lineWidth": 200,
       "semiColons": false
     }
+  },
+  "tasks": {
+    "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts"
   }
 }
