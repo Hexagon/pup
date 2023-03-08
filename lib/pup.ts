@@ -2,19 +2,23 @@ import { createSubprocess } from "./subprocess.ts"
 import { Cron } from "../deps.ts"
 import { Logger } from "./logger.ts"
 import { Configuration, ProcessConfiguration, validateConfiguration } from "./configuration.ts"
+import * as procStatus from "./status.ts";
 
 class Pup {
 
   private configuration : Configuration
   private logger : Logger
 
-  constructor(unvalidatedConfiguration: Configuration) {
+  constructor(unvalidatedConfiguration: Configuration, configFile?: string) {
 
     // Throw on invalid configuration
     this.configuration = validateConfiguration(unvalidatedConfiguration);
 
     // Initialise core logger
     this.logger = new Logger(this.configuration.logger);
+
+    // Set status file name
+    procStatus.setFileName(configFile ? configFile + ".status" : undefined)
 
     if (this.configuration.processes) for (const process of this.configuration.processes) {
       // Start using cron pattern

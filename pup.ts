@@ -40,6 +40,25 @@ if (!configFile || configFile === null) {
   }
 }
 
+// Print status and exit if status flag were specified
+if (args.status) {
+  try {
+    const result = await Deno.readTextFile(configFile + ".status");
+    const parsed = JSON.parse(result);
+    for(const p of Object.entries(parsed)) {
+      const out = {
+        name: p[0],
+        ...(p[1] as unknown)
+      }
+      console.table(out);
+    }
+    Deno.exit(0);
+  } catch (e) {
+    console.error("Could not read status for config file '"+configFile+"'");
+    Deno.exit(1);
+  }
+}
+
 // Exit if no configuration file were specified
 if (configFile === null) {
   console.error("Could not start, no configuration file found")
@@ -72,7 +91,7 @@ try {
 
 // Try to initialize pup
 try {
-  await new Pup(configuration as Configuration)
+  await new Pup(configuration as Configuration, configFile)
 } catch (e) {
   console.error("Could not start pup, invalid configuration:");
   console.error(e.toString())

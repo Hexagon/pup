@@ -6,8 +6,9 @@ function parseArguments(args: string[]): Args {
       "version": "v",
       "help": "h",
       "config": "c",
+      "status": "s"
     },
-    boolean: ["v", "h"],
+    boolean: ["v", "h", "s"],
     string: ["c"],
     stopEarly: true,
     unknown: (_arg: string, key?: string, value?: unknown) => {
