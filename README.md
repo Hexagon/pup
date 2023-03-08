@@ -22,7 +22,7 @@ The -A flag grants all permissions needed for Pup to work properly. In case of D
 
 Passing `-fr` to the installation command will clear cache and upgrade pup to the latest version. `-A` grants all permission for pup to work properly.
 
-```deno install -frA https://deno.land/x/pup/pup.ts```
+`deno install -frA https://deno.land/x/pup/pup.ts`
 
 ## Usage
 
@@ -34,6 +34,10 @@ If you want to use a different configuration file, you can pass the `--config` f
 
 Once Pup is running, it will read the configuration file and start the processes defined in it. You can also use Pup as a library within a Deno program to manage child processes.
 
+While running, pup will keep track of current state in the file `myconfig.jsonc.status`. If you pass the flag `--status` to pup, it will print a summary on the console.
+
+`pup --status` or `pup --config myconfig.json --status`
+
 ## Configuration
 
 Pup is centered around a single configuration file called `pup.jsonc`. This file defines every aspect of the program, such as the processes to manage, how to start them, and when to restart them.
@@ -42,10 +46,8 @@ Here's an example of a `pup.jsoncc` with all possible options defined:
 
 ```jsonc
 {
-
   // Global logger configuration, this whole clause if optional
   "logger": {
-
     // Decorate console log entries?
     "decorate": true, // default true
 
@@ -75,7 +77,7 @@ Here's an example of a `pup.jsoncc` with all possible options defined:
       "name": "periodic-example-task",
       "cmd": ["deno", "run", "--allow-read", "./examples/basic/task.js"],
       "startPattern": "*/5 * * * * *", // default undefined
-      
+
       // Same options as global logger, except "colors" is not available per process
       "logger": {
         // Do not log this process to console
@@ -87,7 +89,6 @@ Here's an example of a `pup.jsoncc` with all possible options defined:
         "stdout": "periodic-example-task.log",
         "stderr": "periodic-example-task.error.log"
       }
-
     }
   ]
 }

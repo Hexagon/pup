@@ -6,7 +6,7 @@ function parseArguments(args: string[]): Args {
       "version": "v",
       "help": "h",
       "config": "c",
-      "status": "s"
+      "status": "s",
     },
     boolean: ["v", "h", "s"],
     string: ["c"],

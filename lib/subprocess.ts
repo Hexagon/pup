@@ -2,7 +2,7 @@ import { readLines } from "../deps.ts"
 import { ProcessConfiguration } from "./pup.ts"
 import { Logger } from "./logger.ts"
 import { Configuration } from "./configuration.ts"
-import * as procStatus from "./status.ts";
+import * as procStatus from "./status.ts"
 
 async function pipeToLogger(
   taskName: string,
@@ -10,25 +10,26 @@ async function pipeToLogger(
   category: string,
   reader: Deno.Reader,
 ) {
-  let lastStderr, lastStdout;
+  let lastStderr, lastStdout
   // Write to log
   try {
     for await (const line of readLines(reader)) {
       if (category === "stderr") {
-        lastStderr = line;
+        lastStderr = line
         logger.error(category, line)
       } else {
-        lastStdout = line;
+        lastStdout = line
         logger.log(category, line)
       }
     }
-  } catch (_e) { logger.error("core", "Pipe error")}
+  } catch (_e) {
+    logger.error("core", "Pipe error")
+  }
   if (lastStderr) procStatus.updateLastStderr(taskName, lastStderr)
   if (lastStdout) procStatus.updateLastStdout(taskName, lastStdout)
 }
 
 async function createSubprocess(globalConfig: Configuration, processConfig: ProcessConfiguration) {
-
   const logger = new Logger(globalConfig.logger)
   logger.setProcess(processConfig)
 
@@ -39,6 +40,7 @@ async function createSubprocess(globalConfig: Configuration, processConfig: Proc
     stderr: "piped",
   })
 
+  procStatus.resetTask(processConfig.name)
   procStatus.updatePid(processConfig.name, cat.pid)
   procStatus.updateStarted(processConfig.name, new Date())
 

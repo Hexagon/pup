@@ -53,9 +53,9 @@ class Logger {
 
     // Write to global log file(s)
     const decorateGlobalFiles = this.config.decorateFiles ?? (this.config.decorate ?? true)
-    // If stderr is not defined but stdout is, use the stdout file 
-    const stderrFileName = (this.config.stderr ?? this.config.stdout)
-    if (isStdErr && stderrFileName ) {
+    // If stderr is not defined but stdout is, use the stdout file
+    const stderrFileName = this.config.stderr ?? this.config.stdout
+    if (isStdErr && stderrFileName) {
       this.#writeFile(stderrFileName, decorateGlobalFiles ? decoratedLogText : text)
     }
     if (!isStdErr && this.config.stdout) {
@@ -64,8 +64,8 @@ class Logger {
 
     // Write process log file(s)
     const decorateProcessFiles = this.process?.logger?.decorateFiles ?? false
-    // If stderr is not defined but stdout is, use the stdout file 
-    const stderrProcessFileName = (this.process?.logger?.stderr ?? this.process?.logger?.stdout)
+    // If stderr is not defined but stdout is, use the stdout file
+    const stderrProcessFileName = this.process?.logger?.stderr ?? this.process?.logger?.stdout
     if (isStdErr && stderrProcessFileName) {
       this.#writeFile(stderrProcessFileName, decorateProcessFiles ? decoratedLogText : text)
     }
