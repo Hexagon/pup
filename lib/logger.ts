@@ -1,6 +1,5 @@
 function logger(severity: string, initiator: string, category: string, text: string) {
-
-  let color = null;
+  let color = null
 
   if (initiator === "core") color = "gray"
 
@@ -9,11 +8,10 @@ function logger(severity: string, initiator: string, category: string, text: str
   if (severity === "error" || category === "stderr") color = "red"
 
   if (color !== null) {
-    console.log(`%c[${new Date().toLocaleString()}][${initiator}][${category}] ${text}`,`color: ${color}`)
+    console.log(`%c[${new Date().toLocaleString()}][${initiator}][${category}] ${text}`, `color: ${color}`)
   } else {
     console.log(`[${new Date().toLocaleString()}][${initiator}][${category}] ${text}`)
   }
-
 }
 
 export { logger }

@@ -41,7 +41,7 @@ function checkArguments(args: Args): Args | null {
     return null
   } else {
     if (!args._) {
-      console.error("Missing argument");
+      console.error("Missing argument")
     }
 
     return args
