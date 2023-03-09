@@ -3,7 +3,10 @@
 Pup is a command-line tool that simplifies the management of processes. Pup can start, stop, restart, and keep processes alive, as well as schedule processes using a cron pattern. It does also manage
 the logs of each process, gathering them into a single stdout or file, making it easy to monitor and analyze the output of your processes in one place.
 
-Pup is centered around a single configuration file called `pup.jsonc`. This file defines every aspect of the program(s) to run, how to run them, and how logging should be handled.
+In addition to serving as a stand alone process manager, Pup can also function as a [as a library](#library-usage), allowing you to seamlessly manage the internal process ecosystem of your
+application.
+
+Pup revolves around a single configuration file, by default named 'pup.jsonc', which control every aspect of the processes to be executed, their execution methods, and the handling of logging.
 
 > **Note** Please note that Pup is currently in an early stage of development and may contain bugs or unexpected behavior. Use at your own risk.
 
@@ -42,23 +45,22 @@ While running, pup will keep track of current state in the file `myconfig.jsonc.
 
 Pup is centered around a single configuration file called `pup.jsonc`. This file defines every aspect of the program, such as the processes to manage, how to start them, and when to restart them.
 
-Here's an example of a `pup.jsoncc` with all possible options defined:
+Here's an example of a `pup.jsonc` with all possible options defined:
 
 ```jsonc
 {
-  // Global logger configuration, this whole clause if optional
+  // Global logger configuration, all options can be ovverridden per process
   "logger": {
     // Decorate console log entries?
     "decorate": true, // default true
 
+    // Use colors in console?
+    "colors": true, // default true
+
     // Decorate log file entries?
     "decorateFiles": true, // default true
 
-    // Use colors in console?
-    "colors": true, // defailt true
-
     // Write logs to files, if stderr is undefined it will default to the stdout file
-    // Files will be written to the working directory of pup if the path is not absolute
     "stdout": "pup.log", // default undefined
     "stderr": "pup.error.log" // default undefined or stdout, if defined
   },
@@ -78,14 +80,11 @@ Here's an example of a `pup.jsoncc` with all possible options defined:
       "cmd": ["deno", "run", "--allow-read", "./examples/basic/task.js"],
       "startPattern": "*/5 * * * * *", // default undefined
 
-      // Same options as global logger, except "colors" is not available per process
+      // Overrides to global logger
+      // Note: "colors" is not configurable per process
       "logger": {
-        // Do not log this process to console
-        "console": false,
-        // Do not decorate log lines with time, initior etc. Leave as is.
-        "decorateFiles": false, // default true
-        // Write logs to separate files, if stderr were omitted, stderr would be written to the file defined by stdout
-        // Files will be written to the working directory of pup if the path is not absolute
+        "console": true, // defaults to global configuration or true
+        "decorateFiles": true, // defaults to global configuration or false
         "stdout": "periodic-example-task.log",
         "stderr": "periodic-example-task.error.log"
       }
@@ -120,6 +119,53 @@ server.js will start instantly, and will restart automatically 10 seconds after 
 **Output**
 
 ![Pup example logs](/docs/pup-logs.png "Pup example logs")
+
+## Library usage
+
+Import pup from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup).
+
+```ts
+import { GlobalLoggerConfiguration, ProcessConfiguration, Pup } from "https://deno.land/x/pup/pup.ts"
+
+const configuration = {
+  "logger": {
+    /* optional */
+  },
+  "processes": [
+    {/*...*/},
+    {/*...*/},
+  ],
+}
+
+const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
+
+// Go!
+pup.start()
+```
+
+### Custom logger
+
+```ts
+// Create a pup instance
+const pup = new Pup() /*...*/
+
+// Create a custom logger
+const logger = (severity: string, category: string, text: string, _config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => {
+  // Initiator
+  const initiator = process ? process.name : "core"
+
+  // Custom log function
+  console.log(`${initiator}(${severity}:${category}): ${text}`)
+
+  // Block built in logger by returning true
+  return true
+}
+
+// Attach the logger to pup
+pup.logger.attach(logger)
+
+pup.start()
+```
 
 ## Contributions
 

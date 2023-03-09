@@ -1,4 +1,4 @@
-import { Args, parse } from "../deps.ts"
+import { Args, parse } from "../../deps.ts"
 
 function parseArguments(args: string[]): Args {
   return parse(args, {

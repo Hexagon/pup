@@ -1,13 +1,13 @@
-import { application } from "../meta.ts"
-import { Args } from "../deps.ts"
+import { Application } from "../../pup.ts"
+import { Args } from "../../deps.ts"
 
 function printHeader() {
-  console.log(application.name + " " + application.version)
-  console.log(application.repo)
+  console.log(Application.name + " " + Application.version)
+  console.log(Application.repository)
 }
 
 function printUsage() {
-  console.log(`Usage: ${application.name} [OPTIONS...]`)
+  console.log(`Usage: ${Application.name} [OPTIONS...]`)
 }
 
 function printFlags() {

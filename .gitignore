@@ -6,8 +6,10 @@ deno.lock
 
 # Files and folders used for quick tests while developing
 test.json
+test.jsonc
 test/*
 
 # Logs
 *.log
-*.status.json
+*.json.status
+*.jsonc.status

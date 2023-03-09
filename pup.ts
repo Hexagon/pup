@@ -1,125 +1,150 @@
 /**
- * Cli application entrypoint
+ * CLI application entry point of Pup
  *
- * @file pup.ts
+ * - Defines and runs a function `main()`
+ *
+ * - Exports application metadata as `{ Application }`, see bottom of file
+ *
+ * @file      pup.ts
+ * @license   MIT
  */
 
-import { Pup } from "./lib/pup.ts"
+import { Pup } from "./lib/core/pup.ts"
 import { jsonc } from "./deps.ts"
-import { checkArguments } from "./lib/checks.ts"
-import { parseArguments } from "./lib/args.ts"
-import { fileExists, isRunning } from "./lib/utils.ts"
-import { Configuration } from "./lib/configuration.ts"
-import { TaskInfo } from "./lib/status.ts"
+import { checkArguments } from "./lib/cli/checks.ts"
+import { parseArguments } from "./lib/cli/args.ts"
+import { fileExists, isRunning } from "./lib/common/utils.ts"
+import { TaskInfo } from "./lib/core/status.ts"
 
-// Parse arguments, null from parseArguments indicate that the program is already done, happens in case of --help
-let args
-try {
-  args = checkArguments(parseArguments(Deno.args))
-} catch (e) {
-  console.error(e)
-  Deno.exit(1)
+/**
+ * Define the main entry point of the CLI application
+ *
+ * @private
+ * @async
+ */
+async function main() {
+  // Parse and check arguments
+  const args = parseArguments(Deno.args)
+  const checkedArgs = checkArguments(args)
+  if (checkedArgs === null) {
+    Deno.exit(0)
+  }
+
+  // Get configuration file path
+  let configFile = checkedArgs.config
+  if (!configFile) {
+    configFile = await findConfigFile()
+  }
+
+  // Print status if status flag is present
+  if (checkedArgs.status) {
+    await printStatus(configFile)
+    Deno.exit(0)
+  }
+
+  // Exit if no configuration file was found
+  if (!configFile) {
+    console.error("Could not start, no configuration file found")
+    Deno.exit(1)
+  }
+
+  // Exit if specified configuration file is not found
+  if (!await fileExists(configFile)) {
+    console.error("Could not start, specified configuration file not found")
+    Deno.exit(1)
+  }
+
+  // Read and parse configuration
+  let configuration
+  try {
+    const rawConfig = await Deno.readTextFile(configFile)
+    configuration = jsonc.parse(rawConfig)
+  } catch (e) {
+    console.error(`Could not start, error reading or parsing configuration file '${configFile}'`)
+    console.error(e)
+    Deno.exit(1)
+  }
+
+  // Start pup
+  try {
+    const statusFile = `${configFile}.status`
+    const pup = new Pup(configuration, statusFile)
+    await pup.start()
+  } catch (e) {
+    console.error("Could not start pup, invalid configuration:")
+    console.error(e.toString())
+    Deno.exit(1)
+  }
 }
 
-// Quit instantly if --help or --version were present
-if (args === null) Deno.exit(0)
-
-// No configuration
-let configFile: string | null = null
-
-// Configuration from command line argument --config/-c
-if (args?.config) {
-  configFile = args.config
-}
-
-// Try default configuration file pup.json
-if (!configFile || configFile === null) {
+/**
+ * Helper which tries to find the configuration file
+ * if it was not specified in the command line arguments
+ *
+ * @private
+ * @async
+ */
+async function findConfigFile(): Promise<string | null> {
   if (await fileExists("./pup.json")) {
-    configFile = "./pup.json"
+    return "./pup.json"
   } else if (await fileExists("./pup.jsonc")) {
-    configFile = "./pup.jsonc"
+    return "./pup.jsonc"
+  } else {
+    return null
   }
 }
 
-// Print status and exit if status flag were specified
-if (args.status) {
-  // Read status file
-  let result
+/**
+ * Helper which print the status of all running processes,
+ * including this main process
+ *
+ * Triggered by supplying `--status` or `-s` as a command
+ * line argument
+ *
+ * @private
+ * @async
+ */
+async function printStatus(configFile: string) {
+  const statusFile = `${configFile}.status`
+
+  let statusData
   try {
-    result = await Deno.readTextFile(configFile + ".status")
+    statusData = await Deno.readTextFile(statusFile)
   } catch (_e) {
-    console.error("Could not read status for config file '" + configFile + "'")
+    console.error(`Could not read status for config file '${configFile}'`)
     Deno.exit(1)
   }
 
-  // Parse status file
-  let parsed
+  let status
   try {
-    parsed = JSON.parse(result)
+    status = JSON.parse(statusData)
   } catch (_e) {
-    console.error("Could not read status for config file '" + configFile + "'")
+    console.error(`Could not read status for config file '${configFile}'`)
     Deno.exit(1)
   }
 
-  // Write information on main process
-  console.log(`\nMain process \t${parsed.pid} (${isRunning(parsed.pid, Date.parse(parsed.heartbeat), 20000)})`)
+  console.log(`\nMain process \t${status.pid} (${isRunning(status.pid, Date.parse(status.heartbeat), 20000)})`)
 
-  // Write information on subprocesses
-  for (const p of Object.values(parsed.taskRegistry)) {
-    const taskInfo: TaskInfo = p as TaskInfo
-    const processRunning = taskInfo.pid ? isRunning(taskInfo.pid, taskInfo.lastUpdate ? Date.parse(taskInfo.lastUpdate) : 0, 30000) : "Not started"
-
-    console.log(`\n  Task: ${taskInfo.name} (PID: ${taskInfo.pid || ""}, ${processRunning})\n`)
-
-    if (taskInfo.lastUpdate) console.log(`    Last update:\t${taskInfo.lastUpdate}`)
-    if (taskInfo.exitCode) console.log(`    Code:\t\t${taskInfo.exitCode}`)
-    if (taskInfo.signal) console.log(`    Signal:\t\t${taskInfo.signal}`)
-    if (taskInfo.started) console.log(`    Started:\t\t${taskInfo.started.toLocaleString()}`)
-    if (taskInfo.exited) console.log(`    Exited:\t\t${taskInfo.exited.toLocaleString()}`)
-    if (taskInfo.lastStdout) console.log(`    Last stdout:\t${taskInfo.lastStdout}`)
-    if (taskInfo.lastStderr) console.log(`    Last stderr:\t${taskInfo.lastStderr}`)
+  for (const taskInfo of Object.values(status.taskRegistry)) {
+    const currentTask = taskInfo as TaskInfo
+    const processRunning = currentTask.pid ? isRunning(currentTask.pid, currentTask.lastUpdate ? Date.parse(currentTask.lastUpdate) : 0, 30000) : "Not started"
+    console.log(`\n  Task: ${currentTask.name} (PID: ${currentTask.pid || ""}, ${processRunning})\n`)
+    if (currentTask.lastUpdate) console.log(`    Last update:\t${currentTask.lastUpdate}`)
+    if (currentTask.exitCode) console.log(`    Code:\t\t${currentTask.exitCode}`)
+    if (currentTask.signal) console.log(`    Signal:\t\t${currentTask.signal}`)
+    if (currentTask.started) console.log(`    Started:\t\t${currentTask.started.toLocaleString()}`)
+    if (currentTask.exited) console.log(`    Exited:\t\t${currentTask.exited.toLocaleString()}`)
+    if (currentTask.lastStdout) console.log(`    Last stdout:\t${currentTask.lastStdout}`)
+    if (currentTask.lastStderr) console.log(`    Last stderr:\t${currentTask.lastStderr}`)
   }
-
   console.log("\n")
-
-  Deno.exit(0)
 }
 
-// Exit if no configuration file were specified
-if (configFile === null) {
-  console.error("Could not start, no configuration file found")
-  Deno.exit(1)
-}
+main()
 
-// Exit if specified configuration file is not found
-if (!await fileExists(configFile)) {
-  console.error("Could not start, specified configuration file not found")
-  Deno.exit(1)
+const Application = {
+  "name": "pup",
+  "version": "0.0.4",
+  "repository": "https://github.com/Hexagon/pup",
 }
-
-// Try to read configuration
-let rawConfig
-try {
-  rawConfig = await Deno.readTextFile(configFile)
-} catch (e) {
-  console.error("Could not start, error reading configuration file", e)
-  Deno.exit(1)
-}
-
-// Try to parse configuration
-let configuration
-try {
-  configuration = jsonc.parse(rawConfig)
-} catch (e) {
-  console.error("Could not start, error parsing configuration file", e)
-  Deno.exit(1)
-}
-
-// Try to initialize pup
-try {
-  await new Pup(configuration as Configuration, configFile)
-} catch (e) {
-  console.error("Could not start pup, invalid configuration:")
-  console.error(e.toString())
-  Deno.exit(1)
-}
+export { Application }

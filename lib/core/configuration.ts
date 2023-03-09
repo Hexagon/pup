@@ -1,4 +1,4 @@
-import { z } from "../deps.ts"
+import { z } from "../../deps.ts"
 
 interface Configuration {
   logger?: GlobalLoggerConfiguration
@@ -66,14 +66,15 @@ const ConfigurationSchema = z.object({
   ),
 }).strict()
 
-function validateConfiguration(configuration: Configuration) {
-  const validationResult = ConfigurationSchema.safeParse(configuration)
+function validateConfiguration(unsafeConfiguration: unknown): Configuration {
+  const validationResult = ConfigurationSchema.safeParse(unsafeConfiguration)
 
   if (!validationResult.success) {
     throw new Error(validationResult.error.errors[0]?.message)
   }
 
-  return configuration
+  // It is now safe to "cast" to a real configuraton object
+  return unsafeConfiguration as Configuration
 }
 
 export { validateConfiguration }
