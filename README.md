@@ -147,7 +147,7 @@ pup.start()
 
 ```ts
 // Create a pup instance
-const pup = new Pup(/* configuration */) 
+const pup = new Pup() /* configuration */
 
 // Create a custom logger
 const logger = (severity: string, category: string, text: string, _config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => {

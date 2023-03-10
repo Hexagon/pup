@@ -25,6 +25,7 @@ interface ProcessLoggerConfiguration extends _BaseLoggerConfiguration {
 interface ProcessConfiguration {
   name: string
   cmd: string[]
+  env?: Record<string, string>
   cwd?: string
   autostart?: boolean
   startPattern?: string
@@ -49,6 +50,7 @@ const ConfigurationSchema = z.object({
       name: z.string(),
       cmd: z.array(z.string()),
       cwd: z.optional(z.string()),
+      env: z.optional(z.object({})),
       autostart: z.optional(z.boolean()),
       startPattern: z.optional(z.string()),
       restart: z.optional(z.string()),

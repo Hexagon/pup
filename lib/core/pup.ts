@@ -48,18 +48,18 @@ class Pup {
       await (new SubProcess(this, processConfig)).run("Cron trigger")
 
       // And so that we can write next run time after the process finishes
-      this.logger.log("scheduled", `Process scheduled to run at '${cronJob.nextRun()?.toLocaleString()}' using cron pattern '${processConfig.startPattern}'`)
+      this.logger.log("scheduler", `${processConfig.name} is scheduled to run at '${processConfig.startPattern} (${cronJob.nextRun()?.toLocaleString()})'`)
     })
 
     // Initial next run time
-    this.logger.log("scheduled", `Process scheduled to run at '${cronJob.nextRun()?.toLocaleString()}' using cron pattern '${processConfig.startPattern}'`)
+    this.logger.log("scheduler", `${processConfig.name} is scheduled to run at '${processConfig.startPattern} (${cronJob.nextRun()?.toLocaleString()})'`)
   }
 
   private autostartSubprocess = async (processConfig: ProcessConfiguration, restart?: boolean) => {
     await (new SubProcess(this, processConfig)).run(restart ? "Autostart" : "Restart")
     if (processConfig.restart === "always") {
       const delay = processConfig.restartDelayMs || 10000
-      this.logger.log("scheduled", `Process scheduled to restart after ${delay} ms`)
+      this.logger.log("scheduler", `${processConfig.name} is scheduled to restart in ${delay} ms`)
       setTimeout(() => this.autostartSubprocess(processConfig), delay)
     }
   }

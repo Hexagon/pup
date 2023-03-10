@@ -43,6 +43,7 @@ class SubProcess {
     const cat = Deno.run({
       cmd: this.processConfig.cmd,
       cwd: this.processConfig.cwd,
+      env: this.processConfig.env,
       stdout: "piped",
       stderr: "piped",
     })
