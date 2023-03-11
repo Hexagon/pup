@@ -80,13 +80,8 @@ Here's an example of a `pup.jsonc` with all possible options defined:
       "restart": "always", // default undefined, possible values ["always" | "error" | undefined]
       "maxRestarts": 10, // default undefined - restart infinitely'
       "restartDelayMs": 10000 // default 10000
-    },
-    {
-      "name": "periodic-example-task",
-      "cmd": ["deno", "run", "--allow-read", "./examples/basic/task.js"],
-      "cron": "*/5 * * * * *", // default undefined
 
-      // Overrides to global logger
+      // Only needed if you want to overrides the global logger
       // Note: "colors" is not configurable per process
       "logger": {
         "console": true, // defaults to global configuration or true
