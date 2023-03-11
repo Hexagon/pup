@@ -94,10 +94,10 @@ Here's an example of a `pup.jsonc` with all possible options defined:
 }
 ```
 
-In this example, we define a process called `server-task`. We specify the command to start the process using an array of strings. We set it to start immediately, and to restart after 10 seconds after
+In this example, we define a process called `server-task`. We specify the command to start the process using an array of strings. We set it to start immediately with, and to restart after 10 seconds after
 quitting for whatever reason.
 
-We also define a complementary process which is launched every 10 seconds using a cron pattern.
+If you use the line `cron: "<pattern>"` instead of `autostart: true` it would be triggered periodically.
 
 Full example available at [/examples/basic](/examples/basic)
 
