@@ -31,7 +31,7 @@
     {
       "name": "periodic-example-task",
       "cmd": ["deno", "run", "--allow-read", "./task.js"],
-      "startPattern": "*/5 * * * * *", // default undefined
+      "cron": "*/5 * * * * *", // default undefined
 
       // Overrides to global logger
       // Note: "colors" is not configurable per process

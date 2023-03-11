@@ -28,7 +28,8 @@ interface ProcessConfiguration {
   env?: Record<string, string>
   cwd?: string
   autostart?: boolean
-  startPattern?: string
+  cron?: string
+  maxRestarts?: number
   restart?: string
   restartDelayMs?: number
   logger?: ProcessLoggerConfiguration
@@ -52,9 +53,10 @@ const ConfigurationSchema = z.object({
       cwd: z.optional(z.string()),
       env: z.optional(z.object({})),
       autostart: z.optional(z.boolean()),
-      startPattern: z.optional(z.string()),
-      restart: z.optional(z.string()),
+      cron: z.optional(z.string()),
+      restart: z.optional(z.enum(["always","error"])),
       restartDelayMs: z.optional(z.number()),
+      maxRestarts: z.optional(z.number()), 
       logger: z.optional(
         z.object({
           console: z.optional(z.boolean()),

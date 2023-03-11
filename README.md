@@ -71,14 +71,20 @@ Here's an example of a `pup.jsonc` with all possible options defined:
     {
       "name": "kept-alive-server", // Required
       "cmd": ["deno", "run", "--allow-read", "./examples/basic/server.js"], // Required
+      "cwd": "/path/to/workingdir", // default undefined
+      "env": {  // default undefined
+        "TZ": "Europe/Olso"
+      },
       "autostart": true, // default undefined, process will not autostart by default
-      "restart": "always", // default undefined, process will not restart by default
-      "restartDelayMs": 10000 // default 10000
+      // "cron": "*/5 * * * * *", // default undefined
+      "restart": "always", // default undefined, possible values ["always" | "error" | undefined]
+      "maxRestarts": 10, // default undefined - restart infinitely'
+      "restartDelayMs": 10000, // default 10000
     },
     {
       "name": "periodic-example-task",
       "cmd": ["deno", "run", "--allow-read", "./examples/basic/task.js"],
-      "startPattern": "*/5 * * * * *", // default undefined
+      "cron": "*/5 * * * * *", // default undefined
 
       // Overrides to global logger
       // Note: "colors" is not configurable per process

@@ -1,0 +1,12 @@
+{
+    "processes": [
+        {
+            "name": "max-3-times",
+            "cmd": ["deno","run","server.js"],
+            "autostart": true,
+            "restart": "always",
+            "maxRestarts": 3,
+            "restartDelayMs": 1000
+        }
+    ]
+}
