@@ -1,10 +1,10 @@
 {
-    "processes": [
-        {
-            "name": "forever",
-            "cmd": ["deno","run","server.js"],
-            "autostart": true,
-            "restart": "always"
-        }
-    ]
+  "processes": [
+    {
+      "name": "forever",
+      "cmd": ["deno", "run", "server.js"],
+      "autostart": true,
+      "restart": "always"
+    }
+  ]
 }

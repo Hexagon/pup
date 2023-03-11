@@ -1,1 +1,1 @@
-console.log("I will restart 3 times before 'giving up'");
+console.log("I will restart 3 times before 'giving up'")

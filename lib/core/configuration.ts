@@ -54,9 +54,9 @@ const ConfigurationSchema = z.object({
       env: z.optional(z.object({})),
       autostart: z.optional(z.boolean()),
       cron: z.optional(z.string()),
-      restart: z.optional(z.enum(["always","error"])),
+      restart: z.optional(z.enum(["always", "error"])),
       restartDelayMs: z.optional(z.number()),
-      maxRestarts: z.optional(z.number()), 
+      maxRestarts: z.optional(z.number()),
       logger: z.optional(
         z.object({
           console: z.optional(z.boolean()),

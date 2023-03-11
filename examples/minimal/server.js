@@ -1,1 +1,1 @@
-console.log("I will restart forever");
+console.log("I will restart forever")

@@ -36,7 +36,6 @@ class Pup {
   }
 
   private heartbeat = () => {
-
     this.status.updateHeartBeat()
 
     const heartBeatTimer = setTimeout(() => {
@@ -44,7 +43,7 @@ class Pup {
     }, 5000)
 
     // Do not block main process
-    Deno.unrefTimer(heartBeatTimer);
+    Deno.unrefTimer(heartBeatTimer)
   }
 
   private startCronSubprocess = (processConfig: ProcessConfiguration) => {
@@ -61,15 +60,13 @@ class Pup {
   }
 
   private autostartSubprocess = async (processConfig: ProcessConfiguration, restart?: number) => {
-
     // Evaluate restarts
 
     // Run subprocess and await result
     const result = await (new SubProcess(this, processConfig)).run(restart ? "Autostart" : "Restart")
 
     // Check conditions to restart
-    if (processConfig.restart === "always" || (result.code > 0 && processConfig.restart=== "error")) {
-
+    if (processConfig.restart === "always" || (result.code > 0 && processConfig.restart === "error")) {
       const delay = processConfig.restartDelayMs || 10000
       const maxRestarts = processConfig.maxRestarts ?? Infinity
       const currentRestarts = (restart ?? 0) + 1
