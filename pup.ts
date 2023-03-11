@@ -144,7 +144,7 @@ main()
 
 const Application = {
   "name": "pup",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha-3",
   "repository": "https://github.com/Hexagon/pup",
 }
 export { Application }

@@ -69,7 +69,7 @@ Here's an example of a `pup.jsonc` with all possible options defined:
   "processes": [
     // One object per process ...
     {
-      "name": "kept-alive-server", // Required
+      "id": "kept-alive-server", // Required
       "cmd": ["deno", "run", "--allow-read", "./examples/basic/server.js"], // Required
       "cwd": "/path/to/workingdir", // default undefined
       "env": { // default undefined
@@ -153,7 +153,7 @@ const pup = new Pup() /* configuration */
 // Create a custom logger
 const logger = (severity: string, category: string, text: string, _config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => {
   // Initiator
-  const initiator = process ? process.name : "core"
+  const initiator = process ? process.id : "core"
 
   // Custom log function
   console.log(`${initiator}(${severity}:${category}): ${text}`)

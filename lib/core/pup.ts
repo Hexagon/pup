@@ -74,10 +74,10 @@ class Pup {
 
       // Go ahead restarting
       if (currentRestarts <= maxRestarts) {
-        this.logger.log("scheduler", `${processConfig.name} is scheduled to restart in ${delay} ms${restartText}`)
+        this.logger.log("scheduler", `${processConfig.id} is scheduled to restart in ${delay} ms${restartText}`)
         setTimeout(() => this.autostartSubprocess(processConfig, currentRestarts), delay)
       } else {
-        this.logger.log("scheduler", `${processConfig.name} has exceeded the maximum number of restarts (${maxRestarts}) and will exit`)
+        this.logger.log("scheduler", `${processConfig.id} has exceeded the maximum number of restarts (${maxRestarts}) and will exit`)
       }
     }
   }

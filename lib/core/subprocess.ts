@@ -30,32 +30,34 @@ class SubProcess {
     } catch (_e) {
       logger.error("error", "Pipe error")
     }
-    if (lastStderr) status.updateLastStderr(this.processConfig.name, lastStderr)
-    if (lastStdout) status.updateLastStdout(this.processConfig.name, lastStdout)
+    if (lastStderr) status.updateLastStderr(this.processConfig.id, lastStderr)
+    if (lastStdout) status.updateLastStdout(this.processConfig.id, lastStdout)
   }
 
   async run(reason: string) {
     const status = this.pup.status
     const logger = this.pup.logger
 
-    logger.log("starting", `Process starting, reason: ${reason}`, this.processConfig)
+    // Extend enviroment config with PUP_PROCESS_NAME
+    const env = this.processConfig.env ? structuredClone(this.processConfig.env) : {};
+    env.PUP_PROCESS_ID = this.processConfig.id
 
+    // Start the process
+    logger.log("starting", `Process starting, reason: ${reason}`, this.processConfig)
     const cat = Deno.run({
       cmd: this.processConfig.cmd,
       cwd: this.processConfig.cwd,
-      env: this.processConfig.env,
+      env,
       stdout: "piped",
       stderr: "piped",
     })
 
-    status.resetTask(this.processConfig.name)
-    status.updatePid(this.processConfig.name, cat.pid)
-    status.updateStarted(this.processConfig.name, new Date())
+    status.resetTask(this.processConfig.id)
+    status.updatePid(this.processConfig.id, cat.pid)
+    status.updateStarted(this.processConfig.id, new Date())
 
-    await Promise.all([
-      this.pipeToLogger("stdout", cat.stdout),
-      this.pipeToLogger("stderr", cat.stderr),
-    ])
+    this.pipeToLogger("stdout", cat.stdout);
+    this.pipeToLogger("stderr", cat.stderr);
 
     const result = await cat.status()
 
@@ -65,12 +67,13 @@ class SubProcess {
       logger.log("finished", `Process finished with code ${result.code}`, this.processConfig)
     }
 
+    // Important! Close streams
     cat.stderr.close()
     cat.stdout.close()
 
-    status.updateExitCode(this.processConfig.name, result.code)
-    status.updateSignal(this.processConfig.name, result.signal)
-    status.updateExited(this.processConfig.name, new Date())
+    status.updateExitCode(this.processConfig.id, result.code)
+    status.updateSignal(this.processConfig.id, result.signal)
+    status.updateExited(this.processConfig.id, new Date())
 
     return result
   }

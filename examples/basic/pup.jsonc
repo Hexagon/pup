@@ -19,7 +19,7 @@
   "processes": [
     // One object per process ...
     {
-      "name": "kept-alive-server", // Required
+      "id": "kept-alive-server", // Required
       "cmd": ["deno", "run", "--allow-read", "--allow-env", "./server.js"], // Required
       "env": { // Default undefined
         "TZ": "Europe/Berlin"
@@ -29,7 +29,7 @@
       "restartDelayMs": 10000 // default 10000
     },
     {
-      "name": "periodic-example-task",
+      "id": "periodic-example-task",
       "cmd": ["deno", "run", "--allow-read", "./task.js"],
       "cron": "*/5 * * * * *", // default undefined
 
