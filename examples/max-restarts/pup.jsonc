@@ -6,7 +6,7 @@
       "autostart": true,
       "restart": "always",
       "maxRestarts": 3,
-      "restartDelayMs": 1000
+      "restartDelayMs": 3000
     }
   ]
 }

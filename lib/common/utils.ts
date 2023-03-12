@@ -15,14 +15,14 @@ async function fileExists(filePath: string) {
   }
 }
 
-function isRunning(pid: number, heartbeat: number, thresholdMs: number): string {
+function isRunning(pid: number, heartbeat: Date, thresholdMs: number): string {
   try {
     Deno.kill(pid, "SIGURG")
     return "Running"
   } catch (e) {
     if (e.name === "TypeError" || e.name === "PermissionDenied") {
       if (heartbeat) {
-        return (new Date().getTime() - heartbeat) < thresholdMs ? "Running" : "Unknown"
+        return (new Date().getTime() - heartbeat.getTime()) < thresholdMs ? "Running" : "Unknown"
       } else {
         return "Not running"
       }

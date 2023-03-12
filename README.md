@@ -76,11 +76,11 @@ Here's an example of a `pup.jsonc` with all possible options defined:
         "TZ": "Europe/Olso"
       },
       "autostart": true, // default undefined, process will not autostart by default
+      "overrun": false, // allow overrun, default false
       // "cron": "*/5 * * * * *", // default undefined
       "restart": "always", // default undefined, possible values ["always" | "error" | undefined]
       "maxRestarts": 10, // default undefined - restart infinitely'
-      "restartDelayMs": 10000 // default 10000
-
+      "restartDelayMs": 10000, // default 10000
       // Only needed if you want to overrides the global logger
       // Note: "colors" is not configurable per process
       "logger": {
@@ -94,8 +94,8 @@ Here's an example of a `pup.jsonc` with all possible options defined:
 }
 ```
 
-In this example, we define a process called `server-task`. We specify the command to start the process using an array of strings. We set it to start immediately with, and to restart after 10 seconds after
-quitting for whatever reason.
+In this example, we define a process called `server-task`. We specify the command to start the process using an array of strings. We set it to start immediately with, and to restart after 10 seconds
+after quitting for whatever reason.
 
 If you use the line `cron: "<pattern>"` instead of `autostart: true` it would be triggered periodically.
 

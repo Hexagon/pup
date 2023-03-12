@@ -1,0 +1,209 @@
+import { Pup } from "./pup.ts"
+import { Cron } from "../../deps.ts"
+import { Runner } from "./runner.ts"
+import { ProcessConfiguration } from "./configuration.ts"
+
+enum ProcessStatus {
+  CREATED = 0,
+  STARTING = 100,
+  RUNNING = 200,
+  STOPPING = 250,
+  FINISHED = 300,
+  ERRORED = 400,
+  EXHAUSTED = 450,
+  BLOCKED = 500,
+}
+
+interface ProcessInformation {
+  id: string
+  status: ProcessStatus
+  code?: number
+  signal?: number
+  pid?: number
+  started?: Date
+  exited?: Date
+  blocked?: boolean
+  restarts?: number
+  updated: Date
+}
+
+interface ProcessInformationParsed {
+  id: string
+  status: ProcessStatus
+  code?: number
+  signal?: number
+  pid?: number
+  started?: string
+  exited?: string
+  blocked?: boolean
+  restarts?: number
+  updated: string
+}
+
+class Process {
+  private readonly config: ProcessConfiguration
+  private readonly pup: Pup
+
+  // Subprocess runner
+  private runner?: Runner
+
+  // Allow manual block
+  private blocked = false
+
+  // Status
+  private status: ProcessStatus = ProcessStatus.CREATED
+  private pid?: number
+  private code?: number
+  private signal?: number
+  private started?: Date
+  private exited?: Date
+  private restarts = 0
+  private updated: Date = new Date()
+
+  constructor(pup: Pup, config: ProcessConfiguration) {
+    this.config = config
+    this.pup = pup
+  }
+
+  private setStatus(s: ProcessStatus) {
+    this.status = s
+    this.updated = new Date()
+  }
+
+  public getStatus(): ProcessInformation {
+    return {
+      id: this.config.id,
+      status: this.status,
+      pid: this.pid,
+      code: this.code,
+      signal: this.signal,
+      started: this.started,
+      exited: this.exited,
+      blocked: this.blocked,
+      restarts: this.restarts,
+      updated: this.updated,
+    }
+  }
+
+  public getConfig() {
+    return this.config
+  }
+
+  public init = () => {
+    // Start using cron pattern
+    if (this.config.cron) this.setupCron()
+  }
+
+  public start = async (reason?: string, restart?: boolean) => {
+    const logger = this.pup.logger
+
+    // Do not start if blocked
+    if (this.blocked) {
+      logger.log("blocked", `Process blocked, refusing to start`, this.config)
+      return
+    }
+
+    // Do not start if running and overrun isn't enabled
+    if (this.status === ProcessStatus.RUNNING && !this.config.overrun) {
+      logger.log("blocked", `Process still running, refusing to start`, this.config)
+      return
+    }
+
+    // Do not restart if maximum number of restarts are exhausted
+    if (this.restarts >= (this.config.maxRestarts ?? Infinity)) {
+      logger.log("exhausted", `Maximum number of starts exhausted, refusing to start`, this.config)
+      this.setStatus(ProcessStatus.EXHAUSTED)
+      return
+    }
+
+    logger.log("starting", `Process starting, reason: ${reason}`, this.config)
+
+    // Update status
+    this.setStatus(ProcessStatus.STARTING)
+    this.pid = undefined
+    this.code = undefined
+    this.signal = undefined
+    this.exited = undefined
+    this.started = undefined
+
+    // Start process (await for it to exit)
+    this.runner = new Runner(this.pup, this.config)
+
+    // Update restart counter, this is reset on successful exit, or manual .stop()
+    if (restart) {
+      this.restarts = this.restarts + 1
+    }
+
+    // Try to start
+    try {
+      const result = await this.runner.run((pid: number) => {
+        // Process started
+        this.setStatus(ProcessStatus.RUNNING)
+        this.pid = pid
+        this.started = new Date()
+      })
+
+      this.code = result.code
+      this.signal = result.signal
+
+      // Exited - Update status
+      if (result.code === 0) {
+        // Reset restarts on successful exit
+        this.setStatus(ProcessStatus.FINISHED)
+        logger.log("finished", `Process finished with code ${result.code}`, this.config)
+      } else {
+        this.setStatus(ProcessStatus.ERRORED)
+        logger.log("errored", `Process exited with code ${result.code}`, this.config)
+      }
+    } catch (e) {
+      this.code = undefined
+      this.signal = undefined
+      this.setStatus(ProcessStatus.ERRORED)
+      logger.log("errored", `Process could not start, error: ${e}`, this.config)
+    }
+
+    this.exited = new Date()
+    this.pid = undefined
+    this.runner = undefined
+  }
+
+  public stop = (reason: string): boolean => {
+    if (this.runner) {
+      try {
+        this.pup.logger.log("starting", `Killing process, reason: ${reason}`, this.config)
+        this.runner?.kill("SIGINT")
+        this.restarts = 0
+        return true
+      } catch (_e) {
+        return false
+      }
+    }
+    return false
+  }
+
+  public block = () => {
+    this.blocked = true
+  }
+
+  public unblock = () => {
+    this.blocked = false
+  }
+
+  private setupCron = () => {
+    try {
+      // ToDo: Take care of env TZ?
+      const cronJob = new Cron(this.config.cron as string, () => {
+        this.start("Cron pattern")
+        this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
+      })
+
+      // Initial next run time
+      this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
+    } catch (e) {
+      this.pup.logger.error("scheduled", `Fatal error setup up the cron job for '${this.config.id}', process will not autostart. Error: ${e}`)
+    }
+  }
+}
+
+export { Process, ProcessStatus }
+export type { ProcessInformation, ProcessInformationParsed }

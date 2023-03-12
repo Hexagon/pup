@@ -30,7 +30,7 @@ class Logger {
     if (blockedByAttachedLogger) return
 
     // Default initiator to
-    const initiator = process?.name || "core"
+    const initiator = process?.id || "core"
 
     // Log to console
     const logToConsoleProcess = (process?.logger?.console ?? true) === false

@@ -3,7 +3,13 @@ import { z } from "../../deps.ts"
 interface Configuration {
   logger?: GlobalLoggerConfiguration
   processes: ProcessConfiguration[]
+  /* plugins?: PluginEntry[] */
 }
+
+/*interface PluginEntry {
+  url: string
+  options?: unknown
+}*/
 
 interface _BaseLoggerConfiguration {
   console?: boolean
@@ -28,11 +34,13 @@ interface ProcessConfiguration {
   env?: Record<string, string>
   cwd?: string
   autostart?: boolean
+  overrun?: boolean
   cron?: string
   maxRestarts?: number
   restart?: string
   restartDelayMs?: number
   logger?: ProcessLoggerConfiguration
+  timeout?: number
 }
 
 const ConfigurationSchema = z.object({
@@ -46,6 +54,12 @@ const ConfigurationSchema = z.object({
       decorate: z.optional(z.boolean()),
     }).strict(),
   ),
+  /*plugins: z.optional(
+    z.object({
+      url: z.string(),
+      options: z.optional(z.object({}))
+    }).strict()
+  ),*/
   processes: z.array(
     z.object({
       id: z.string().min(1).max(64).regex(/^[a-z0-9@._\-]+$/i, "Process ID can only contain characters a-Z 0-9 . _ - or @"),
@@ -55,8 +69,10 @@ const ConfigurationSchema = z.object({
       autostart: z.optional(z.boolean()),
       cron: z.optional(z.string().min(9).max(256)),
       restart: z.optional(z.enum(["always", "error"])),
-      restartDelayMs: z.optional(z.number().min(0).max(24*60*60*1000*1)), // Max one day
+      restartDelayMs: z.optional(z.number().min(0).max(24 * 60 * 60 * 1000 * 1)), // Max one day
+      overrun: z.optional(z.boolean()),
       maxRestarts: z.optional(z.number().min(0)),
+      timeout: z.optional(z.number().min(1)),
       logger: z.optional(
         z.object({
           console: z.optional(z.boolean()),
