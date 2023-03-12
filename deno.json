@@ -6,6 +6,7 @@
     }
   },
   "tasks": {
-    "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts"
+    "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts",
+    "build-schema": "deno run tools/build-schema.ts > docs/configuraton.schema.json"
   }
 }
