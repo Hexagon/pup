@@ -67,6 +67,15 @@ Here's an example of a `pup.jsonc` with all possible options defined:
     "stderr": "pup.error.log" // default undefined or stdout, if defined
   },
 
+  // Configure file watcher, enabled by adding `watch: true` to the process config
+  // This whole clause is optional and will default to the values listed
+  "watcher": {
+    "interval": 350, // default 350
+    "exts": ["ts", "tsx", "js", "jsx", "json"], // defaults to ["ts", "tsx", "js", "jsx", "json"]
+    "match": ["**/*.*"], // defaults to ["**/*.*"]
+    "skip": ["**/.git/**"] // defaults to "**/.git/**"
+  },
+
   // Process configuration - Required to be an array, and at least one process definition is required
   "processes": [
     // One object per process ...
