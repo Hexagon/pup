@@ -5,7 +5,7 @@
       "cmd": ["deno", "run", "server.js"],
       "autostart": true,
       "restart": "always",
-      "maxRestarts": 3,
+      "restartLimit": 3,
       "restartDelayMs": 3000
     }
   ]

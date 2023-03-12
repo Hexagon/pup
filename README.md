@@ -3,6 +3,8 @@
 Pup is a command-line tool that simplifies the management of processes. Pup can start, stop, restart, and keep processes alive, as well as schedule processes using a cron pattern. It does also manage
 the logs of each process, gathering them into a single stdout or file, making it easy to monitor and analyze the output of your processes in one place.
 
+Pup can also watch the filesystem, and restart processes when files change, similar to Nodemon and Denon.
+
 In addition to serving as a stand alone process manager, Pup can also function as a [as a library](#library-usage), allowing you to seamlessly manage the internal process ecosystem of your
 application.
 
@@ -79,7 +81,7 @@ Here's an example of a `pup.jsonc` with all possible options defined:
       "overrun": false, // allow overrun, default false
       // "cron": "*/5 * * * * *", // default undefined
       "restart": "always", // default undefined, possible values ["always" | "error" | undefined]
-      "maxRestarts": 10, // default undefined - restart infinitely'
+      "restartLimit": 10, // default undefined - restart infinitely'
       "restartDelayMs": 10000, // default 10000
       // Only needed if you want to overrides the global logger
       // Note: "colors" is not configurable per process
@@ -99,21 +101,31 @@ after quitting for whatever reason.
 
 If you use the line `cron: "<pattern>"` instead of `autostart: true` it would be triggered periodically.
 
-Full example available at [/examples/basic](/examples/basic)
+## Examples 
 
-**Running the example**
+Full examples available at [/examples](/examples)
 
-Change working dir to the example directory containg a couple of scripts and `pup.jsonc`
+**Running the examples**
+
+Change working dir to the example directory you want to run, the directory contains a couple of scripts and `pup.jsonc`
 
 ```
 cd /examples/basic
 ```
 
-Start pup by running the command `pup`. If you have not yet installed pup, you can run it from this repository like this.
+**If you have installed pup**
+
+Start pup by running the command `pup`.
+
+**If you have not yet installed pup**
+
+You can run it from the `examples/*` directory like this.
 
 ```
 deno run -A ../../pup.ts
 ```
+
+Taking `examples/basic` as an example:
 
 server.js will start instantly, and will restart automatically 10 seconds after exiting. task.js will start every tenth second according to cron pattern `*/10 * * * * *`
 

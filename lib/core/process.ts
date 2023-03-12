@@ -2,6 +2,7 @@ import { Pup } from "./pup.ts"
 import { Cron } from "../../deps.ts"
 import { Runner } from "./runner.ts"
 import { ProcessConfiguration } from "./configuration.ts"
+import { Watcher } from "./watcher.ts"
 
 enum ProcessStatus {
   CREATED = 0,
@@ -92,6 +93,8 @@ class Process {
   public init = () => {
     // Start using cron pattern
     if (this.config.cron) this.setupCron()
+    // Restart on file/directory watcher
+    if (this.config.watch) this.setupWatch(this.config.watch)
   }
 
   public start = async (reason?: string, restart?: boolean) => {
@@ -110,7 +113,7 @@ class Process {
     }
 
     // Do not restart if maximum number of restarts are exhausted
-    if (this.restarts >= (this.config.maxRestarts ?? Infinity)) {
+    if (this.restarts >= (this.config.restartLimit ?? Infinity)) {
       logger.log("exhausted", `Maximum number of starts exhausted, refusing to start`, this.config)
       this.setStatus(ProcessStatus.EXHAUSTED)
       return
@@ -170,8 +173,9 @@ class Process {
   public stop = (reason: string): boolean => {
     if (this.runner) {
       try {
-        this.pup.logger.log("starting", `Killing process, reason: ${reason}`, this.config)
-        this.runner?.kill("SIGINT")
+        this.status = ProcessStatus.STOPPING
+        this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
+        this.runner?.kill("SIGTERM")
         this.restarts = 0
         return true
       } catch (_e) {
@@ -201,6 +205,18 @@ class Process {
       this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
     } catch (e) {
       this.pup.logger.error("scheduled", `Fatal error setup up the cron job for '${this.config.id}', process will not autostart. Error: ${e}`)
+    }
+  }
+
+  private setupWatch = async (paths: string[]) => {
+    const config = this.pup.configuration.watcher
+    const watcher = new Watcher({ ...config, paths })
+    for await (const watchEvent of watcher) {
+      if (watchEvent.some((_) => _.type.includes("modify"))) {
+        this.pup.logger.log("watcher", "File change detected", this.config)
+        this.stop("restart")
+        // Restart will be handled by watchdog
+      }
     }
   }
 }

@@ -2,6 +2,7 @@ import { z } from "../../deps.ts"
 
 interface Configuration {
   logger?: GlobalLoggerConfiguration
+  watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
   /* plugins?: PluginEntry[] */
 }
@@ -28,19 +29,27 @@ interface ProcessLoggerConfiguration extends _BaseLoggerConfiguration {
   decorateFiles?: boolean
 }
 
+interface GlobalWatcherConfiguration {
+  interval?: number
+  exts?: string[]
+  match?: string[]
+  skip?: string[]
+}
+
 interface ProcessConfiguration {
   id: string
   cmd: string[]
   env?: Record<string, string>
   cwd?: string
+  watch?: string[]
   autostart?: boolean
-  overrun?: boolean
   cron?: string
-  maxRestarts?: number
+  timeout?: number
+  overrun?: boolean
+  logger?: ProcessLoggerConfiguration
   restart?: string
   restartDelayMs?: number
-  logger?: ProcessLoggerConfiguration
-  timeout?: number
+  restartLimit?: number
 }
 
 const ConfigurationSchema = z.object({
@@ -52,6 +61,14 @@ const ConfigurationSchema = z.object({
       colors: z.optional(z.boolean()),
       decorateFiles: z.optional(z.boolean()),
       decorate: z.optional(z.boolean()),
+    }).strict(),
+  ),
+  watcher: z.optional(
+    z.object({
+      interval: z.optional(z.boolean()),
+      exts: z.optional(z.array(z.string())),
+      match: z.optional(z.array(z.string())),
+      skip: z.optional(z.array(z.string())),
     }).strict(),
   ),
   /*plugins: z.optional(
@@ -67,11 +84,12 @@ const ConfigurationSchema = z.object({
       cwd: z.optional(z.string()),
       env: z.optional(z.object({})),
       autostart: z.optional(z.boolean()),
+      watch: z.optional(z.array(z.string())),
       cron: z.optional(z.string().min(9).max(256)),
       restart: z.optional(z.enum(["always", "error"])),
       restartDelayMs: z.optional(z.number().min(0).max(24 * 60 * 60 * 1000 * 1)), // Max one day
       overrun: z.optional(z.boolean()),
-      maxRestarts: z.optional(z.number().min(0)),
+      restartLimit: z.optional(z.number().min(0)),
       timeout: z.optional(z.number().min(1)),
       logger: z.optional(
         z.object({
@@ -94,9 +112,18 @@ function validateConfiguration(unsafeConfiguration: unknown): Configuration {
   }
 
   // It is now safe to "cast" to a real configuraton object
+  const safeConfiguration: Configuration = unsafeConfiguration as Configuration
+
+  // Check for unwanted configuration
+  for (const process of safeConfiguration.processes) {
+    if (process.watch && !process.restart) {
+      throw new Error(`Configuration: Process '${process.id}' configured to restart on watch, but do not have a restart policy.`)
+    }
+  }
+
   return unsafeConfiguration as Configuration
 }
 
-export { validateConfiguration }
+export { ConfigurationSchema, validateConfiguration }
 
 export type { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, ProcessLoggerConfiguration }
