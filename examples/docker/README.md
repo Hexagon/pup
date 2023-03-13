@@ -24,6 +24,20 @@ Run `docker run -d --name="pup-demo" pup-docker-demo`
 
 Run `docker logs pup-demo`
 
+```
+[3/13/2023, 10:41:33 PM][core][scheduler] periodic-task-demo is scheduled to run at '0/5 * * * * * (3/13/2023, 10:41:35 PM)'
+[3/13/2023, 10:41:35 PM][periodic-task-demo][starting] Process starting, reason: Cron pattern
+[3/13/2023, 10:41:35 PM][core][scheduler] periodic-task-demo is scheduled to run at '0/5 * * * * * (3/13/2023, 10:41:40 PM)'
+[3/13/2023, 10:41:35 PM][periodic-task-demo][stdout] Periodic task running
+[3/13/2023, 10:41:35 PM][periodic-task-demo][finished] Process finished with code 0
+[3/13/2023, 10:41:40 PM][periodic-task-demo][starting] Process starting, reason: Cron pattern
+[3/13/2023, 10:41:40 PM][core][scheduler] periodic-task-demo is scheduled to run at '0/5 * * * * * (3/13/2023, 10:41:45 PM)'
+[3/13/2023, 10:41:40 PM][periodic-task-demo][stdout] Periodic task running
+[3/13/2023, 10:41:40 PM][periodic-task-demo][finished] Process finished with code 0
+```
+
+Success!
+
 **Remove the demo container**
 
 Run `docker stop pup-demo` and `docker rm pup-demo`
