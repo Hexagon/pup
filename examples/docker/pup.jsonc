@@ -3,7 +3,7 @@
     {
       "id": "periodic-task-demo",
       "cmd": ["deno", "run", "task.ts"],
-      "cron": "0/5 * * * *",
+      "cron": "0/5 * * * * *",
       "restartLimit": 1
     }
   ]
