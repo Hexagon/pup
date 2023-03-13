@@ -11,7 +11,7 @@
 
 const Application = {
   name: "pup",
-  version: "1.0.0-alpha-6",
+  version: "1.0.0-alpha-7",
   repository: "https://github.com/Hexagon/pup",
 }
 
@@ -119,7 +119,7 @@ async function main() {
   try {
     const resolvedPath = path.parse(path.resolve(configFile))
     Deno.chdir(resolvedPath.dir)
-    configFile = resolvedPath.name
+    configFile = `${resolvedPath.name}${resolvedPath.ext}`
   } catch (e) {
     console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
     Deno.exit(1)
