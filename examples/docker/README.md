@@ -4,11 +4,11 @@ This demo runs a Deno script in the official Deno docker image periodically usin
 
 ## Files
 
-*  **Dockerfile** - Sets up a container based on `denoland/deno:debian-1.31.1`, installs Pup, and copies this directory content to `/app/`
-*  **pup.jsonc** - Pup configuration, setting up `task.ts` to run at schedule `0/5 * * * * *` (every fifth second).
-*  **task.ts** - The actual script to run. Prints "Task running" to console and exits.
+*  [Dockerfile](./Dockerfile) - Sets up a container based on `denoland/deno:debian-1.31.1`, installs Pup, and copies this directory content to `/app/`
+*  [pup.jsonc](./pup.jsonc) - Pup configuration, sets up `task.ts` to run at cron schedule `0/5 * * * * *` (every fifth second).
+*  [task.ts](./task.ts) - The actual script to run. Prints "Task running" to console and exits.
 
-## Building
+## Building and running
 
 `cd` to this directory.
 
@@ -38,6 +38,6 @@ Run `docker logs pup-demo`
 
 Success!
 
-**Remove the demo container**
+**Remove the demo from docker**
 
-Run `docker stop pup-demo` and `docker rm pup-demo`
+Run `docker stop pup-demo`, `docker rm pup-demo` `docker rmi pup-docker-demo`
