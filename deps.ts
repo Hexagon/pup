@@ -15,6 +15,7 @@
 // cli
 export { readLines } from "https://deno.land/std@0.178.0/io/mod.ts"
 export { parse } from "https://deno.land/std@0.178.0/flags/mod.ts"
+export * as path from "https://deno.land/std@0.178.0/path/mod.ts"
 export type { Args } from "https://deno.land/std@0.178.0/flags/mod.ts"
 // config
 export * as jsonc from "https://deno.land/std@0.178.0/encoding/jsonc.ts"

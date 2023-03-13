@@ -13,3 +13,7 @@ test/*
 *.log
 *.json.status
 *.jsonc.status
+
+# Pid files
+*.pid
+*.status

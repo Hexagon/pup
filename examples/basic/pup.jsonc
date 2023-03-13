@@ -24,6 +24,7 @@
       "env": { // Default undefined
         "TZ": "Europe/Berlin"
       },
+      "pidFile": "kept-alive-server.pid", // Write pid to file, default undefined
       "autostart": true, // default undefined, process will not autostart by default
       "restart": "always", // default undefined, process will not restart by default
       "restartDelayMs": 10000 // default 10000

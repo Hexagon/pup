@@ -41,6 +41,7 @@ interface ProcessConfiguration {
   cmd: string[]
   env?: Record<string, string>
   cwd?: string
+  pidFile?: string
   watch?: string[]
   autostart?: boolean
   cron?: string
@@ -83,6 +84,7 @@ const ConfigurationSchema = z.object({
       cmd: z.array(z.string()),
       cwd: z.optional(z.string()),
       env: z.optional(z.object({})),
+      pidFile: z.optional(z.string()),
       autostart: z.optional(z.boolean()),
       watch: z.optional(z.array(z.string())),
       cron: z.optional(z.string().min(9).max(256)),
@@ -124,6 +126,36 @@ function validateConfiguration(unsafeConfiguration: unknown): Configuration {
   return unsafeConfiguration as Configuration
 }
 
-export { ConfigurationSchema, validateConfiguration }
+/**
+ * Configuration file generator
+ */
+
+function generateConfiguration(id: string, cmd: string, cwd?: string, cron?: string, autostart?: boolean, watch?: string) {
+  const configuration: Configuration = {
+    processes: [],
+  }
+
+  // Split command to array
+  const commandArray = cmd.split(" ")
+
+  const processConfiguration: ProcessConfiguration = {
+    id,
+    cmd: commandArray,
+  }
+
+  if (cwd) processConfiguration.cwd = cwd
+  if (cron) processConfiguration.cron = cron
+  if (autostart) processConfiguration.autostart = autostart
+  if (watch) processConfiguration.watch = [watch]
+
+  configuration.processes.push(processConfiguration)
+
+  // Validate configuration before returning
+  validateConfiguration(configuration)
+
+  return configuration
+}
+
+export { ConfigurationSchema, generateConfiguration, validateConfiguration }
 
 export type { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, ProcessLoggerConfiguration }

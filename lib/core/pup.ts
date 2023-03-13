@@ -76,7 +76,6 @@ class Pup {
 
     // Update process status
     try {
-      this.status.updateHeartBeat()
       this.status.writeToDisk(this.processes)
     } catch (e) {
       this.logger.error("watchdog", `Heartbeat update failed: ${e}`)
@@ -86,7 +85,7 @@ class Pup {
     // ToDo: Exit if all processes are exhausted?
     setTimeout(() => {
       this.watchdog()
-    }, 1000)
+    }, 2000)
   }
 }
 

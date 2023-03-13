@@ -1,7 +1,7 @@
 /**
  * Very inspired by watcher.ts from https://github.com/denosaurs/denon - MIT License
  * Original header: "// Copyright 2020-2021 the denosaurs team. All rights reserved. MIT license."
- * 
+ *
  * @file watcher.ts
  * @license MIT
  */

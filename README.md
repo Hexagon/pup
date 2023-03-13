@@ -37,7 +37,7 @@ If you want to use a different configuration file, you can pass the `--config` f
 
 `pup --config myconfig.json`
 
-Once Pup is running, it will read the configuration file and start the processes defined in it. You can also use Pup as a library within a Deno program to manage child processes.
+Once Pup is running, it will read the configuration file and start the processes defined in it. You can also use Pup as [a library](#library-usage) within a Deno program to manage child processes.
 
 While running, pup will keep track of current state in the file `myconfig.jsonc.status`. If you pass the flag `--status` to pup, it will print a summary on the console.
 
@@ -46,6 +46,35 @@ While running, pup will keep track of current state in the file `myconfig.jsonc.
 ## Configuration
 
 Pup is centered around a single configuration file called `pup.jsonc`. This file defines every aspect of the program, such as the processes to manage, how to start them, and when to restart them.
+
+You can either create the file manually, with help from the full configuration example below, or use the command line to initialize and modify your configuration.
+
+> **Note**
+> Using the cli to modify your configuration **will** remove any jsonc comments
+
+**To create a new pup.jsonc**
+
+With a forever running task
+
+`pup --init --id my-server --cmd "deno run server.js" --autostart`
+
+... or a periodic task running 12 o'clock every day
+
+`pup --init --id my-periodic-task --cmd "deno run task.js" --cron "0 0 12 * * *"`
+
+**Add a task to an existing configuration**
+
+`pup --append --id my-new-task --cmd "deno run additional.js" --autostart`
+
+**To remove a task**
+
+`pup --remove --id my-new-task`
+
+**The working directory**
+
+The working directory of pup will always be the location of `pup.jsonc`, and relative paths in configuration will stem from there. You can override this per-process by supplying `--cwd` to the cli, or using the option `cwd: ` in the configuration.
+
+### Full configuration example
 
 Here's an example of a `pup.jsonc` with all possible options defined:
 
@@ -83,6 +112,7 @@ Here's an example of a `pup.jsonc` with all possible options defined:
       "id": "kept-alive-server", // Required
       "cmd": ["deno", "run", "--allow-read", "./examples/basic/server.js"], // Required
       "cwd": "/path/to/workingdir", // default undefined
+      "pidFile": "/path/to/pidfile", // default undefined
       "env": { // default undefined
         "TZ": "Europe/Olso"
       },
@@ -110,33 +140,23 @@ after quitting for whatever reason.
 
 If you use the line `cron: "<pattern>"` instead of `autostart: true` it would be triggered periodically.
 
-## Examples 
+## Examples
 
 Full examples available at [/examples](/examples)
 
 **Running the examples**
 
-Change working dir to the example directory you want to run, the directory contains a couple of scripts and `pup.jsonc`
-
-```
-cd /examples/basic
-```
+Taking `examples/basic` as an example:
 
 **If you have installed pup**
 
-Start pup by running the command `pup`.
+Start pup by running the command `pup --config examples/basic/pup.jsonc`.
 
 **If you have not yet installed pup**
 
-You can run it from the `examples/*` directory like this.
+Start pup by running the command `deno run -A pup.ts --config examples/basic/pup.jsonc`.
 
-```
-deno run -A ../../pup.ts
-```
-
-Taking `examples/basic` as an example:
-
-server.js will start instantly, and will restart automatically 10 seconds after exiting. task.js will start every tenth second according to cron pattern `*/10 * * * * *`
+Now `server.js` will start instantly, and will restart automatically 10 seconds after exiting. `task.js` will start every tenth second according to cron pattern `*/10 * * * * *`
 
 **Output**
 
@@ -144,7 +164,7 @@ server.js will start instantly, and will restart automatically 10 seconds after 
 
 ## Library usage
 
-Import pup from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup).
+Pup can also be build in in your application. Just import pup from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
 
 ```ts
 import { GlobalLoggerConfiguration, ProcessConfiguration, Pup } from "https://deno.land/x/pup/pup.ts"

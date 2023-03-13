@@ -14,6 +14,32 @@ class Runner {
     this.pup = pup
   }
 
+  private async writePidFile() {
+    if (this.processConfig.pidFile && this.process?.pid) {
+      try {
+        await Deno.writeTextFile(this.processConfig.pidFile, this.process?.pid.toString())
+      } catch (_e) {
+        this.pup.logger.error("error", `Failed to write pid file '${this.processConfig.pidFile}'`, this.processConfig)
+      }
+    }
+  }
+
+  private async removePidFile() {
+    if (this.processConfig.pidFile) {
+      try {
+        // Make sure pid file exists
+        const fileInfo = await Deno.stat(this.processConfig.pidFile)
+
+        // First check that the pid file is actually a file, then try to delete
+        if (fileInfo.isFile) {
+          await Deno.remove(this.processConfig.pidFile, { recursive: false })
+        }
+      } catch (_e) {
+        this.pup.logger.error("error", `Failed to remove pid file '${this.processConfig.pidFile}', file will be left on the filesystem.`, this.processConfig)
+      }
+    }
+  }
+
   private async pipeToLogger(category: string, reader: Deno.Reader) {
     const logger = this.pup.logger
 
@@ -46,18 +72,23 @@ class Runner {
     })
     this.process = process
 
+    // Process started, report pid to callback and file
     runningCallback(process.pid)
+    this.writePidFile()
 
     this.pipeToLogger("stdout", process.stdout)
     this.pipeToLogger("stderr", process.stderr)
 
+    // Wait for process to stop and retrieve exit status
     const result = await process.status()
 
     // Important! Close streams
     process.stderr.close()
     process.stdout.close()
 
-    // Exited
+    // ... and clean up the pid file
+    this.removePidFile()
+
     return result
   }
 
