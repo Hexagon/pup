@@ -150,11 +150,11 @@ It should look something like this:
 {
   "json.schemas": [
     {
-        "fileMatch": [
-            "/pup.json",
-            "/pup.jsonc"
-        ],
-        "url": "https://deno.land/x/pup/docs/pup.schema.json"
+      "fileMatch": [
+        "/pup.json",
+        "/pup.jsonc"
+      ],
+      "url": "https://deno.land/x/pup/docs/pup.schema.json"
     }
   ]
 }
@@ -203,7 +203,7 @@ const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
 
 // Go!
 pup.start()
-````
+```
 
 ### Custom logger
 
