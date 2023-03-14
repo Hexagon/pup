@@ -4,9 +4,9 @@ This demo runs a Deno script in the official Deno docker image periodically usin
 
 ## Files
 
-*  [Dockerfile](./Dockerfile) - Sets up a container based on `denoland/deno:debian-1.31.1`, installs Pup, and copies this directory content to `/app/`
-*  [pup.jsonc](./pup.jsonc) - Pup configuration, sets up `task.ts` to run at cron schedule `0/5 * * * * *` (every fifth second).
-*  [task.ts](./task.ts) - The actual script to run. Prints "Task running" to console and exits.
+- [Dockerfile](./Dockerfile) - Sets up a container based on `denoland/deno:debian-1.31.1`, installs Pup, and copies this directory content to `/app/`
+- [pup.jsonc](./pup.jsonc) - Pup configuration, sets up `task.ts` to run at cron schedule `0/5 * * * * *` (every fifth second).
+- [task.ts](./task.ts) - The actual script to run. Prints "Task running" to console and exits.
 
 ## Building and running
 

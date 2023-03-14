@@ -1,4 +1,4 @@
-import { Application } from "../../pup.ts"
+import { Application } from "../../application.meta.ts"
 import { Process } from "./process.ts"
 
 class Status {
@@ -12,7 +12,7 @@ class Status {
   }
 
   /* Internal methods */
-  public writeToDisk(processes: Process[]) {
+  public async writeToDisk(processes: Process[]) {
     if (this.statusFileName) {
       const processStatuses = processes.map((p) => p.getStatus())
 
@@ -27,7 +27,7 @@ class Status {
 
       // Try to write to disk
       try {
-        Deno.writeFile(this.statusFileName, result)
+        await Deno.writeFile(this.statusFileName, result)
       } catch (_e) {
         console.error("Error while writing status to disk.")
       }

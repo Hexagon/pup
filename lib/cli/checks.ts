@@ -1,4 +1,4 @@
-import { Application } from "../../pup.ts"
+import { Application } from "../../application.meta.ts"
 import { Args } from "../../deps.ts"
 
 function printHeader() {
@@ -30,86 +30,50 @@ function printFlags() {
 }
 
 function checkArguments(args: Args): Args | null {
-  let exit = false
-
   if (args.version) {
-    exit = true
     if (!args.quiet) {
       printHeader()
     }
+    return null
   }
 
   if (args.help) {
-    exit = true
     printUsage()
     console.log("")
     printFlags()
+    return null
   }
 
   // Do not allow configuration creation options without --init and vice versa
   if (args.autostart && !args.init && !args.append) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--autostart' requires '--init' or '--append'")
+    throw new Error("Argument '--autostart' requires '--init' or '--append'")
   }
   if (args.cron && !args.init && !args.append) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--cron' requires '--init' or '--append'")
+    throw new Error("Argument '--cron' requires '--init' or '--append'")
   }
   if (args.watch && !args.init && !args.append) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--watch' requires '--init' or '--append'")
-    Deno.exit(1)
+    throw new Error("Argument '--watch' requires '--init' or '--append'")
   }
   if (args.cmd && !args.init && !args.append) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--cmd' requires '--init' or '--append'")
-    Deno.exit(1)
+    throw new Error("Argument '--cmd' requires '--init' or '--append'")
   }
   if (args.watch && !args.init && !args.append) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--watch' requires '--init' or '--append'")
-    Deno.exit(1)
+    throw new Error("Argument '--watch' requires '--init' or '--append'")
   }
   if (!args.cmd && (args.init || args.append)) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--init' and '--append' requires '--cmd'")
-    Deno.exit(1)
+    throw new Error("Argument '--init' and '--append' requires '--cmd'")
   }
   if (!args.id && (args.init || args.append || args.remove)) {
-    printUsage()
-    console.log("")
-    console.error("Arguments '--init','--append' and '--remove' requires '--id'")
-    Deno.exit(1)
+    throw new Error("Arguments '--init','--append' and '--remove' requires '--id'")
   }
   if (!args.cmd && (args.init || args.append)) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--init' and '--append' requires '--cmd'")
-    Deno.exit(1)
+    throw new Error("Argument '--init' and '--append' requires '--cmd'")
   }
   if (!args.id && (args.remove)) {
-    printUsage()
-    console.log("")
-    console.error("Argument '--remove' requires '--id'")
-    Deno.exit(1)
+    throw new Error("Argument '--remove' requires '--id'")
   }
 
-
-  if (exit) {
-    return null
-  } else {
-    if (!args._) {
-      console.error("Missing argument")
-    }
-
-    return args
-  }
+  return args
 }
 
 export { checkArguments, printFlags, printHeader, printUsage }

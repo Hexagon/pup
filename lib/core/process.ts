@@ -132,7 +132,7 @@ class Process {
     // Start process (await for it to exit)
     this.runner = new Runner(this.pup, this.config)
 
-    // Update restart counter, this is reset on successful exit, or manual .stop()
+    // Update restart counter, this is reset on successful exit, new cron run, or manual .stop()
     if (restart) {
       this.restarts = this.restarts + 1
     }
@@ -151,7 +151,6 @@ class Process {
 
       // Exited - Update status
       if (result.code === 0) {
-        // Reset restarts on successful exit
         this.setStatus(ProcessStatus.FINISHED)
         logger.log("finished", `Process finished with code ${result.code}`, this.config)
       } else {
@@ -199,6 +198,7 @@ class Process {
       const cronJob = new Cron(this.config.cron as string, () => {
         this.start("Cron pattern")
         this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
+        this.restarts = 0
       })
 
       // Initial next run time
@@ -214,6 +214,7 @@ class Process {
     for await (const watchEvent of watcher) {
       if (watchEvent.some((_) => _.type.includes("modify"))) {
         this.pup.logger.log("watcher", "File change detected", this.config)
+        this.restarts = 0
         this.stop("restart")
         // Restart will be handled by watchdog
       }

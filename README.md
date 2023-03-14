@@ -49,8 +49,7 @@ Pup is centered around a single configuration file called `pup.jsonc`. This file
 
 You can either create the file manually, with help from the full configuration example below, or use the command line to initialize and modify your configuration.
 
-> **Note**
-> Using the cli to modify your configuration **will** remove any jsonc comments
+> **Note** Using the cli to modify your configuration **will** remove any jsonc comments
 
 **To create a new pup.jsonc**
 
@@ -72,7 +71,8 @@ With a forever running task
 
 **The working directory**
 
-The working directory of pup will always be the location of `pup.jsonc`, and relative paths in configuration will stem from there. You can override this per-process by supplying `--cwd` to the cli, or using the option `cwd: ` in the configuration.
+The working directory of pup will always be the location of `pup.jsonc`, and relative paths in configuration will stem from there. You can override this per-process by supplying `--cwd` to the cli, or
+using the option `cwd:` in the configuration.
 
 ### Full configuration example
 
@@ -140,6 +140,25 @@ after quitting for whatever reason.
 
 If you use the line `cron: "<pattern>"` instead of `autostart: true` it would be triggered periodically.
 
+### VS Code Intellisense for pup.jsonc
+
+If you want Intellisense and code completion for `pup.jsonc` in VS Code, you can append the pup schema to `json.schemas` in your user settings/`.vscode/settings.json`.
+
+It should look something like this:
+
+````jsonc
+{
+  "json.schemas": [
+    {
+        "fileMatch": [
+            "/pup.json",
+            "/pup.jsonc"
+        ],
+        "url": "https://deno.land/x/pup/docs/pup.schema.json"
+    }
+  ]
+}
+
 ## Examples
 
 Full examples available at [/examples](/examples)
@@ -183,7 +202,7 @@ const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
 
 // Go!
 pup.start()
-```
+````
 
 ### Custom logger
 
