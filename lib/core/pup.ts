@@ -51,14 +51,18 @@ class Pup {
 
         // Handle restarts
         if (status.status === ProcessStatus.FINISHED || status.status === ProcessStatus.ERRORED) {
-          // Handle max restart policy
           const msSinceExited = status.exited ? (new Date().getTime() - status.exited?.getTime()) : Infinity
           const restartDelay = config.restartDelayMs ?? 10000
-          const restartPolicy = config.restart ?? "always"
-          if (restartPolicy === "always" && msSinceExited > restartDelay) {
-            process.start("restart", true)
-          } else if (restartPolicy === "error" && ProcessStatus.ERRORED) {
-            process.start("restart", true)
+
+          // Always restart if restartpolicy is undefined and autostart is true
+          const restartPolicy = config.restart ?? (config.autostart ? "always" : undefined)
+
+          if (msSinceExited > restartDelay) {
+            if (restartPolicy === "always" && msSinceExited > restartDelay) {
+              process.start("restart", true)
+            } else if (restartPolicy === "error" && ProcessStatus.ERRORED && msSinceExited > restartDelay) {
+              process.start("restart", true)
+            }
           }
         }
 
@@ -66,7 +70,7 @@ class Pup {
         if (status.status === ProcessStatus.RUNNING && config.timeout && status.started) {
           const secondsSinceStart = (new Date().getTime() - status.started.getTime()) / 1000
           if (secondsSinceStart > config.timeout) {
-            process.stop("Timeout")
+            process.stop("timeout")
           }
         }
       }
