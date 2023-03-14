@@ -146,7 +146,7 @@ If you want Intellisense and code completion for `pup.jsonc` in VS Code, you can
 
 It should look something like this:
 
-````jsonc
+```jsonc
 {
   "json.schemas": [
     {
@@ -158,6 +158,7 @@ It should look something like this:
     }
   ]
 }
+```
 
 ## Examples
 
