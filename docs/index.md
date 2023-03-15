@@ -3,7 +3,6 @@ layout: page
 title: Pup - Universal process manager
 tagline: Test tagline
 description: Test description
-remote_theme: jekyll/minima
 ---
 
 # Pup - Simple yet powerful Process Manager

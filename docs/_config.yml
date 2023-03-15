@@ -1,0 +1,8 @@
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - manual.md
+  - index.md
