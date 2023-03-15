@@ -264,6 +264,7 @@ These options can be used in both the global scope logger, and for each process 
     }
   ]
 }
+```
 
 ##### Watcher
 
