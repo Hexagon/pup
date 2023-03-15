@@ -28,7 +28,7 @@ Initialise configuration file `pup.json`
 
 Add hourly task
 
-`pup --append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *`
+`pup --append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
 Launch your ecosystem
 
