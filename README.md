@@ -162,25 +162,25 @@ It should look something like this:
 
 ## Examples
 
-Full examples available at [/examples](/examples)
+Full examples available at [/docs/examples](/docs/examples)
 
 **Running the examples**
 
-Taking `examples/basic` as an example:
+Taking `docs/examples/basic` as an example:
 
 **If you have installed pup**
 
-Start pup by running the command `pup --config examples/basic/pup.jsonc`.
+Start pup by running the command `pup --config docs/examples/basic/pup.jsonc`.
 
 **If you have not yet installed pup**
 
-Start pup by running the command `deno run -A pup.ts --config examples/basic/pup.jsonc`.
+Start pup by running the command `deno run -A pup.ts --config docs/examples/basic/pup.jsonc`.
 
 Now `server.js` will start instantly, and will restart automatically 10 seconds after exiting. `task.js` will start every tenth second according to cron pattern `*/10 * * * * *`
 
 **Output**
 
-![Pup example logs](/docs/pup-logs.png "Pup example logs")
+![Pup example logs](/docs/resources/pup-logs.png "Pup example logs")
 
 ## Library usage
 
@@ -231,5 +231,5 @@ pup.start()
 
 ## Contributions
 
-Contributions to Pup are very welcome! Please read [CONTRIBUTING.md](/docs/CONTRIBUTING.md), fork the repository, make your changes, and submit a pull request. We appreciate all feedback and
+Contributions to Pup are very welcome! Please read [the contibuting section](/docs/MANUAL.md#contributing) of the manual, fork the repository, make your changes, and submit a pull request. We appreciate all feedback and
 contributions that help make Pup better.

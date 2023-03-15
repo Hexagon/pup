@@ -1,26 +1,58 @@
-# Pup - Process Management Tool
+---
+layout: page
+title: Pup - The Manual
+tagline: Test tagline
+description: Test description
+remote_theme: 'amitmerchant1990/reverie'
+---
 
-Pup is a process management tool designed to simplify the management of various types of processes in a system. It provides easy configuration, logging, and monitoring of processes.
+# Pup - Process Management Tool
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Configuration](#configuration)
-   - [Global Configuration](#global-configuration)
-   - [Process Configuration](#process-configuration)
-4. [Usage](#usage)
-   - [Starting and Stopping Processes](#starting-and-stopping-processes)
-   - [Process Monitoring](#process-monitoring)
-   - [Cron Jobs and Watcher](#cron-jobs-and-watcher)
-5. [API Reference](#api-reference)
-6. [Troubleshooting](#troubleshooting)
-7. [Contributing](#contributing)
-8. [License](#license)
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [General flags](#general-flags)
+  - [Configuring using the cli](#configuring-using-the-cli)
+  - [Single command usage](#single-command-usage)
+  - [The working directory](#working-directory)
+- [Configuration](#configuration)
+  - [Creating the Configuration File](#creating-the-configuration-file)
+  - [Configuration Options](#configuration-options)
+  - [Process configuration](#process-configuration)
+    - [Start policy](#start-policy)
+    - [Restart policy](#restart-policy)
+  - [Global configuration](#global-configuration)
+    - [Logger](#watcher)
+    - [Watcher](#logger)
+  - [Validating the Configuration](#validating-the-configuration)
+  - [VS Code Intellisense](#vs-code-intellisense)
+- [Library usage](#library-usage)
+  - [Process Management](#process-management)
+  - [Monitoring Process Information](#monitoring-process-information)
+  - [Logging](#logging)
+  - [File Watching](#file-watching)
+  - [Cron Scheduling](#cron-scheduling)
+- [FAQ](#faq)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+  - [Reporting bugs and requesting features](#reporting-bugs-and-requesting-features)
+  - [Submitting code changes](#submitting-code-changes)
+  - [Improving documentation](#improving-documentation)
+  - [Helping other users](#helping-other-users)
 
 ## Introduction
 
-Pup is a powerful and flexible process management tool that allows users to define, manage, and monitor processes with ease. It supports various features like process autostart, cron scheduling, file watching, and restart policies. Pup also provides an extensive logging system to keep track of process activities and statuses.
+Pup is a command-line tool that simplifies the management of processes. Pup can start, stop, restart, and keep processes alive, as well as schedule processes using a cron pattern. It does also manage
+the logs of each process, gathering them into a single stdout or file, making it easy to monitor and analyze the output of your processes in one place.
+
+Pup can also watch the filesystem, and restart processes when files change, similar to Nodemon and Denon.
+
+In addition to serving as a stand alone process manager, Pup can also function as a [as a library](#library-usage), allowing you to seamlessly manage the internal process ecosystem of your
+application.
+
+Pup revolves around a single configuration file, by default named `pup.jsonc`, which control every aspect of the processes to be executed, their execution methods, and the handling of logging.
 
 ## Installation
 This section will guide you through the installation process of Pup, the process management tool.
@@ -60,7 +92,7 @@ deno install -A --unstable -n pup https://deno.land/x/pup/mod.ts
 
 This will overwrite the existing installation with the latest version of Pup.
 
-## Command Line Parameters
+## Usage
 
 Pup offers various command line parameters to help you control its behavior. These parameters are grouped into general flags, init, append, and no-config options. In this section, we'll describe each group and provide examples of usage.
 
@@ -70,6 +102,8 @@ General flags are used to control the basic behavior of Pup and can be combined 
 
 - `-h, --help`: Display the help message with a list of available commands and options.
 - `-v, --version`: Show the current version of Pup.
+
+### Configuring using the cli
 
 ### Init
 
@@ -107,7 +141,7 @@ pup --append --id anotherprocess --cmd "python script.py" --cwd /path/to/another
 
 > **Warning** When using `--append` to modify an existing configuration file, any comments will be stripped.
 
-### No-config
+### Single command usage
 
 The `--no-config` or `-n`option allows you to start a single process using command line parameters without reading or writing any configuration file. This mode uses default options for logging.
 
@@ -133,11 +167,14 @@ The same example, using short aliases for the command line parameters.
 pup -nAc "npm run server"
 ```
 
+### Working directory
+
+The working directory of pup will always be the location of `pup.jsonc`, and relative paths in configuration will stem from there. You can override this per-process by supplying `--cwd` to the cli, or
+using the option `cwd:` in the configuration.
+
 ## Configuration
 
 In this section, you will learn how to create and manage configuration files for Pup.
-
-### Creating a Configuration File
 
 To create a configuration file for Pup, first create a new file named `pup.json` in your project's root directory. You can also name it `pup.jsonc` if you want to use jsonc-style comments. Then, add the following basic structure to the file:
 
@@ -155,7 +192,7 @@ To create a configuration file for Pup, first create a new file named `pup.json`
 
 This basic configuration defines a single process named example that runs a Deno script (app.ts) with the `--allow-net` flag. You can customize the configuration to suit your needs by adding more processes or updating the existing process definition.
 
-### Configuration Options
+### Process configuration
 
 Here's a list of available configuration options for each process:
 
@@ -183,20 +220,104 @@ You need to specify one of these for each process, else the process will never s
 *   `restartDelayMs` (optional): A number specifying the delay (in milliseconds) before restarting the process.
 *   `restartLimit` (optional): A number specifying the maximum number of restarts allowed for the process.
 
-#### Global Configuration Options
+#### Global configuration
 
-You can also define global configuration options that apply to all processes. Some of the global options include:
+Global configuration are entirely optional.
+
+You can define global configuration options that apply to all processes. In addition to `processes: ` the global configuration clauses are:
 
 *   `logger`: An object containing global logger configuration options.
 *   `watcher`: An object containing global watcher configuration options.
 
-For a complete list of global configuration options, refer to the /lib/core/configuration.ts file.
+##### Logger
+
+The global logger configuration allows you to control the logging settings for pup, and the defaults of each process. To the global logger, include the following properties within your configuration file:
+
+*   `console` (boolean): Set to true to enable logging to the console. Default is false.
+*   `stdout` (string): The file path to write standard output logs.
+*   `stderr` (string): The file path to write standard error logs.
+*   `decorateFiles` (boolean): Set to true to enable decoration in the output files. Default is false.
+*   `decorate` (boolean): **Only available in global scope.** Set to true to enable decoration in the logs. Default is false. 
+*   `colors` (boolean): **Only available in global scope.** Set to true to enable colored output. Default is false. 
+
+These options can be used in both the global scope logger, and for each process like:
+
+```jsonc
+{
+  "logger": {
+    "console": true,
+    "stdout": "/path/to/stdout.log",
+    "stderr": "/path/to/stderr.log",
+    "colors": true,
+    "decorateFiles": true,
+    "decorate": true
+  },
+  "processes": [
+    {
+        "id": "my-process",
+        /* ... */
+        "logger": {
+            "console": true,
+            "stdout": "/path/to/process.stdout.log",
+            "stderr": "/path/to/process.stderr.log",
+            "decorateFiles": true
+        }
+    }
+  ]
+}
+
+##### Watcher
+
+The global watcher configuration allows you to control file watching settings for the entire library. To configure the global watcher, include the following properties within your configuration file:
+
+*   `interval` (number): The interval (in milliseconds) at which the watcher checks for file changes. Default is 100.
+*   `exts` (array of strings): The file extensions to watch. Default is ["ts", "tsx", "js", "jsx", "json"].
+*   `match` (array of strings): The patterns to match for watched files. Default is ["**/*.*"].
+*   `skip` (array of strings): The patterns to exclude from watching. Default is ["**/.git/**"].
+
+Then enable watcher in the process configuration using `watch: ["paths","to","watch"]`. An example:
+
+{
+  "watcher": {
+    "interval": 100,
+    "exts": ["ts", "tsx", "js", "jsx", "json"],
+    "match": ["**/*.*"],
+    "skip": ["**/.git/**"]
+  },
+  "processes": [
+    {
+        "id": "my-process",
+        /* ... */
+        "watch": ["src/"]
+    }
+  ]
+}
 
 ### Validating the Configuration
 
 To ensure your configuration is valid, just run `pup`. If using pup as a library, can use the validateConfiguration() function provided by the `/lib/core/configuration.ts` file. This function checks if the configuration adheres to the schema and throws an error if it doesn't.
 
 With a valid configuration in place, you're ready to use Pup to manage your processes.
+
+### VS Code Intellisense
+
+If you want Intellisense and code completion for `pup.json`/`pup.jsonc` in VS Code, you can append the pup json schema to `json.schemas` in your user settings or project settings (`.vscode/settings.json`).
+
+It should look something like this:
+
+```jsonc
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "/pup.json",
+        "/pup.jsonc"
+      ],
+      "url": "https://deno.land/x/pup/docs/pup.schema.json"
+    }
+  ]
+}
+```
 
 ## Library usage
 
@@ -255,7 +376,7 @@ By combining the various process management methods and monitoring techniques, y
 
 Pup uses a custom logger to provide detailed logs about the processes being managed. You can configure the logger's behavior through the `logger` object in the configuration file.
 
-There are two types of logger configurations: `GlobalLoggerConfiguration` and `ProcessLoggerConfiguration`. The global logger configuration applies to all processes managed by Pup, while the process logger configuration can be used to override the global settings for a specific process.
+There are two types of logger configurations: `GlobalLoggerConfiguration` and `ProcessLoggerConfiguration`. The global logger configuration applies to all processes managed, while the process logger configuration can be used to override the global settings for a specific process.
 
 Here's an example of how to configure logging for Pup:
 
