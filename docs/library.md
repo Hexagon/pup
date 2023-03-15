@@ -5,7 +5,6 @@ title: 5. Library usage
 
 ## Library usage
 
-
 Pup can be build in in your application. Just import from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
 
 ```ts
@@ -26,6 +25,7 @@ const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
 // Go!
 pup.start()
 ```
+
 ### Custom logger
 
 Pup supports plugging in an custom logger, use like this:

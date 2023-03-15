@@ -4,21 +4,41 @@
 Universal process manager.
 </p>
 
-<hr>
+<br>
 
-Pup is a command-line tool that simplifies the management of processes. Pup can start, stop, restart, and keep processes alive, as well as schedule processes using a cron pattern. It does also manage
-the logs of each process, gathering them into a single stdout or file, making it easy to monitor and analyze the output of your processes in one place.
+**Install Pup using deno**
 
-Pup can also watch the filesystem, and restart processes when files change, similar to Nodemon and Denon.
+`deno install -A -n pup https://deno.land/x/pup/pup.ts`
 
-In addition to serving as a stand alone process manager, Pup can also function as a [as a library](#library-usage), allowing you to seamlessly manage the internal process ecosystem of your
-application.
+**Quick examples**
 
-Pup revolves around a single configuration file, by default named 'pup.jsonc', which control every aspect of the processes to be executed, their execution methods, and the handling of logging.
+To keep a process alive forever, without configuration
 
-> **Note** Please note that Pup is currently in an early stage of development and may contain bugs or unexpected behavior. Use at your own risk.
+`pup -n --cmd "deno run -A server.ts" --autostart`
+
+To restart process on file changes, without configuration
+
+`pup -n --cmd "deno run -A server.ts" --watch "server.ts"`
+
+**Ecosystem example**
+
+Initialise configuration file `pup.json`
+
+`pup --init --id "my-server" --cmd "deno run -A server.ts" --autostart`
+
+Add hourly task
+
+`pup --append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *`
+
+Launch your ecosystem
+
+`pup`
+
+Full documentation available at [hexagon.github.io/pup](https://hexagon.github.io/pup).
 
 # Pup - Universal process manager
+
+> **Note** Please note that Pup is currently in an early stage of development and may contain bugs or unexpected behavior. Use at your own risk.
 
 ## Installation
 
