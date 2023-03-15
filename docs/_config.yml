@@ -1,9 +1,15 @@
+title: Pup
+
+description: Universal Process Manager
+
+remote_theme: just-the-docs/just-the-docs
+
+url: https://hexagon.github.io/pup
+
+aux_links:
+  GitHub Repository: https://github.com/hexagon/pup
+  Deno Library: https://deno.land/x/pup
+
 plugins:
   - jekyll-relative-links
-remote_theme: amitmerchant1990/reverie
-relative_links:
-  enabled: true
-  collections: true
-include:
-  - manual.md
-  - index.md
+  - jekyll-default-layou

@@ -231,5 +231,5 @@ pup.start()
 
 ## Contributions
 
-Contributions to Pup are very welcome! Please read [the contibuting section](/docs/MANUAL.md#contributing) of the manual, fork the repository, make your changes, and submit a pull request. We appreciate all feedback and
-contributions that help make Pup better.
+Contributions to Pup are very welcome! Please read [the contibuting section](/docs/MANUAL.md#contributing) of the manual, fork the repository, make your changes, and submit a pull request. We
+appreciate all feedback and contributions that help make Pup better.

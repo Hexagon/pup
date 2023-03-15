@@ -10,15 +10,14 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
     "--autostart",
     "--remove",
     "--status",
-    "--no-config"
+    "--no-config",
   ]
   const parsedArgs = parseArguments(inputArgs)
   const expectedArgs = {
-
     /* Specified */
     version: true,
     v: true,
-    
+
     help: true,
     h: true,
 
@@ -40,7 +39,7 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
     "no-config": true,
     n: true,
 
-    _: []
+    _: [],
   }
   assertEquals(parsedArgs, expectedArgs)
 })
@@ -58,11 +57,10 @@ Deno.test("String options and aliases are parsed correctly", () => {
     "--id",
     "id",
     "--cron",
-    "cron"
+    "cron",
   ]
   const parsedArgs = parseArguments(inputArgs)
   const expectedArgs = {
-
     /* Specified */
     config: "config.json",
     c: "config.json",
@@ -100,7 +98,7 @@ Deno.test("String options and aliases are parsed correctly", () => {
     "no-config": false,
     n: false,
 
-    _: []
+    _: [],
   }
   assertEquals(parsedArgs, expectedArgs)
 })
