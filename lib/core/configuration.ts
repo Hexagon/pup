@@ -107,13 +107,12 @@ const ConfigurationSchema = z.object({
 }).strict()
 
 function validateConfiguration(unsafeConfiguration: unknown): Configuration {
-  let validationResult
   try {
-    validationResult = ConfigurationSchema.parse(unsafeConfiguration)
+    ConfigurationSchema.parse(unsafeConfiguration)
   } catch (e) {
     throw new Error(e.errors[0]?.message)
   }
-  return validationResult as Configuration
+  return unsafeConfiguration as Configuration
 }
 
 /**
