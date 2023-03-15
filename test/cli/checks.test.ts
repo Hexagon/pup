@@ -65,7 +65,7 @@ Deno.test("checkArguments should throw error when init or append argument is pro
       checkArguments(args)
     },
     Error,
-    "Argument '--init', '--append' and '--no-config' requires '--cmd'",
+    "Arguments '--init', '--append', and '--no-config' require '--cmd'",
   )
 })
 
@@ -76,7 +76,7 @@ Deno.test("checkArguments should throw error when id argument is missing with in
       checkArguments(args)
     },
     Error,
-    "Arguments '--init','--append' and '--remove' requires '--id'",
+    "Arguments '--init','--append', and '--remove' require '--id'",
   )
 })
 

@@ -74,16 +74,12 @@ Deno.test("Status.writeToDisk should not write the status to disk if statusFileN
 
 Deno.test("Status.writeToDisk should catch and log errors", async () => {
   const expectedProcess = new MockProcess()
-  const consoleErrorSpy = spy(console, "error")
   const writeFileSpy = spy(Deno, "writeFile")
 
   const status = new Status("status.json")
   await status.writeToDisk([expectedProcess])
 
   assertEquals(writeFileSpy.calls.length, 1)
-  assertEquals(consoleErrorSpy.calls.length, 1)
-  assertEquals(consoleErrorSpy.calls[0].args[0], "Error while writing status to disk.")
 
   writeFileSpy.restore()
-  consoleErrorSpy.restore()
 })

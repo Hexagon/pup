@@ -1,86 +1,106 @@
 import { assertEquals } from "../deps.ts"
 import { parseArguments } from "../../lib/cli/args.ts"
 
-Deno.test("parseArguments should return expected arguments object when full options are used", () => {
-  const args = ["--id", "test", "--init", "--config", "test.sh", "--watch", "test", "--version", "--cmd", "test.ts", "--cwd", "/test"]
-  const expectedOutput = {
-    _: [],
+Deno.test("Boolean options and aliases are parsed correctly", () => {
+  const inputArgs = [
+    "--version",
+    "--help",
+    "--init",
+    "--append",
+    "--autostart",
+    "--remove",
+    "--status",
+    "--no-config"
+  ]
+  const parsedArgs = parseArguments(inputArgs)
+  const expectedArgs = {
 
-    help: false,
-    h: false,
-
+    /* Specified */
     version: true,
     v: true,
-
-    id: "test",
-
-    cmd: "test.ts",
-
-    cwd: "/test",
-
-    config: "test.sh",
-    c: "test.sh",
-
-    autostart: false,
-    u: false,
-
-    watch: "test",
-    w: "test",
+    
+    help: true,
+    h: true,
 
     init: true,
     i: true,
 
-    remove: false,
-    r: false,
+    append: true,
+    a: true,
 
-    append: false,
-    a: false,
+    autostart: true,
+    A: true,
 
-    status: false,
-    s: false,
+    remove: true,
+    r: true,
 
-    "no-config": false,
-    n: false,
-  }
-  assertEquals(parseArguments(args), expectedOutput)
-})
-
-Deno.test("parseArguments should return expected arguments object when aliases are used", () => {
-  const args = ["--id", "test", "-i", "-c", "test.sh", "-w", "test", "-v", "-n"]
-  const expectedOutput = {
-    _: [],
-
-    help: false,
-    h: false,
-
-    version: true,
-    v: true,
-
-    id: "test",
-
-    c: "test.sh",
-    config: "test.sh",
-
-    watch: "test",
-    w: "test",
-
-    init: true,
-    i: true,
-
-    remove: false,
-    r: false,
-
-    append: false,
-    a: false,
-
-    status: false,
-    s: false,
-
-    autostart: false,
-    u: false,
+    status: true,
+    s: true,
 
     "no-config": true,
     n: true,
+
+    _: []
   }
-  assertEquals(parseArguments(args), expectedOutput)
+  assertEquals(parsedArgs, expectedArgs)
+})
+
+Deno.test("String options and aliases are parsed correctly", () => {
+  const inputArgs = [
+    "--config",
+    "config.json",
+    "--watch",
+    "watched.ts",
+    "--cmd",
+    "command",
+    "--cwd",
+    "cwd",
+    "--id",
+    "id",
+    "--cron",
+    "cron"
+  ]
+  const parsedArgs = parseArguments(inputArgs)
+  const expectedArgs = {
+
+    /* Specified */
+    config: "config.json",
+    c: "config.json",
+
+    watch: "watched.ts",
+    w: "watched.ts",
+
+    cmd: "command",
+    C: "command",
+
+    cwd: "cwd",
+    W: "cwd",
+
+    id: "id",
+    I: "id",
+
+    cron: "cron",
+    O: "cron",
+
+    /* All boolean options will be included in output too */
+    version: false,
+    v: false,
+    help: false,
+    h: false,
+    init: false,
+    i: false,
+    append: false,
+    a: false,
+    autostart: false,
+    A: false,
+    remove: false,
+    r: false,
+    status: false,
+    s: false,
+    "no-config": false,
+    n: false,
+
+    _: []
+  }
+  assertEquals(parsedArgs, expectedArgs)
 })

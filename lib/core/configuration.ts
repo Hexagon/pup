@@ -66,10 +66,10 @@ const ConfigurationSchema = z.object({
   ),
   watcher: z.optional(
     z.object({
-      interval: z.optional(z.boolean()),
-      exts: z.optional(z.array(z.string())),
-      match: z.optional(z.array(z.string())),
-      skip: z.optional(z.array(z.string())),
+      interval: z.optional(z.number()),
+      exts: z.optional(z.array(z.string()).default(["ts", "tsx", "js", "jsx", "json"])),
+      match: z.optional(z.array(z.string()).default(["**/*.*"])),
+      skip: z.optional(z.array(z.string()).default(["**/.git/**"])),
     }).strict(),
   ),
   /*plugins: z.optional(
@@ -89,7 +89,7 @@ const ConfigurationSchema = z.object({
       watch: z.optional(z.array(z.string())),
       cron: z.optional(z.string().min(9).max(256)),
       restart: z.optional(z.enum(["always", "error"])),
-      restartDelayMs: z.optional(z.number().min(0).max(24 * 60 * 60 * 1000 * 1)), // Max one day
+      restartDelayMs: z.number().min(0).max(24 * 60 * 60 * 1000 * 1).default(10000), // Max one day
       overrun: z.optional(z.boolean()),
       restartLimit: z.optional(z.number().min(0)),
       timeout: z.optional(z.number().min(1)),
@@ -107,14 +107,13 @@ const ConfigurationSchema = z.object({
 }).strict()
 
 function validateConfiguration(unsafeConfiguration: unknown): Configuration {
-  const validationResult = ConfigurationSchema.safeParse(unsafeConfiguration)
-
-  if (!validationResult.success) {
-    throw new Error(validationResult.error.errors[0]?.message)
+  let validationResult
+  try {
+    validationResult = ConfigurationSchema.parse(unsafeConfiguration)
+  } catch (e) {
+    throw new Error(e.errors[0]?.message)
   }
-
-  // It is now safe to "cast" to a real configuraton object
-  return unsafeConfiguration as Configuration
+  return validationResult as Configuration
 }
 
 /**

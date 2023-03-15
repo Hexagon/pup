@@ -35,7 +35,12 @@ class Pup {
     }
     this.watchdog()
   }
-
+  /**
+   * Watchdog function that manages process lifecycle events like
+   * auto-start, restart, and timeouts.
+   *
+   * @private
+   */
   private watchdog = () => {
     // Wrap watchdog operation in a catch to prevent it from ever stopping
     try {

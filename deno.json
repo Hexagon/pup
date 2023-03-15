@@ -8,7 +8,7 @@
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts test/deps.ts",
     "build-schema": "deno run --allow-write tools/build-schema.ts",
-    "check": "deno fmt --check && deno lint && deno check pup.ts && deno test",
+    "check": "deno fmt --check && deno lint && deno check pup.ts && deno test --allow-read --allow-write",
     "build": "deno task check && deno task build-schema"
   }
 }

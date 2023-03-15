@@ -1,7 +1,6 @@
 # Deno files
 deno.lock
 /.idea/
-/.vscode/
 /node_modules
 .env
 *.orig
