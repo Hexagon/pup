@@ -1,5 +1,6 @@
 plugins:
   - jekyll-relative-links
+remote_theme: amitmerchant1990/reverie
 relative_links:
   enabled: true
   collections: true
