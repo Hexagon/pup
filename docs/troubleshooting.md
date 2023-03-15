@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Troubleshooting
+title: 7. Troubleshooting
 ---
 
 ## Troubleshooting

@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Usage
+title: 3. Usage
 ---
 
 ## Usage

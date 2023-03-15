@@ -1,6 +1,6 @@
 ---
 layout: page
-title: The Manual
+title: 1. Overview
 ---
 
 ## Pup - The Manual
@@ -17,35 +17,26 @@ Pup revolves around a single configuration file, by default named `pup.jsonc`, w
 
 ## Table of Contents
 
-1. [The Pup Manual](#overview)
-2. [Installation](#installation)
+- [Overview](./)
+- [Installation](./installation.html)
 
-- [Usage](#usage)
-  - [General flags](#general-flags)
-  - [Configuring using the cli](#configuring-using-the-cli)
-  - [Single command usage](#single-command-usage)
-  - [The working directory](#working-directory)
-- [Configuration](#configuration)
-  - [Creating the Configuration File](#creating-the-configuration-file)
-  - [Configuration Options](#configuration-options)
-  - [Process configuration](#process-configuration)
-    - [Start policy](#start-policy)
-    - [Restart policy](#restart-policy)
-  - [Global configuration](#global-configuration)
-    - [Logger](#watcher)
-    - [Watcher](#logger)
-  - [Validating the Configuration](#validating-the-configuration)
-  - [VS Code Intellisense](#vs-code-intellisense)
-- [Library usage](#library-usage)
-  - [Process Management](#process-management)
-  - [Monitoring Process Information](#monitoring-process-information)
-  - [Logging](#logging)
-  - [File Watching](#file-watching)
-  - [Cron Scheduling](#cron-scheduling)
-- [FAQ](#faq)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-  - [Reporting bugs and requesting features](#reporting-bugs-and-requesting-features)
-  - [Submitting code changes](#submitting-code-changes)
-  - [Improving documentation](#improving-documentation)
-  - [Helping other users](#helping-other-users)
+- [Usage](./usage.html)
+  - [General flags](./usage.html#general-flags)
+  - [Configuring using the cli](./usage.html#configuring-using-the-cli)
+  - [Single command usage](./usage.html#single-command-usage)
+  - [The working directory](./usage.html#working-directory)
+- [Configuration](./configuration.html)
+  - [Creating the Configuration File](./configuration.html#creating-the-configuration-file)
+  - [Configuration Options](./configuration.html#configuration-options)
+  - [Process configuration](./configuration.html#process-configuration)
+    - [Start policy](./configuration.html#start-policy)
+    - [Restart policy](./configuration.html#restart-policy)
+  - [Global configuration](./configuration.html#global-configuration)
+    - [Logger](./configuration.html#watcher)
+    - [Watcher](./configuration.html#logger)
+  - [Validating the Configuration](./configuration.html#validating-the-configuration)
+  - [VS Code Intellisense](./configuration.html#vs-code-intellisense)
+- [Library usage](./library.html)
+- [FAQ](./faq.html#faq)
+- [Troubleshooting](./troubleshooting.html#troubleshooting)
+- [Contributing](./contributing.html)

@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Installation
+title: 2. Installation
 ---
 
 ## Installation
