@@ -3,7 +3,7 @@ layout: page
 title: Pup - The Manual
 tagline: Test tagline
 description: Test description
-remote_theme: 'amitmerchant1990/reverie'
+remote_theme: amitmerchant1990/reverie
 ---
 
 # Pup - Process Management Tool
