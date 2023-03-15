@@ -2,7 +2,7 @@ import { assertEquals } from "../deps.ts"
 import { parseArguments } from "../../lib/cli/args.ts"
 
 Deno.test("parseArguments should return expected arguments object when full options are used", () => {
-  const args = ["--id", "test", "--init", "--config", "test.sh", "--watch", "--version", "--cmd", "test.ts", "--cwd", "/test"]
+  const args = ["--id", "test", "--init", "--config", "test.sh", "--watch", "test", "--version", "--cmd", "test.ts", "--cwd", "/test"]
   const expectedOutput = {
     _: [],
 
@@ -24,8 +24,8 @@ Deno.test("parseArguments should return expected arguments object when full opti
     autostart: false,
     u: false,
 
-    watch: true,
-    w: true,
+    watch: "test",
+    w: "test",
 
     init: true,
     i: true,
@@ -38,12 +38,15 @@ Deno.test("parseArguments should return expected arguments object when full opti
 
     status: false,
     s: false,
+
+    "no-config": false,
+    n: false,
   }
   assertEquals(parseArguments(args), expectedOutput)
 })
 
 Deno.test("parseArguments should return expected arguments object when aliases are used", () => {
-  const args = ["--id", "test", "-i", "-c", "test.sh", "-w", "-v"]
+  const args = ["--id", "test", "-i", "-c", "test.sh", "-w", "test", "-v", "-n"]
   const expectedOutput = {
     _: [],
 
@@ -58,8 +61,8 @@ Deno.test("parseArguments should return expected arguments object when aliases a
     c: "test.sh",
     config: "test.sh",
 
-    watch: true,
-    w: true,
+    watch: "test",
+    w: "test",
 
     init: true,
     i: true,
@@ -75,6 +78,9 @@ Deno.test("parseArguments should return expected arguments object when aliases a
 
     autostart: false,
     u: false,
+
+    "no-config": true,
+    n: true,
   }
   assertEquals(parseArguments(args), expectedOutput)
 })

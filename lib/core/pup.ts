@@ -52,10 +52,12 @@ class Pup {
         // Handle restarts
         if (status.status === ProcessStatus.FINISHED || status.status === ProcessStatus.ERRORED) {
           const msSinceExited = status.exited ? (new Date().getTime() - status.exited?.getTime()) : Infinity
-          const restartDelay = config.restartDelayMs ?? 10000
+
+          // Default restart delay to 10000ms, except when watching
+          const restartDelay = config.restartDelayMs ?? config.watch ? 500 : 10000
 
           // Always restart if restartpolicy is undefined and autostart is true
-          const restartPolicy = config.restart ?? (config.autostart ? "always" : undefined)
+          const restartPolicy = config.restart ?? (config.autostart || config.watch ? "always" : undefined)
 
           if (msSinceExited > restartDelay) {
             if (restartPolicy === "always" && msSinceExited > restartDelay) {

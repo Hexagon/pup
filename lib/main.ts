@@ -20,96 +20,102 @@ async function main() {
     Deno.exit(0)
   }
 
-  // Get configuration file path
-  let configFile = checkedArgs.config
-  if (!configFile) {
-    configFile = await findConfigFile()
-  }
+  // Read/Generate configuration
+  let configuration, configFile
+  if (!checkedArgs["no-config"]) {
+    // Get configuration file path
+    configFile = checkedArgs.config
+    if (!configFile) {
+      configFile = await findConfigFile()
+    }
 
-  // Generate configuration on --init
-  if (checkedArgs.init) {
-    const fallbackedConfigFile = configFile ?? "pup.jsonc"
-    if (await fileExists(fallbackedConfigFile)) {
-      console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
-      Deno.exit(1)
-    } else {
-      await createConfigurationFile(fallbackedConfigFile, checkedArgs)
-      console.log(`Configuration file '${fallbackedConfigFile}' created`)
+    // Generate configuration
+    if (checkedArgs.init) {
+      const fallbackedConfigFile = configFile ?? "pup.jsonc"
+      if (await fileExists(fallbackedConfigFile)) {
+        console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
+        Deno.exit(1)
+      } else {
+        await createConfigurationFile(fallbackedConfigFile, checkedArgs)
+        console.log(`Configuration file '${fallbackedConfigFile}' created`)
+        Deno.exit(0)
+      }
+    }
+
+    // Append configuration on --append
+    if (checkedArgs.append) {
+      const fallbackedConfigFile = configFile ?? "pup.jsonc"
+      if (await fileExists(fallbackedConfigFile)) {
+        await appendConfigurationFile(fallbackedConfigFile, checkedArgs)
+        console.log(`Process '${args.id}' appended to configuration file '${fallbackedConfigFile}'.`)
+        Deno.exit(0)
+      } else {
+        console.log("Configuration file '${fallbackedConfigFile}' not found, use --init if you want to create a new one. Exiting.")
+        Deno.exit(1)
+      }
+    }
+
+    // Remove process on --remove
+    if (checkedArgs.remove) {
+      const fallbackedConfigFile = configFile ?? "pup.jsonc"
+      if (await fileExists(fallbackedConfigFile)) {
+        await removeFromConfigurationFile(fallbackedConfigFile, checkedArgs)
+        console.log(`Process '${args.id}' removed from configuration file '${fallbackedConfigFile}'.`)
+        Deno.exit(0)
+      } else {
+        console.log("Configuration file '${fallbackedConfigFile}' not found, use --init if you want to create a new one. Exiting.")
+        Deno.exit(1)
+      }
+    }
+
+    // Look for config file
+    // Print status if status flag is present
+    if (checkedArgs.status) {
+      await printStatus(configFile)
       Deno.exit(0)
     }
-  }
 
-  // Append configuration on --append
-  if (checkedArgs.append) {
-    const fallbackedConfigFile = configFile ?? "pup.jsonc"
-    if (await fileExists(fallbackedConfigFile)) {
-      await appendConfigurationFile(fallbackedConfigFile, checkedArgs)
-      console.log(`Process '${args.id}' appended to configuration file '${fallbackedConfigFile}'.`)
-      Deno.exit(0)
-    } else {
-      console.log("Configuration file '${fallbackedConfigFile}' not found, use --init if you want to create a new one. Exiting.")
+    // Exit if no configuration file was found
+    if (!configFile) {
+      console.error("Could not start, no configuration file found")
       Deno.exit(1)
     }
-  }
 
-  // Remove process on --remove
-  if (checkedArgs.remove) {
-    const fallbackedConfigFile = configFile ?? "pup.jsonc"
-    if (await fileExists(fallbackedConfigFile)) {
-      await removeFromConfigurationFile(fallbackedConfigFile, checkedArgs)
-      console.log(`Process '${args.id}' removed from configuration file '${fallbackedConfigFile}'.`)
-      Deno.exit(0)
-    } else {
-      console.log("Configuration file '${fallbackedConfigFile}' not found, use --init if you want to create a new one. Exiting.")
+    // Exit if specified configuration file is not found
+    if (!await fileExists(configFile)) {
+      console.error("Could not start, specified configuration file not found")
       Deno.exit(1)
     }
-  }
 
-  // Look for config file
-  // Print status if status flag is present
-  if (checkedArgs.status) {
-    await printStatus(configFile)
-    Deno.exit(0)
-  }
+    // Read and parse configuration
+    try {
+      const rawConfig = await Deno.readTextFile(configFile)
+      configuration = jsonc.parse(rawConfig)
+    } catch (e) {
+      console.error(`Could not start, error reading or parsing configuration file '${configFile}'`)
+      console.error(e)
+      Deno.exit(1)
+    }
 
-  // Exit if no configuration file was found
-  if (!configFile) {
-    console.error("Could not start, no configuration file found")
-    Deno.exit(1)
-  }
-
-  // Exit if specified configuration file is not found
-  if (!await fileExists(configFile)) {
-    console.error("Could not start, specified configuration file not found")
-    Deno.exit(1)
-  }
-
-  // Read and parse configuration
-  let configuration
-  try {
-    const rawConfig = await Deno.readTextFile(configFile)
-    configuration = jsonc.parse(rawConfig)
-  } catch (e) {
-    console.error(`Could not start, error reading or parsing configuration file '${configFile}'`)
-    console.error(e)
-    Deno.exit(1)
-  }
-
-  // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
-  try {
-    const resolvedPath = path.parse(path.resolve(configFile))
-    Deno.chdir(resolvedPath.dir)
-    configFile = `${resolvedPath.name}${resolvedPath.ext}`
-  } catch (e) {
-    console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
-    Deno.exit(1)
+    // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
+    try {
+      const resolvedPath = path.parse(path.resolve(configFile))
+      Deno.chdir(resolvedPath.dir)
+      configFile = `${resolvedPath.name}${resolvedPath.ext}`
+    } catch (e) {
+      console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
+      Deno.exit(1)
+    }
+  } else {
+    configuration = generateConfiguration(args.id || "task", args.cmd, args.cwd, args.cron, args.autostart, args.watch)
   }
 
   // Start pup
   try {
-    const statusFile = `${configFile}.status`
+    let statusFile
+    if (configFile) statusFile = `${configFile}.status`
     const pup = new Pup(configuration, statusFile)
-    await pup.start()
+    pup.start()
   } catch (e) {
     console.error("Could not start pup, invalid configuration:")
     console.error(e.toString())

@@ -15,8 +15,9 @@ function printFlags() {
   console.log("")
   console.log(" -s\t--status\t\tDisplay status for a running instance")
   console.log("")
+  console.log(" -n\t--no-config\t\t\tDo not use a configuration file")
   console.log(" -i\t--init\t\t\tCreate a new pup.json")
-  console.log(" -i\t--append\t\t\tAppend to existing configuraton file")
+  console.log(" -a\t--append\t\t\tAppend to existing configuraton file")
   console.log('   \t--id "name"\t\tname of the task')
   console.log('   \t--cmd "command"\t\tCommand to run')
   console.log('   \t--cwd "command"\t\tWorking directory of the process')
@@ -45,32 +46,26 @@ function checkArguments(args: Args): Args | null {
   }
 
   // Do not allow configuration creation options without --init and vice versa
-  if (args.autostart && !args.init && !args.append) {
-    throw new Error("Argument '--autostart' requires '--init' or '--append'")
+  if (args.autostart && !args.init && !args.append && !args["no-config"]) {
+    throw new Error("Argument '--autostart' requires '--init', '--append' or '--no-config'")
   }
-  if (args.cron && !args.init && !args.append) {
-    throw new Error("Argument '--cron' requires '--init' or '--append'")
+  if (args.cron && !args.init && !args.append && !args["no-config"]) {
+    throw new Error("Argument '--cron' requires '--init', '--append' or '--no-config'")
   }
-  if (args.watch && !args.init && !args.append) {
-    throw new Error("Argument '--watch' requires '--init' or '--append'")
+  if (args.watch && !args.init && !args.append && !args["no-config"]) {
+    throw new Error("Argument '--watch' requires '--init', '--append' or '--no-config'")
   }
-  if (args.cmd && !args.init && !args.append) {
-    throw new Error("Argument '--cmd' requires '--init' or '--append'")
+  if (args.cmd && !args.init && !args.append && !args["no-config"]) {
+    throw new Error("Argument '--cmd' requires '--init', '--append' or '--no-config'")
   }
-  if (args.watch && !args.init && !args.append) {
-    throw new Error("Argument '--watch' requires '--init' or '--append'")
-  }
-  if (!args.cmd && (args.init || args.append)) {
-    throw new Error("Argument '--init' and '--append' requires '--cmd'")
+  if (!args.cmd && (args.init || args.append || args["no-config"])) {
+    throw new Error("Argument '--init', '--append' and '--no-config' requires '--cmd'")
   }
   if (!args.id && (args.init || args.append || args.remove)) {
     throw new Error("Arguments '--init','--append' and '--remove' requires '--id'")
   }
-  if (!args.cmd && (args.init || args.append)) {
-    throw new Error("Argument '--init' and '--append' requires '--cmd'")
-  }
-  if (!args.id && (args.remove)) {
-    throw new Error("Argument '--remove' requires '--id'")
+  if (args["no-config"] && !args.cmd) {
+    throw new Error("Argument '--no-config' requires '--cmd")
   }
 
   return args

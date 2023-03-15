@@ -14,14 +14,14 @@ Deno.test("checkArguments should return null when version argument is provided",
   assertEquals(result, null)
 })
 
-Deno.test("checkArguments should throw error when autostart argument is provided without init or append", async () => {
+Deno.test("checkArguments should throw error when autostart argument is provided without init, append or no-config", async () => {
   const args = { _: [], autostart: true }
   await assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Argument '--autostart' requires '--init' or '--append'",
+    "Argument '--autostart' requires '--init', '--append' or '--no-config'",
   )
 })
 
@@ -32,7 +32,7 @@ Deno.test("checkArguments should throw error when cron argument is provided with
       checkArguments(args)
     },
     Error,
-    "Argument '--cron' requires '--init' or '--append'",
+    "Argument '--cron' requires '--init', '--append' or '--no-config'",
   )
 })
 
@@ -43,18 +43,18 @@ Deno.test("checkArguments should throw error when watch argument is provided wit
       checkArguments(args)
     },
     Error,
-    "Argument '--watch' requires '--init' or '--append'",
+    "Argument '--watch' requires '--init', '--append' or '--no-config'",
   )
 })
 
-Deno.test("checkArguments should throw error when cmd argument is provided without init or append", async () => {
+Deno.test("checkArguments should throw error when cmd argument is provided without init, append or no-config", async () => {
   const args = { _: [], cmd: "command" }
   await assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Argument '--cmd' requires '--init' or '--append'",
+    "Argument '--cmd' requires '--init', '--append' or '--no-config'",
   )
 })
 
@@ -65,7 +65,7 @@ Deno.test("checkArguments should throw error when init or append argument is pro
       checkArguments(args)
     },
     Error,
-    "Argument '--init' and '--append' requires '--cmd'",
+    "Argument '--init', '--append' and '--no-config' requires '--cmd'",
   )
 })
 

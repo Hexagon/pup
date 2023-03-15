@@ -114,15 +114,6 @@ function validateConfiguration(unsafeConfiguration: unknown): Configuration {
   }
 
   // It is now safe to "cast" to a real configuraton object
-  const safeConfiguration: Configuration = unsafeConfiguration as Configuration
-
-  // Check for unwanted configuration
-  for (const process of safeConfiguration.processes) {
-    if (process.watch && !process.restart) {
-      throw new Error(`Configuration: Process '${process.id}' configured to restart on watch, but do not have a restart policy.`)
-    }
-  }
-
   return unsafeConfiguration as Configuration
 }
 
