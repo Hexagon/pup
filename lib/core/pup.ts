@@ -62,12 +62,12 @@ class Pup {
           const restartDelay = config.restartDelayMs ?? config.watch ? 500 : 10000
 
           // Always restart if restartpolicy is undefined and autostart is true
-          const restartPolicy = config.restart ?? (config.autostart || config.watch ? "always" : undefined)
+          const restartPolicy = config.restart ?? ((config.autostart || config.watch) ? "always" : undefined)
 
           if (msSinceExited > restartDelay) {
             if (restartPolicy === "always") {
               process.start("restart", true)
-            } else if (restartPolicy === "error" && ProcessStatus.ERRORED) {
+            } else if (restartPolicy === "error" && status.status === ProcessStatus.ERRORED) {
               process.start("restart", true)
             }
           }
