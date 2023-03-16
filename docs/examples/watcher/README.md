@@ -1,11 +1,12 @@
 ---
 layout: page
-title: "Appendix: File watcher example"
+title: "Appendix: File watcher"
 ---
 
 # Example: Restart on file changes
 
-The example at [/docs/examples/watcher](https://github.com/hexagon/pup/docs/examples/watcher) runs `script.js` with Deno using Pup. The process is restarted on any file change in the current directory (configuration `watch: ["."]`).
+The example at [/docs/examples/watcher](https://github.com/hexagon/pup/docs/examples/watcher) runs `script.js` with Deno using Pup. The process is restarted on any file change in the current directory
+(configuration `watch: ["."]`).
 
 ## Files
 

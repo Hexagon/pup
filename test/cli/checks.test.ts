@@ -1,18 +1,7 @@
 import { assertEquals, assertThrows, spy } from "../deps.ts"
-import { checkArguments, printHeader, printUsage } from "../../lib/cli/checks.ts"
+import { checkArguments } from "../../lib/cli/checks.ts"
 import { Application } from "../../application.meta.ts"
-
-Deno.test("checkArguments should return null when help argument is provided", () => {
-  const args = { _: [], help: true }
-  const result = checkArguments(args)
-  assertEquals(result, null)
-})
-
-Deno.test("checkArguments should return null when version argument is provided", () => {
-  const args = { _: [], version: true }
-  const result = checkArguments(args)
-  assertEquals(result, null)
-})
+import { printHeader, printUsage } from "../../lib/cli/output.ts"
 
 Deno.test("checkArguments should throw error when autostart argument is provided without init, append or no-config", async () => {
   const args = { _: [], autostart: true }

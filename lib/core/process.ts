@@ -160,10 +160,21 @@ class Process {
       this.code = result.code
       this.signal = result.signal
 
-      // Exited - Update status
-      if (result.code === 0) {
+      /**
+       * Exited - Update status
+       *
+       * Treat SIGTERM (Exit Code 143) as a non-error exit, to avoid restarts after
+       * a manual stop
+       */
+      if (result.code === 0 || result.code === 143) {
         this.setStatus(ProcessStatus.FINISHED)
         logger.log("finished", `Process finished with code ${result.code}`, this.config)
+
+        /**
+         * Exited - Update status
+         *
+         * Treat all exit codes except 0 and 143(SIGTERM) as errors
+         */
       } else {
         this.setStatus(ProcessStatus.ERRORED)
         logger.log("errored", `Process exited with code ${result.code}`, this.config)

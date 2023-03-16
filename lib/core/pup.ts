@@ -80,9 +80,16 @@ class Pup {
           const restartPolicy = config.restart ?? ((config.autostart || config.watch) ? "always" : undefined)
 
           if (msSinceExited > restartDelay) {
+            /* Always restart if the process exits, with that restart policy */
             if (restartPolicy === "always") {
               process.start("restart", true)
-            } else if (restartPolicy === "error" && status.status === ProcessStatus.ERRORED) {
+
+              /* Restart on error if ProcessStatus is ERRORED */
+            } else if (
+              restartPolicy === "error" &&
+              status.status === ProcessStatus.ERRORED &&
+              status.code !== 143
+            ) {
               process.start("restart", true)
             }
           }
