@@ -3,7 +3,7 @@ layout: page
 title: "Appendix: Docker (Deno)"
 ---
 
-# Using pup with Docker
+# Example: Using pup with Docker
 
 The example at [/docs/examples/docker](https://github.com/hexagon/pup/docs/examples/docker] runs a Deno script periodically with Pup in the official Deno docker imag.
 
