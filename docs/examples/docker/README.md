@@ -1,6 +1,11 @@
-# Pup docker demo
+---
+layout: page
+title: "Appendix: Docker (Deno)"
+---
 
-This demo runs a Deno script in the official Deno docker image periodically using Pup process manager
+# Using pup with Docker
+
+The example at [/docs/examples/docker](https://github.com/hexagon/pup/docs/examples/docker] runs a Deno script periodically with Pup in the official Deno docker imag.
 
 ## Files
 
@@ -10,7 +15,7 @@ This demo runs a Deno script in the official Deno docker image periodically usin
 
 ## Building and running
 
-`cd` to this directory.
+`cd` to `/docs/examples/docker` directory.
 
 **Build image**
 

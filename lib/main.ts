@@ -5,6 +5,7 @@ import { parseArguments } from "./cli/args.ts"
 import { fileExists, isRunning } from "./common/utils.ts"
 import { ProcessInformationParsed, ProcessStatus } from "./core/process.ts"
 import { generateConfiguration, ProcessConfiguration } from "./core/configuration.ts"
+import { FileIPC } from "./core/ipc.ts"
 
 /**
  * Define the main entry point of the CLI application
@@ -110,12 +111,30 @@ async function main() {
     configuration = generateConfiguration(args.id || "task", args.cmd, args.cwd, args.cron, args.autostart, args.watch)
   }
 
+  // Prepare for IPC
+  let ipcFile
+  if (configFile) ipcFile = `${configFile}.ipc`
+
+  // Handle --restart, --stop etc
+  for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
+    if (args[op] !== undefined) {
+      if (ipcFile) {
+        const ipc = new FileIPC(ipcFile)
+        await ipc.sendData(JSON.stringify({ [op]: args[op] || true }))
+        Deno.exit(0)
+      } else {
+        console.error("No configuration file specified, cannot send restart message.")
+        Deno.exit(1)
+      }
+    }
+  }
+
   // Start pup
   try {
     let statusFile
     if (configFile) statusFile = `${configFile}.status`
-    const pup = new Pup(configuration, statusFile)
-    pup.start()
+    const pup = new Pup(configuration, statusFile, ipcFile)
+    pup.init()
   } catch (e) {
     console.error("Could not start pup, invalid configuration:")
     console.error(e.toString())

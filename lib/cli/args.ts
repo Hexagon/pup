@@ -27,6 +27,14 @@ function parseArguments(args: string[]): Args {
     "cwd",
     "id",
     "cron",
+
+    "restart",
+    "start",
+    "stop",
+    "block",
+    "unblock",
+
+    "terminate",
   ]
 
   // And a list of aliases

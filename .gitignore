@@ -15,7 +15,8 @@ test.jsonc
 *.status
 
 # Pup test files
-test_data_.*
+test_data_*.*
+status.json
 
 # VS Code
 .vscode/*

@@ -23,7 +23,7 @@ const configuration = {
 const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
 
 // Go!
-pup.start()
+pup.init()
 ```
 
 ### Custom logger
@@ -49,5 +49,5 @@ const logger = (severity: string, category: string, text: string, _config?: Glob
 // Attach the logger to pup
 pup.logger.attach(logger)
 
-pup.start()
+pup.init()
 ```

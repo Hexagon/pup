@@ -26,6 +26,7 @@ interface ProcessInformation {
   blocked?: boolean
   restarts?: number
   updated: Date
+  pendingRestartReason?: string
 }
 
 interface ProcessInformationParsed {
@@ -60,6 +61,7 @@ class Process {
   private exited?: Date
   private restarts = 0
   private updated: Date = new Date()
+  private pendingRestartReason?: string
 
   constructor(pup: Pup, config: ProcessConfiguration) {
     this.config = config
@@ -83,6 +85,7 @@ class Process {
       blocked: this.blocked,
       restarts: this.restarts,
       updated: this.updated,
+      pendingRestartReason: this.pendingRestartReason,
     }
   }
 
@@ -103,6 +106,12 @@ class Process {
     // Do not start if blocked
     if (this.blocked) {
       logger.log("blocked", `Process blocked, refusing to start`, this.config)
+
+      // Reset pending restart when blocked
+      if (this.pendingRestartReason) {
+        this.pendingRestartReason = undefined
+      }
+
       return
     }
 
@@ -139,6 +148,8 @@ class Process {
 
     // Try to start
     try {
+      this.pendingRestartReason = undefined
+
       const result = await this.runner.run((pid: number) => {
         // Process started
         this.setStatus(ProcessStatus.RUNNING)
@@ -184,6 +195,11 @@ class Process {
     return false
   }
 
+  public restart = (reason: string) => {
+    this.stop(reason)
+    this.pendingRestartReason = reason
+  }
+
   public block = () => {
     this.blocked = true
   }
@@ -195,7 +211,7 @@ class Process {
   private setupCron = () => {
     try {
       // ToDo: Take care of env TZ?
-      const cronJob = new Cron(this.config.cron as string, () => {
+      const cronJob = new Cron(this.config.cron as string, { unref: true }, () => {
         this.start("Cron pattern")
         this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
         this.restarts = 0
@@ -220,6 +236,8 @@ class Process {
       }
     }
   }
+
+  public isPendingRestart = () => this.pendingRestartReason !== undefined
 }
 
 export { Process, ProcessStatus }

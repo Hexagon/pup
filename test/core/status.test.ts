@@ -4,6 +4,8 @@ import { Pup } from "../../lib/core/pup.ts"
 import { Status } from "../../lib/core/status.ts"
 import { assertEquals, spy } from "../deps.ts"
 
+const TEST_FILE_PATH = "./test_data_Status.jsontest"
+
 class MockProcess extends Process {
   constructor() {
     const pup = new Pup({ processes: [{ id: "task-1", cmd: ["deno", "run", "test"] }] })
@@ -26,7 +28,7 @@ class MockProcess extends Process {
 }
 
 Deno.test("Status should create an instance with statusFileName property if provided", () => {
-  const expectedFileName = "status.json"
+  const expectedFileName = TEST_FILE_PATH
   const status = new Status(expectedFileName)
   assertEquals(status["statusFileName"], expectedFileName)
 })
@@ -37,7 +39,7 @@ Deno.test("Status should not have statusFileName property if not provided", () =
 })
 
 Deno.test("Status.writeToDisk should write the status to disk if statusFileName property is set", () => {
-  /*const expectedFileName = "status.json"
+  /*const expectedFileName = TEST_FILE_PATH
   const expectedProcess = new MockProcess()
   const expectedProcessStatus = expectedProcess.getStatus()
   const expectedPupStatus = {
@@ -76,7 +78,7 @@ Deno.test("Status.writeToDisk should catch and log errors", async () => {
   const expectedProcess = new MockProcess()
   const writeFileSpy = spy(Deno, "writeFile")
 
-  const status = new Status("status.json")
+  const status = new Status(TEST_FILE_PATH)
   await status.writeToDisk([expectedProcess])
 
   assertEquals(writeFileSpy.calls.length, 1)

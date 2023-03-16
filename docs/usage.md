@@ -15,6 +15,26 @@ General flags are used to control the basic behavior of Pup and can be combined 
 - `-h, --help`: Display the help message with a list of available commands and options.
 - `-v, --version`: Show the current version of Pup.
 
+### Controlling running instances
+
+The pup CLI can be used to control running instances, using the following command line flags. Run in a directory with a `pup.json`, or point to the correct instance configuration using
+`--config "path/to/config"`.
+
+- `--restart all|process-id`: Restarts, or starts, the running processes `process-id`, or all processes
+- `--start all|process-id`: Starts the running processes `process-id`, or all processes if not already running
+- `--stop all|process-id`: Stops the process `process-id`, or all processes, if they are running. Process will restart instantly if configured to.
+- `--block all|process-id`: Block the process `process-id`, or all processes, completely from starting.
+- `--stop all|process-id`: Unblock the process `process-id`, or all processes, allowing it to start again. Will not start the process.
+- `--terminate`: Stop all processes and exit.
+
+Example to restart task-1 started using `pup.json` in the current directory.
+
+`pup --restart task-1`
+
+Example to stop task-2 started using `/root/pup.json` in the current directory. Requires write permission to `/root/`
+
+`pup --stop task-2 --config /root/pup.json`
+
 ### Configuring using the cli
 
 ### Init
