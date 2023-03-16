@@ -12,4 +12,6 @@ aux_links:
 
 plugins:
   - jekyll-relative-links
-  - jekyll-default-layou
+  - jekyll-default-layout
+  
+color_scheme: dark
