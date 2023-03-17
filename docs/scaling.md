@@ -24,8 +24,7 @@ Example available in the GitHub Repository at [/docs/examples/cluster](https://g
         "commonPort": 3000,
         "startPort": 8000,
         "strategy": "round-robin"
-      },
-      "loadBalancerStrategy": "round-robin"
+      }
     }
   ]
 }

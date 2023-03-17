@@ -13,7 +13,7 @@ The end user configuration for activating a plugin by `pup.json` is
 
 ```jsonc
 {
-    /* ... */,
+    /* ... */
     "processes": [ /* ... */ ],
     "plugins": [
         /* Remote plugin */
