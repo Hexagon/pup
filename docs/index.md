@@ -10,7 +10,7 @@ the logs of each process, gathering them into a single stdout or file, making it
 
 Pup can also watch the filesystem, and restart processes when files change, similar to Nodemon and Denon.
 
-In addition to serving as a stand alone process manager, Pup can also function as a [as a library](#library-usage), allowing you to seamlessly manage the internal process ecosystem of your
+In addition to serving as a stand alone process manager, Pup can also function as a [as a library](./library.html), allowing you to seamlessly manage the internal process ecosystem of your
 application.
 
 Pup revolves around a single configuration file, by default named `pup.jsonc`, which control every aspect of the processes to be executed, their execution methods, and the handling of logging.

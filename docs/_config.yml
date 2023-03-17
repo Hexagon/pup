@@ -14,4 +14,4 @@ plugins:
   - jekyll-relative-links
   - jekyll-default-layout
   
-color_scheme: dark
+# color_scheme: dark
