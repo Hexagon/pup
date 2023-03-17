@@ -5,7 +5,7 @@ title: 9. Contributing
 
 # 9. Contributing
 
-***
+---
 
 Pup is an open-source project, and we welcome contributions from the community. If you're interested in contributing to Pup, here are some ways you can get involved:
 

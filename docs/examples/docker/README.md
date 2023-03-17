@@ -5,13 +5,14 @@ title: "Example: Docker (Deno)"
 
 # Example: Using pup with Docker
 
-***
+---
 
 The example at [/docs/examples/docker](https://github.com/Hexagon/pup/tree/main/docs/examples/docker) runs a Deno script periodically with Pup in the official Deno docker imag.
 
 ## Files
 
-- [Dockerfile](https://github.com/Hexagon/pup/tree/main/docs/examples/docker/Dockerfile) - Sets up a container based on `denoland/deno:debian-1.31.1`, installs Pup, and copies this directory content to `/app/`
+- [Dockerfile](https://github.com/Hexagon/pup/tree/main/docs/examples/docker/Dockerfile) - Sets up a container based on `denoland/deno:debian-1.31.1`, installs Pup, and copies this directory content
+  to `/app/`
 - [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/examples/docker/pup.jsonc) - Pup configuration, sets up `task.ts` to run at cron schedule `0/5 * * * * *` (every fifth second).
 - [task.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/docker/task.ts) - The actual script to run. Prints "Task running" to console and exits.
 

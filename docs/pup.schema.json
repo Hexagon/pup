@@ -134,7 +134,7 @@
                   "strategy": {
                     "type": "string",
                     "enum": [
-                      "strategy",
+                      "ip-hash",
                       "round-robin"
                     ],
                     "default": "round-robin"

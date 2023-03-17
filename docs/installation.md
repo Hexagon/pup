@@ -5,7 +5,7 @@ title: 2. Installation
 
 # 2. Installation
 
-***
+---
 
 This section will guide you through the installation process of Pup, the process management tool.
 
@@ -46,4 +46,5 @@ To update Pup to the latest version, simply re-run the installation command:
 deno install -A -f -n pup https://deno.land/x/pup/mod.ts
 ```
 
-This will overwrite the existing installation with the latest version of Pup, `-A` grants all permissions for pup, `-f` allow the installer to overwrite the previous version, and `-n pup` sets the executable name.
+This will overwrite the existing installation with the latest version of Pup, `-A` grants all permissions for pup, `-f` allow the installer to overwrite the previous version, and `-n pup` sets the
+executable name.

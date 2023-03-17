@@ -31,12 +31,11 @@ export class LoadBalancer {
     const targetConn = await Deno.connect(backend)
     try {
       await Promise.all([copy(client, targetConn), copy(targetConn, client)])
-    } catch (err) {
-      console.error("Proxy error:", err)
+    } catch (_err) {
+      //console.error("Proxy error:", err)
     } finally {
       client.close()
       targetConn.close()
-      console.log("Connection closed")
     }
   }
 

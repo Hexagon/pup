@@ -5,7 +5,7 @@ title: 8. Troubleshooting
 
 # 8. Troubleshooting
 
-***
+---
 
 In this section, we will cover some common issues and their solutions when using Pup.
 

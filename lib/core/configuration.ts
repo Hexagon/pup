@@ -98,7 +98,7 @@ const ConfigurationSchema = z.object({
         instances: z.number().min(0).max(65535),
         commonPort: z.number().min(1).max(65535),
         startPort: z.number().min(1).max(65535),
-        strategy: z.enum(["strategy", "round-robin"]).default("round-robin"),
+        strategy: z.enum(["ip-hash", "round-robin"]).default("round-robin"),
       })),
       pidFile: z.optional(z.string()),
       autostart: z.optional(z.boolean()),
