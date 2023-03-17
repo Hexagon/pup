@@ -12,19 +12,19 @@ The end user configuration for activating a plugin by `pup.json` is
 ```jsonc
 {
     /* ... */,
-    processes: [ /* ... */ ],
-    plugins: [
+    "processes": [ /* ... */ ],
+    "plugins": [
         /* Remote plugin */
         {
-            url: "https://deno.land/x/pup-example-plugin@0.0.1/mod.ts",
-            configuration: {
+            "url": "https://deno.land/x/pup-example-plugin@0.0.1/mod.ts",
+            "configuration": {
                 /* Plugin specific configuration */
             }
         },
         /* Local plugin */
         {
-            url: "./plugins/app-plugin.ts",
-            configuration: {
+            "url": "./plugins/app-plugin.ts",
+            "configuration": {
                 /* Plugin specific configuration */
             }
         }
@@ -32,4 +32,4 @@ The end user configuration for activating a plugin by `pup.json` is
 }
 ```
 
-Check out [main.ts](./main.ts) for a demo showing how to implement a custom logger.
+Check out [/docs/examples/logger-plugin/main.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/watcher/main.ts) for a demo showing how to implement a custom logger.

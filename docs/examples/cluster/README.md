@@ -1,18 +1,18 @@
 ---
 layout: page
-title: "Appendix: Cluster w/ Load balancer
+title: "Appendix: Cluster w/ Load balancer"
 ---
 
 # Example: Pup Cluster
 
-The example at [/docs/examples/scaling](https://github.com/hexagon/pup/docs/examples/scaling] shows how to scale up an application using the clustering feature of Pup.
+The example at [/docs/examples/scaling](https://github.com/Hexagon/pup/tree/main/docs/examples/scaling) shows how to scale up an application using the clustering feature of Pup.
 
-Detailed documentation available at [/docs/examples/scaling](hexagon.github.io/pup/scaling].
+Detailed documentation available at [/docs/examples/scaling](https://hexagon.github.io/pup/scaling).
 
 ## Files
 
-- [pup.jsonc](./pup.jsonc) - Pup configuration, sets up a process with the cluster setting, and a load balancer using round-robin at port `3456`
-- [app.ts](./app.ts) - Demo http server, will be launched in three instances on ports `4000`,`4001`, and `4002`
+- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/examples/scaling/pup.jsonc) - Pup configuration, sets up a process with the cluster setting, and a load balancer using round-robin at port `3456`
+- [app.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/scaling/app.ts) - Demo http server, will be launched in three instances on ports `4000`,`4001`, and `4002`
 
 ## Running
 
