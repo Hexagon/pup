@@ -5,6 +5,8 @@ title: "Appendix: Plugin development"
 
 # Appendix: Developing plugins for Pup
 
+***
+
 > **Warning** The plugin interface is currently a Draft. Expect it to change!
 
 The end user configuration for activating a plugin by `pup.json` is
