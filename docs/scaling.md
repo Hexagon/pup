@@ -3,11 +3,11 @@ layout: page
 title: 5. Scaling applications
 ---
 
-## Pup Process Manager: Scaling Processes with JSON Configuration
+# 5. Scaling applications
 
 Pup is a process manager that supports scaling of processes through a JSON configuration pattern. This manual will cover the configuration pattern, process scaling, and the supported load balancing strategies, as well as the advantages of using the source-ip-hash strategy for stateful applications.
 
-### Configuration Pattern
+## Configuration Pattern
 
 Pup uses a JSON configuration pattern to define how processes should be scaled. An example configuration is shown below:
 
@@ -39,7 +39,7 @@ In this example, Pup will start 4 instances of the process with the ID `my-scala
   - `commonPort`: Sets the port for, and enables, the load balancer
   - `strategy`: Strategy for the load balancer, default is 'round-robin', an alternative is 'source-ip-hash'
 
-### Scaling Processes
+## Scaling Processes
 
 During operations, the number of instances for a process can be increased or decreased using command-line options. For example, to change the number of instances for `my-scalable-app` to 6, use the following command:
 
@@ -47,20 +47,20 @@ During operations, the number of instances for a process can be increased or dec
 
 Pup will automatically adjust the number of instances to the specified value. Each instance will receive a unique identifier in the format `my-scalable-app-<n>`, where `<n>` is a sequential integer starting from 1.
 
-### Load Balancing Strategies
+## Load Balancing Strategies
 
 Pup supports two load balancing strategies:
 
 1. **Round-robin**: The default strategy, where incoming connections are distributed sequentially among available instances.
 2. **Source-ip-hash**: Incoming connections are distributed based on the hash of the client's IP address. This ensures that clients with the same IP address are consistently directed to the same instance.
 
-### Source-ip-hash for Stateful Applications
+## Source-ip-hash for Stateful Applications
 
 For stateful applications, the source-ip-hash strategy is often a better choice than the round-robin strategy. This is because stateful applications maintain information about client sessions, and directing a client to a different instance may result in a loss of session data.
 
 The source-ip-hash strategy mitigates this issue by consistently directing clients with the same IP address to the same instance. However, this strategy is not perfect, as it may cause uneven load distribution when a large number of clients share the same IP address, for example, when clients are behind a proxy server or a NAT device.
 
-### Built-in vs External Load Balancer
+## Built-in vs External Load Balancer
 
 Pup's load balancer is suitable for small applications and development environments, as it offers simplicity and ease of setup. However, for larger applications and production environments, it is recommended to use an external, more robust load balancer, such as NGINX.
 

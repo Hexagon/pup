@@ -3,7 +3,7 @@ layout: page
 title: 4. Configuration
 ---
 
-## Configuration
+# 4. Configuration
 
 In this section, you will learn how to create and manage configuration files for Pup.
 
@@ -25,7 +25,7 @@ the following basic structure to the file:
 This basic configuration defines a single process named example that runs a Deno script (app.ts) with the `--allow-net` flag. You can customize the configuration to suit your needs by adding more
 processes or updating the existing process definition.
 
-### Process configuration
+## Process configuration
 
 Here's a list of available configuration options for each process:
 
@@ -53,7 +53,7 @@ You need to specify one of these for each process, else the process will never s
 - `restartDelayMs` (optional): A number specifying the delay (in milliseconds) before restarting the process.
 - `restartLimit` (optional): A number specifying the maximum number of restarts allowed for the process.
 
-#### Global configuration
+## Global configuration
 
 Global configuration are entirely optional.
 
@@ -62,7 +62,7 @@ You can define global configuration options that apply to all processes. In addi
 - `logger`: An object containing global logger configuration options.
 - `watcher`: An object containing global watcher configuration options.
 
-##### Logger
+### Logger
 
 The global logger configuration allows you to control the logging settings for pup, and the defaults of each process. To the global logger, include the following properties within your configuration
 file:
@@ -101,7 +101,7 @@ These options can be used in both the global scope logger, and for each process 
 }
 ```
 
-##### Watcher
+### Watcher
 
 The global watcher configuration allows you to control file watching settings for the entire library. To configure the global watcher, include the following properties within your configuration file:
 
@@ -114,14 +114,14 @@ Then enable watcher in the process configuration using `watch: ["paths","to","wa
 
 { "watcher": { "interval": 100, "exts": ["ts", "tsx", "js", "jsx", "json"], "match": ["**/_._"], "skip": ["**/.git/**"] }, "processes": [ { "id": "my-process", /* ... */ "watch": ["src/"] } ] }
 
-### Validating the Configuration
+## Validating the Configuration
 
 To ensure your configuration is valid, just run `pup`. If using pup as a library, can use the validateConfiguration() function provided by the `/lib/core/configuration.ts` file. This function checks
 if the configuration adheres to the schema and throws an error if it doesn't.
 
 With a valid configuration in place, you're ready to use Pup to manage your processes.
 
-### VS Code Intellisense
+## VS Code Intellisense
 
 If you want Intellisense and code completion for `pup.json`/`pup.jsonc` in VS Code, you can append the pup json schema to `json.schemas` in your user settings or project settings
 (`.vscode/settings.json`).

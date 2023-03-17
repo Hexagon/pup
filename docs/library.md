@@ -3,7 +3,7 @@ layout: page
 title: 6. Library usage
 ---
 
-## Library usage
+# 6. Library usage
 
 Pup can be build in in your application. Just import from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
 
@@ -26,7 +26,7 @@ const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
 pup.init()
 ```
 
-### Custom logger
+## Custom logger
 
 Pup supports plugging in an custom logger, use like this:
 

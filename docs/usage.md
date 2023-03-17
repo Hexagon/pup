@@ -3,19 +3,19 @@ layout: page
 title: 3. Usage
 ---
 
-## Usage
+# 3. Usage
 
 Pup offers various command line parameters to help you control its behavior. These parameters are grouped into general flags, init, append, and no-config options. In this section, we'll describe each
 group and provide examples of usage.
 
-### General Flags
+## General Flags
 
 General flags are used to control the basic behavior of Pup and can be combined with other command line parameters.
 
 - `-h, --help`: Display the help message with a list of available commands and options.
 - `-v, --version`: Show the current version of Pup.
 
-### Controlling running instances
+## Controlling running instances
 
 The pup CLI can be used to control running instances, using the following command line flags. Run in a directory with a `pup.json`, or point to the correct instance configuration using
 `--config "path/to/config"`.
@@ -35,7 +35,7 @@ Example to stop task-2 started using `/root/pup.json` in the current directory. 
 
 `pup --stop task-2 --config /root/pup.json`
 
-### Configuring using the cli
+## Configuring using the cli
 
 ### Init
 
@@ -99,7 +99,7 @@ The same example, using short aliases for the command line parameters.
 pup -nAc "npm run server"
 ```
 
-### Working directory
+## Working directory
 
 The working directory of pup will always be the location of `pup.jsonc`, and relative paths in configuration will stem from there. You can override this per-process by supplying `--cwd` to the cli, or
 using the option `cwd:` in the configuration.

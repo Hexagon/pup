@@ -5,9 +5,9 @@ title: "Appendix: Cluster w/ Load balancer"
 
 # Example: Pup Cluster
 
-The example at [/docs/examples/scaling](https://github.com/Hexagon/pup/tree/main/docs/examples/scaling) shows how to scale up an application using the clustering feature of Pup.
+The example at [/docs/examples/cluster](https://github.com/Hexagon/pup/tree/main/docs/examples/cluster) shows how to scale up an application using the clustering feature of Pup.
 
-Detailed documentation available at [/docs/examples/scaling](https://hexagon.github.io/pup/scaling).
+Detailed documentation available at [5. Scaling applications](https://hexagon.github.io/pup/scaling).
 
 ## Files
 

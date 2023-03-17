@@ -3,7 +3,7 @@ layout: page
 title: 1. Overview
 ---
 
-## Pup - The Manual
+# 1. Overview
 
 Pup is a command-line tool that simplifies the management of processes. Pup can start, stop, restart, and keep processes alive, as well as schedule processes using a cron pattern. It does also manage
 the logs of each process, gathering them into a single stdout or file, making it easy to monitor and analyze the output of your processes in one place.
@@ -19,7 +19,6 @@ Pup revolves around a single configuration file, by default named `pup.jsonc`, w
 
 - [Overview](./)
 - [Installation](./installation.html)
-
 - [Usage](./usage.html)
   - [General flags](./usage.html#general-flags)
   - [Configuring using the cli](./usage.html#configuring-using-the-cli)
