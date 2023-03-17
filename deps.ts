@@ -22,7 +22,8 @@ export * as jsonc from "https://deno.land/std@0.179.0/encoding/jsonc.ts"
 // watcher
 export { deferred, delay } from "https://deno.land/std@0.179.0/async/mod.ts"
 export { globToRegExp, relative } from "https://deno.land/std@0.179.0/path/mod.ts"
-
+// load balancer
+export { copy } from "https://deno.land/std@0.179.0/streams/mod.ts"
 /**
  * Third party dependencies
  *

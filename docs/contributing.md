@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 8. Contributing
+title: 9. Contributing
 ---
 
 ## Contributing

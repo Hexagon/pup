@@ -1,0 +1,229 @@
+{
+  "$ref": "#/definitions/ConfigurationSchema",
+  "definitions": {
+    "ConfigurationSchema": {
+      "type": "object",
+      "properties": {
+        "logger": {
+          "type": "object",
+          "properties": {
+            "console": {
+              "type": "boolean"
+            },
+            "stdout": {
+              "type": "string"
+            },
+            "stderr": {
+              "type": "string"
+            },
+            "colors": {
+              "type": "boolean"
+            },
+            "decorateFiles": {
+              "type": "boolean"
+            },
+            "decorate": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "watcher": {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "type": "number"
+            },
+            "exts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "ts",
+                "tsx",
+                "js",
+                "jsx",
+                "json"
+              ]
+            },
+            "match": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "**/*.*"
+              ]
+            },
+            "skip": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "**/.git/**"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "plugins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "options": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "url"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "processes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[a-z0-9@._\\-]+$"
+              },
+              "cmd": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cwd": {
+                "type": "string"
+              },
+              "env": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "cluster": {
+                "type": "object",
+                "properties": {
+                  "instances": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "commonPort": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 65535
+                  },
+                  "startPort": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 65535
+                  },
+                  "strategy": {
+                    "type": "string",
+                    "enum": [
+                      "strategy",
+                      "round-robin"
+                    ],
+                    "default": "round-robin"
+                  }
+                },
+                "required": [
+                  "instances",
+                  "commonPort",
+                  "startPort"
+                ],
+                "additionalProperties": false
+              },
+              "pidFile": {
+                "type": "string"
+              },
+              "autostart": {
+                "type": "boolean"
+              },
+              "watch": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cron": {
+                "type": "string",
+                "minLength": 9,
+                "maxLength": 256
+              },
+              "restart": {
+                "type": "string",
+                "enum": [
+                  "always",
+                  "error"
+                ]
+              },
+              "restartDelayMs": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 86400000,
+                "default": 10000
+              },
+              "overrun": {
+                "type": "boolean"
+              },
+              "restartLimit": {
+                "type": "number",
+                "minimum": 0
+              },
+              "timeout": {
+                "type": "number",
+                "minimum": 1
+              },
+              "logger": {
+                "type": "object",
+                "properties": {
+                  "console": {
+                    "type": "boolean"
+                  },
+                  "stdout": {
+                    "type": "string"
+                  },
+                  "stderr": {
+                    "type": "string"
+                  },
+                  "decorateFiles": {
+                    "type": "boolean"
+                  },
+                  "decorate": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "cmd"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "processes"
+      ],
+      "additionalProperties": false,
+      "description": "Pup configuration file"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

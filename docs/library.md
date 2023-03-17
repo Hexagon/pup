@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 5. Library usage
+title: 6. Library usage
 ---
 
 ## Library usage

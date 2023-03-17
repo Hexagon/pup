@@ -4,13 +4,13 @@ interface Configuration {
   logger?: GlobalLoggerConfiguration
   watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
-  /* plugins?: PluginEntry[] */
+  plugins?: PluginConfiguration[]
 }
 
-/*interface PluginEntry {
+interface PluginConfiguration {
   url: string
   options?: unknown
-}*/
+}
 
 interface _BaseLoggerConfiguration {
   console?: boolean
@@ -29,6 +29,13 @@ interface ProcessLoggerConfiguration extends _BaseLoggerConfiguration {
   decorateFiles?: boolean
 }
 
+interface ClusterConfiguration {
+  instances: number
+  commonPort: number
+  startPort: number
+  strategy: string
+}
+
 interface GlobalWatcherConfiguration {
   interval?: number
   exts?: string[]
@@ -41,6 +48,7 @@ interface ProcessConfiguration {
   cmd: string[]
   env?: Record<string, string>
   cwd?: string
+  cluster?: ClusterConfiguration
   pidFile?: string
   watch?: string[]
   autostart?: boolean
@@ -72,18 +80,26 @@ const ConfigurationSchema = z.object({
       skip: z.optional(z.array(z.string()).default(["**/.git/**"])),
     }).strict(),
   ),
-  /*plugins: z.optional(
-    z.object({
-      url: z.string(),
-      options: z.optional(z.object({}))
-    }).strict()
-  ),*/
+  plugins: z.optional(
+    z.array(
+      z.object({
+        url: z.string(),
+        options: z.optional(z.object({})),
+      }),
+    ),
+  ),
   processes: z.array(
     z.object({
       id: z.string().min(1).max(64).regex(/^[a-z0-9@._\-]+$/i, "Process ID can only contain characters a-Z 0-9 . _ - or @"),
       cmd: z.array(z.string()),
       cwd: z.optional(z.string()),
       env: z.optional(z.object({})),
+      cluster: z.optional(z.object({
+        instances: z.number().min(0).max(65535),
+        commonPort: z.number().min(1).max(65535),
+        startPort: z.number().min(1).max(65535),
+        strategy: z.enum(["strategy", "round-robin"]).default("round-robin"),
+      })),
       pidFile: z.optional(z.string()),
       autostart: z.optional(z.boolean()),
       watch: z.optional(z.array(z.string())),
@@ -147,4 +163,4 @@ function generateConfiguration(id: string, cmd: string, cwd?: string, cron?: str
 
 export { ConfigurationSchema, generateConfiguration, validateConfiguration }
 
-export type { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, ProcessLoggerConfiguration }
+export type { Configuration, GlobalLoggerConfiguration, PluginConfiguration, ProcessConfiguration, ProcessLoggerConfiguration }

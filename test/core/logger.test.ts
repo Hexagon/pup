@@ -1,5 +1,6 @@
 import { assertEquals } from "../deps.ts"
 import { AttachedLogger, Logger } from "../../lib/core/logger.ts"
+import { ProcessConfiguration } from "../../mod.ts"
 
 Deno.test("Creating Logger instance with global configuration", () => {
   const globalConfig = {
@@ -20,11 +21,10 @@ Deno.test("Attaching an external logger", () => {
   let externalLoggerText = ""
   const expectedExteralLoggerText = "Testing attached logger"
   const externalLogger: AttachedLogger = (
-    _severity,
-    _category,
-    _text,
-    _config,
-    _process,
+    _severity: string,
+    _category: string,
+    _text: string,
+    _process?: ProcessConfiguration,
   ) => {
     externalLoggerCalled = true
     externalLoggerText = _text

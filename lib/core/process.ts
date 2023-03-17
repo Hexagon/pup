@@ -43,8 +43,8 @@ interface ProcessInformationParsed {
 }
 
 class Process {
-  private readonly config: ProcessConfiguration
-  private readonly pup: Pup
+  public readonly config: ProcessConfiguration
+  public readonly pup: Pup
 
   // Subprocess runner
   private runner?: Runner
@@ -87,6 +87,10 @@ class Process {
       updated: this.updated,
       pendingRestartReason: this.pendingRestartReason,
     }
+  }
+
+  public isCluster() {
+    return false
   }
 
   public getConfig() {
@@ -147,44 +151,43 @@ class Process {
     }
 
     // Try to start
-    try {
-      this.pendingRestartReason = undefined
+    // try {
+    this.pendingRestartReason = undefined
+    const result = await this.runner.run((pid: number) => {
+      // Process started
+      this.setStatus(ProcessStatus.RUNNING)
+      this.pid = pid
+      this.started = new Date()
+    })
 
-      const result = await this.runner.run((pid: number) => {
-        // Process started
-        this.setStatus(ProcessStatus.RUNNING)
-        this.pid = pid
-        this.started = new Date()
-      })
+    this.code = result.code
+    this.signal = result.signal
 
-      this.code = result.code
-      this.signal = result.signal
+    /**
+     * Exited - Update status
+     *
+     * Treat SIGTERM (Exit Code 143) as a non-error exit, to avoid restarts after
+     * a manual stop
+     */
+    if (result.code === 0 || result.code === 143) {
+      this.setStatus(ProcessStatus.FINISHED)
+      logger.log("finished", `Process finished with code ${result.code}`, this.config)
 
       /**
        * Exited - Update status
        *
-       * Treat SIGTERM (Exit Code 143) as a non-error exit, to avoid restarts after
-       * a manual stop
+       * Treat all exit codes except 0 and 143(SIGTERM) as errors
        */
-      if (result.code === 0 || result.code === 143) {
-        this.setStatus(ProcessStatus.FINISHED)
-        logger.log("finished", `Process finished with code ${result.code}`, this.config)
-
-        /**
-         * Exited - Update status
-         *
-         * Treat all exit codes except 0 and 143(SIGTERM) as errors
-         */
-      } else {
-        this.setStatus(ProcessStatus.ERRORED)
-        logger.log("errored", `Process exited with code ${result.code}`, this.config)
-      }
-    } catch (e) {
+    } else {
+      this.setStatus(ProcessStatus.ERRORED)
+      logger.log("errored", `Process exited with code ${result.code}`, this.config)
+    }
+    /*} catch (e) {
       this.code = undefined
       this.signal = undefined
       this.setStatus(ProcessStatus.ERRORED)
       logger.log("errored", `Process could not start, error: ${e}`, this.config)
-    }
+    }*/
 
     this.exited = new Date()
     this.pid = undefined

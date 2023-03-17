@@ -1,6 +1,13 @@
 import { GlobalLoggerConfiguration, ProcessConfiguration } from "./configuration.ts"
 
-type AttachedLogger = (severity: string, category: string, text: string, config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => boolean
+export interface LoggerPluginParams {
+  severity: string
+  category: string
+  text: string
+  process?: ProcessConfiguration
+}
+
+type AttachedLogger = (severity: string, category: string, text: string, process?: ProcessConfiguration) => boolean
 
 class Logger {
   private config: GlobalLoggerConfiguration = {}
@@ -20,7 +27,7 @@ class Logger {
     if (this.attachedLogger) {
       // Do not trust the attached logger
       try {
-        blockedByAttachedLogger = this.attachedLogger(severity, category, text, this.config, process)
+        blockedByAttachedLogger = this.attachedLogger(severity, category, text, process)
       } catch (e) {
         console.error("Error in attached logger: ", e)
       }

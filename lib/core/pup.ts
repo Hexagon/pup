@@ -3,6 +3,8 @@ import { FileIPC, ValidatedMessage } from "./ipc.ts"
 import { Logger } from "./logger.ts"
 import { Process, ProcessStatus } from "./process.ts"
 import { Status } from "./status.ts"
+import { Plugin } from "./plugin.ts"
+import { Cluster } from "./cluster.ts"
 
 class Pup {
   public configuration: Configuration
@@ -10,7 +12,8 @@ class Pup {
   public status: Status
   public ipc?: FileIPC
 
-  public processes: Process[] = []
+  public processes: (Process | Cluster)[] = []
+  public plugins: Plugin[] = []
 
   private requestTerminate = false
 
@@ -32,17 +35,68 @@ class Pup {
     // Create processes
     if (this.configuration.processes) {
       for (const process of this.configuration.processes) {
-        const newProcess = new Process(this, process)
-        this.processes.push(newProcess)
+        // Cluster or normal process?
+        if (process.cluster) {
+          this.logger.log("processes", `Cluster '${process.id}' loading`)
+          const newProcess = new Cluster(this, process)
+          this.processes.push(newProcess)
+        } else {
+          const newProcess = new Process(this, process)
+          this.logger.log("processes", `Process '${process.id}' loaded`)
+          this.processes.push(newProcess)
+        }
       }
     }
+
+    // Initialize plugins
+    if (this.configuration.plugins) {
+      for (const plugin of this.configuration.plugins) {
+        const newPlugin = new Plugin(this, plugin)
+        try {
+          this.logger.log("plugins", `Loading plugin from '${plugin.url}'`)
+          newPlugin.load()
+        } catch (_e) {
+          this.logger.error("plugins", `Failed to load plugin '${plugin.url}'`)
+        }
+        this.plugins.push(newPlugin)
+      }
+    }
+
+    // Attach plugins to logger
+    this.logger.attach((severity: string, category: string, text: string, process?: ProcessConfiguration): boolean => {
+      return this.pluginSignal("logger", {
+        severity,
+        category,
+        text,
+        process,
+      })
+    })
   }
 
   public init = () => {
+    // Initiate all processes
     for (const process of this.processes) {
       process.init()
     }
+
+    // Call all plugins
+    this.pluginSignal("init", {})
+
     this.watchdog()
+  }
+
+  private allProcesses(): Process[] {
+    const allProcesses = []
+    for (const process of this.processes) {
+      if (process instanceof Cluster) {
+        for (const cProcess of process.processes) {
+          allProcesses.push(cProcess)
+        }
+      } else {
+        allProcesses.push(process)
+      }
+    }
+    return allProcesses
   }
 
   /**
@@ -52,10 +106,12 @@ class Pup {
    * @private
    */
   private watchdog = () => {
+    this.pluginSignal("watchdog", {})
+
     // Wrap watchdog operation in a catch to prevent it from ever stopping
     try {
       // Loop through all processes, checking if some actions are needed
-      for (const process of this.processes) {
+      for (const process of this.allProcesses()) {
         const status = process.getStatus()
         const config = process.getConfig()
 
@@ -148,7 +204,7 @@ class Pup {
 
   private restart(id: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
-    const foundProcess = this.processes.findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+    const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.restart("rpc")
     } else {
@@ -158,7 +214,7 @@ class Pup {
 
   private start(id: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
-    const foundProcess = this.processes.findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+    const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.start("ipc")
     } else {
@@ -168,7 +224,7 @@ class Pup {
 
   private stop(id: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
-    const foundProcess = this.processes.findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+    const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.stop("ipc")
     } else {
@@ -178,7 +234,7 @@ class Pup {
 
   private block(id: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
-    const foundProcess = this.processes.findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+    const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.block()
     } else {
@@ -188,7 +244,7 @@ class Pup {
 
   private unblock(id: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
-    const foundProcess = this.processes.findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+    const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.unblock()
     } else {
@@ -196,12 +252,23 @@ class Pup {
     }
   }
 
+  private pluginSignal(signal: string, args: unknown): boolean {
+    let result = false
+    for (const plugin of this.plugins) {
+      if (plugin.impl && plugin.impl.signal) {
+        const pluginResult = plugin.impl.signal(signal, args)
+        if (pluginResult) result = true
+      }
+    }
+    return result
+  }
+
   private processIpcMessage(message: ValidatedMessage) {
     if (message.data !== null) {
       const parsedMessage = JSON.parse(message.data)
       if (parsedMessage.start) {
         if (parsedMessage.start.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.processes) {
+          for (const process of this.allProcesses()) {
             process.start("ipc")
           }
           // ToDo, also check valid characters
@@ -210,7 +277,7 @@ class Pup {
         }
       } else if (parsedMessage.stop) {
         if (parsedMessage.stop.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.processes) {
+          for (const process of this.allProcesses()) {
             process.stop("ipc")
           }
           // ToDo, also check valid characters
@@ -219,7 +286,7 @@ class Pup {
         }
       } else if (parsedMessage.restart) {
         if (parsedMessage.restart.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.processes) {
+          for (const process of this.allProcesses()) {
             process.restart("ipc")
           }
           // ToDo, also check valid characters
@@ -228,7 +295,7 @@ class Pup {
         }
       } else if (parsedMessage.block) {
         if (parsedMessage.block.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.processes) {
+          for (const process of this.allProcesses()) {
             process.block()
           }
           // ToDo, also check valid characters
@@ -237,7 +304,7 @@ class Pup {
         }
       } else if (parsedMessage.unblock) {
         if (parsedMessage.unblock.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.processes) {
+          for (const process of this.allProcesses()) {
             process.unblock()
           }
           // ToDo, also check valid characters
@@ -253,7 +320,7 @@ class Pup {
   private terminate(forceQuitMs: number) {
     this.requestTerminate = true
 
-    console.log("Termination requested")
+    this.logger.log("terminate", "Termination requested")
 
     // ToDo: Log
     for (const process of this.processes) {
@@ -263,7 +330,7 @@ class Pup {
 
     // Force quit after 30 seconds
     const timer = setTimeout(() => {
-      console.log("Terminating by force")
+      this.logger.warn("terminate", "Terminating by force")
       Deno.exit(0)
     }, forceQuitMs)
 
