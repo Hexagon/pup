@@ -31,7 +31,7 @@ export class LoadBalancer {
     let targetConn
     try {
       targetConn = await Deno.connect(backend)
-    } catch (e) {
+    } catch (_e) {
       console.error("Could not connect to backend ", backend)
     }
     if (targetConn) {
@@ -87,5 +87,5 @@ function hashCode(s: string) {
     hash = (hash << 5) - hash + character
     hash |= 0 // Convert to 32bit integer
   }
-  return hash
+  return Math.abs(hash)
 }
