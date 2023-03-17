@@ -5,7 +5,7 @@ title: 3. Usage
 
 # 3. Usage
 
----
+***
 
 Pup offers various command line parameters to help you control its behavior. These parameters are grouped into general flags, init, append, and no-config options. In this section, we'll describe each
 group and provide examples of usage.

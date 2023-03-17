@@ -5,6 +5,8 @@ title: 5. Scaling applications
 
 # 5. Scaling applications
 
+***
+
 Pup is a process manager that supports scaling of processes through a JSON configuration pattern. This manual will cover the configuration pattern, process scaling, and the supported load balancing strategies, as well as the advantages of using the source-ip-hash strategy for stateful applications.
 
 ## Configuration Pattern

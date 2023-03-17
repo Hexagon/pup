@@ -3,7 +3,9 @@ layout: page
 title: 7. FAQ
 ---
 
-# FAQ
+# 7. FAQ
+
+***
 
 In this section, we will answer some frequently asked questions about Pup.
 

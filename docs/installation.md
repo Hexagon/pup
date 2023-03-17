@@ -5,6 +5,8 @@ title: 2. Installation
 
 # 2. Installation
 
+***
+
 This section will guide you through the installation process of Pup, the process management tool.
 
 ## Prerequisites

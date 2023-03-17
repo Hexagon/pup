@@ -3,9 +3,9 @@ layout: page
 title: 4. Configuration
 ---
 
-***
-
 # 4. Configuration
+
+***
 
 In this section, you will learn how to create and manage configuration files for Pup.
 
