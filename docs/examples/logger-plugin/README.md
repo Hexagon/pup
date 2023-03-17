@@ -32,4 +32,4 @@ The end user configuration for activating a plugin by `pup.json` is
 }
 ```
 
-Check out [/docs/examples/logger-plugin/main.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/watcher/main.ts) for a demo showing how to implement a custom logger.
+Check out [/docs/examples/logger-plugin/main.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/logger-plugin/main.ts) for a demo showing how to implement a custom logger.
