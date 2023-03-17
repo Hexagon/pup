@@ -52,7 +52,6 @@ export class LoadBalancer {
     switch (this.strategy) {
       case LoadBalancingStrategy.IP_HASH: {
         const hash = remoteAddr ? remoteAddr.transport === "tcp" ? hashCode(remoteAddr.hostname) : 0 : 0
-        console.log(hash % this.backends.length)
         return this.backends[hash % this.backends.length]
       }
 
