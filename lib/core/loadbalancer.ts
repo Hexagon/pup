@@ -28,14 +28,22 @@ export class LoadBalancer {
     client: Deno.Conn,
     backend: Backend,
   ): Promise<void> {
-    const targetConn = await Deno.connect(backend)
+    let targetConn
     try {
-      await Promise.all([copy(client, targetConn), copy(targetConn, client)])
-    } catch (_err) {
-      //console.error("Proxy error:", err)
-    } finally {
-      client.close()
-      targetConn.close()
+      targetConn = await Deno.connect(backend)
+    } catch (e) {
+      console.error("Could not connect to backend ", backend)
+    }
+    if (targetConn) {
+      try {
+        await Promise.all([copy(client, targetConn), copy(targetConn, client)])
+      } catch (_err) {
+        // Transport error, ignore
+        //console.error("Proxy error:", err)
+      } finally {
+        client.close()
+        targetConn?.close()
+      }
     }
   }
 
@@ -44,6 +52,7 @@ export class LoadBalancer {
     switch (this.strategy) {
       case LoadBalancingStrategy.IP_HASH: {
         const hash = remoteAddr ? remoteAddr.transport === "tcp" ? hashCode(remoteAddr.hostname) : 0 : 0
+        console.log(hash % this.backends.length)
         return this.backends[hash % this.backends.length]
       }
 
