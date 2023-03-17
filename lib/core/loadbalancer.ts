@@ -2,7 +2,7 @@ import { copy } from "../../deps.ts"
 
 export enum LoadBalancingStrategy {
   ROUND_ROBIN,
-  SOURCE_IP_HASH,
+  IP_HASH,
 }
 
 export interface Backend {
@@ -42,7 +42,7 @@ export class LoadBalancer {
   private selectBackend(client: Deno.Conn): Backend {
     const { remoteAddr } = client
     switch (this.strategy) {
-      case LoadBalancingStrategy.SOURCE_IP_HASH: {
+      case LoadBalancingStrategy.IP_HASH: {
         const hash = remoteAddr ? remoteAddr.transport === "tcp" ? hashCode(remoteAddr.hostname) : 0 : 0
         return this.backends[hash % this.backends.length]
       }

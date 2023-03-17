@@ -57,8 +57,17 @@ class Cluster extends Process {
     }
 
     if (this.config.cluster?.commonPort) {
-      this.pup.logger.log("cluster", `Setting up load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort}`, this.config)
-      this.loadBalancer = new LoadBalancer(backends, LoadBalancingStrategy.ROUND_ROBIN)
+      let strategy: LoadBalancingStrategy
+
+      if (this.config.cluster.strategy === "ip-hash") {
+        strategy = LoadBalancingStrategy.IP_HASH
+      } else {
+        strategy = LoadBalancingStrategy.ROUND_ROBIN
+      }
+
+      this.pup.logger.log("cluster", `Setting up load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort} and strategy ${strategy}`, this.config)
+
+      this.loadBalancer = new LoadBalancer(backends, strategy)
       this.loadBalancer.start(this.config.cluster.commonPort)
     }
   }
