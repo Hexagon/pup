@@ -75,7 +75,7 @@ pup --append --id anotherprocess --cmd "python script.py" --cwd /path/to/another
 
 ### Single command usage
 
-The `--no-config` or `-n`option allows you to start a single process using command line parameters without reading or writing any configuration file. This mode uses default options for logging.
+The `--no-config` or `-n` option allows you to start a single process using command line parameters without reading or writing any configuration file. This mode uses default options for logging.
 
 To run Pup in no-config mode, use the `--no-config` or `-n` flag, followed by a command and a restart policy. `id` is optional in this mode.
 
