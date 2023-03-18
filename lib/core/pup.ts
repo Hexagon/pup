@@ -1,3 +1,10 @@
+/**
+ * Exports main class of Pup - `Pup`
+ *
+ * @file      lib/core/pup.ts
+ * @license   MIT
+ */
+
 import { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, validateConfiguration } from "./configuration.ts"
 import { FileIPC, ValidatedMessage } from "./ipc.ts"
 import { Logger } from "./logger.ts"

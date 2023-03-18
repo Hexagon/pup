@@ -5,6 +5,6 @@
  * @license   MIT
  */
 
-import { main } from "./lib/main.ts"
+import { main } from "./lib/cli/main.ts"
 
 main(Deno.args)

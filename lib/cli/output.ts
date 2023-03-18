@@ -1,3 +1,11 @@
+/**
+ * Exports helper functions to print standardised messages
+ * Belongs to Pup cli entrypoint
+ *
+ * @file      lib/cli/output.ts
+ * @license   MIT
+ */
+
 import { Application } from "../../application.meta.ts"
 
 export function printHeader() {

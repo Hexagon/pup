@@ -1,3 +1,11 @@
+/**
+ * Exports functions belonging to --status functionality
+ * Belongs to Pup cli entrypoint
+ *
+ * @file      lib/cli/status.ts
+ * @license   MIT
+ */
+
 import { ProcessInformationParsed, ProcessStatus } from "../core/process.ts"
 
 interface TaskTableInformation {

@@ -1,3 +1,11 @@
+/**
+ * Exports helper functions to find, create and modify pup configuration file
+ * Belongs to Pup cli entrypoint
+ *
+ * @file      lib/cli/config.ts
+ * @license   MIT
+ */
+
 import { generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
 import { Args } from "../../deps.ts"
 import { fileExists } from "../common/utils.ts"
@@ -92,7 +100,13 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
  *
  * @async
  */
-export async function findConfigFile(): Promise<string | null> {
+export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFile?: string): Promise<string | null> {
+  if (!useConfigFile) return null
+
+  if (argumentsConfigFile && await fileExists(argumentsConfigFile)) {
+    return argumentsConfigFile
+  }
+
   if (await fileExists("./pup.json")) {
     return "./pup.json"
   } else if (await fileExists("./pup.jsonc")) {
