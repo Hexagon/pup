@@ -7,9 +7,18 @@ This is the source code repository, documentation available at <a href="https://
 
 <br>
 
-**Install Pup using deno**
+**Install/Upgrade Pup using deno**
 
-`deno install -A -n pup https://deno.land/x/pup/pup.ts`
+Before using Pup, you need to have Deno installed on your system. You can download and install Deno with a single command following the instructions provided on the official website:
+<https://deno.land/#installation>
+
+With Deno in place, open your terminal and execute the following command to install or upgrade Pup:
+
+```bash
+deno install -Afr https://deno.land/x/pup/pup.ts
+```
+
+This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.
 
 **Quick examples**
 
@@ -19,7 +28,7 @@ To keep a process alive forever, without configuration
 
 To restart process on file changes, without configuration
 
-`pup -n --cmd "deno run -A server.ts" --watch "server.ts"`
+`pup -n --cmd "deno run -A server.ts" --watch .
 
 **Ecosystem example**
 
@@ -38,23 +47,6 @@ Launch your ecosystem
 # Pup - Universal process manager
 
 > **Note** Please note that Pup is currently in an early stage of development and may contain bugs or unexpected behavior. Use at your own risk.
-
-## Installation
-
-Latest version of pup can be installed using Deno with the following command:
-
-`deno install -A -n pup https://deno.land/x/pup/pup.ts`
-
-The -A flag grants all permissions needed for Pup to work properly. In case of Deno subprocesses, you can specify individual permissions for each process with the usual command line flags.
-
-> **Note** Before using Pup, you need to have Deno installed on your system. You can download and install Deno with a single command following the instructions provided on the official website:
-> https://deno.land/#installation
-
-### Upgrading from a previous version
-
-Passing `-fr` to the installation command will clear cache and upgrade pup to the latest version. `-A` grants all permission for pup to work properly.
-
-`deno install -frA https://deno.land/x/pup/pup.ts`
 
 ## Usage
 
