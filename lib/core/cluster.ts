@@ -65,7 +65,11 @@ class Cluster extends Process {
         strategy = LoadBalancingStrategy.ROUND_ROBIN
       }
 
-      this.pup.logger.log("cluster", `Setting up load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort} and strategy ${strategy}`, this.config)
+      this.pup.logger.log(
+        "cluster",
+        `Setting up load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort} and strategy ${LoadBalancingStrategy[strategy]}`,
+        this.config,
+      )
 
       this.loadBalancer = new LoadBalancer(backends, strategy)
       this.loadBalancer.start(this.config.cluster.commonPort)
@@ -98,6 +102,7 @@ class Cluster extends Process {
       id: this.getConfig().id,
       status: ProcessStatus.CREATED,
       updated: new Date(),
+      type: "cluster",
     }
 
     const statuses = this.getStatuses()

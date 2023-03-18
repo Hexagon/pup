@@ -23,6 +23,7 @@ class MockProcess extends Process {
       blocked: false,
       restarts: 1,
       updated: new Date(),
+      type: "process",
     }
   }
 }

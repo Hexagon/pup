@@ -1,5 +1,6 @@
 import { Application } from "../../application.meta.ts"
-import { Process } from "./process.ts"
+import { Cluster } from "./cluster.ts"
+import { Process, ProcessInformation } from "./process.ts"
 
 class Status {
   /* Properties related to disk write */
@@ -14,7 +15,16 @@ class Status {
   /* Internal methods */
   public async writeToDisk(processes: Process[]) {
     if (this.statusFileName) {
-      const processStatuses = processes.map((p) => p.getStatus())
+      // Get status from all processes
+      const processStatuses: ProcessInformation[] = []
+      for (const p of processes) {
+        processStatuses.push(p.getStatus())
+        if (p.isCluster()) {
+          for (const subP of (p as Cluster).processes) processStatuses.push(subP.getStatus())
+        }
+      }
+
+      console.log
 
       // Prepare the object to write
       const pupStatus = {

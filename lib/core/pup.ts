@@ -5,6 +5,7 @@ import { Process, ProcessStatus } from "./process.ts"
 import { Status } from "./status.ts"
 import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
+import { path } from "../../deps.ts"
 
 class Pup {
   public configuration: Configuration
@@ -19,34 +20,15 @@ class Pup {
 
   private WATCHDOG_INTERVAL_MS = 2000
 
+  // Put path of temporary/status files here
+  public cleanupQueue: string[] = []
+
   constructor(unvalidatedConfiguration: unknown, statusFile?: string, ipcFile?: string) {
     // Throw on invalid configuration
     this.configuration = validateConfiguration(unvalidatedConfiguration)
 
     // Initialise core logger
     this.logger = new Logger(this.configuration.logger ?? {})
-
-    // Initialise status tracker
-    this.status = new Status(statusFile)
-
-    // Initialize file ipc, if a path were passed
-    this.ipc = ipcFile ? new FileIPC(ipcFile) : undefined
-
-    // Create processes
-    if (this.configuration.processes) {
-      for (const process of this.configuration.processes) {
-        // Cluster or normal process?
-        if (process.cluster) {
-          this.logger.log("processes", `Cluster '${process.id}' loading`)
-          const newProcess = new Cluster(this, process)
-          this.processes.push(newProcess)
-        } else {
-          const newProcess = new Process(this, process)
-          this.logger.log("processes", `Process '${process.id}' loaded`)
-          this.processes.push(newProcess)
-        }
-      }
-    }
 
     // Initialize plugins
     if (this.configuration.plugins) {
@@ -71,6 +53,44 @@ class Pup {
         process,
       })
     })
+
+    // Initialise status tracker
+    this.status = new Status(statusFile)
+    if (statusFile) this.cleanupQueue.push(path.resolve(statusFile))
+
+    // Initialize file ipc, if a path were passed
+    this.ipc = ipcFile ? new FileIPC(ipcFile) : undefined
+    if (ipcFile) this.cleanupQueue.push(path.resolve(ipcFile))
+
+    // Create processes
+    if (this.configuration.processes) {
+      for (const process of this.configuration.processes) {
+        // Cluster or normal process?
+        if (process.cluster) {
+          this.logger.log("processes", `Cluster '${process.id}' loading`)
+          const newProcess = new Cluster(this, process)
+          this.processes.push(newProcess)
+        } else {
+          const newProcess = new Process(this, process)
+          this.logger.log("processes", `Process '${process.id}' loaded`)
+          this.processes.push(newProcess)
+        }
+      }
+    }
+  }
+
+  public cleanup = () => {
+    // This is intended to be called by global unload event
+    // and clears any stray files
+    for (const cleanupFilePath of this.cleanupQueue) {
+      try {
+        Deno.remove(cleanupFilePath)
+        this.logger.log("cleanup", `${cleanupFilePath} removed.`)
+        // Ignore errors
+      } catch (_e) {
+        this.logger.error("cleanup", `${cleanupFilePath} could not be removed, will be left.`)
+      }
+    }
   }
 
   public init = () => {
@@ -88,13 +108,15 @@ class Pup {
   private allProcesses(): Process[] {
     const allProcesses = []
     for (const process of this.processes) {
+      // Add all subprocesses if current process is a cluster
       if (process instanceof Cluster) {
         for (const cProcess of process.processes) {
           allProcesses.push(cProcess)
         }
-      } else {
-        allProcesses.push(process)
       }
+
+      // Always add current process (even clusters)
+      allProcesses.push(process)
     }
     return allProcesses
   }

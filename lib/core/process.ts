@@ -27,6 +27,7 @@ interface ProcessInformation {
   restarts?: number
   updated: Date
   pendingRestartReason?: string
+  type: "cluster" | "process"
 }
 
 interface ProcessInformationParsed {
@@ -86,6 +87,7 @@ class Process {
       restarts: this.restarts,
       updated: this.updated,
       pendingRestartReason: this.pendingRestartReason,
+      type: "process",
     }
   }
 

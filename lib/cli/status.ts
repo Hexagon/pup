@@ -1,5 +1,13 @@
 import { ProcessInformationParsed, ProcessStatus } from "../core/process.ts"
-import { isRunning } from "../common/utils.ts"
+
+interface TaskTableInformation {
+  Id: string
+  Pid?: number
+  Status: string
+  Started?: string
+  Exited?: string
+  Signal: string
+}
 
 /**
  * Helper which print the status of all running processes,
@@ -18,7 +26,7 @@ export async function printStatus(configFile: string) {
   try {
     statusData = await Deno.readTextFile(statusFile)
   } catch (_e) {
-    console.error(`Could not read status for config file '${configFile}' from '${statusFile}'`)
+    console.error(`Could not read status for config file '${configFile}' from '${statusFile}', no instance running.`)
     Deno.exit(1)
   }
 
@@ -26,22 +34,33 @@ export async function printStatus(configFile: string) {
   try {
     status = JSON.parse(statusData)
   } catch (_e) {
-    console.error(`Could not read status for config file '${configFile}' from '${statusFile}'`)
+    console.error(`Could not parse status for config file '${configFile}' from '${statusFile}, invalid file content.'`)
     Deno.exit(1)
   }
 
-  console.log(`\nMain process (Version: ${status.version}, PID: ${status.pid}, ${isRunning(status.pid, new Date(Date.parse(status.updated)), 5000)})`)
+  const taskTable: TaskTableInformation[] = []
 
+  // Add main process
+  taskTable.push({
+    Id: "Main",
+    Pid: status.pid,
+    Status: status.status,
+    Started: status.started,
+    Exited: status.exited,
+    Signal: `${(status.code ?? "-")}${status.signal ? (" " + status.signal) : ""}`,
+  })
+
+  // Add all processes
   for (const taskInfo of Object.values(status.processes)) {
     const currentTask = taskInfo as ProcessInformationParsed
-    const processRunning = currentTask.pid ? isRunning(currentTask.pid, new Date(Date.parse(currentTask.updated)), 30000) : "Not running"
-    console.log(`\nTask: ${currentTask.id} (${(currentTask.pid ? ("PID: " + currentTask.pid + ", ") : "")}${processRunning})\n`)
-    console.log(`  Started:\t${currentTask.started ? currentTask.started.toLocaleString() : "-"}`)
-    console.log(`  Last status:\t${ProcessStatus[currentTask.status] ?? "-"}`)
-    console.log(`  Last update:\t${currentTask.updated ?? "-"}`)
-    console.log(`  Code:\t\t${currentTask.code ?? "-"}`)
-    console.log(`  Signal:\t${currentTask.signal ?? "-"}`)
-    console.log(`  Exited:\t${currentTask.exited ? currentTask.exited.toLocaleString() : "-"}`)
+    taskTable.push({
+      Id: currentTask.id,
+      Pid: currentTask.pid,
+      Status: ProcessStatus[currentTask.status],
+      Started: currentTask.started,
+      Exited: currentTask.exited,
+      Signal: `${(currentTask.code ?? "-")}${currentTask.signal ? (" " + currentTask.signal) : ""}`,
+    })
   }
-  console.log("\n")
+  console.table(taskTable)
 }

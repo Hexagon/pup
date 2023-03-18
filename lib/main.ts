@@ -82,17 +82,16 @@ async function main(inputArgs: string[]) {
       }
     }
 
-    // Look for config file
-    // Print status if status flag is present
-    if (checkedArgs.status) {
-      await printStatus(configFile)
-      Deno.exit(0)
-    }
-
     // Exit if no configuration file was found
     if (!configFile) {
       console.error("Could not start, no configuration file found")
       Deno.exit(1)
+    }
+
+    // Print status if status flag is present
+    if (checkedArgs.status) {
+      await printStatus(configFile)
+      Deno.exit(0)
     }
 
     // Exit if specified configuration file is not found
@@ -140,10 +139,18 @@ async function main(inputArgs: string[]) {
   let ipcFile
   if (configFile) ipcFile = `${configFile}.ipc`
 
+  // Prepare status file
+  let statusFile
+  if (configFile) statusFile = `${configFile}.status`
+
   // Handle --restart, --stop etc using IPC
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
     if (args[op] !== undefined) {
-      if (ipcFile) {
+      // If status file doesn't exist, don't even try to communicate
+      if (!statusFile || !await fileExists(statusFile)) {
+        console.error(`No status file found, no instance seem to be running.`)
+        Deno.exit(1)
+      } else if (ipcFile) {
         const ipc = new FileIPC(ipcFile)
         await ipc.sendData(JSON.stringify({ [op]: args[op] || true }))
         Deno.exit(0)
@@ -154,14 +161,31 @@ async function main(inputArgs: string[]) {
     }
   }
 
-  // Prepare status file
-  let statusFile
-  if (configFile) statusFile = `${configFile}.status`
+  // Do not continue from here if there is a running instance already
+  if (statusFile && await fileExists(statusFile)) {
+    // ToDo: Check when statusFile were last updated, exit if fresh (which means a instance is already running)
+    // Print a warning for now
+    console.warn("WARNING! A status file were found. Now you probably have to instances running the same config.")
+  }
 
   // Start pup
   try {
     const pup = new Pup(configuration, statusFile, ipcFile)
+
+    // Start the watchdog
     pup.init()
+
+    // Register for running pup.cleanup() on exit
+    addEventListener("unload", () => {
+      pup.cleanup()
+    })
+
+    // Needed to trigger unload event on CTRL+C
+    Deno.addSignalListener("SIGINT", () => {
+      Deno.exit(0)
+    })
+
+    // Let program end gracefully, no Deno.exit here
   } catch (e) {
     console.error("Could not start pup, invalid configuration:")
     console.error(e.toString())

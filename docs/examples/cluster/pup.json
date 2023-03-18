@@ -1,7 +1,7 @@
 {
   "processes": [
     {
-      "id": "custer-example",
+      "id": "cluster-example",
       "cmd": ["deno", "run", "-A", "app.ts"],
       "cluster": {
         "instances": 3,
