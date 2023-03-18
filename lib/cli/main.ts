@@ -7,17 +7,17 @@
 
 // Import core dependencies
 import { Pup } from "../core/pup.ts"
+import { generateConfiguration } from "../core/configuration.ts"
+import { FileIPC } from "../core/ipc.ts"
 
-// Import CLI dependencies
+// Import CLI utilities
 import { printFlags, printHeader, printUsage } from "./output.ts"
 import { checkArguments, parseArguments } from "./args.ts"
 import { appendConfigurationFile, createConfigurationFile, findConfigFile, removeFromConfigurationFile } from "./config.ts"
 import { printStatus } from "./status.ts"
 
-// Import utility dependencies
+// Import common utilities
 import { fileExists } from "../common/utils.ts"
-import { generateConfiguration } from "../core/configuration.ts"
-import { FileIPC } from "../core/ipc.ts"
 
 // Import external dependencies
 import { jsonc, path } from "../../deps.ts"
