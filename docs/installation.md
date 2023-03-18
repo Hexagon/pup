@@ -25,7 +25,8 @@ deno install -Afr https://deno.land/x/pup/pup.ts
 
 This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.
 
-After the installation is complete, you will see a message indicating the installation path of the Pup executable. To use the pup command from any location in your terminal, ensure the installation path is added to your system's PATH environment variable.
+After the installation is complete, you will see a message indicating the installation path of the Pup executable. To use the pup command from any location in your terminal, ensure the installation
+path is added to your system's PATH environment variable.
 
 ## Verifying the Installation
 

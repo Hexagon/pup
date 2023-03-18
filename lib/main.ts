@@ -165,7 +165,7 @@ async function main(inputArgs: string[]) {
   if (statusFile && await fileExists(statusFile)) {
     // ToDo: Check when statusFile were last updated, exit if fresh (which means a instance is already running)
     // Print a warning for now
-    console.warn("WARNING! A status file were found. Now you probably have to instances running the same config.")
+    console.warn("WARNING! A status file were found. Is pup already running using this configuration file?")
   }
 
   // Start pup

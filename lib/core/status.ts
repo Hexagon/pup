@@ -24,8 +24,6 @@ class Status {
         }
       }
 
-      console.log
-
       // Prepare the object to write
       const pupStatus = {
         pid: Deno.pid,
