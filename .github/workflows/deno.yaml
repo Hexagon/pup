@@ -23,14 +23,5 @@ jobs:
         with:
           deno-version: ${{ matrix.deno-version }}
 
-      - name: Check format
-        run: deno fmt --check
-
-      - name: Lint
-        run: deno lint
-
-      - name: Type check
-        run: deno check pup.ts
-
-      - name: Run tests
-        run: deno test
+      - name: Run all checks
+        run: deno task check
