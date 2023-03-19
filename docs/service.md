@@ -5,6 +5,14 @@ title: " 5. Run at boot"
 
 # 5. Run pup at boot
 
+***
+
+This section covers three options for running Pup at boot: using [Docker](#using-docker) (for Mac, Windows, and Linux), a [systemd user service](#using-a-systemd-user-service) (for Linux), and [Launchd](#using-launchd-on-macos) (for macOS). 
+
+Docker is a platform for running applications in containers, and it is the preferred way of running Pup instances. Systemd and Launchd are service managers for Linux and macOS, respectively.
+
+> **Note** If you just need to start a single process and keep it alive, you probably don't need Pup at all. Just follow these instructions and replace the command for Pup with your own application entrypoint.
+
 ## Using Docker
 
 Docker is a platform for running applications in containers. A container is a lightweight, standalone, and executable package of software that includes everything needed to run an application. Docker provides an easy way to package and distribute applications.
@@ -65,7 +73,7 @@ Description=Pup
 After=network.target
 
 [Service]
-ExecStart=/home/user/.deno/bin/deno run -Afr https://deno.land/x/pup/pup.ts --config /path/to/your/pup.json
+ExecStart=/home/user/.deno/bin/deno run -A https://deno.land/x/pup/pup.ts --config /path/to/your/pup.json
 Restart=always
 
 [Install]
@@ -75,6 +83,8 @@ WantedBy=default.target
 Make sure to replace `/home/user/.deno/bin/deno` with the actual path of your deno executable, which can be found by running `which deno` at the console.
 
 You should also replace `/path/to/your/pup.json` with the actual path.
+
+Finally you should add a version specifier to `https://deno.land/x/pup/pup.ts`, like `https://deno.land/x/pup@1.0.0-alpha-25/pup.ts`, Find the latest version at <https://deno.land/x/pup>.
 
 Note that systemd always expects full paths.
 
