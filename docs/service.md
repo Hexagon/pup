@@ -139,6 +139,7 @@ Create a Pup property list (plist) file in the ~/Library/LaunchAgents directory.
   </dict>
 </dict>
 </plist>
+```
 
 Load the Pup plist file using the following command:
 
