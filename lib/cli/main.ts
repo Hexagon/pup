@@ -36,10 +36,9 @@ async function main(inputArgs: string[]) {
   if (inputArgs.indexOf("--") >= 0) {
     postDelimiter = inputArgs.slice(inputArgs.indexOf("--") + 1)
   }
-  console.log(postDelimiter)
   const args = parseArguments(inputArgs)
   const checkedArgs = checkArguments(args, postDelimiter)
-  const cmd = checkedArgs.cmd.split(" ") || postDelimiter
+  const cmd = checkedArgs.cmd?.split(" ") || postDelimiter
 
   /**
    * Begin with --version and --help, as they have no dependencies on other
