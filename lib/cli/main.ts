@@ -29,8 +29,18 @@ import { jsonc, path } from "../../deps.ts"
  * @async
  */
 async function main(inputArgs: string[]) {
+  
+  /**
+   * Extract part after "--", which can be used in place of --cmd
+   */
+  let postDelimiter : string[] = []
+  if (inputArgs.indexOf("--")>=0) {
+    postDelimiter = inputArgs.slice(inputArgs.indexOf("--")+1)
+  }
+
   const args = parseArguments(inputArgs)
-  const checkedArgs = checkArguments(args)
+  const checkedArgs = checkArguments(args, postDelimiter)
+  const cmd = checkedArgs.cmd || postDelimiter.join(" ")
 
   /**
    * Begin with --version and --help, as they have no dependencies on other
@@ -144,7 +154,7 @@ async function main(inputArgs: string[]) {
       Deno.exit(1)
     }
   } else {
-    configuration = generateConfiguration(args.id || "task", args.cmd, args.cwd, args.cron, args.autostart, args.watch)
+    configuration = generateConfiguration(args.id || "task", cmd, args.cwd, args.cron, args.autostart, args.watch)
 
     // Change working directory to configuration file directory
     if (args.cwd) {

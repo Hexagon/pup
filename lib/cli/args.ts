@@ -65,9 +65,11 @@ function parseArguments(args: string[]): Args {
   return parse(args, { alias, boolean: booleanArgs, string: stringArgs, stopEarly: true })
 }
 
-function checkArguments(args: Args): Args {
-  const configOptions = args.init || args.append || args["no-config"]
+function checkArguments(args: Args, postDelimiter: string[]): Args {
 
+  const configOptions = args.init || args.append || args["no-config"]
+  const hasCmd = postDelimiter.length > 0 || args.cmd;
+  console.log (postDelimiter)
   // Do not allow configuration creation options without --init and vice versa
   if (args.autostart && !configOptions) {
     throw new Error("Argument '--autostart' requires '--init', '--append' or '--no-config'")
@@ -78,17 +80,20 @@ function checkArguments(args: Args): Args {
   if (args.watch && !configOptions) {
     throw new Error("Argument '--watch' requires '--init', '--append' or '--no-config'")
   }
-  if (args.cmd && !configOptions) {
+  if (hasCmd && !configOptions) {
     throw new Error("Argument '--cmd' requires '--init', '--append' or '--no-config'")
   }
-  if (!args.cmd && configOptions) {
+  if (!hasCmd && configOptions) {
     throw new Error("Arguments '--init', '--append', and '--no-config' require '--cmd'")
   }
   if (!args.id && (args.init || args.append || args.remove)) {
     throw new Error("Arguments '--init','--append', and '--remove' require '--id'")
   }
-  if (args["no-config"] && !args.cmd) {
+  if (args["no-config"] && !hasCmd) {
     throw new Error("Argument '--no-config' requires '--cmd'")
+  }
+  if (postDelimiter.length > 0 && args.cmd) {
+    throw new Error("Both '--cmd' and '--' cannot be used at the same time.")
   }
 
   return args
