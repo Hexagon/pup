@@ -3,7 +3,7 @@ layout: page
 title: " 5. Run at boot"
 ---
 
-# 5. Pup pup att boot
+# 5. Run pup at boot
 
 ## Using Docker
 
