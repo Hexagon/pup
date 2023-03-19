@@ -135,13 +135,12 @@ function validateConfiguration(unsafeConfiguration: unknown): Configuration {
  * Configuration file generator
  */
 
-function generateConfiguration(id: string, cmd: string, cwd?: string, cron?: string, autostart?: boolean, watch?: string) {
+function generateConfiguration(id: string, commandArray: string[], cwd?: string, cron?: string, autostart?: boolean, watch?: string) {
   const configuration: Configuration = {
     processes: [],
   }
 
   // Split command to array
-  const commandArray = cmd.split(" ")
 
   const processConfiguration: ProcessConfiguration = {
     id,
