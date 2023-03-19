@@ -76,7 +76,7 @@ async function main(inputArgs: string[]) {
       console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
       Deno.exit(1)
     } else {
-      await createConfigurationFile(fallbackedConfigFile, checkedArgs)
+      await createConfigurationFile(fallbackedConfigFile, checkedArgs, cmd)
       console.log(`Configuration file '${fallbackedConfigFile}' created`)
       Deno.exit(0)
     }
@@ -108,7 +108,7 @@ async function main(inputArgs: string[]) {
    */
   if (checkedArgs.append) {
     if (configFile) {
-      await appendConfigurationFile(configFile, checkedArgs)
+      await appendConfigurationFile(configFile, checkedArgs, cmd)
       console.log(`Process '${args.id}' appended to configuration file '${configFile}'.`)
       Deno.exit(0)
     } else {

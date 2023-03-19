@@ -66,7 +66,7 @@ will keep all configuration withing your home directory.
 
 First, make sure `linger` is enabled for your user. This will make user services run without being logged in.
 
-```sudo loginctl enable-linger username```
+`sudo loginctl enable-linger username`
 
 Replace `username` with your username.
 

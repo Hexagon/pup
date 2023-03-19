@@ -112,7 +112,7 @@ class Pup {
     this.watchdog()
   }
 
-  private allProcesses(): Process[] {
+  public allProcesses(): Process[] {
     const allProcesses = []
     for (const process of this.processes) {
       // Add all subprocesses if current process is a cluster
