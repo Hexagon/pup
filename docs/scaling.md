@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 6. Scaling applications
+title: " 6. Scaling applications"
 ---
 
 # 6. Scaling applications

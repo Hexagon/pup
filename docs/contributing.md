@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 10. Contributing
+title: "10. Contributing"
 ---
 
 # 10. Contributing

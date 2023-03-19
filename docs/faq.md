@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 8. FAQ
+title: " 8. FAQ"
 ---
 
 # 8. FAQ

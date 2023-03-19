@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 4. Configuration
+title: " 4. Configuration"
 ---
 
 # 4. Configuration
