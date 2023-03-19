@@ -1,9 +1,9 @@
 ---
 layout: page
-title: 7. FAQ
+title: 8. FAQ
 ---
 
-# 7. FAQ
+# 8. FAQ
 
 ---
 

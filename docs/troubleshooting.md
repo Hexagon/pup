@@ -1,9 +1,9 @@
 ---
 layout: page
-title: 8. Troubleshooting
+title: 9. Troubleshooting
 ---
 
-# 8. Troubleshooting
+# 9. Troubleshooting
 
 ---
 

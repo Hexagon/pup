@@ -1,9 +1,9 @@
 ---
 layout: page
-title: 5. Scaling applications
+title: 6. Scaling applications
 ---
 
-# 5. Scaling applications
+# 6. Scaling applications
 
 ---
 
