@@ -160,6 +160,17 @@ Deno.test("checkArguments should throw error when init or append argument is pro
   )
 })
 
+Deno.test("checkArguments should throw error when both --cmd and -- is specified", async () => {
+  const args = { _: [], cmd: "hello world", init: true, id: "test" }
+  await assertThrows(
+    () => {
+      checkArguments(args, ["hello", "world"])
+    },
+    Error,
+    "Both '--cmd' and '--' cannot be used at the same time.",
+  )
+})
+
 Deno.test("checkArguments should throw error when id argument is missing with init or append argument", async () => {
   const args = { _: [], init: true, cmd: "command" }
   await assertThrows(

@@ -29,14 +29,16 @@ import { jsonc, path } from "../../deps.ts"
  * @async
  */
 async function main(inputArgs: string[]) {
+  const args = parseArguments(inputArgs)
+
   /**
-   * Extract part after "--", which can be used in place of --cmd
+   * Before checking the arguments, extract part after "--",
+   * which can be used in place of --cmd
    */
   let postDelimiter: string[] = []
   if (inputArgs.indexOf("--") >= 0) {
     postDelimiter = inputArgs.slice(inputArgs.indexOf("--") + 1)
   }
-  const args = parseArguments(inputArgs)
   const checkedArgs = checkArguments(args, postDelimiter)
   const cmd = checkedArgs.cmd?.split(" ") || postDelimiter
 

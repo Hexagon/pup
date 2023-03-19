@@ -5,17 +5,20 @@ title: " 5. Run at boot"
 
 # 5. Run pup at boot
 
-***
+---
 
-This section covers three options for running Pup at boot: using [Docker](#using-docker) (for Mac, Windows, and Linux), a [systemd user service](#using-a-systemd-user-service) (for Linux), and [Launchd](#using-launchd-on-macos) (for macOS). 
+This section covers three options for running Pup at boot: using [Docker](#using-docker) (for Mac, Windows, and Linux), a [systemd user service](#using-a-systemd-user-service) (for Linux), and
+[Launchd](#using-launchd-on-macos) (for macOS).
 
 Docker is a platform for running applications in containers, and it is the preferred way of running Pup instances. Systemd and Launchd are service managers for Linux and macOS, respectively.
 
-> **Note** If you just need to start a single process and keep it alive, you probably don't need Pup at all. Just follow these instructions and replace the command for Pup with your own application entrypoint.
+> **Note** If you just need to start a single process and keep it alive, you probably don't need Pup at all. Just follow these instructions and replace the command for Pup with your own application
+> entrypoint.
 
 ## Using Docker
 
-Docker is a platform for running applications in containers. A container is a lightweight, standalone, and executable package of software that includes everything needed to run an application. Docker provides an easy way to package and distribute applications.
+Docker is a platform for running applications in containers. A container is a lightweight, standalone, and executable package of software that includes everything needed to run an application. Docker
+provides an easy way to package and distribute applications.
 
 This works on all platforms (Mac, Windows and Linux), and is the preferred way of running pup instances.
 
@@ -51,11 +54,13 @@ This will build a Docker image named `my-pup-image` using the Dockerfile in the 
 docker run -d --restart=always --name my-pup-container my-pup-image
 ```
 
-This will start a Docker container named my-pup-container using the my-pup-image image. The container will be started in the background (`-d`), and it will be restarted automatically if it fails (`--restart=always`).
+This will start a Docker container named my-pup-container using the my-pup-image image. The container will be started in the background (`-d`), and it will be restarted automatically if it fails
+(`--restart=always`).
 
 ## Using a systemd user service
 
-Systemd is a system and service manager for Linux. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the systemd user mode, which will keep all configuration withing your home directory, and avoid any need for root privileges.
+Systemd is a system and service manager for Linux. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the systemd user mode, which
+will keep all configuration withing your home directory, and avoid any need for root privileges.
 
 ### Steps
 
@@ -110,7 +115,6 @@ systemctl --user status pup
 
 If you need to make any changes, run `daemon-reload` and `restart`, then check the logs again.
 
-
 Enable the Pup service to start at boot using the following command:
 
 ```
@@ -119,7 +123,8 @@ systemctl --user enable pup
 
 ## Using Launchd on macOS
 
-Launchd is a system and service manager for macOS. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the launchd user mode, which will keep all configuration withing your home directory, and avoid any need for root privileges.
+Launchd is a system and service manager for macOS. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the launchd user mode, which
+will keep all configuration withing your home directory, and avoid any need for root privileges.
 
 ### Steps
 
@@ -153,18 +158,18 @@ Create a Pup property list (plist) file in the ~/Library/LaunchAgents directory.
 
 Load the Pup plist file using the following command:
 
-```launchctl load ~/Library/LaunchAgents/com.mycompany.pup.plist```
+`launchctl load ~/Library/LaunchAgents/com.mycompany.pup.plist`
 
 This will load the Pup plist file into launchd.
 
 Start the Pup service using the following command:
 
-```launchctl start com.mycompany.pup```
+`launchctl start com.mycompany.pup`
 
 This will start the Pup service.
 
 Enable the Pup service to start at boot using the following command:
 
-```launchctl enable user/com.mycompany.pup```
+`launchctl enable user/com.mycompany.pup`
 
 This will enable the Pup service to start at boot.
