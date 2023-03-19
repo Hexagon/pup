@@ -66,10 +66,9 @@ function parseArguments(args: string[]): Args {
 }
 
 function checkArguments(args: Args, postDelimiter: string[]): Args {
-
   const configOptions = args.init || args.append || args["no-config"]
-  const hasCmd = postDelimiter.length > 0 || args.cmd;
-  console.log (postDelimiter)
+  const hasCmd = postDelimiter.length > 0 || args.cmd
+
   // Do not allow configuration creation options without --init and vice versa
   if (args.autostart && !configOptions) {
     throw new Error("Argument '--autostart' requires '--init', '--append' or '--no-config'")

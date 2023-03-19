@@ -109,7 +109,7 @@ Deno.test("checkArguments should throw error when autostart argument is provided
   const args = { _: [], autostart: true }
   await assertThrows(
     () => {
-      checkArguments(args)
+      checkArguments(args, [])
     },
     Error,
     "Argument '--autostart' requires '--init', '--append' or '--no-config'",
@@ -120,7 +120,7 @@ Deno.test("checkArguments should throw error when cron argument is provided with
   const args = { _: [], cron: true }
   await assertThrows(
     () => {
-      checkArguments(args)
+      checkArguments(args, [])
     },
     Error,
     "Argument '--cron' requires '--init', '--append' or '--no-config'",
@@ -131,7 +131,7 @@ Deno.test("checkArguments should throw error when watch argument is provided wit
   const args = { _: [], watch: "path" }
   await assertThrows(
     () => {
-      checkArguments(args)
+      checkArguments(args, [])
     },
     Error,
     "Argument '--watch' requires '--init', '--append' or '--no-config'",
@@ -142,7 +142,7 @@ Deno.test("checkArguments should throw error when cmd argument is provided witho
   const args = { _: [], cmd: "command" }
   await assertThrows(
     () => {
-      checkArguments(args)
+      checkArguments(args, [])
     },
     Error,
     "Argument '--cmd' requires '--init', '--append' or '--no-config'",
@@ -153,7 +153,7 @@ Deno.test("checkArguments should throw error when init or append argument is pro
   const args = { _: [], init: true }
   await assertThrows(
     () => {
-      checkArguments(args)
+      checkArguments(args, [])
     },
     Error,
     "Arguments '--init', '--append', and '--no-config' require '--cmd'",
@@ -164,7 +164,7 @@ Deno.test("checkArguments should throw error when id argument is missing with in
   const args = { _: [], init: true, cmd: "command" }
   await assertThrows(
     () => {
-      checkArguments(args)
+      checkArguments(args, [])
     },
     Error,
     "Arguments '--init','--append', and '--remove' require '--id'",
@@ -202,6 +202,6 @@ Deno.test("checkArguments should return the provided arguments when they are val
     cmd: "command",
     id: "taskId",
   }
-  const result = checkArguments(expectedArgs)
+  const result = checkArguments(expectedArgs, [])
   assertEquals(result, expectedArgs)
 })

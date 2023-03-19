@@ -29,13 +29,12 @@ import { jsonc, path } from "../../deps.ts"
  * @async
  */
 async function main(inputArgs: string[]) {
-  
   /**
    * Extract part after "--", which can be used in place of --cmd
    */
-  let postDelimiter : string[] = []
-  if (inputArgs.indexOf("--")>=0) {
-    postDelimiter = inputArgs.slice(inputArgs.indexOf("--")+1)
+  let postDelimiter: string[] = []
+  if (inputArgs.indexOf("--") >= 0) {
+    postDelimiter = inputArgs.slice(inputArgs.indexOf("--") + 1)
   }
 
   const args = parseArguments(inputArgs)
