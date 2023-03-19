@@ -119,6 +119,12 @@ This will start the Pup service. Now check that everything is working.
 systemctl --user status pup
 ```
 
+If you want more details or full logs, you can run journalctl
+
+```
+journalctl --user -u pup
+```
+
 If you need to make any changes, run `daemon-reload` and `restart`, then check the logs again.
 
 Enable the Pup service to start at boot using the following command:
