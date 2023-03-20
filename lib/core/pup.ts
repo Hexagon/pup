@@ -6,18 +6,20 @@
  */
 
 import { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, validateConfiguration } from "./configuration.ts"
-import { FileIPC, ValidatedMessage } from "./ipc.ts"
+import { FileIPC, IpcValidatedMessage } from "./ipc.ts"
 import { Logger } from "./logger.ts"
 import { Process, ProcessStatus } from "./process.ts"
 import { Status } from "./status.ts"
 import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
 import { path } from "../../deps.ts"
+import { EventEmitter } from "../common/eventemitter.ts"
 
 class Pup {
   public configuration: Configuration
   public logger: Logger
   public status: Status
+  public events: EventEmitter
   public ipc?: FileIPC
 
   public processes: (Process | Cluster)[] = []
@@ -37,29 +39,8 @@ class Pup {
     // Initialise core logger
     this.logger = new Logger(this.configuration.logger ?? {})
 
-    // Initialize plugins
-    if (this.configuration.plugins) {
-      for (const plugin of this.configuration.plugins) {
-        const newPlugin = new Plugin(this, plugin)
-        try {
-          this.logger.log("plugins", `Loading plugin from '${plugin.url}'`)
-          newPlugin.load()
-        } catch (_e) {
-          this.logger.error("plugins", `Failed to load plugin '${plugin.url}'`)
-        }
-        this.plugins.push(newPlugin)
-      }
-    }
-
-    // Attach plugins to logger
-    this.logger.attach((severity: string, category: string, text: string, process?: ProcessConfiguration): boolean => {
-      return this.pluginSignal("logger", {
-        severity,
-        category,
-        text,
-        process,
-      })
-    })
+    // EventEmitter
+    this.events = new EventEmitter()
 
     // Initialise status tracker
     this.status = new Status(statusFile)
@@ -69,21 +50,6 @@ class Pup {
     this.ipc = ipcFile ? new FileIPC(ipcFile) : undefined
     if (ipcFile) this.cleanupQueue.push(path.resolve(ipcFile))
 
-    // Create processes
-    if (this.configuration.processes) {
-      for (const process of this.configuration.processes) {
-        // Cluster or normal process?
-        if (process.cluster) {
-          this.logger.log("processes", `Cluster '${process.id}' loading`)
-          const newProcess = new Cluster(this, process)
-          this.processes.push(newProcess)
-        } else {
-          const newProcess = new Process(this, process)
-          this.logger.log("processes", `Process '${process.id}' loaded`)
-          this.processes.push(newProcess)
-        }
-      }
-    }
   }
 
   public cleanup = () => {
@@ -100,14 +66,77 @@ class Pup {
     }
   }
 
-  public init = () => {
+  public init = async () => {
+
+    // Initialize plugins
+    if (this.configuration.plugins) {
+      for (const plugin of this.configuration.plugins) {
+
+        const newPlugin = new Plugin(this, plugin)
+        let success = true;
+
+        try {
+          this.logger.log("plugins", `Loading plugin from '${plugin.url}'`)
+          await newPlugin.load()
+        } catch (e) {
+          this.logger.error("plugins", `Failed to load plugin '${plugin.url}: ${e.message}'`)
+          success = false
+        }
+        try {
+          this.logger.log("plugins", `Verifying plugin from '${plugin.url}'`)
+          newPlugin.verify()
+        } catch (e) {
+          this.logger.error("plugins", `Failed to verify plugin '${plugin.url}': ${e.message}`)
+          success = false
+        }
+
+        if (success) {
+          this.plugins.push(newPlugin)
+          this.logger.log("plugins", `Plugin '${newPlugin.impl?.meta.name}@${newPlugin.impl?.meta.version}' loaded from '${plugin.url}'`)
+        }
+       
+      }
+    }
+
+    // Attach plugins to logger
+    this.logger.attach((severity: string, category: string, text: string, process?: ProcessConfiguration): boolean => {
+      this.events.emit("log", {
+        severity,
+        category,
+        text,
+        process,
+      })
+      return this.pluginHook("log", {
+        severity,
+        category,
+        text,
+        process,
+      })
+    })
+
+    // Create processes
+    if (this.configuration.processes) {
+      for (const process of this.configuration.processes) {
+        // Cluster or normal process?
+        if (process.cluster) {
+          this.logger.log("processes", `Cluster '${process.id}' loading`)
+          const newProcess = new Cluster(this, process)
+          this.processes.push(newProcess)
+        } else {
+          const newProcess = new Process(this, process)
+          this.logger.log("processes", `Process '${process.id}' loaded`)
+          this.processes.push(newProcess)
+        }
+      }
+    }
+    
+    // Call all plugins
+    this.events.emit("init")
+
     // Initiate all processes
     for (const process of this.processes) {
       process.init()
     }
-
-    // Call all plugins
-    this.pluginSignal("init", {})
 
     this.watchdog()
   }
@@ -135,7 +164,7 @@ class Pup {
    * @private
    */
   private watchdog = () => {
-    this.pluginSignal("watchdog", {})
+    this.events.emit("watchdog")
 
     // Wrap watchdog operation in a catch to prevent it from ever stopping
     try {
@@ -281,18 +310,21 @@ class Pup {
     }
   }
 
-  private pluginSignal(signal: string, args: unknown): boolean {
+  /* Plugin hooks is a special type of events that can be used by plugins to block normal operation */
+  private pluginHook(signal: string, args: unknown): boolean {
     let result = false
     for (const plugin of this.plugins) {
-      if (plugin.impl && plugin.impl.signal) {
-        const pluginResult = plugin.impl.signal(signal, args)
+      if (plugin.impl && plugin.impl.hook) {
+        const pluginResult = plugin.impl.hook(signal, args)
         if (pluginResult) result = true
       }
     }
     return result
   }
 
-  private processIpcMessage(message: ValidatedMessage) {
+  private processIpcMessage(message: IpcValidatedMessage) {
+    this.events.emit("ipc", message)
+
     if (message.data !== null) {
       const parsedMessage = JSON.parse(message.data)
       if (parsedMessage.start) {
@@ -350,6 +382,8 @@ class Pup {
     this.requestTerminate = true
 
     this.logger.log("terminate", "Termination requested")
+
+    this.events.emit("terminating", forceQuitMs)
 
     // ToDo: Log
     for (const process of this.processes) {

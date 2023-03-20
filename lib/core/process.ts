@@ -22,6 +22,22 @@ enum ProcessStatus {
   BLOCKED = 500,
 }
 
+interface ProcessStatusChangedEvent {
+  old?: ProcessStatus
+  new?: ProcessStatus
+  status: ProcessInformation
+}
+
+interface ProcessScheduledEvent {
+  next?: ProcessStatus
+  status: ProcessInformation
+}
+
+interface ProcessWatchEvent {
+  at: Date
+  status: ProcessInformation
+}
+
 interface ProcessInformation {
   id: string
   status: ProcessStatus
@@ -60,6 +76,9 @@ class Process {
   // Allow manual block
   private blocked = false
 
+  // Cron job
+  private job?: Cron
+
   // Status
   private status: ProcessStatus = ProcessStatus.CREATED
   private pid?: number
@@ -77,8 +96,14 @@ class Process {
   }
 
   private setStatus(s: ProcessStatus) {
+    const oldVal = this.status
     this.status = s
     this.updated = new Date()
+    this.pup.events.emit("process_status_changed", {
+      old: oldVal,
+      new: this.status,
+      status: this.getStatus(),
+    })
   }
 
   public getStatus(): ProcessInformation {
@@ -111,6 +136,12 @@ class Process {
     if (this.config.cron) this.setupCron()
     // Restart on file/directory watcher
     if (this.config.watch) this.setupWatch(this.config.watch)
+    // Send initial process status
+    this.pup.events.emit("process_status_changed", {
+      old: null,
+      new: this.status,
+      status: this.getStatus(),
+    })
   }
 
   public start = async (reason?: string, restart?: boolean) => {
@@ -225,6 +256,7 @@ class Process {
 
   public block = () => {
     this.blocked = true
+    this.setStatus(ProcessStatus.BLOCKED)
   }
 
   public unblock = () => {
@@ -237,11 +269,22 @@ class Process {
       const cronJob = new Cron(this.config.cron as string, { unref: true }, () => {
         this.start("Cron pattern")
         this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
+        this.pup.events.emit("process_scheduled", {
+          next: this.job?.nextRun(),
+          status: this.getStatus(),
+        })
         this.restarts = 0
       })
 
       // Initial next run time
       this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
+      this.pup.events.emit("process_scheduled", {
+        next: this.job?.nextRun(),
+        status: this.getStatus(),
+      })
+
+      // Initial next
+      this.job = cronJob
     } catch (e) {
       this.pup.logger.error("scheduled", `Fatal error setup up the cron job for '${this.config.id}', process will not autostart. Error: ${e}`)
     }
@@ -253,6 +296,10 @@ class Process {
     for await (const watchEvent of watcher) {
       if (watchEvent.some((_) => _.type.includes("modify"))) {
         this.pup.logger.log("watcher", "File change detected", this.config)
+        this.pup.events.emit("process_watch", {
+          at: new Date(),
+          status: this.getStatus(),
+        })
         this.restarts = 0
         this.stop("restart")
         // Restart will be handled by watchdog
@@ -264,4 +311,4 @@ class Process {
 }
 
 export { Process, ProcessStatus }
-export type { ProcessInformation, ProcessInformationParsed }
+export type { ProcessInformation, ProcessInformationParsed, ProcessScheduledEvent, ProcessStatusChangedEvent, ProcessWatchEvent }

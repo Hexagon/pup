@@ -1,6 +1,6 @@
 /**
  * Functions and interfaces related to core configuration of pup
- * 
+ *
  * @file      lib/core/process.ts
  * @license   MIT
  */

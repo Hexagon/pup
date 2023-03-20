@@ -1,6 +1,6 @@
 import { GlobalLoggerConfiguration, ProcessConfiguration } from "./configuration.ts"
 
-export interface LoggerPluginParams {
+export interface LogEvent {
   severity: string
   category: string
   text: string
@@ -17,6 +17,7 @@ class Logger {
     this.config = globalConfiguration
   }
 
+  // Used for attaching the logger hook
   public attach(pluginLogger: AttachedLogger) {
     this.attachedLogger = pluginLogger
   }

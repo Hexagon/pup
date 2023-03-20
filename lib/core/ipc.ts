@@ -6,7 +6,7 @@
 
 import { fileExists } from "../common/utils.ts"
 
-export interface ValidatedMessage {
+export interface IpcValidatedMessage {
   pid: number | null
   sent: Date | null
   data: string | null
@@ -50,7 +50,7 @@ export class FileIPC {
    *
    * @returns An array of [received message, or null if the message is invalid]
    */
-  async receiveData(): Promise<ValidatedMessage[]> {
+  async receiveData(): Promise<IpcValidatedMessage[]> {
     if (await fileExists(this.filePath)) {
       let fileContent
       try {
@@ -66,7 +66,7 @@ export class FileIPC {
         throw new Error(`Failed to remove '${this.filePath}', aborting ipc read.`)
       }
 
-      const receivedMessages: ValidatedMessage[] = []
+      const receivedMessages: IpcValidatedMessage[] = []
 
       try {
         const messages = JSON.parse(fileContent || "[]")

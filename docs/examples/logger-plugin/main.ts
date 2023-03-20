@@ -1,41 +1,31 @@
-import { LoggerPluginParams, PluginConfiguration, PluginImplementation, PluginMetadata, Pup } from "../../../mod.ts"
+import { LogEvent, PluginConfiguration, PluginMetadata, PluginApi } from "../../../mod.ts"
 
-/**
- * Every plug in should extend PluginImplementation
- */
-export class PupPlugin extends PluginImplementation {
+export class PupPlugin {
+
   public meta: PluginMetadata = {
     name: "Demo logger plugin",
     version: "0.0.1",
-    repository: "https://github.com/hexagon/pup",
+    repository: "https://github.com/Hexagon/pup/tree/main/docs/examples/logger-plugin",
   }
-  constructor(pup: Pup, config: PluginConfiguration) {
-    /**
-     * This makes two variables exist in the instance
-     * - this.pup - Main class of pup, here will most information be available
-     * - this.config - The configuration of this plugin
-     */
-    super(pup, config)
-  }
-  public signal(signal: string, parameters: unknown): boolean {
-    /**
-     * signal can be one of logger | watchdog | init
-     */
-    if (signal === "logger") {
-      const p: LoggerPluginParams = parameters as LoggerPluginParams
 
-      /**
-       * This console.log will replace the build in logger
-       */
+  private api: PluginApi
+  private config: PluginConfiguration
+
+  constructor(pup: PluginApi, config: PluginConfiguration) {
+    this.api = pup
+    this.config = config
+  }
+
+  public hook(hook: string, parameters: unknown): boolean {
+    if (hook === "log") {
+      const p: LogEvent = parameters as LogEvent
+      // This output the logs in a more simple way than default
       console.log(p.severity, p.category, p.text)
-
-      /**
-       * Returning true will block normal operations,
-       * in this case the built in logger wont log anything.
-       */
+      // Return true to block normal operation this is the logger hook
       return true
     }
-
+    // Return false if this was any hook other than logger
     return false
   }
+
 }
