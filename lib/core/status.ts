@@ -1,3 +1,10 @@
+/**
+ * Class that writes the current status of pup to disk
+ *
+ * @file      lib/core/status.ts
+ * @license   MIT
+ */
+
 import { Application } from "../../application.meta.ts"
 import { Cluster } from "./cluster.ts"
 import { Process, ProcessInformation } from "./process.ts"

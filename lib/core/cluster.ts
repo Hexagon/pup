@@ -1,3 +1,12 @@
+/**
+ * Everything related to class `Cluster`, which is the internal representation of a cluster in Pup
+ * 
+ * `Cluster` is basically a collection of processes, also extending `Process` to support the exact same methods
+ *
+ * @file      lib/core/process.ts
+ * @license   MIT
+ */
+
 import { Process, ProcessInformation, ProcessStatus } from "./process.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Pup } from "./pup.ts"

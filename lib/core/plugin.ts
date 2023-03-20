@@ -1,3 +1,11 @@
+/**
+ * Classes and interfaces related to the plugin feature of Pup
+ *
+ * @file      lib/core/plugin.ts
+ * @license   MIT
+ */
+
+
 import { PluginConfiguration } from "./configuration.ts"
 import { Pup } from "./pup.ts"
 
@@ -7,6 +15,9 @@ export interface PluginMetadata {
   repository: string
 }
 
+/**
+ * Internal representation of a plugin
+ */
 export class Plugin {
   private pup: Pup
   private config: PluginConfiguration
@@ -22,6 +33,9 @@ export class Plugin {
   }
 }
 
+/**
+ * Every plugin should extend this Class
+ */
 export class PluginImplementation {
   public meta = {
     name: "Plugin Implemetation",

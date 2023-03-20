@@ -1,3 +1,10 @@
+/**
+ * Everything related to class `Process`, which is the internal representation of a process in Pup
+ *
+ * @file      lib/core/process.ts
+ * @license   MIT
+ */
+
 import { Pup } from "./pup.ts"
 import { Cron } from "../../deps.ts"
 import { Runner } from "./runner.ts"
