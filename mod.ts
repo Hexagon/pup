@@ -17,7 +17,7 @@ export type { Configuration, GlobalLoggerConfiguration, ProcessConfiguration } f
 export type { AttachedLogger } from "./lib/core/logger.ts"
 
 /** Export everything needed for Plugins */
-export { PluginImplementation, PluginApi } from "./lib/core/plugin.ts"
+export { PluginApi, PluginImplementation } from "./lib/core/plugin.ts"
 export type { PluginMetadata } from "./lib/core/plugin.ts"
 export type { PluginConfiguration } from "./lib/core/configuration.ts"
 

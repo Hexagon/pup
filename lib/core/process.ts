@@ -11,6 +11,10 @@ import { Runner } from "./runner.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
 
+/**
+ * Never ever change or delete any existing mapping,
+ * just add
+ */
 enum ProcessStatus {
   CREATED = 0,
   STARTING = 100,
@@ -254,13 +258,15 @@ class Process {
     this.pendingRestartReason = reason
   }
 
-  public block = () => {
+  public block = (reason: string) => {
     this.blocked = true
+    this.pup.logger.log("block", `Process blocked, reason: ${reason}`, this.config)
     this.setStatus(ProcessStatus.BLOCKED)
   }
 
-  public unblock = () => {
+  public unblock = (reason: string) => {
     this.blocked = false
+    this.pup.logger.log("unblock", `Process unblocked, reason: ${reason}`, this.config)
   }
 
   private setupCron = () => {

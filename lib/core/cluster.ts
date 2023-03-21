@@ -94,12 +94,12 @@ class Cluster extends Process {
     this.processes.forEach((process) => process.restart(reason))
   }
 
-  public override block = () => {
-    this.processes.forEach((process) => process.block())
+  public override block = (reason: string) => {
+    this.processes.forEach((process) => process.block(reason))
   }
 
-  public override unblock = () => {
-    this.processes.forEach((process) => process.unblock())
+  public override unblock = (reason: string) => {
+    this.processes.forEach((process) => process.unblock(reason))
   }
 
   public getStatuses(): ProcessInformation[] {

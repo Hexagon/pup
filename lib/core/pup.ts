@@ -49,7 +49,6 @@ class Pup {
     // Initialize file ipc, if a path were passed
     this.ipc = ipcFile ? new FileIPC(ipcFile) : undefined
     if (ipcFile) this.cleanupQueue.push(path.resolve(ipcFile))
-
   }
 
   public cleanup = () => {
@@ -67,13 +66,11 @@ class Pup {
   }
 
   public init = async () => {
-
     // Initialize plugins
     if (this.configuration.plugins) {
       for (const plugin of this.configuration.plugins) {
-
         const newPlugin = new Plugin(this, plugin)
-        let success = true;
+        let success = true
 
         try {
           this.logger.log("plugins", `Loading plugin from '${plugin.url}'`)
@@ -94,7 +91,6 @@ class Pup {
           this.plugins.push(newPlugin)
           this.logger.log("plugins", `Plugin '${newPlugin.impl?.meta.name}@${newPlugin.impl?.meta.version}' loaded from '${plugin.url}'`)
         }
-       
       }
     }
 
@@ -129,7 +125,7 @@ class Pup {
         }
       }
     }
-    
+
     // Call all plugins
     this.events.emit("init")
 
@@ -260,51 +256,51 @@ class Pup {
     }
   }
 
-  private restart(id: string) {
+  public restart(id: string, requestor: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
-      foundProcess.restart("rpc")
+      foundProcess.restart(requestor)
     } else {
       console.error("Rpc: Got signal to restart process which does not exist.")
     }
   }
 
-  private start(id: string) {
+  public start(id: string, requestor: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
-      foundProcess.start("ipc")
+      foundProcess.start(requestor)
     } else {
       console.error("Rpc: Got signal to stop process which does not exist.")
     }
   }
 
-  private stop(id: string) {
+  public stop(id: string, requestor: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
-      foundProcess.stop("ipc")
+      foundProcess.stop(requestor)
     } else {
       console.error("Rpc: Got signal to stop process which does not exist.")
     }
   }
 
-  private block(id: string) {
+  public block(id: string, requestor: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
-      foundProcess.block()
+      foundProcess.block(requestor)
     } else {
       console.error("Rpc: Got signal to block process which does not exist.")
     }
   }
 
-  private unblock(id: string) {
+  public unblock(id: string, requestor: string) {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
-      foundProcess.unblock()
+      foundProcess.unblock(requestor)
     } else {
       console.error("Rpc: Got signal to unblock process which does not exist.")
     }
@@ -334,7 +330,7 @@ class Pup {
           }
           // ToDo, also check valid characters
         } else if (parsedMessage.start.length >= 1 && parsedMessage.start.length <= 64) {
-          this.start(parsedMessage.start)
+          this.start(parsedMessage.start, "ipc")
         }
       } else if (parsedMessage.stop) {
         if (parsedMessage.stop.trim().toLocaleLowerCase() === "all") {
@@ -343,7 +339,7 @@ class Pup {
           }
           // ToDo, also check valid characters
         } else if (parsedMessage.stop.length >= 1 && parsedMessage.stop.length <= 64) {
-          this.stop(parsedMessage.stop)
+          this.stop(parsedMessage.stop, "ipc")
         }
       } else if (parsedMessage.restart) {
         if (parsedMessage.restart.trim().toLocaleLowerCase() === "all") {
@@ -352,25 +348,25 @@ class Pup {
           }
           // ToDo, also check valid characters
         } else if (parsedMessage.restart.length >= 1 && parsedMessage.restart.length <= 64) {
-          this.restart(parsedMessage.restart)
+          this.restart(parsedMessage.restart, "ipc")
         }
       } else if (parsedMessage.block) {
         if (parsedMessage.block.trim().toLocaleLowerCase() === "all") {
           for (const process of this.allProcesses()) {
-            process.block()
+            process.block("ipc")
           }
           // ToDo, also check valid characters
         } else if (parsedMessage.block.length >= 1 && parsedMessage.block.length <= 64) {
-          this.block(parsedMessage.block)
+          this.block(parsedMessage.block, "ipc")
         }
       } else if (parsedMessage.unblock) {
         if (parsedMessage.unblock.trim().toLocaleLowerCase() === "all") {
           for (const process of this.allProcesses()) {
-            process.unblock()
+            process.unblock("ipc")
           }
           // ToDo, also check valid characters
         } else if (parsedMessage.unblock.length >= 1 && parsedMessage.unblock.length <= 64) {
-          this.unblock(parsedMessage.unblock)
+          this.unblock(parsedMessage.unblock, "ipc")
         }
       } else if (parsedMessage.terminate) {
         this.terminate(30000)
@@ -378,7 +374,7 @@ class Pup {
     }
   }
 
-  private terminate(forceQuitMs: number) {
+  public terminate(forceQuitMs: number) {
     this.requestTerminate = true
 
     this.logger.log("terminate", "Termination requested")
@@ -387,7 +383,7 @@ class Pup {
 
     // ToDo: Log
     for (const process of this.processes) {
-      process.block()
+      process.block("terminating")
       process.stop("terminating")
     }
 
