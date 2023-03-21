@@ -35,8 +35,8 @@ In this section, we will cover some common issues and their solutions when using
 
 If you still encounter any issues or need help with Pup, the following resources are available for troubleshooting and support:
 
-1. **GitHub repository**: Check the [Pup GitHub repository](https://github.com/yourusername/pup) for any known issues or to report new ones. You can also participate in the Discussions section to seek
-   help from the community.
+1. **GitHub repository**: Check the [Pup GitHub repository](https://github.com/hexagon/pup) for any known issues or to report new ones. You can also participate in the Discussions section to seek help
+   from the community.
 
 2. **Documentation**: Thoroughly review this documentation to ensure you have correctly followed the installation, configuration, and usage instructions.
 

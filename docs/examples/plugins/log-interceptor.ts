@@ -7,7 +7,7 @@ export class PupPlugin extends PluginImplementation {
       name: "LoggerInterceptorPlugin",
       version: "1.0.0",
       api: "1",
-      repository: "https://github.com/myusername/loggerinterceptorplugin",
+      repository: "https://github.com/hexagon/pup",
     }
   }
 

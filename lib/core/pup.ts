@@ -29,10 +29,30 @@ class Pup {
 
   private WATCHDOG_INTERVAL_MS = 2000
 
-  // Put path of temporary/status files here
+  public temporaryStoragePath?: string
+  public persistentStoragePath?: string
+  public configFilePath?: string
+
   public cleanupQueue: string[] = []
 
-  constructor(unvalidatedConfiguration: unknown, statusFile?: string, ipcFile?: string) {
+  constructor(unvalidatedConfiguration: unknown, configFilePath?: string) {
+    // Setup paths
+    let statusFile
+    let ipcFile
+    if (configFilePath) {
+      this.configFilePath = path.resolve(configFilePath)
+
+      const resolvedPath = path.parse(this.configFilePath)
+
+      this.temporaryStoragePath = `${resolvedPath.dir}/.${resolvedPath.name}-tmp`
+      this.cleanupQueue.push(this.temporaryStoragePath)
+
+      this.persistentStoragePath = `${resolvedPath.dir}/.${resolvedPath.name}`
+
+      statusFile = `${this.temporaryStoragePath}/.status`
+      ipcFile = `.${this.temporaryStoragePath}/.ipc`
+    }
+
     // Throw on invalid configuration
     this.configuration = validateConfiguration(unvalidatedConfiguration)
 
@@ -44,11 +64,9 @@ class Pup {
 
     // Initialise status tracker
     this.status = new Status(statusFile)
-    if (statusFile) this.cleanupQueue.push(path.resolve(statusFile))
 
     // Initialize file ipc, if a path were passed
-    this.ipc = ipcFile ? new FileIPC(ipcFile) : undefined
-    if (ipcFile) this.cleanupQueue.push(path.resolve(ipcFile))
+    if (ipcFile) this.ipc = new FileIPC(ipcFile)
   }
 
   public cleanup = () => {
@@ -56,7 +74,7 @@ class Pup {
     // and clears any stray files
     for (const cleanupFilePath of this.cleanupQueue) {
       try {
-        Deno.remove(cleanupFilePath)
+        Deno.remove(cleanupFilePath, { recursive: true })
         this.logger.log("cleanup", `${cleanupFilePath} removed.`)
         // Ignore errors
       } catch (_e) {

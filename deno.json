@@ -5,6 +5,11 @@
       "semiColons": false
     }
   },
+  "lint": {
+    "files": {
+      "exclude": ["plugins/web-interface/static/js"]
+    }
+  },
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts test/deps.ts",
     "build-schema": "deno run --allow-write tools/build-schema.ts",

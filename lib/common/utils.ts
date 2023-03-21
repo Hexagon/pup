@@ -1,4 +1,6 @@
-async function fileExists(filePath: string) {
+import { path } from "../../deps.ts"
+
+export async function fileExists(filePath: string) {
   try {
     const statResult = await Deno.stat(filePath)
     if (statResult.isFile) {
@@ -15,4 +17,12 @@ async function fileExists(filePath: string) {
   }
 }
 
-export { fileExists }
+export function toTempPath(configFile: string) {
+  const resolvedPath = path.parse(path.resolve(configFile))
+  return `${resolvedPath.dir}/.${resolvedPath.name}_${resolvedPath.ext}-tmp`
+}
+
+export function toPersistentPath(configFile: string) {
+  const resolvedPath = path.parse(path.resolve(configFile))
+  return `${resolvedPath.dir}/.${resolvedPath.name}_${resolvedPath.ext}`
+}

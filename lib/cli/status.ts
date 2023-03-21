@@ -27,8 +27,7 @@ interface TaskTableInformation {
  * @private
  * @async
  */
-export async function printStatus(configFile: string) {
-  const statusFile = `${configFile}.status`
+export async function printStatus(configFile: string, statusFile: string) {
 
   let statusData
   try {

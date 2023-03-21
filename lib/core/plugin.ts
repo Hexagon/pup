@@ -71,15 +71,27 @@ export interface PluginProcessData {
   config: PluginProcessConfiguration
 }
 
+export interface PluginPaths {
+  temporaryStorage?: string
+  persistantStorage?: string
+  configFilePath?: string
+}
+
 /**
  * Exposes selected features of pup to Plugins
  */
 export class PluginApi {
   public events: EventEmitter
+  public paths: PluginPaths
   private _pup: Pup
   constructor(pup: Pup) {
     this.events = pup.events
     this._pup = pup
+    this.paths = {
+      temporaryStorage: pup.temporaryStoragePath,
+      persistantStorage: pup.temporaryStoragePath,
+      configFilePath: pup.configFilePath,
+    }
   }
   public allProcessStatuses(): PluginProcessData[] {
     const statuses: PluginProcessData[] = this._pup.allProcesses().map((p) => {

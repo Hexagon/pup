@@ -17,7 +17,7 @@ import { appendConfigurationFile, createConfigurationFile, findConfigFile, remov
 import { printStatus } from "./status.ts"
 
 // Import common utilities
-import { fileExists } from "../common/utils.ts"
+import { fileExists, toPersistentPath, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
 import { jsonc, path } from "../../deps.ts"
@@ -89,19 +89,6 @@ async function main(inputArgs: string[]) {
   }
 
   /**
-   * Now when the configuration file is located
-   * --status, print status for current running instance, and exit.
-   */
-  if (checkedArgs.status) {
-    if (!configFile) {
-      console.error("Can not print status, no configuration file found")
-      Deno.exit(1)
-    }
-    await printStatus(configFile)
-    Deno.exit(0)
-  }
-
-  /**
    * Now, the arguments to modify existing configuration files and exit
    * -- append - Append configuration to existing configuration file and exit
    * -- remove - Remove process from existing configuration file and exit
@@ -168,14 +155,26 @@ async function main(inputArgs: string[]) {
       }
     }
   }
-
   // Prepare for IPC
   let ipcFile
-  if (useConfigFile) ipcFile = `${configFile}.ipc`
+  if (useConfigFile) ipcFile = `.${toTempPath(configFile as string)}/.ipc`
 
   // Prepare status file
   let statusFile
-  if (useConfigFile) statusFile = `${configFile}.status`
+  if (useConfigFile) statusFile = `.${toPersistentPath(configFile as string)}/.status`
+
+  /**
+   * Now when the configuration file is located
+   * --status, print status for current running instance, and exit.
+   */
+  if (checkedArgs.status) {
+    if (!statusFile) {
+      console.error("Can not print status, no configuration file found")
+      Deno.exit(1)
+    }
+    await printStatus(configFile, statusFile)
+    Deno.exit(0)
+  }
 
   // Handle --restart, --stop etc using IPC
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
@@ -208,7 +207,7 @@ async function main(inputArgs: string[]) {
    * Ready to start pup!
    */
   try {
-    const pup = new Pup(configuration, statusFile, ipcFile)
+    const pup = new Pup(configuration, configFile ?? undefined)
 
     // Start the watchdog
     pup.init()

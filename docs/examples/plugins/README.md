@@ -22,7 +22,7 @@ export class PupPlugin extends PluginImplementation {
       name: "MinimalPlugin",
       version: "1.0.0",
       api: "1",
-      repository: "https://github.com/myusername/loggerinterceptorplugin",
+      repository: "https://github.com/hexagon/pup",
     }
   }
 }
@@ -52,7 +52,8 @@ The following events are available:
 
 ## PluginApi
 
-The PluginApi class is the main API for interacting with Pup from a plugin. It exposes methods for managing processes and listening to events.
+The PluginApi class is the main API for interacting with Pup from a plugin. It exposes methods for managing processes and listening to events, the class also exposes some paths that may be useful for
+plugins:
 
 To use the PluginApi, access it through the pup parameter in your custom plugin's constructor:
 
@@ -60,6 +61,7 @@ To use the PluginApi, access it through the pup parameter in your custom plugin'
 class PupPlugin extends PluginImplementation {
   constructor(pup: PluginApi, config: PluginConfiguration) {
     // Use the pup PluginApi instance to interact with pup
+
     // - Start, stop, restart, block, and unblock processes:
     pup.start(id, reason)
     pup.stop(id, reason)
@@ -77,6 +79,14 @@ class PupPlugin extends PluginImplementation {
     pup.events.on("process_status_changed", (eventData) => {
       console.log("Process status changed:", eventData)
     })
+
+    // Extract usable paths:
+    // - A path to temporary storage that can be used by the plugin.
+    const tempStoragePath = pup.paths.temporaryStorage
+    // - A path to persistent storage that can be used by the plugin to store data across Pup restarts.
+    const persistentStoragePath = pup.paths.persistantStorage //
+    // - The full path to Pup's current configuration file (usually pup.json).
+    const configFilePath = pup.paths.configFilePath
   }
 }
 ```
@@ -96,7 +106,7 @@ export class PupPlugin extends PluginImplementation {
       name: "LoggerInterceptorPlugin",
       version: "1.0.0",
       api: "1",
-      repository: "https://github.com/myusername/loggerinterceptorplugin",
+      repository: "https://github.com/hexagon/pup",
     }
   }
 
@@ -127,14 +137,14 @@ The end user configuration for activating a plugin by `pup.json` is
     /* Remote plugin */
     {
       "url": "https://deno.land/x/pup-example-plugin@0.0.1/mod.ts",
-      "configuration": {
+      "options": {
         /* Plugin specific configuration */
       }
     },
     /* Local plugin */
     {
       "url": "./plugins/app-plugin.ts",
-      "configuration": {
+      "options": {
         /* Plugin specific configuration */
       }
     }
