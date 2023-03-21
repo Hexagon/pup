@@ -1,16 +1,25 @@
-// deno-lint-ignore-file no-explicit-any
 /**
  * Main entrypoint of the Pup plugin 'web-interface'
  *
  * @file plugins/web-interface/mod.ts
  */
 
-import { PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
+// deno-lint-ignore-file no-explicit-any
 
-import { Application, dirname, fromFileUrl, isWebSocketCloseEvent, isWebSocketPingEvent, isWebSocketPongEvent, Router } from "./deps.ts"
+import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
+
+import { Application, dirname, fromFileUrl, Router } from "./deps.ts"
 
 interface Configuration {
   port: number
+}
+
+interface LogInventoryEntry {
+  ts: Date
+  id?: string
+  severity: string
+  category: string
+  text: string
 }
 
 export class PupPlugin extends PluginImplementation {
@@ -25,9 +34,11 @@ export class PupPlugin extends PluginImplementation {
   private config: Configuration
   private app: Application
   private router: Router
+  private logs: Map<string, Array<LogInventoryEntry>>
 
   constructor(pup: PluginApi, config: PluginConfiguration) {
     super(pup, config)
+
     this.pup = pup
     this.config = config.options as Configuration
     this.app = new Application()
@@ -40,15 +51,36 @@ export class PupPlugin extends PluginImplementation {
 
     this.setupRoutes()
     this.startServer()
+
+    this.logs = new Map<string, Array<LogInventoryEntry>>()
+
+    this.pup.events.on("log", (d?: LogEvent) => {
+      const logRow: LogInventoryEntry = {
+        ts: new Date(),
+        id: d.process?.id,
+        category: d.category,
+        severity: d.severity,
+        text: d.text,
+      }
+      const process = d.process?.id || "__core"
+      if (!this.logs.has(process)) {
+        this.logs.set(process, [logRow])
+      } else {
+        const arr = this.logs.get(process) || []
+        arr?.push(logRow)
+        this.logs.set(process, arr)
+      }
+    })
   }
 
   private setupRoutes() {
     // Set up WebSocket route
     this.router.get("/ws", async (context: any) => {
-      if (context.isUpgradable) {
-        const ws = await context.upgrade()
-        this.handleWebSocketConnection(ws)
+      if (!context.isUpgradable) {
+        context.throw(501)
       }
+      const ws = await context.upgrade()
+      this.handleWebSocketConnection(ws)
     })
 
     // Set up endpoint to serve process data
@@ -56,7 +88,11 @@ export class PupPlugin extends PluginImplementation {
       const processStatuses = this.pup.allProcessStatuses()
       context.response.body = processStatuses
     })
-
+    // Set up endpoint to serve process data
+    this.router.get("/logs/:id", (context: any) => {
+      const id = context.params.id
+      context.response.body = JSON.stringify(this.logs.get(id))
+    })
     // Set up route to serve static files (e.g., HTML, CSS, JS)
     this.app.use(async (context: any, next: any) => {
       const basePath = dirname(fromFileUrl(import.meta.url))
@@ -79,28 +115,25 @@ export class PupPlugin extends PluginImplementation {
     await this.app.listen({ port: this.config.port })
   }
 
-  private async handleWebSocketConnection(socket: WebSocket) {
-    console.log("WebSocket connection established")
-
-    for await (const event of socket) {
-      if (isWebSocketCloseEvent(event) || isWebSocketPingEvent(event) || isWebSocketPongEvent(event)) {
-        // Handle WebSocket close, ping, and pong events
-        continue
+  private handleWebSocketConnection(ws: WebSocket) {
+    const logStreamer = (d?: LogEvent) => {
+      const logRow: LogInventoryEntry = {
+        ts: new Date(),
+        id: d.process?.id,
+        category: d.category,
+        severity: d.severity,
+        text: d.text,
       }
-
-      // Handle WebSocket messages
-      const message = typeof event === "string" ? JSON.parse(event) : event
-      this.handleWebSocketMessage(socket, message)
-    }
-  }
-
-  private async handleWebSocketMessage(socket: WebSocket, message: any) {
-    if (message.type === "request_initial_data") {
-      const processStatuses = this.pup.allProcessStatuses()
-      await socket.send(JSON.stringify({
-        type: "initial_data",
-        data: processStatuses,
+      ws.send(JSON.stringify({
+        type: "log",
+        data: logRow,
       }))
+    }
+    ws.onopen = () => {
+      this.pup.events.on("log", logStreamer)
+    }
+    ws.onclose = () => {
+      this.pup.events.off("log", logStreamer)
     }
   }
 }

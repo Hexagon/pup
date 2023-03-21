@@ -84,7 +84,7 @@ class PupPlugin extends PluginImplementation {
     // - A path to temporary storage that can be used by the plugin.
     const tempStoragePath = pup.paths.temporaryStorage
     // - A path to persistent storage that can be used by the plugin to store data across Pup restarts.
-    const persistentStoragePath = pup.paths.persistantStorage //
+    const persistentStoragePath = pup.paths.persistentStorage //
     // - The full path to Pup's current configuration file (usually pup.json).
     const configFilePath = pup.paths.configFilePath
   }

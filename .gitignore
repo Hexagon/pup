@@ -13,6 +13,8 @@ test.jsonc
 *.log
 *.pid
 *.status
+.*-data
+.*-tmp
 
 # Pup test files
 test_data_*.*

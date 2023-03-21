@@ -157,18 +157,18 @@ async function main(inputArgs: string[]) {
   }
   // Prepare for IPC
   let ipcFile
-  if (useConfigFile) ipcFile = `.${toTempPath(configFile as string)}/.ipc`
+  if (useConfigFile) ipcFile = `${toTempPath(configFile as string)}/.ipc`
 
   // Prepare status file
   let statusFile
-  if (useConfigFile) statusFile = `.${toPersistentPath(configFile as string)}/.status`
+  if (useConfigFile) statusFile = `${toPersistentPath(configFile as string)}/.status`
 
   /**
    * Now when the configuration file is located
    * --status, print status for current running instance, and exit.
    */
   if (checkedArgs.status) {
-    if (!statusFile) {
+    if (!statusFile || !configFile) {
       console.error("Can not print status, no configuration file found")
       Deno.exit(1)
     }

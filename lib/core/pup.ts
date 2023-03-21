@@ -14,6 +14,7 @@ import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
 import { path } from "../../deps.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
+import { toPersistentPath, toTempPath } from "../common/utils.ts"
 
 class Pup {
   public configuration: Configuration
@@ -42,15 +43,13 @@ class Pup {
     if (configFilePath) {
       this.configFilePath = path.resolve(configFilePath)
 
-      const resolvedPath = path.parse(this.configFilePath)
-
-      this.temporaryStoragePath = `${resolvedPath.dir}/.${resolvedPath.name}-tmp`
+      this.temporaryStoragePath = toTempPath(this.configFilePath)
       this.cleanupQueue.push(this.temporaryStoragePath)
 
-      this.persistentStoragePath = `${resolvedPath.dir}/.${resolvedPath.name}`
+      this.persistentStoragePath = toPersistentPath(this.configFilePath)
 
       statusFile = `${this.temporaryStoragePath}/.status`
-      ipcFile = `.${this.temporaryStoragePath}/.ipc`
+      ipcFile = `${this.temporaryStoragePath}/.ipc`
     }
 
     // Throw on invalid configuration

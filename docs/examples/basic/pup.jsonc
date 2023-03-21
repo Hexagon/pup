@@ -43,8 +43,5 @@
         "stderr": "periodic-example-task.error.log"
       }
     }
-  ],
-  "plugins": [
-    { "url": "../../plugins/web-interface/mod.ts", "options": { "port": 5000 } }
   ]
 }

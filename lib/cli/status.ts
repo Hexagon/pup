@@ -28,7 +28,6 @@ interface TaskTableInformation {
  * @async
  */
 export async function printStatus(configFile: string, statusFile: string) {
-
   let statusData
   try {
     statusData = await Deno.readTextFile(statusFile)

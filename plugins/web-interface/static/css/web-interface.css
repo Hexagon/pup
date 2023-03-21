@@ -41,35 +41,6 @@ body {
     border-radius: 0.25rem;
   }
 
-  .process-card .log-lines {
-    background-color: #424242;
-    border-radius: 0.25rem;
-    padding: 0.5rem;
-    max-height: 200px;
-    overflow-y: auto;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-size: 0.875rem;
-  }
-
-  
-.process-card .log-lines .log-line {
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .process-card .log-lines .log-line.info {
-    color: #50fa7b;
-  }
-  
-  .process-card .log-lines .log-line.warning {
-    color: #f1fa8c;
-  }
-  
-  .process-card .log-lines .log-line.error {
-    color: #ff5555;
-  }
-
   header {
     display: flex;
     justify-content: space-between;
@@ -95,6 +66,10 @@ body {
     border-left: 1px solid #424242;
     overflow-y: auto;
     max-height: calc(100vh - 2rem - 2rem);
+  }
+
+  #logs pre {
+    margin: 0.2em;
   }
   
   .hidden {

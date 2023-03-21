@@ -43,8 +43,8 @@ class Status {
       // Try to write to disk
       try {
         await Deno.writeFile(this.statusFileName, result)
-      } catch (_e) {
-        console.error("Error while writing status to disk.")
+      } catch (e) {
+        console.error("Error while writing status to disk: " + e.message)
       }
     }
   }

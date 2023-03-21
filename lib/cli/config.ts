@@ -100,8 +100,8 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
  *
  * @async
  */
-export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFile?: string): Promise<string | null> {
-  if (!useConfigFile) return null
+export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFile?: string): Promise<string | undefined> {
+  if (!useConfigFile) return undefined
 
   if (argumentsConfigFile && await fileExists(argumentsConfigFile)) {
     return argumentsConfigFile
@@ -112,6 +112,6 @@ export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFil
   } else if (await fileExists("./pup.jsonc")) {
     return "./pup.jsonc"
   } else {
-    return null
+    return undefined
   }
 }

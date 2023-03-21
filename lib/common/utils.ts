@@ -19,10 +19,14 @@ export async function fileExists(filePath: string) {
 
 export function toTempPath(configFile: string) {
   const resolvedPath = path.parse(path.resolve(configFile))
-  return `${resolvedPath.dir}/.${resolvedPath.name}_${resolvedPath.ext}-tmp`
+  const tempPath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-tmp`)
+  Deno.mkdir(tempPath, { recursive: true })
+  return tempPath
 }
 
 export function toPersistentPath(configFile: string) {
   const resolvedPath = path.parse(path.resolve(configFile))
-  return `${resolvedPath.dir}/.${resolvedPath.name}_${resolvedPath.ext}`
+  const persistentStoragePath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-data`)
+  Deno.mkdir(persistentStoragePath, { recursive: true })
+  return persistentStoragePath
 }

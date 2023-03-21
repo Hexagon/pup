@@ -73,7 +73,7 @@ export interface PluginProcessData {
 
 export interface PluginPaths {
   temporaryStorage?: string
-  persistantStorage?: string
+  persistentStorage?: string
   configFilePath?: string
 }
 
@@ -89,7 +89,7 @@ export class PluginApi {
     this._pup = pup
     this.paths = {
       temporaryStorage: pup.temporaryStoragePath,
-      persistantStorage: pup.temporaryStoragePath,
+      persistentStorage: pup.persistentStoragePath,
       configFilePath: pup.configFilePath,
     }
   }

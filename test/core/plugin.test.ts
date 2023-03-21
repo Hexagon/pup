@@ -97,13 +97,13 @@ Deno.test("PluginApi - Check persistentStorage path - undefined", () => {
   const pluginApi = new PluginApi(pup)
 
   assertEquals(
-    pluginApi.paths.persistantStorage,
+    pluginApi.paths.persistentStorage,
     pup.temporaryStoragePath,
     "Persistent storage path should match Pup's temporaryStoragePath",
   )
 
   assertEquals(
-    pluginApi.paths.persistantStorage,
+    pluginApi.paths.persistentStorage,
     undefined,
     "Persistent storage path should be undefined",
   )
@@ -135,9 +135,9 @@ Deno.test("PluginApi - Check configFilePath - set", () => {
     pup.configFilePath,
     "Config file path should match Pup's configFilePath",
   )
-
+  console.log("asdasad", pluginApi.paths.configFilePath)
   assertEquals(
-    pluginApi.paths.configFilePath?.includes("test/core/test-data/test.json"),
+    pluginApi.paths.configFilePath?.includes("test/core/test-data/test.json") || pluginApi.paths.configFilePath?.includes("test\\core\\test-data\\test.json"),
     true,
     "Config file path should include the actual path",
   )
@@ -152,9 +152,8 @@ Deno.test("PluginApi - Check temporaryStorage path - set", () => {
     pup.temporaryStoragePath,
     "Temporary storage path should match Pup's temporaryStoragePath",
   )
-
   assertEquals(
-    pup.temporaryStoragePath?.includes("test/core/test-data/.test-tmp"),
+    pup.temporaryStoragePath?.includes("test/core/test-data/.test.json-tmp") || pup.temporaryStoragePath?.includes("test\\core\\test-data\\.test.json-tmp"),
     true,
   )
 })
@@ -163,14 +162,16 @@ Deno.test("PluginApi - Check persistentStorage path - set", () => {
   const pup = new Pup(minimalPupConfiguration, "./test/core/test-data/test.json")
   const pluginApi = new PluginApi(pup)
 
+  console.log("MWWWWE", pluginApi.paths.persistentStorage, pup.persistentStoragePath)
+
   assertEquals(
-    pluginApi.paths.persistantStorage,
-    pup.temporaryStoragePath,
-    "Persistent storage path should match Pup's temporaryStoragePath",
+    pluginApi.paths.persistentStorage,
+    pup.persistentStoragePath,
+    "Persistent storage path should match Pup's persistentStoragePath",
   )
 
   assertEquals(
-    pup.temporaryStoragePath?.includes("test/core/test-data/.test"),
+    pup.persistentStoragePath?.includes("test/core/test-data/.test.json-data") || pup.persistentStoragePath?.includes("test\\core\\test-data\\.test.json-data"),
     true,
   )
 })
