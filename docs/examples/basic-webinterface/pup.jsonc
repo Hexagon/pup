@@ -1,0 +1,57 @@
+{
+  // Global logger configuration, all options can be ovverridden per process
+  "logger": {
+    // Decorate console log entries?
+    "decorate": true, // default true
+
+    // Use colors in console?
+    "colors": true, // default true
+
+    // Decorate log file entries?
+    "decorateFiles": true, // default true
+
+    // Write logs to files, if stderr is undefined it will default to the stdout file
+    "stdout": "pup.log", // default undefined
+    "stderr": "pup.error.log" // default undefined or stdout, if defined
+  },
+
+  // Process configuration - Required to be an array, and at least one process definition is required
+  "processes": [
+    // One object per process ...
+    {
+      "id": "kept-alive-server", // Required
+      "cmd": ["deno", "run", "--allow-read", "--allow-env", "../basic/server.js"], // Required
+      "env": { // Default undefined
+        "TZ": "Europe/Berlin"
+      },
+      "pidFile": "kept-alive-server.pid", // Write pid to file, default undefined
+      "autostart": true, // default undefined, process will not autostart by default
+      "restart": "always", // default undefined, process will not restart by default
+      "restartDelayMs": 10000 // default 10000
+    },
+    {
+      "id": "periodic-example-task",
+      "cmd": ["deno", "run", "--allow-read", "../basic/task.js"],
+      "cron": "*/20 * * * * *", // default undefined
+      "restartDelayMs": 3000, // default 10000
+      // Overrides to global logger
+      // Note: "colors" is not configurable per process
+      "logger": {
+        "console": true, // defaults to global configuration or true
+        "decorateFiles": true, // defaults to global configuration or false
+        "stdout": "periodic-example-task.log",
+        "stderr": "periodic-example-task.error.log"
+      }
+    }
+  ],
+  "plugins": [
+    {
+      "url": "../../plugins/web-interface/mod.ts",
+      "options": {
+        "port": 5000,
+        "externalHost": "localhost",
+        "externalPort": 5000
+      }
+    }
+  ]
+}

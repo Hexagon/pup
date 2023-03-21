@@ -135,7 +135,7 @@ Deno.test("PluginApi - Check configFilePath - set", () => {
     pup.configFilePath,
     "Config file path should match Pup's configFilePath",
   )
-  console.log("asdasad", pluginApi.paths.configFilePath)
+
   assertEquals(
     pluginApi.paths.configFilePath?.includes("test/core/test-data/test.json") || pluginApi.paths.configFilePath?.includes("test\\core\\test-data\\test.json"),
     true,
@@ -161,8 +161,6 @@ Deno.test("PluginApi - Check temporaryStorage path - set", () => {
 Deno.test("PluginApi - Check persistentStorage path - set", () => {
   const pup = new Pup(minimalPupConfiguration, "./test/core/test-data/test.json")
   const pluginApi = new PluginApi(pup)
-
-  console.log("MWWWWE", pluginApi.paths.persistentStorage, pup.persistentStoragePath)
 
   assertEquals(
     pluginApi.paths.persistentStorage,
