@@ -1,5 +1,5 @@
 // Initialize WebSocket connection
-const socket = new WebSocket("ws://localhost:5000/ws")
+const socket = new WebSocket(generateWebSocketURL())
 
 // Add event listener for incoming messages
 socket.addEventListener("message", (event) => {
@@ -34,7 +34,7 @@ function updateProcessCard(data) {
 
   // Update process status
   const processStatus = processCard.querySelector(".process-status")
-  processStatus.textContent = `Status: ${data.status.status}`
+  processStatus.textContent = ` - ${processStatusToString(data.status.status)}`
 }
 
 // Function to fetch the list of processes from the server
@@ -48,18 +48,20 @@ function generateProcessCard(processData) {
   const { status, config } = processData
   const processCard = document.createElement("div")
   processCard.classList.add("process-card")
+  processCard.id = `process-card-${config.id}`
 
   // Add process title
   const title = document.createElement("span")
   title.classList.add("process-title")
   title.textContent = config.id
-  processCard.appendChild(title)
 
   // Add process status
-  const processStatus = document.createElement("p")
-  processStatus.textContent = `Status: ${status.status}`
+  const processStatus = document.createElement("span")
+  processStatus.textContent = ` - ${processStatusToString(status.status)}`
   processStatus.classList.add("process-status")
-  processCard.appendChild(processStatus)
+  title.appendChild(processStatus)
+
+  processCard.appendChild(title)
 
   // Add action buttons
   const actions = document.createElement("div")

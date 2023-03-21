@@ -6,6 +6,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
+import { ProcessStatus, ProcessStatusChangedEvent } from "../../lib/core/process.ts"
 import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
 
 import { Application, dirname, fromFileUrl, Router } from "./deps.ts"
@@ -129,11 +130,19 @@ export class PupPlugin extends PluginImplementation {
         data: logRow,
       }))
     }
+    const processStatusStreamer = (d?: ProcessStatusChangedEvent) => {
+      ws.send(JSON.stringify({
+        type: "process_status_changed",
+        data: d,
+      }))
+    }
     ws.onopen = () => {
       this.pup.events.on("log", logStreamer)
+      this.pup.events.on("process_status_changed", processStatusStreamer)
     }
     ws.onclose = () => {
       this.pup.events.off("log", logStreamer)
+      this.pup.events.off("process_status_changed", processStatusStreamer)
     }
   }
 }

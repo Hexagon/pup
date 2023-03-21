@@ -50,3 +50,45 @@ function showSpecificClassElements(containerId, targetClass) {
     targetElements[i].classList.remove("hidden")
   }
 }
+
+function generateWebSocketURL() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+  const host = window.location.hostname
+  const port = window.location.port ? `:${window.location.port}` : ""
+  const wsURL = `${protocol}//${host}${port}/ws`
+  return wsURL
+}
+
+const ProcessStatus = {
+  CREATED: 0,
+  STARTING: 100,
+  RUNNING: 200,
+  STOPPING: 250,
+  FINISHED: 300,
+  ERRORED: 400,
+  EXHAUSTED: 450,
+  BLOCKED: 500,
+}
+
+function processStatusToString(status) {
+  switch (status) {
+    case ProcessStatus.CREATED:
+      return "Created"
+    case ProcessStatus.STARTING:
+      return "Starting"
+    case ProcessStatus.RUNNING:
+      return "Running"
+    case ProcessStatus.STOPPING:
+      return "Stopping"
+    case ProcessStatus.FINISHED:
+      return "Finished"
+    case ProcessStatus.ERRORED:
+      return "Errored"
+    case ProcessStatus.EXHAUSTED:
+      return "Exhausted"
+    case ProcessStatus.BLOCKED:
+      return "Blocked"
+    default:
+      return "Unknown"
+  }
+}

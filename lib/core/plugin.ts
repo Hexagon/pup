@@ -28,7 +28,7 @@ export interface PluginMetadata {
  */
 interface PluginProcessInformation {
   id: string
-  status: ProcessStatus
+  status: string
   code?: number
   signal?: number
   pid?: number
