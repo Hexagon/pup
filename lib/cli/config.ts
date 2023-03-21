@@ -6,8 +6,8 @@
  * @license   MIT
  */
 
-import { generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
-import { Args } from "../../deps.ts"
+import { Configuration, generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
+import { Args, jsonc } from "../../deps.ts"
 import { fileExists } from "../common/utils.ts"
 
 /**
@@ -38,10 +38,16 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
     let existingConfigurationObject
     try {
       const existingConfiguration = await Deno.readTextFile(configFile)
-      existingConfigurationObject = JSON.parse(existingConfiguration)
+      existingConfigurationObject = jsonc.parse(existingConfiguration) as unknown as Configuration
     } catch (e) {
-      throw new Error("Could not read configuration file.", e.message)
+      throw new Error("Could not read configuration file: " + e.message)
     }
+
+    // Check for valid parse
+    if (!existingConfigurationObject) {
+      throw new Error("Could not parse configuration file.")
+    }
+
     // Generate new configuration
     const newConfiguration = generateConfiguration(checkedArgs.id, cmd, checkedArgs.cwd, checkedArgs.cron, checkedArgs.autostart, checkedArgs.watch)
     const newProcess = newConfiguration.processes[0]
@@ -72,9 +78,13 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
     let existingConfigurationObject
     try {
       const existingConfiguration = await Deno.readTextFile(configFile)
-      existingConfigurationObject = JSON.parse(existingConfiguration)
+      existingConfigurationObject = jsonc.parse(existingConfiguration) as unknown as Configuration
     } catch (e) {
       throw new Error("Could not read configuration file.", e.message)
+    }
+
+    if (!existingConfigurationObject) {
+      throw new Error("Could not parse configuration file.")
     }
 
     // Remove from configuration
