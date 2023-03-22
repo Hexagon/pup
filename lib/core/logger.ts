@@ -48,7 +48,7 @@ class Logger {
     const isStdErr = severity === "error" || category === "stderr"
 
     // Prepare decorated log text
-    const decoratedLogText = `[${new Date().toLocaleString()}][${initiator}][${category}] ${text}`
+    const decoratedLogText = `${new Date().toISOString()} [${severity.toUpperCase()}] [${initiator}:${category}] ${text}`
 
     if (logToConsole) {
       const logWithColors = this.config.colors ?? true
