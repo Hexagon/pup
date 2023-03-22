@@ -37,7 +37,6 @@ export class FileIPC {
       const messages = JSON.parse(fileContent || "[]")
       messages.push({ pid: Deno.pid, data, sent: new Date().toISOString() })
       await Deno.writeTextFile(this.filePath, JSON.stringify(messages), { create: true })
-      console.log("Data sent successfully")
     } catch (_e) {
       console.error("Error sending data, read or write failed.")
     }

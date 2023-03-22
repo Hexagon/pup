@@ -385,6 +385,16 @@ class Pup {
         } else if (parsedMessage.unblock.length >= 1 && parsedMessage.unblock.length <= 64) {
           this.unblock(parsedMessage.unblock, "ipc")
         }
+      } else if (parsedMessage.telemetry) {
+        const telemetry = parsedMessage.telemetry
+        if (telemetry.sender && typeof telemetry.sender === "string") {
+          const cleanedId = telemetry.sender.trim().toLocaleLowerCase()
+          const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+          if (foundProcess) {
+            delete telemetry.sender
+            foundProcess?.setTelemetry(telemetry)
+          }
+        }
       } else if (parsedMessage.terminate) {
         this.terminate(30000)
       }

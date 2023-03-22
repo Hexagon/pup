@@ -36,6 +36,7 @@ class Status {
         pid: Deno.pid,
         version: Application.version,
         updated: new Date().toISOString(),
+        memory: Deno.memoryUsage(),
         processes: processStatuses,
       }
       const result = new TextEncoder().encode(JSON.stringify(pupStatus))

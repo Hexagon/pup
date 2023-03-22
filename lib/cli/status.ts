@@ -14,6 +14,7 @@ interface TaskTableInformation {
   Status: string
   Started?: string
   Exited?: string
+  RSS?: number
   Signal: string
 }
 
@@ -53,6 +54,7 @@ export async function printStatus(configFile: string, statusFile: string) {
     Status: status.status,
     Started: status.started,
     Exited: status.exited,
+    RSS: status.memory?.rss,
     Signal: `${(status.code ?? "-")}${status.signal ? (" " + status.signal) : ""}`,
   })
 
@@ -65,6 +67,7 @@ export async function printStatus(configFile: string, statusFile: string) {
       Status: ProcessStatus[currentTask.status],
       Started: currentTask.started,
       Exited: currentTask.exited,
+      RSS: currentTask.telemetry?.memory?.rss,
       Signal: `${(currentTask.code ?? "-")}${currentTask.signal ? (" " + currentTask.signal) : ""}`,
     })
   }

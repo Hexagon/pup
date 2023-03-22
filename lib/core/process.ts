@@ -10,6 +10,7 @@ import { Cron } from "../../deps.ts"
 import { Runner } from "./runner.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
+import { TelemetryData } from "../../telemetry.ts"
 
 /**
  * Never ever change or delete any existing mapping,
@@ -46,7 +47,7 @@ interface ProcessInformation {
   id: string
   status: ProcessStatus
   code?: number
-  signal?: number
+  signal?: string
   pid?: number
   started?: Date
   exited?: Date
@@ -54,6 +55,7 @@ interface ProcessInformation {
   restarts?: number
   updated: Date
   pendingRestartReason?: string
+  telemetry?: TelemetryData
   type: "cluster" | "process"
 }
 
@@ -68,6 +70,7 @@ interface ProcessInformationParsed {
   blocked?: boolean
   restarts?: number
   updated: string
+  telemetry?: TelemetryData
 }
 
 class Process {
@@ -87,16 +90,21 @@ class Process {
   private status: ProcessStatus = ProcessStatus.CREATED
   private pid?: number
   private code?: number
-  private signal?: number
+  private signal?: string
   private started?: Date
   private exited?: Date
   private restarts = 0
   private updated: Date = new Date()
   private pendingRestartReason?: string
+  private telemetry?: TelemetryData
 
   constructor(pup: Pup, config: ProcessConfiguration) {
     this.config = config
     this.pup = pup
+  }
+
+  public setTelemetry(t: TelemetryData) {
+    this.telemetry = t
   }
 
   private setStatus(s: ProcessStatus) {
@@ -122,6 +130,7 @@ class Process {
       blocked: this.blocked,
       restarts: this.restarts,
       updated: this.updated,
+      telemetry: this.telemetry,
       pendingRestartReason: this.pendingRestartReason,
       type: "process",
     }
@@ -185,6 +194,7 @@ class Process {
     this.signal = undefined
     this.exited = undefined
     this.started = undefined
+    this.telemetry = undefined
 
     // Start process (await for it to exit)
     this.runner = new Runner(this.pup, this.config)
@@ -195,43 +205,43 @@ class Process {
     }
 
     // Try to start
-    // try {
-    this.pendingRestartReason = undefined
-    const result = await this.runner.run((pid: number) => {
-      // Process started
-      this.setStatus(ProcessStatus.RUNNING)
-      this.pid = pid
-      this.started = new Date()
-    })
+    try {
+      this.pendingRestartReason = undefined
+      const result = await this.runner.run((pid: number) => {
+        // Process started
+        this.setStatus(ProcessStatus.RUNNING)
+        this.pid = pid
+        this.started = new Date()
+      })
 
-    this.code = result.code
-    this.signal = result.signal
-
-    /**
-     * Exited - Update status
-     *
-     * Treat SIGTERM (Exit Code 143) as a non-error exit, to avoid restarts after
-     * a manual stop
-     */
-    if (result.code === 0 || result.code === 143) {
-      this.setStatus(ProcessStatus.FINISHED)
-      logger.log("finished", `Process finished with code ${result.code}`, this.config)
+      this.code = result.code
+      this.signal = result.signal as string
 
       /**
        * Exited - Update status
        *
-       * Treat all exit codes except 0 and 143(SIGTERM) as errors
+       * Treat SIGTERM (Exit Code 143) as a non-error exit, to avoid restarts after
+       * a manual stop
        */
-    } else {
-      this.setStatus(ProcessStatus.ERRORED)
-      logger.log("errored", `Process exited with code ${result.code}`, this.config)
-    }
-    /*} catch (e) {
+      if (result.code === 0 || result.code === 143) {
+        this.setStatus(ProcessStatus.FINISHED)
+        logger.log("finished", `Process finished with code ${result.code}`, this.config)
+
+        /**
+         * Exited - Update status
+         *
+         * Treat all exit codes except 0 and 143(SIGTERM) as errors
+         */
+      } else {
+        this.setStatus(ProcessStatus.ERRORED)
+        logger.log("errored", `Process exited with code ${result.code}`, this.config)
+      }
+    } catch (e) {
       this.code = undefined
       this.signal = undefined
       this.setStatus(ProcessStatus.ERRORED)
       logger.log("errored", `Process could not start, error: ${e}`, this.config)
-    }*/
+    }
 
     this.exited = new Date()
     this.pid = undefined

@@ -7,7 +7,19 @@ This is the source code repository, documentation available at <a href="https://
 
 <br>
 
-**Install/Upgrade Pup using deno**
+Pup is a powerful process manager for Deno, designed to simplify the management of your applications and services. Here are some of the key features of Pup:
+
+- **Easy process management:** Define, control, and manage your processes with simple commands and configuration options.
+- **Multiple start policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
+- **Restart policies:** Configure processes to restart automatically, either always or only in case of errors, with optional delay and restart limits.
+- **Clustering and load balancing:** Easily scale your processes with built-in clustering and load balancing support.
+- **Flexible configuration:** Define global settings and per-process configurations, including logging, working directories, environment variables, and more.
+- **Plugin support:** Extend Pup's functionality with custom plugins for additional features and integrations.
+- **CLI and programmatic usage:** Manage your processes using the Pup command-line interface, or integrate Pup directly into your Deno applications.
+- **Process Telemetry:** Pup can collect telemetry data from client processes written in Deno, such as memory usage and current working directory. This can be used to provide better insights into the
+  managed processes.
+
+This readme is primarily for the source code and development of Pup, if you're looking for instructions you should head over to <https://hexagon.github.io/pup> **Install/Upgrade Pup using deno**
 
 Before using Pup, you need to have Deno installed on your system. You can download and install Deno with a single command following the instructions provided on the official website:
 <https://deno.land/#installation>
@@ -24,15 +36,15 @@ This command downloads the Pup executable and installs it on your system. The `A
 
 To keep a process alive forever, without configuration
 
-`pup -n --cmd "deno run -A server.ts" --autostart`
+`pup -n --cmd "deno run -A server.ts" --autostart` or with short flags `pup -nAC "deno run -A server.ts"`
 
 To restart process on file changes, without configuration
 
-`pup -n --cmd "deno run -A server.ts" --watch .
+`pup -n --cmd "deno run -A server.ts" --watch . or with short flags`pup -nC "deno run -A server.ts" -W .`
 
 **Ecosystem example**
 
-Initialise configuration file `pup.json`
+Use the cli helpers to initialise a new configuration file `pup.json`
 
 `pup --init --id "my-server" --cmd "deno run -A server.ts" --autostart`
 
@@ -44,142 +56,7 @@ Launch your ecosystem
 
 `pup`
 
-# Pup - Universal process manager
-
-> **Note** Please note that Pup is currently in an early stage of development and may contain bugs or unexpected behavior. Use at your own risk.
-
-## Usage
-
-To start using Pup, you can simply run `pup` on the command line. This will use the default configuration file `pup.jsonc` located in the current directory.
-
-If you want to use a different configuration file, you can pass the `--config` flag followed by the filename:
-
-`pup --config myconfig.json`
-
-Once Pup is running, it will read the configuration file and start the processes defined in it. You can also use Pup as [a library](#library-usage) within a Deno program to manage child processes.
-
-While running, pup will keep track of current state in the file `myconfig.jsonc.status`. If you pass the flag `--status` to pup, it will print a summary on the console.
-
-`pup --status` or `pup --config myconfig.json --status`
-
-## Configuration
-
-Pup is centered around a single configuration file called `pup.jsonc`. This file defines every aspect of the program, such as the processes to manage, how to start them, and when to restart them.
-
-You can either create the file manually, with help from the full configuration example below, or use the command line to initialize and modify your configuration.
-
-> **Note** Using the cli to modify your configuration **will** remove any jsonc comments
-
-**To create a new pup.jsonc**
-
-With a forever running task
-
-`pup --init --id my-server --cmd "deno run server.js" --autostart`
-
-... or a periodic task running 12 o'clock every day
-
-`pup --init --id my-periodic-task --cmd "deno run task.js" --cron "0 0 12 * * *"`
-
-**Add a task to an existing configuration**
-
-`pup --append --id my-new-task --cmd "deno run additional.js" --autostart`
-
-**To remove a task**
-
-`pup --remove --id my-new-task`
-
-**The working directory**
-
-The working directory of pup will always be the location of `pup.jsonc`, and relative paths in configuration will stem from there. You can override this per-process by supplying `--cwd` to the cli, or
-using the option `cwd:` in the configuration.
-
-### Full configuration example
-
-Here's an example of a `pup.jsonc` with all possible options defined:
-
-```jsonc
-{
-  // Global logger configuration, all options can be ovverridden per process
-  "logger": {
-    // Decorate console log entries?
-    "decorate": true, // default true
-
-    // Use colors in console?
-    "colors": true, // default true
-
-    // Decorate log file entries?
-    "decorateFiles": true, // default true
-
-    // Write logs to files, if stderr is undefined it will default to the stdout file
-    "stdout": "pup.log", // default undefined
-    "stderr": "pup.error.log" // default undefined or stdout, if defined
-  },
-
-  // Configure file watcher, enabled by adding `watch: true` to the process config
-  // This whole clause is optional and will default to the values listed
-  "watcher": {
-    "interval": 350, // default 350
-    "exts": ["ts", "tsx", "js", "jsx", "json"], // defaults to ["ts", "tsx", "js", "jsx", "json"]
-    "match": ["**/*.*"], // defaults to ["**/*.*"]
-    "skip": ["**/.git/**"] // defaults to "**/.git/**"
-  },
-
-  // Process configuration - Required to be an array, and at least one process definition is required
-  "processes": [
-    // One object per process ...
-    {
-      "id": "kept-alive-server", // Required
-      "cmd": ["deno", "run", "--allow-read", "./examples/basic/server.js"], // Required
-      "cwd": "/path/to/workingdir", // default undefined
-      "pidFile": "/path/to/pidfile", // default undefined
-      "env": { // default undefined
-        "TZ": "Europe/Olso"
-      },
-      "autostart": true, // default undefined, process will not autostart by default
-      "overrun": false, // allow overrun, default false
-      // "cron": "*/5 * * * * *", // default undefined
-      "restart": "always", // default undefined, possible values ["always" | "error" | undefined]
-      "restartLimit": 10, // default undefined - restart infinitely'
-      "restartDelayMs": 10000, // default 10000
-      // Only needed if you want to overrides the global logger
-      // Note: "colors" is not configurable per process
-      "logger": {
-        "console": true, // defaults to global configuration or true
-        "decorateFiles": true, // defaults to global configuration or false
-        "stdout": "periodic-example-task.log",
-        "stderr": "periodic-example-task.error.log"
-      }
-    }
-  ]
-}
-```
-
-In this example, we define a process called `server-task`. We specify the command to start the process using an array of strings. We set it to start immediately with, and to restart after 10 seconds
-after quitting for whatever reason.
-
-If you use the line `cron: "<pattern>"` instead of `autostart: true` it would be triggered periodically.
-
-### VS Code Intellisense for pup.jsonc
-
-If you want Intellisense and code completion for `pup.jsonc` in VS Code, you can append the pup schema to `json.schemas` in your user settings/`.vscode/settings.json`.
-
-It should look something like this:
-
-```jsonc
-{
-  "json.schemas": [
-    {
-      "fileMatch": [
-        "/pup.json",
-        "/pup.jsonc"
-      ],
-      "url": "https://deno.land/x/pup/docs/pup.schema.json"
-    }
-  ]
-}
-```
-
-## Examples
+## Example setups
 
 Full examples available at [/docs/examples](/docs/examples)
 
@@ -203,7 +80,7 @@ Now `server.js` will start instantly, and will restart automatically 10 seconds 
 
 ## Library usage
 
-Pup can also be build in in your application. Just import pup from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
+Pup can also be built in in your application. Just import pup from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
 
 ```ts
 import { GlobalLoggerConfiguration, ProcessConfiguration, Pup } from "https://deno.land/x/pup/pup.ts"
@@ -224,34 +101,22 @@ const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
 pup.init()
 ```
 
-### Custom logger
+## Contributions and Development
 
-```ts
-// Create a pup instance
-const pup = new Pup() /* configuration */
+Contributions to Pup are very welcome! Please read [the contibuting section](https://hexagon.github.io/pup/contributing.html) of the manual, fork the repository, make your changes, and submit a pull
+request.
 
-// Create a custom logger
-const logger = (severity: string, category: string, text: string, _config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => {
-  // Initiator
-  const initiator = process ? process.id : "core"
+We appreciate all feedback and contributions that help make Pup better!
 
-  // Custom log function
-  console.log(`${initiator}(${severity}:${category}): ${text}`)
+### Examples of areas that need extra attention right now
 
-  // Block built in logger by returning true
-  return true
-}
-
-// Attach the logger to pup
-pup.logger.attach(logger)
-
-pup.init()
-```
-
-## Contributions
-
-Contributions to Pup are very welcome! Please read [the contibuting section](/docs/MANUAL.md#contributing) of the manual, fork the repository, make your changes, and submit a pull request. We
-appreciate all feedback and contributions that help make Pup better.
+- **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://hexagon.github.io/pup/examples/plugins/README.html> to
+  get started.
+- **Testing**: Pup needs to be thoroughly tested; help out by using and testing it in various scenarios. Report any issues you find.
+- **Reading**: Review the documentation and report any issues or areas for improvement.
+- **Bugfixes**: Find bugs, report them, and optionally create a PR to fix the issue.
+- **Spread the word**: If you find Pup useful, spread the word to attract more users, developers, and testers to the community. Sharing your experiences and showcasing Pup's capabilities can help grow
+  and strengthen the project.
 
 ## Become a Sponsor
 

@@ -13,17 +13,22 @@
  * - Always use the same version of all imports from deno.land/std
  */
 // cli
-export { readLines } from "https://deno.land/std@0.179.0/io/mod.ts"
-export { parse } from "https://deno.land/std@0.179.0/flags/mod.ts"
-export type { Args } from "https://deno.land/std@0.179.0/flags/mod.ts"
-export * as path from "https://deno.land/std@0.179.0/path/mod.ts"
+export { parse } from "https://deno.land/std@0.180.0/flags/mod.ts"
+export type { Args } from "https://deno.land/std@0.180.0/flags/mod.ts"
+export * as path from "https://deno.land/std@0.180.0/path/mod.ts"
+// logger
+export { stripColor } from "https://deno.land/std@0.180.0/fmt/colors.ts"
 // config
-export * as jsonc from "https://deno.land/std@0.179.0/encoding/jsonc.ts"
+export * as jsonc from "https://deno.land/std@0.180.0/encoding/jsonc.ts"
 // watcher
-export { deferred, delay } from "https://deno.land/std@0.179.0/async/mod.ts"
-export { globToRegExp, relative } from "https://deno.land/std@0.179.0/path/mod.ts"
+export { deferred, delay } from "https://deno.land/std@0.180.0/async/mod.ts"
+export { globToRegExp, relative } from "https://deno.land/std@0.180.0/path/mod.ts"
 // load balancer
-export { copy } from "https://deno.land/std@0.179.0/streams/mod.ts"
+export { copy } from "https://deno.land/std@0.180.0/streams/mod.ts"
+// core - process
+export { StringReader } from "https://deno.land/std@0.180.0/io/string_reader.ts"
+export { readLines } from "https://deno.land/std@0.180.0/io/mod.ts"
+
 /**
  * Third party dependencies
  *

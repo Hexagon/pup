@@ -19,4 +19,3 @@ if (!isNaN(PORT)) {
 } else {
   console.error("Could not start http server")
 }
-console.log("Woop")

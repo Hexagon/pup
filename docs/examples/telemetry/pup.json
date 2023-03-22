@@ -1,0 +1,10 @@
+{
+  "processes": [
+    {
+      "cmd": ["deno", "run", "-A", "task-with-telemetry.ts"],
+      "id": "telemetry-task",
+      "autostart": true,
+      "restart": "always"
+    }
+  ]
+}

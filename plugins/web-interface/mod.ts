@@ -6,7 +6,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { ProcessStatus, ProcessStatusChangedEvent } from "../../lib/core/process.ts"
+import { ProcessStatusChangedEvent } from "../../lib/core/process.ts"
 import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
 
 import { Application, dirname, fromFileUrl, Router } from "./deps.ts"
@@ -56,20 +56,22 @@ export class PupPlugin extends PluginImplementation {
     this.logs = new Map<string, Array<LogInventoryEntry>>()
 
     this.pup.events.on("log", (d?: LogEvent) => {
-      const logRow: LogInventoryEntry = {
-        ts: new Date(),
-        id: d.process?.id,
-        category: d.category,
-        severity: d.severity,
-        text: d.text,
-      }
-      const process = d.process?.id || "__core"
-      if (!this.logs.has(process)) {
-        this.logs.set(process, [logRow])
-      } else {
-        const arr = this.logs.get(process) || []
-        arr?.push(logRow)
-        this.logs.set(process, arr)
+      if (d) {
+        const logRow: LogInventoryEntry = {
+          ts: new Date(),
+          id: d.process?.id,
+          category: d.category,
+          severity: d.severity,
+          text: d.text,
+        }
+        const process = d.process?.id || "__core"
+        if (!this.logs.has(process)) {
+          this.logs.set(process, [logRow])
+        } else {
+          const arr = this.logs.get(process) || []
+          arr?.push(logRow)
+          this.logs.set(process, arr)
+        }
       }
     })
   }
@@ -118,17 +120,19 @@ export class PupPlugin extends PluginImplementation {
 
   private handleWebSocketConnection(ws: WebSocket) {
     const logStreamer = (d?: LogEvent) => {
-      const logRow: LogInventoryEntry = {
-        ts: new Date(),
-        id: d.process?.id,
-        category: d.category,
-        severity: d.severity,
-        text: d.text,
+      if (d) {
+        const logRow: LogInventoryEntry = {
+          ts: new Date(),
+          id: d.process?.id,
+          category: d.category,
+          severity: d.severity,
+          text: d.text,
+        }
+        ws.send(JSON.stringify({
+          type: "log",
+          data: logRow,
+        }))
       }
-      ws.send(JSON.stringify({
-        type: "log",
-        data: logRow,
-      }))
     }
     const processStatusStreamer = (d?: ProcessStatusChangedEvent) => {
       ws.send(JSON.stringify({

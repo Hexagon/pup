@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts"
+import { assertEquals } from "../deps.ts"
 import { FileIPC } from "../../lib/core/ipc.ts"
 import { fileExists } from "../../lib/common/utils.ts"
 
@@ -39,7 +39,6 @@ Deno.test({
     await new Promise((resolve) => setTimeout(resolve, TEST_STALE_LIMIT + 100))
     await fileIPC.sendData("test data 2")
     const receivedMessages = await fileIPC.receiveData()
-    console.log(receivedMessages)
     assertEquals(receivedMessages.length, 2)
     assertEquals(receivedMessages[0].pid, Deno.pid)
     assertEquals(receivedMessages[0].data, null)

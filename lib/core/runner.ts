@@ -1,5 +1,5 @@
 import { ProcessConfiguration, Pup } from "./pup.ts"
-import { readLines } from "../../deps.ts"
+import { readLines, StringReader } from "../../deps.ts"
 
 type RunnerCallback = (pid: number) => void
 
@@ -7,7 +7,7 @@ class Runner {
   private readonly processConfig: ProcessConfiguration
   private readonly pup: Pup
 
-  private process?: Deno.Process
+  private process?: Deno.ChildProcess
 
   constructor(pup: Pup, processConfig: ProcessConfiguration) {
     this.processConfig = processConfig
@@ -34,22 +34,25 @@ class Runner {
         if (fileInfo.isFile) {
           await Deno.remove(this.processConfig.pidFile, { recursive: false })
         }
-      } catch (_e) {
-        this.pup.logger.error("error", `Failed to remove pid file '${this.processConfig.pidFile}', file will be left on the filesystem.`, this.processConfig)
+      } catch (e) {
+        this.pup.logger.error("error", `Failed to remove pid file '${this.processConfig.pidFile}', file will be left on the filesystem. Error: ${e.message}`, this.processConfig)
       }
     }
   }
 
-  private async pipeToLogger(category: string, reader: Deno.Reader) {
+  private async pipeToLogger(category: string, reader: ReadableStream<Uint8Array>) {
     const logger = this.pup.logger
 
     // Write to log
     try {
-      for await (const line of readLines(reader)) {
-        if (category === "stderr") {
-          logger.error(category, line, this.processConfig)
-        } else {
-          logger.log(category, line, this.processConfig)
+      for await (const chunk of reader) {
+        const r = new StringReader(new TextDecoder().decode(chunk))
+        for await (const line of readLines(r)) {
+          if (category === "stderr") {
+            logger.error(category, line, this.processConfig)
+          } else {
+            logger.log(category, line, this.processConfig)
+          }
         }
       }
     } catch (_e) {
@@ -61,30 +64,35 @@ class Runner {
     // Extend enviroment config with PUP_PROCESS_ID
     const env = this.processConfig.env ? structuredClone(this.processConfig.env) : {}
     env.PUP_PROCESS_ID = this.processConfig.id
+    env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
+    env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
 
     // Start the process
-    const process = Deno.run({
-      cmd: this.processConfig.cmd,
-      cwd: this.processConfig.cwd,
-      env,
-      stdout: "piped",
-      stderr: "piped",
-    })
-    this.process = process
+    const commander = new Deno.Command(
+      this.processConfig.cmd[0],
+      {
+        args: this.processConfig.cmd.slice(1),
+        cwd: this.processConfig.cwd,
+        env,
+        stdout: "piped",
+        stderr: "piped",
+      },
+    )
+
+    this.process = commander.spawn()
 
     // Process started, report pid to callback and file
-    runningCallback(process.pid)
+    runningCallback(this.process.pid)
+
     this.writePidFile()
 
-    this.pipeToLogger("stdout", process.stdout)
-    this.pipeToLogger("stderr", process.stderr)
+    this.pipeToLogger("stdout", this.process.stdout)
+    this.pipeToLogger("stderr", this.process.stderr)
 
     // Wait for process to stop and retrieve exit status
-    const result = await process.status()
+    const result = await this.process.status
 
     // Important! Close streams
-    process.stderr.close()
-    process.stdout.close()
 
     // ... and clean up the pid file
     this.removePidFile()

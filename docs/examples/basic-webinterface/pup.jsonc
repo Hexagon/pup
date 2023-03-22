@@ -48,9 +48,7 @@
     {
       "url": "../../plugins/web-interface/mod.ts",
       "options": {
-        "port": 5000,
-        "externalHost": "localhost",
-        "externalPort": 5000
+        "port": 5000
       }
     }
   ]

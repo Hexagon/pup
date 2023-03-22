@@ -7,7 +7,7 @@
 
 // Import core dependencies
 import { Pup } from "../core/pup.ts"
-import { generateConfiguration } from "../core/configuration.ts"
+import { Configuration, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
 import { FileIPC } from "../core/ipc.ts"
 
 // Import CLI utilities
@@ -17,7 +17,7 @@ import { appendConfigurationFile, createConfigurationFile, findConfigFile, remov
 import { printStatus } from "./status.ts"
 
 // Import common utilities
-import { fileExists, toPersistentPath, toTempPath } from "../common/utils.ts"
+import { fileExists, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
 import { jsonc, path } from "../../deps.ts"
@@ -130,11 +130,11 @@ async function main(inputArgs: string[]) {
   }
 
   // Read or generate configuration
-  let configuration
+  let configuration: Configuration
   if (configFile) {
     try {
       const rawConfig = await Deno.readTextFile(configFile)
-      configuration = jsonc.parse(rawConfig)
+      configuration = validateConfiguration(jsonc.parse(rawConfig))
     } catch (e) {
       console.error(`Could not start, error reading or parsing configuration file '${configFile}'`)
       console.error(e)
@@ -155,13 +155,14 @@ async function main(inputArgs: string[]) {
       }
     }
   }
+
   // Prepare for IPC
   let ipcFile
   if (useConfigFile) ipcFile = `${toTempPath(configFile as string)}/.ipc`
 
   // Prepare status file
   let statusFile
-  if (useConfigFile) statusFile = `${toPersistentPath(configFile as string)}/.status`
+  if (useConfigFile) statusFile = `${toTempPath(configFile as string)}/.status`
 
   /**
    * Now when the configuration file is located
@@ -184,9 +185,15 @@ async function main(inputArgs: string[]) {
         console.error(`No status file found, no instance seem to be running.`)
         Deno.exit(1)
       } else if (ipcFile) {
-        const ipc = new FileIPC(ipcFile)
-        await ipc.sendData(JSON.stringify({ [op]: args[op] || true }))
-        Deno.exit(0)
+        // Check that operation is "all" or set to an valid id
+        if (args[op] === "all" || configuration.processes?.find((p) => p.id === args[op])) {
+          const ipc = new FileIPC(ipcFile)
+          await ipc.sendData(JSON.stringify({ [op]: args[op] || true }))
+          Deno.exit(0)
+        } else {
+          console.error(`Could not ${op} process '${args[op]}', process not found.`)
+          Deno.exit(0)
+        }
       } else {
         console.error(`No configuration file specified, cannot send command ${op} over IPC.`)
         Deno.exit(1)
@@ -195,12 +202,45 @@ async function main(inputArgs: string[]) {
   }
 
   /**
-   * Print a warning if there is an existing status file
-   * - ToDo: Check when statusFile were last updated, exit if fresh (which means a instance is already running)
-   * - Just print a warning for now
+   * handle the case where there is an existing status file
    */
   if (statusFile && await fileExists(statusFile)) {
-    console.warn(`WARNING! A status file were found at '${statusFile}, there could be an existing instance of pup running, or the file can be stale.`)
+    // Read status file, exit if not readable
+    // - Probably locked by a running process
+    let statusData
+    try {
+      statusData = await Deno.readTextFile(statusFile)
+    } catch (_e) {
+      console.error(`Could not read existing statusfile '${statusFile}', main process probably already running. Exiting.`)
+      Deno.exit(1)
+    }
+
+    // Parse status file, continue if not parseable
+    // - Probably a stale file from a broken process
+    let status
+    try {
+      status = JSON.parse(statusData)
+    } catch (_e) {
+      console.error(`Could not parse status for config file '${configFile}' from '${statusFile}, invalid file content. Assuming a stale status file and starting anyway.'`)
+    }
+
+    if (!status) {
+      console.warn(`WARNING! A broken status file were found at '${statusFile}', there could be an existing instance of pup running, continuing anyway.`)
+    } else {
+      // A valid status file were found, figure out if it is stale or not
+      if (status && status.updated) {
+        const parsedDate = Date.parse(status.updated)
+        // Watchdog interval is 2 seconds, allow an extra 8 seconds to pass before allowing a new instance to start after a dirty shutdown
+        if (new Date().getTime() - parsedDate > 20000) {
+          // Everything is ok, this is definitely a stale file, just continue
+        } else {
+          console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
+          Deno.exit(1)
+        }
+      } else {
+        console.warn(`WARNING! A broken status file were found at '${statusFile}', there could be an existing instance of pup running, continuing anyway.`)
+      }
+    }
   }
 
   /**

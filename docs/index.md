@@ -7,15 +7,19 @@ title: " 1. Overview"
 
 ---
 
-Pup is a command-line tool that simplifies the management of processes. Pup can start, stop, restart, and keep processes alive, as well as schedule processes using a cron pattern. It does also manage
-the logs of each process, gathering them into a single stdout or file, making it easy to monitor and analyze the output of your processes in one place.
+Pup is a powerful process manager for Deno, designed to simplify the management of your applications and services. Here are some of the key features of Pup:
 
-Pup can also watch the filesystem, and restart processes when files change, similar to Nodemon and Denon.
+- **Easy process management:** Define, control, and manage your processes with simple commands and configuration options.
+- **Multiple start policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
+- **Restart policies:** Configure processes to restart automatically, either always or only in case of errors, with optional delay and restart limits.
+- **Clustering and load balancing:** Easily scale your processes with built-in clustering and load balancing support.
+- **Flexible configuration:** Define global settings and per-process configurations, including logging, working directories, environment variables, and more.
+- **Plugin support:** Extend Pup's functionality with custom plugins for additional features and integrations.
+- **CLI and programmatic usage:** Manage your processes using the Pup command-line interface, or integrate Pup directly into your Deno applications.
+- **Process telem:** Although it can manage any process, Pup integrates extra well with Deno applications
 
-In addition to serving as a stand alone process manager, Pup can also function as a [as a library](./library.html), allowing you to seamlessly manage the internal process ecosystem of your
-application.
-
-Pup revolves around a single configuration file, by default named `pup.jsonc`, which control every aspect of the processes to be executed, their execution methods, and the handling of logging.
+Pup revolves around a single configuration file, preferably named `pup.json` or `pup.jsonc`, which control every aspect of the processes to be executed, their execution methods, and the handling of
+logging.
 
 ## Table of Contents
 
@@ -35,12 +39,16 @@ Pup revolves around a single configuration file, by default named `pup.jsonc`, w
   - [Global configuration](./configuration.html#global-configuration)
     - [Logger](./configuration.html#watcher)
     - [Watcher](./configuration.html#logger)
+    - [Plugins](./configuration.html#plugins)
   - [Validating the Configuration](./configuration.html#validating-the-configuration)
   - [VS Code Intellisense](./configuration.html#vs-code-intellisense)
 - [Run at boot](./service.html)
   - [Using Docker](./service.html#using-docker)
   - [Using a Systemd user service](./service.html#using-a-systemd-user-service)
   - [Using launchd user service](./service.html#using-launchd-on-macos)
+- [Clusters and Load Balancer](./scaling.html)
+  - [Creating a cluster](./scaling.html#creating-a-cluster)
+  - [Using the load balancer](./scaling.html#using-the-load-balancer)
 - [Library usage](./library.html)
 - [FAQ](./faq.html#faq)
 - [Troubleshooting](./troubleshooting.html#troubleshooting)

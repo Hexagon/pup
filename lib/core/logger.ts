@@ -1,3 +1,4 @@
+import { stripColor } from "../../deps.ts"
 import { GlobalLoggerConfiguration, ProcessConfiguration } from "./configuration.ts"
 
 export interface LogEvent {
@@ -103,6 +104,8 @@ class Logger {
   }
 
   private async writeFile(fileName: string, text: string) {
+    // Strip colors
+    text = stripColor(text)
     try {
       await Deno.writeTextFile(fileName, `${text}\n`, { append: true })
     } catch (_e) {

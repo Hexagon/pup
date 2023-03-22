@@ -9,25 +9,25 @@ title: " 9. Troubleshooting"
 
 In this section, we will cover some common issues and their solutions when using Pup.
 
-## Issue: Pup is not starting my process
+**Issue: Pup is not starting my process**
 
 - Make sure that the process configuration is correct and valid.
 - Ensure that the `autostart` property is set to `true` if you want the process to start automatically when Pup starts.
 - Check the Pup logs for any error messages or warnings that might indicate the cause of the issue.
 
-## Issue: My process is not restarting after a crash
+**Issue: My process is not restarting after a crash**
 
 - Check if the `restart` property is set to either `"always"` or `"error"` in the process configuration.
 - Verify that the number of restart attempts has not exceeded the `restartLimit` specified in the process configuration.
 - Check the Pup logs for any error messages or warnings that might indicate the cause of the issue.
 
-## Issue: Pup is not running my process at the specified cron schedule
+**Issue: Pup is not running my process at the specified cron schedule**
 
 - Ensure that the cron pattern specified in the `cron` property is correct and valid.
 - Verify that the process is not blocked by the `blocked` property or other constraints.
 - Check the Pup logs for any error messages or warnings that might indicate the cause of the issue.
 
-## Issue: Pup is not watching for changes in the specified directories
+**Issue: Pup is not watching for changes in the specified directories**
 
 - Make sure that the `watch` property is set correctly in the process configuration, and the specified directories exist.
 - Verify that your system has the necessary permissions to access and monitor the specified directories.

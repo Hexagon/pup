@@ -1,9 +1,9 @@
 ---
 layout: page
-title: " 6. Scaling applications"
+title: " 6. Clusters and Load Balancer"
 ---
 
-# 6. Scaling applications
+# 6. Clusters and Load Balancer
 
 ---
 
@@ -46,15 +46,13 @@ Each process will have two additional environment variables set
 - `PUP_CLUSTER_INDEX`: Index of the current instance, starting from `0`
 - `PUP_CLUSTER_PORT`: The port to listen at, will be set to `startPort + n`, in this example `8000` for instance `0`, `8001` for instance `1` etc.
 
-## Load Balancing
+## Using the load balancer
 
-> **Note** The load balancer is optional, read more below.
+The load balancer is enabled by providing a value for `commonPort` in the cluster configuration. This port will be the single point of access for end users to reach your application. Omitting this
+entry disables the load balancer.
 
-The load balancer is enabled by supplying `commonPort` value in the cluster configuration. This port will be the single port end users ill access your application at. Omitting this entry disables the
-load balancer.
-
-Without the load balancer, you will have to set up an external load balancer, such as NGINX, pointing directly at the port specified by `startPort`. The port for the additional instances will be
-`startPort + n`.
+Without the load balancer, you will need to set up an external load balancer, such as NGINX, pointing directly to the port specified by `startPort`. The ports for additional instances will be
+`startPort` + n.
 
 ### Built-in vs External Load Balancer
 
@@ -70,7 +68,7 @@ include:
 - Caching and compression: NGINX provides caching and compression capabilities, reducing the load on application servers and improving response times.
 
 To use Pup's process scaling with an external load balancer like NGINX, you would configure the load balancer to distribute incoming requests to the different instances of your application, using the
-`processStartPort` value as a starting point for the backend server ports.
+`startPort` value as a starting point for the backend server ports.
 
 Pup supports two load balancing strategies:
 
@@ -92,7 +90,7 @@ distribution when a large number of clients share the same IP address, for examp
 During operations, the number of instances for a process can be increased or decreased using command-line options. For example, to change the number of instances for `my-scalable-app` to 6, use the
 following command:
 
-    pup --id my-scalable-app --instances 6
+`pup --id my-scalable-app --instances 6`
 
 Pup will automatically adjust the number of instances to the specified value. Each instance will receive a unique identifier in the format `my-scalable-app-<n>`, where `<n>` is a sequential integer
 starting from 1.
