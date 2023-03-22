@@ -4,8 +4,9 @@
 Universal process manager.<br><br>
 This is the source code repository, documentation available at <a href="https://hexagon.github.io/pup">hexagon.github.io/pup</a>.
 </p>
-
 <br>
+
+# Pup - The process manager
 
 Pup is a powerful process manager for Deno, designed to simplify the management of your applications and services. Here are some of the key features of Pup:
 
@@ -16,10 +17,13 @@ Pup is a powerful process manager for Deno, designed to simplify the management 
 - **Flexible configuration:** Define global settings and per-process configurations, including logging, working directories, environment variables, and more.
 - **Plugin support:** Extend Pup's functionality with custom plugins for additional features and integrations.
 - **CLI and programmatic usage:** Manage your processes using the Pup command-line interface, or integrate Pup directly into your Deno applications.
-- **Process Telemetry:** Pup can collect telemetry data from client processes written in Deno, such as memory usage and current working directory. This can be used to provide better insights into the
-  managed processes.
+- **Process Telemetry:** Pup can collect telemetry data from client processes written in Deno, such as memory usage and current working directory. This can be used to provide better insights into the managed processes.
 
-This readme is primarily for the source code and development of Pup, if you're looking for instructions you should head over to <https://hexagon.github.io/pup> **Install/Upgrade Pup using deno**
+This readme is primarily for the source code and development of Pup, if you're looking for instructions you should head over to <https://hexagon.github.io/pup>
+
+## Quick guide 
+
+**Install/Upgrade Pup using deno**
 
 Before using Pup, you need to have Deno installed on your system. You can download and install Deno with a single command following the instructions provided on the official website:
 <https://deno.land/#installation>
@@ -31,16 +35,6 @@ deno install -Afr https://deno.land/x/pup/pup.ts
 ```
 
 This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.
-
-**Quick examples**
-
-To keep a process alive forever, without configuration
-
-`pup -n --cmd "deno run -A server.ts" --autostart` or with short flags `pup -nAC "deno run -A server.ts"`
-
-To restart process on file changes, without configuration
-
-`pup -n --cmd "deno run -A server.ts" --watch . or with short flags`pup -nC "deno run -A server.ts" -W .`
 
 **Ecosystem example**
 
@@ -56,50 +50,11 @@ Launch your ecosystem
 
 `pup`
 
+For the full manual, see <https://hexagon.github.io/pup>
+
 ## Example setups
 
 Full examples available at [/docs/examples](/docs/examples)
-
-**Running the examples**
-
-Taking `docs/examples/basic` as an example:
-
-**If you have installed pup**
-
-Start pup by running the command `pup --config docs/examples/basic/pup.jsonc`.
-
-**If you have not yet installed pup**
-
-Start pup by running the command `deno run -A pup.ts --config docs/examples/basic/pup.jsonc`.
-
-Now `server.js` will start instantly, and will restart automatically 10 seconds after exiting. `task.js` will start every tenth second according to cron pattern `*/10 * * * * *`
-
-**Output**
-
-![Pup example logs](/docs/resources/pup-logs.png "Pup example logs")
-
-## Library usage
-
-Pup can also be built in in your application. Just import pup from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
-
-```ts
-import { GlobalLoggerConfiguration, ProcessConfiguration, Pup } from "https://deno.land/x/pup/pup.ts"
-
-const configuration = {
-  "logger": {
-    /* optional */
-  },
-  "processes": [
-    {/*...*/},
-    {/*...*/},
-  ],
-}
-
-const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
-
-// Go!
-pup.init()
-```
 
 ## Contributions and Development
 
