@@ -24,6 +24,7 @@ function parseArguments(args: string[]): Args {
     "remove",
     "status",
     "no-config",
+    "terminate",
   ]
 
   // All string arguments
@@ -40,7 +41,6 @@ function parseArguments(args: string[]): Args {
     "stop",
     "block",
     "unblock",
-    "terminate",
   ]
 
   // And a list of aliases

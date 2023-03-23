@@ -41,6 +41,8 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
     "no-config": true,
     n: true,
 
+    terminate: false,
+
     _: [],
   }
   assertEquals(parsedArgs, expectedArgs)
@@ -99,6 +101,7 @@ Deno.test("String options and aliases are parsed correctly", () => {
     s: false,
     "no-config": false,
     n: false,
+    terminate: false,
 
     _: [],
   }

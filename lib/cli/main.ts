@@ -14,7 +14,7 @@ import { FileIPC } from "../core/ipc.ts"
 import { printFlags, printHeader, printUsage } from "./output.ts"
 import { checkArguments, parseArguments } from "./args.ts"
 import { appendConfigurationFile, createConfigurationFile, findConfigFile, removeFromConfigurationFile } from "./config.ts"
-import { printStatus } from "./status.ts"
+import { getStatus, printStatus } from "./status.ts"
 
 // Import common utilities
 import { fileExists, toTempPath } from "../common/utils.ts"
@@ -187,23 +187,20 @@ async function main(inputArgs: string[]) {
 
   // Handle --restart, --stop etc using IPC
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
-    if (args[op] !== undefined) {
+    if (args[op]) {
       // If status file doesn't exist, don't even try to communicate
-      if (!statusFile || !await fileExists(statusFile)) {
-        console.error(`No status file found, no instance seem to be running.`)
-        Deno.exit(1)
-      } else if (ipcFile) {
-        // Check that operation is "all" or set to an valid id
-        if (args[op] === "all" || configuration.processes?.find((p) => p.id === args[op])) {
+      try {
+        if (await getStatus(configFile, statusFile) && ipcFile) {
           const ipc = new FileIPC(ipcFile)
           await ipc.sendData(JSON.stringify({ [op]: args[op] || true }))
+          console.log("Command sent.")
           Deno.exit(0)
         } else {
-          console.error(`Could not ${op} process '${args[op]}', process not found.`)
-          Deno.exit(0)
+          console.error(`No running instance found, cannot send command '${op}' over IPC.`)
+          Deno.exit(1)
         }
-      } else {
-        console.error(`No configuration file specified, cannot send command ${op} over IPC.`)
+      } catch (e) {
+        console.error(e.message)
         Deno.exit(1)
       }
     }
@@ -213,41 +210,17 @@ async function main(inputArgs: string[]) {
    * handle the case where there is an existing status file
    */
   if (statusFile && await fileExists(statusFile)) {
-    // Read status file, exit if not readable
-    // - Probably locked by a running process
-    let statusData
     try {
-      statusData = await Deno.readTextFile(statusFile)
-    } catch (_e) {
-      console.error(`Could not read existing statusfile '${statusFile}', main process probably already running. Exiting.`)
-      Deno.exit(1)
-    }
-
-    // Parse status file, continue if not parseable
-    // - Probably a stale file from a broken process
-    let status
-    try {
-      status = JSON.parse(statusData)
-    } catch (_e) {
-      console.error(`Could not parse status for config file '${configFile}' from '${statusFile}, invalid file content. Assuming a stale status file and starting anyway.'`)
-    }
-
-    if (!status) {
-      console.warn(`WARNING! A broken status file were found at '${statusFile}', there could be an existing instance of pup running, continuing anyway.`)
-    } else {
-      // A valid status file were found, figure out if it is stale or not
-      if (status && status.updated) {
-        const parsedDate = Date.parse(status.updated)
-        // Watchdog interval is 2 seconds, allow an extra 8 seconds to pass before allowing a new instance to start after a dirty shutdown
-        if (new Date().getTime() - parsedDate > 20000) {
-          // Everything is ok, this is definitely a stale file, just continue
-        } else {
-          console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
-          Deno.exit(1)
-        }
+      // A valid status file were found
+      if (!await getStatus(configFile, statusFile)) {
+        console.warn(`WARNING! A stale or broken status file were found at '${statusFile}', there could be an existing instance of pup running, continuing anyway.`)
       } else {
-        console.warn(`WARNING! A broken status file were found at '${statusFile}', there could be an existing instance of pup running, continuing anyway.`)
+        console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
+        Deno.exit(1)
       }
+    } catch (e) {
+      console.error(e.message)
+      Deno.exit(1)
     }
   }
 
