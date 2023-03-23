@@ -15,11 +15,24 @@
   </header>
   <main>
     <div id="app">
+      <header id="process-card-header">
+        <h2>Processes</h2>
+      </header>
       <div id="processes">
         <!-- Process cards will be generated here -->
       </div>
     </div>
-    <div id="logs"></div>
+    <div id="logs-container">
+      <div id="toolbar">
+        <span id="selected-process-id">-</span>
+        <div class="actions-container">
+          <button id="start-process"><i class="fas fa-play"></i></button>
+          <button id="stop-process"><i class="fas fa-stop"></i></button>
+          <button id="restart-process"><i class="fas fa-redo"></i></button>
+        </div>
+      </div>
+      <div id="logs"></div>
+    </div>
   </main>
   <script src="js/helpers.js"></script>
   <script src="js/web-interface.js"></script>

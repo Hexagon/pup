@@ -21,7 +21,9 @@ function addLog(log) {
   const logsDiv = document.getElementById("logs")
   logsDiv.classList.remove("hidden")
 
-  let logsHtml = `<pre class="${log.id}">${log.ts} | ${log.category} | ${log.severity} > ${ansiToHtml(log.text)}\n</pre>`
+  const selectedProcessId = document.getElementById("selected-process-id").textContent
+  const hiddenClass = selectedProcessId === log.id ? "" : "hidden"
+  let logsHtml = `<pre class="${log.id} ${hiddenClass}">${log.ts} | ${log.category} | ${log.severity} > ${ansiToHtml(log.text)}\n</pre>`
   logsDiv.innerHTML = logsHtml + logsDiv.innerHTML
 }
 
@@ -63,38 +65,46 @@ function generateProcessCard(processData) {
 
   processCard.appendChild(title)
 
-  // Add action buttons
-  const actions = document.createElement("div")
-  actions.classList.add("actions")
-
-  const startButton = document.createElement("button")
-  startButton.classList.add("small-button")
-  startButton.innerHTML = '<i class="fas fa-play"></i>'
-  startButton.addEventListener("click", () => {
-    // Start process logic
+  processCard.addEventListener("click", () => {
+    changeLogScope(config.id)
   })
-  actions.appendChild(startButton)
-
-  const stopButton = document.createElement("button")
-  stopButton.classList.add("small-button")
-  stopButton.innerHTML = '<i class="fas fa-stop"></i>'
-  stopButton.addEventListener("click", () => {
-    // Stop process logic
-  })
-  actions.appendChild(stopButton)
-
-  const restartButton = document.createElement("button")
-  restartButton.classList.add("small-button")
-  restartButton.innerHTML = '<i class="fas fa-redo"></i>'
-  restartButton.addEventListener("click", () => {
-    // Restart process logic
-  })
-  actions.appendChild(restartButton)
-
-  processCard.appendChild(actions)
 
   return processCard
 }
+
+function changeLogScope(processId) {
+  document.getElementById("selected-process-id").textContent = processId
+  showSpecificClassElements("logs", processId)
+}
+function changeLogScope(processId) {
+  // Remove the class from all process cards
+  const processCards = document.querySelectorAll(".process-card")
+  processCards.forEach((processCard) => {
+    processCard.classList.remove("process-card-selected")
+  })
+
+  // Add the class to the selected process card
+  const selectedProcessCard = document.getElementById(`process-card-${processId}`)
+  selectedProcessCard.classList.add("process-card-selected")
+
+  // Update the selected process ID in the toolbar
+  document.getElementById("selected-process-id").textContent = processId
+
+  // Show logs for the selected process only
+  showSpecificClassElements("logs", processId)
+}
+
+document.getElementById("start-process").addEventListener("click", () => {
+  // Start process logic
+})
+
+document.getElementById("stop-process").addEventListener("click", () => {
+  // Stop process logic
+})
+
+document.getElementById("restart-process").addEventListener("click", () => {
+  // Restart process logic
+})
 
 // Main function to initialize the application
 async function main() {

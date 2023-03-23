@@ -5,15 +5,17 @@ body {
   color: #ffffff;
   margin: 0;
   padding: 0;
+  height: 100vh;
 }
 
 /* App container */
 #app {
+  width: 400px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  flex-direction: column;
+  background-color: #1e1e1e;
+  overflow-y: auto;
+  max-height: calc(100vh - 2rem - 2rem);
 }
 
 /* Process card styles */
@@ -26,6 +28,15 @@ body {
   display: flex;
   flex-direction: column;
   margin-bottom: 0.5rem;
+}
+
+.process-card-selected {
+  background-color: #2b2b2b;
+}
+
+.process-card-selected .process-title {
+  font-weight: bold;
+  color: #50fa7b;
 }
 
 .process-title {
@@ -58,23 +69,42 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-header h1 {
+header h1,
+header h2 {
   margin: 0;
   font-size: 1.5rem;
+  color: #50fa7b;
 }
 
 /* Main content styles */
 main {
   display: flex;
+  flex-direction: row;
+  height: calc(100vh - 2rem - 2rem);
 }
 
 #logs {
   flex: 1;
-  background-color: #212121;
+  background-color: #171717;
   padding: 1rem;
   border-left: 1px solid #424242;
   overflow-y: auto;
-  max-height: calc(100vh - 2rem - 2rem);
+  height: calc(100vh - 2rem - 2rem - 2rem);
+}
+
+#logs-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#toolbar {
+  display: flex;
+  align-items: center;
+  background-color: #1e1e1e;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 0.5rem;
 }
 
 #logs pre {
@@ -83,6 +113,13 @@ main {
 
 .hidden {
   display: none;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-grow: 1;
 }
 
 /* Button styles */
@@ -98,16 +135,26 @@ button {
   transition: background-color 0.3s;
   margin-right:0.25rem;
 }
-
 button:hover {
   background-color: #69ff94;
 }
-
 button:active {
   background-color: #37d367;
-}
-
-button.small-button {
+  }
+  
+  button.small-button {
   font-size: 0.8rem;
   padding: 0.4rem 0.6rem;
-}
+  }
+
+  /* Process cards area header */
+.process-card-header {
+  background-color: #1e1e1e;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .process-card-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  }
