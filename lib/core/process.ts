@@ -13,10 +13,12 @@ import { Watcher } from "./watcher.ts"
 import { TelemetryData } from "../../telemetry.ts"
 
 /**
- * Never ever change or delete any existing mapping,
- * just add
+ * Represents the state of a process in Pup.
+ *
+ * NEVER change or delete any existing mapping,
+ * just add new ones.
  */
-enum ProcessStatus {
+enum ProcessState {
   CREATED = 0,
   STARTING = 100,
   RUNNING = 200,
@@ -27,14 +29,14 @@ enum ProcessStatus {
   BLOCKED = 500,
 }
 
-interface ProcessStatusChangedEvent {
-  old?: ProcessStatus
-  new?: ProcessStatus
+interface ProcessStateChangedEvent {
+  old?: ProcessState
+  new?: ProcessState
   status: ProcessInformation
 }
 
 interface ProcessScheduledEvent {
-  next?: ProcessStatus
+  next?: ProcessState
   status: ProcessInformation
 }
 
@@ -45,7 +47,7 @@ interface ProcessWatchEvent {
 
 interface ProcessInformation {
   id: string
-  status: ProcessStatus
+  status: ProcessState
   code?: number
   signal?: string
   pid?: number
@@ -61,7 +63,7 @@ interface ProcessInformation {
 
 interface ProcessInformationParsed {
   id: string
-  status: ProcessStatus
+  status: ProcessState
   code?: number
   signal?: number
   pid?: number
@@ -87,7 +89,7 @@ class Process {
   private job?: Cron
 
   // Status
-  private status: ProcessStatus = ProcessStatus.CREATED
+  private status: ProcessState = ProcessState.CREATED
   private pid?: number
   private code?: number
   private signal?: string
@@ -107,7 +109,7 @@ class Process {
     this.telemetry = t
   }
 
-  private setStatus(s: ProcessStatus) {
+  private setStatus(s: ProcessState) {
     const oldVal = this.status
     this.status = s
     this.updated = new Date()
@@ -173,7 +175,7 @@ class Process {
     }
 
     // Do not start if running and overrun isn't enabled
-    if (this.status === ProcessStatus.RUNNING && !this.config.overrun) {
+    if (this.status === ProcessState.RUNNING && !this.config.overrun) {
       logger.log("blocked", `Process still running, refusing to start`, this.config)
       return
     }
@@ -181,14 +183,14 @@ class Process {
     // Do not restart if maximum number of restarts are exhausted
     if (this.restarts >= (this.config.restartLimit ?? Infinity)) {
       logger.log("exhausted", `Maximum number of starts exhausted, refusing to start`, this.config)
-      this.setStatus(ProcessStatus.EXHAUSTED)
+      this.setStatus(ProcessState.EXHAUSTED)
       return
     }
 
     logger.log("starting", `Process starting, reason: ${reason}`, this.config)
 
     // Update status
-    this.setStatus(ProcessStatus.STARTING)
+    this.setStatus(ProcessState.STARTING)
     this.pid = undefined
     this.code = undefined
     this.signal = undefined
@@ -209,7 +211,7 @@ class Process {
       this.pendingRestartReason = undefined
       const result = await this.runner.run((pid: number) => {
         // Process started
-        this.setStatus(ProcessStatus.RUNNING)
+        this.setStatus(ProcessState.RUNNING)
         this.pid = pid
         this.started = new Date()
       })
@@ -224,7 +226,7 @@ class Process {
        * a manual stop
        */
       if (result.code === 0 || result.code === 143) {
-        this.setStatus(ProcessStatus.FINISHED)
+        this.setStatus(ProcessState.FINISHED)
         logger.log("finished", `Process finished with code ${result.code}`, this.config)
 
         /**
@@ -233,13 +235,13 @@ class Process {
          * Treat all exit codes except 0 and 143(SIGTERM) as errors
          */
       } else {
-        this.setStatus(ProcessStatus.ERRORED)
+        this.setStatus(ProcessState.ERRORED)
         logger.log("errored", `Process exited with code ${result.code}`, this.config)
       }
     } catch (e) {
       this.code = undefined
       this.signal = undefined
-      this.setStatus(ProcessStatus.ERRORED)
+      this.setStatus(ProcessState.ERRORED)
       logger.log("errored", `Process could not start, error: ${e}`, this.config)
     }
 
@@ -251,7 +253,7 @@ class Process {
   public stop = (reason: string): boolean => {
     if (this.runner) {
       try {
-        this.status = ProcessStatus.STOPPING
+        this.status = ProcessState.STOPPING
         this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
         this.runner?.kill("SIGTERM")
         this.restarts = 0
@@ -271,7 +273,7 @@ class Process {
   public block = (reason: string) => {
     this.blocked = true
     this.pup.logger.log("block", `Process blocked, reason: ${reason}`, this.config)
-    this.setStatus(ProcessStatus.BLOCKED)
+    this.setStatus(ProcessState.BLOCKED)
   }
 
   public unblock = (reason: string) => {
@@ -326,5 +328,5 @@ class Process {
   public isPendingRestart = () => this.pendingRestartReason !== undefined
 }
 
-export { Process, ProcessStatus }
-export type { ProcessInformation, ProcessInformationParsed, ProcessScheduledEvent, ProcessStatusChangedEvent, ProcessWatchEvent }
+export { Process, ProcessState }
+export type { ProcessInformation, ProcessInformationParsed, ProcessScheduledEvent, ProcessStateChangedEvent, ProcessWatchEvent }

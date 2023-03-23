@@ -6,7 +6,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { ProcessStatusChangedEvent } from "../../lib/core/process.ts"
+import { ProcessStateChangedEvent } from "../../lib/core/process.ts"
 import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
 
 import { Application, dirname, fromFileUrl, Router } from "./deps.ts"
@@ -88,8 +88,8 @@ export class PupPlugin extends PluginImplementation {
 
     // Set up endpoint to serve process data
     this.router.get("/processes", (context: any) => {
-      const processStatuses = this.pup.allProcessStatuses()
-      context.response.body = processStatuses
+      const ProcessStatees = this.pup.allProcessStatees()
+      context.response.body = ProcessStatees
     })
     // Set up endpoint to serve process data
     this.router.get("/logs/:id", (context: any) => {
@@ -134,7 +134,7 @@ export class PupPlugin extends PluginImplementation {
         }))
       }
     }
-    const processStatusStreamer = (d?: ProcessStatusChangedEvent) => {
+    const ProcessStateStreamer = (d?: ProcessStateChangedEvent) => {
       ws.send(JSON.stringify({
         type: "process_status_changed",
         data: d,
@@ -142,11 +142,11 @@ export class PupPlugin extends PluginImplementation {
     }
     ws.onopen = () => {
       this.pup.events.on("log", logStreamer)
-      this.pup.events.on("process_status_changed", processStatusStreamer)
+      this.pup.events.on("process_status_changed", ProcessStateStreamer)
     }
     ws.onclose = () => {
       this.pup.events.off("log", logStreamer)
-      this.pup.events.off("process_status_changed", processStatusStreamer)
+      this.pup.events.off("process_status_changed", ProcessStateStreamer)
     }
   }
 }

@@ -9,7 +9,7 @@
 
 import { EventEmitter } from "../common/eventemitter.ts"
 import { PluginConfiguration, ProcessLoggerConfiguration } from "./configuration.ts"
-import { ProcessStatus } from "./process.ts"
+import { ProcessState } from "./process.ts"
 import { Pup } from "./pup.ts"
 
 const SUPPORTED_API_VERSIONS = ["1"]
@@ -28,7 +28,7 @@ export interface PluginMetadata {
  */
 interface PluginProcessInformation {
   id: string
-  status: ProcessStatus
+  status: ProcessState
   code?: number
   signal?: string
   pid?: number
@@ -93,7 +93,7 @@ export class PluginApi {
       configFilePath: pup.configFilePath,
     }
   }
-  public allProcessStatuses(): PluginProcessData[] {
+  public allProcessStatees(): PluginProcessData[] {
     const statuses: PluginProcessData[] = this._pup.allProcesses().map((p) => {
       return {
         status: p.getStatus(),
@@ -172,7 +172,7 @@ export class Plugin {
  *   log                     LogEvent
  *   init                    Undefined
  *   watchdog                Undefined
- *   process_status_changed  ProcessStatusChangedEvent
+ *   process_status_changed  ProcessStateChangedEvent
  *   process_scheduled       ProcessScheduledEvent
  *   process_watch           ProcessWatchEvent
  *   terminating             Number (ms)

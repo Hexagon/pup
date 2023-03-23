@@ -42,6 +42,7 @@ Here's a list of available configuration options for each process:
 - `cmd` (**required**): An array containing the command and its arguments to run the process.
 - `cwd` (optional): The working directory for the process.
 - `env` (optional): An object containing environment variables for the process.
+- `path` (optional): Extra paths that will be **appended** to `PATH` for this process.
 - `pidFile` (optional): The path to the file where the process ID (PID) will be stored.
 - `timeout` (optional): A number specifying the maximum time (in seconds) that the process is allowed to run before it's terminated.
 - `overrun` (optional): A boolean indicating whether a new instance of the process is allowed to start if the previous instance is still running. Default: false.

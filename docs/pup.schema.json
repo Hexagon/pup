@@ -150,6 +150,9 @@
               "pidFile": {
                 "type": "string"
               },
+              "path": {
+                "type": "string"
+              },
               "autostart": {
                 "type": "boolean"
               },

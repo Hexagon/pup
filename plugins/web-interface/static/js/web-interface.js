@@ -35,8 +35,8 @@ function updateProcessCard(data) {
   }
 
   // Update process status
-  const processStatus = processCard.querySelector(".process-status")
-  processStatus.textContent = ` - ${processStatusToString(data.status.status)}`
+  const ProcessState = processCard.querySelector(".process-status")
+  ProcessState.textContent = ` - ${ProcessStateToString(data.status.status)}`
 }
 
 // Function to fetch the list of processes from the server
@@ -58,10 +58,10 @@ function generateProcessCard(processData) {
   title.textContent = config.id
 
   // Add process status
-  const processStatus = document.createElement("span")
-  processStatus.textContent = ` - ${processStatusToString(status.status)}`
-  processStatus.classList.add("process-status")
-  title.appendChild(processStatus)
+  const ProcessState = document.createElement("span")
+  ProcessState.textContent = ` - ${ProcessStateToString(status.status)}`
+  ProcessState.classList.add("process-status")
+  title.appendChild(ProcessState)
 
   processCard.appendChild(title)
 

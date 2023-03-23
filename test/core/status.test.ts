@@ -1,5 +1,5 @@
 //import { Application } from "../../application.meta.ts"
-import { Process, ProcessInformation, ProcessStatus } from "../../lib/core/process.ts"
+import { Process, ProcessInformation, ProcessState } from "../../lib/core/process.ts"
 import { Pup } from "../../lib/core/pup.ts"
 import { Status } from "../../lib/core/status.ts"
 import { assertEquals, spy } from "../deps.ts"
@@ -14,7 +14,7 @@ class MockProcess extends Process {
   public getStatus(): ProcessInformation {
     return {
       id: super.getConfig().id,
-      status: ProcessStatus.RUNNING,
+      status: ProcessState.RUNNING,
       pid: 123,
       code: undefined,
       signal: undefined,
@@ -42,12 +42,12 @@ Deno.test("Status should not have statusFileName property if not provided", () =
 Deno.test("Status.writeToDisk should write the status to disk if statusFileName property is set", () => {
   /*const expectedFileName = TEST_FILE_PATH
   const expectedProcess = new MockProcess()
-  const expectedProcessStatus = expectedProcess.getStatus()
+  const expectedProcessState = expectedProcess.getStatus()
   const expectedPupStatus = {
     pid: Deno.pid,
     version: Application.version,
     updated: new Date().toISOString(),
-    processes: [expectedProcessStatus],
+    processes: [expectedProcessState],
   }
   const writeFileSpy = spy(Deno, "writeFile")
 

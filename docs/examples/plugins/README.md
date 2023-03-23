@@ -73,7 +73,7 @@ class PupPlugin extends PluginImplementation {
     pup.terminate(forceQuitMs)
 
     // - Get the status of all processes:
-    const processStatuses = pup.allProcessStatuses()
+    const ProcessStatees = pup.allProcessStatees()
 
     // Listen to events using the pup.events property:
     pup.events.on("process_status_changed", (eventData) => {

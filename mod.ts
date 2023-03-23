@@ -22,6 +22,6 @@ export type { PluginMetadata } from "./lib/core/plugin.ts"
 export type { PluginConfiguration } from "./lib/core/configuration.ts"
 
 export { Process } from "./lib/core/process.ts"
-export type { ProcessScheduledEvent, ProcessStatusChangedEvent, ProcessWatchEvent } from "./lib/core/process.ts"
+export type { ProcessScheduledEvent, ProcessStateChangedEvent, ProcessWatchEvent } from "./lib/core/process.ts"
 
 export type { LogEvent } from "./lib/core/logger.ts"

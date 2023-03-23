@@ -55,6 +55,7 @@ interface ProcessConfiguration {
   cmd: string[]
   env?: Record<string, string>
   cwd?: string
+  path?: string
   cluster?: ClusterConfiguration
   pidFile?: string
   watch?: string[]
@@ -108,6 +109,7 @@ const ConfigurationSchema = z.object({
         strategy: z.enum(["ip-hash", "round-robin"]).default("round-robin"),
       })),
       pidFile: z.optional(z.string()),
+      path: z.optional(z.string()),
       autostart: z.optional(z.boolean()),
       watch: z.optional(z.array(z.string())),
       cron: z.optional(z.string().min(9).max(256)),

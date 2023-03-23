@@ -7,10 +7,10 @@
  * @license   MIT
  */
 
-import { Process, ProcessInformation, ProcessStatus } from "./process.ts"
+import { Process, ProcessInformation, ProcessState } from "./process.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Pup } from "./pup.ts"
-import { LoadBalancer, LoadBalancingStrategy } from "./loadbalancer.ts"
+import { BalancingStrategy, LoadBalancer } from "./loadbalancer.ts"
 
 class Cluster extends Process {
   public processes: Process[] = []
@@ -66,17 +66,17 @@ class Cluster extends Process {
     }
 
     if (this.config.cluster?.commonPort) {
-      let strategy: LoadBalancingStrategy
+      let strategy: BalancingStrategy
 
       if (this.config.cluster.strategy === "ip-hash") {
-        strategy = LoadBalancingStrategy.IP_HASH
+        strategy = BalancingStrategy.IP_HASH
       } else {
-        strategy = LoadBalancingStrategy.ROUND_ROBIN
+        strategy = BalancingStrategy.ROUND_ROBIN
       }
 
       this.pup.logger.log(
         "cluster",
-        `Setting up load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort} and strategy ${LoadBalancingStrategy[strategy]}`,
+        `Setting up load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort} and strategy ${BalancingStrategy[strategy]}`,
         this.config,
       )
 
@@ -109,22 +109,22 @@ class Cluster extends Process {
   public getStatus(): ProcessInformation {
     const clusterStatus: ProcessInformation = {
       id: this.getConfig().id,
-      status: ProcessStatus.CREATED,
+      status: ProcessState.CREATED,
       updated: new Date(),
       type: "cluster",
     }
 
     const statuses = this.getStatuses()
     const allBlocked = statuses.every((status) => status.blocked)
-    const allRunning = statuses.every((status) => status.status === ProcessStatus.RUNNING)
-    const anyRunning = statuses.some((status) => status.status === ProcessStatus.RUNNING)
+    const allRunning = statuses.every((status) => status.status === ProcessState.RUNNING)
+    const anyRunning = statuses.some((status) => status.status === ProcessState.RUNNING)
 
     if (allBlocked) {
-      clusterStatus.status = ProcessStatus.BLOCKED
+      clusterStatus.status = ProcessState.BLOCKED
     } else if (allRunning) {
-      clusterStatus.status = ProcessStatus.RUNNING
+      clusterStatus.status = ProcessState.RUNNING
     } else if (anyRunning) {
-      clusterStatus.status = ProcessStatus.STARTING
+      clusterStatus.status = ProcessState.STARTING
     }
 
     clusterStatus.updated = new Date()

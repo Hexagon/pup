@@ -67,6 +67,15 @@ class Runner {
     env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
     env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
 
+    // Extend path (if specified)
+    if (this.processConfig.path) {
+      if (Deno.env.has("PATH")) {
+        Deno.env.set("PATH", `${Deno.env.get("PATH")}:${this.processConfig.path}`)
+      } else {
+        Deno.env.set("PATH", `${this.processConfig.path}`)
+      }
+    }
+
     // Start the process
     const commander = new Deno.Command(
       this.processConfig.cmd[0],

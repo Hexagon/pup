@@ -59,7 +59,7 @@ function generateWebSocketURL() {
   return wsURL
 }
 
-const ProcessStatus = {
+const ProcessState = {
   CREATED: 0,
   STARTING: 100,
   RUNNING: 200,
@@ -70,23 +70,23 @@ const ProcessStatus = {
   BLOCKED: 500,
 }
 
-function processStatusToString(status) {
+function ProcessStateToString(status) {
   switch (status) {
-    case ProcessStatus.CREATED:
+    case ProcessState.CREATED:
       return "Created"
-    case ProcessStatus.STARTING:
+    case ProcessState.STARTING:
       return "Starting"
-    case ProcessStatus.RUNNING:
+    case ProcessState.RUNNING:
       return "Running"
-    case ProcessStatus.STOPPING:
+    case ProcessState.STOPPING:
       return "Stopping"
-    case ProcessStatus.FINISHED:
+    case ProcessState.FINISHED:
       return "Finished"
-    case ProcessStatus.ERRORED:
+    case ProcessState.ERRORED:
       return "Errored"
-    case ProcessStatus.EXHAUSTED:
+    case ProcessState.EXHAUSTED:
       return "Exhausted"
-    case ProcessStatus.BLOCKED:
+    case ProcessState.BLOCKED:
       return "Blocked"
     default:
       return "Unknown"

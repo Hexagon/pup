@@ -7,6 +7,7 @@
  */
 
 import { Application } from "../../application.meta.ts"
+import { Column, Columns, TableRow } from "./columns.ts"
 
 export function printHeader() {
   console.log(Application.name + " " + Application.version)
@@ -18,36 +19,52 @@ export function printUsage() {
 }
 
 export function printFlags() {
-  console.log(" -h\t--help\t\t\tDisplay this help and exit")
-  console.log(" -v\t--version\t\tOutput version information and exit")
-  console.log("")
-  console.log(' -c\t--config "path"\t\tUse specific configuration file. Default: pup.jsonc')
-  console.log(" -n\t--no-config\t\tDo not use a configuration file")
-  console.log("")
-  console.log("Configuration file helpers")
-  console.log("")
-  console.log(" -i\t--init\t\t\tCreate a new pup.json")
-  console.log(" -a\t--append\t\tAppend to existing configuraton file")
-  console.log("")
-  console.log("Process settings, for --no-config, --init, and --append")
-  console.log("")
-  console.log(' -I\t--id "name"\t\tname of the task')
-  console.log(' -C\t--cmd "command"\t\tCommand to run')
-  console.log(' -W\t--cwd "command"\t\tWorking directory of the process')
-  console.log(" -A\t--autostart\t\tAutostart process")
-  console.log(" -O\t--cron\t\t\tStart using a cron pattern")
-  console.log(' -w\t--watch "path"\t\tRestart on file change')
-  console.log("")
-  console.log("Control a running instance")
-  console.log("")
-  console.log("   \t--restart all|proc-id\tRestart process using IPC")
-  console.log("   \t--start all|proc-id\tStart process using IPC")
-  console.log("   \t--stop all|proc-id\tStop process using IPC")
-  console.log("   \t--block all|proc-id\tBlock process using IPC")
-  console.log("   \t--unblock all|proc-id\tUnblock process using IPC")
-  console.log("")
-  console.log("Monitor a running instance")
-  console.log("")
-  console.log(" -s\t--status\t\tDisplay status for a running instance")
-  console.log("")
+  const rows: TableRow[] = [
+    { content: "General", spanStart: 1, align: "left" },
+    { separator: "empty" },
+    { short: "-h", long: "--help", description: "Display this help and exit" },
+    { short: "-v", long: "--version", description: "Output version information and exit" },
+    { separator: "empty" },
+    { content: "Configuration file", spanStart: 1 },
+    { separator: "empty" },
+    { short: "-c", long: '--config "path"', description: "Use specific configuration file. Default: pup.jsonc" },
+    { short: "-n", long: "--no-config", description: "Run without configuration. Specify command and policies using Process configuration." },
+    { separator: "empty" },
+    { content: "Configuration file helpers", spanStart: 1 },
+    { separator: "empty" },
+    { short: "-i", long: "--init", description: "Initialize a new configuration file using the flags below." },
+    { short: "-a", long: "--append proc-id", description: "Append a new process to the configuration file, configure using the flags below." },
+    { short: "-r", long: "--remove proc-id", description: "Remove a process from a configuration file, specify process using '--id'" },
+    { separator: "empty" },
+    { content: "Process configuration, used with above config helpers, or '--no-config'", spanStart: 1 },
+    { separator: "empty" },
+    { short: "-I", long: "--id", description: "Id of the process to add/append/remove from configuration." },
+    { short: "-C", long: "--cmd", description: "Command to run, for complex commands use '--' then the command." },
+    { short: "-A", long: "--autostart", description: "Set the new process to start automatically." },
+    { short: "-w", long: "--watch", description: "Location to watch for filesystem changes." },
+    { short: "-O", long: "--cron", description: "Start according to a cron pattern." },
+    { short: "-W", long: "--cwd", description: "Working directory for the process." },
+    { separator: "empty" },
+    { content: "Control a running instance", spanStart: 1 },
+    { separator: "empty" },
+    { long: "--restart all|proc-id", description: "Restart process using IPC" },
+    { long: "--start all|proc-id", description: "Start process using IPC" },
+    { long: "--stop all|proc-id", description: "Stop process using IPC" },
+    { long: "--block all|proc-id", description: "Block process using IPC" },
+    { long: "--unblock all|proc-id", description: "Unblock process using IPC" },
+    { long: "--terminate all|proc-id", description: "Forcefully terminate process using IPC" },
+    { separator: "empty" },
+    { content: "Monitor a running instance", spanStart: 1 },
+    { separator: "empty" },
+    { short: "-s", long: "--status", description: "Display status for a running instance" },
+    { separator: "empty" },
+  ]
+
+  const columns: Column[] = [
+    { key: "short", align: "right", minWidth: 8 },
+    { key: "long", minWidth: 24 },
+    { key: "description" },
+  ]
+
+  console.log(Columns(rows, columns))
 }

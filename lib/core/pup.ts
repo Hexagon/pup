@@ -8,7 +8,7 @@
 import { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, validateConfiguration } from "./configuration.ts"
 import { FileIPC, IpcValidatedMessage } from "./ipc.ts"
 import { Logger } from "./logger.ts"
-import { Process, ProcessStatus } from "./process.ts"
+import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
 import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
@@ -187,17 +187,17 @@ class Pup {
         const config = process.getConfig()
 
         // Handle initial starts
-        if (config.autostart && status.status === ProcessStatus.CREATED) {
+        if (config.autostart && status.status === ProcessState.CREATED) {
           process.start("autostart")
         }
 
         // Handle pending restart
-        if (status.status !== ProcessStatus.STOPPING && process.isPendingRestart()) {
+        if (status.status !== ProcessState.STOPPING && process.isPendingRestart()) {
           process.start(process["pendingRestartReason"])
         }
 
         // Handle restarts
-        if (status.status === ProcessStatus.FINISHED || status.status === ProcessStatus.ERRORED) {
+        if (status.status === ProcessState.FINISHED || status.status === ProcessState.ERRORED) {
           const msSinceExited = status.exited ? (new Date().getTime() - status.exited?.getTime()) : Infinity
 
           // Default restart delay to 10000ms, except when watching
@@ -211,10 +211,10 @@ class Pup {
             if (restartPolicy === "always") {
               process.start("restart", true)
 
-              /* Restart on error if ProcessStatus is ERRORED */
+              /* Restart on error if ProcessState is ERRORED */
             } else if (
               restartPolicy === "error" &&
-              status.status === ProcessStatus.ERRORED &&
+              status.status === ProcessState.ERRORED &&
               status.code !== 143
             ) {
               process.start("restart", true)
@@ -223,7 +223,7 @@ class Pup {
         }
 
         // Handle timeouts
-        if (status.status === ProcessStatus.RUNNING && config.timeout && status.started) {
+        if (status.status === ProcessState.RUNNING && config.timeout && status.started) {
           const secondsSinceStart = (new Date().getTime() - status.started.getTime()) / 1000
           if (secondsSinceStart > config.timeout) {
             process.stop("timeout")

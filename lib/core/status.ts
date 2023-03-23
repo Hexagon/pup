@@ -23,11 +23,11 @@ class Status {
   public async writeToDisk(processes: Process[]) {
     if (this.statusFileName) {
       // Get status from all processes
-      const processStatuses: ProcessInformation[] = []
+      const ProcessStatees: ProcessInformation[] = []
       for (const p of processes) {
-        processStatuses.push(p.getStatus())
+        ProcessStatees.push(p.getStatus())
         if (p.isCluster()) {
-          for (const subP of (p as Cluster).processes) processStatuses.push(subP.getStatus())
+          for (const subP of (p as Cluster).processes) ProcessStatees.push(subP.getStatus())
         }
       }
 
@@ -37,7 +37,7 @@ class Status {
         version: Application.version,
         updated: new Date().toISOString(),
         memory: Deno.memoryUsage(),
-        processes: processStatuses,
+        processes: ProcessStatees,
       }
       const result = new TextEncoder().encode(JSON.stringify(pupStatus))
 
