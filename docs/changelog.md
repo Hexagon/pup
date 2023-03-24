@@ -11,7 +11,7 @@ title: " 11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [Unreleased]
+## [1.0.0-alpha-32] - 2023-03-24
 
 - Feature: IPC functionality in the Telemetry client.
 - Add: Print process type (main/cluster/process) on cli `--status`.
