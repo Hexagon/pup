@@ -17,7 +17,7 @@ Pup is a powerful process manager for Deno, designed to simplify the management 
 - **Flexible configuration:** Define global settings and per-process configurations, including logging, working directories, environment variables, and more.
 - **Plugin support:** Extend Pup's functionality with custom plugins for additional features and integrations.
 - **CLI and programmatic usage:** Manage your processes using the Pup command-line interface, or integrate Pup directly into your Deno applications.
-- __Process Telemetry and IPC_:_* Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
+- **Process Telemetry and IPC:** Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
   telemetry feature also enables inter-process communication, allowing connected processes to interact with one another.
 
 This readme is primarily for the source code and development of Pup, if you're looking for instructions you should head over to <https://hexagon.github.io/pup>
