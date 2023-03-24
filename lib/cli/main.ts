@@ -15,6 +15,7 @@ import { printFlags, printHeader, printUsage } from "./output.ts"
 import { checkArguments, parseArguments } from "./args.ts"
 import { appendConfigurationFile, createConfigurationFile, findConfigFile, removeFromConfigurationFile } from "./config.ts"
 import { getStatus, printStatus } from "./status.ts"
+import { upgrade } from "./upgrade.ts"
 
 // Import common utilities
 import { fileExists, toTempPath } from "../common/utils.ts"
@@ -49,7 +50,7 @@ async function main(inputArgs: string[]) {
   const cmd = checkedArgs?.cmd?.split(" ") || postDelimiter
 
   /**
-   * Begin with --version and --help, as they have no dependencies on other
+   * Begin with --version, --upgrade and --help, as they have no dependencies on other
    * arguments, and just exit
    */
 
@@ -63,6 +64,15 @@ async function main(inputArgs: string[]) {
     console.log("")
     printFlags()
     Deno.exit(0)
+  }
+
+  if (args.upgrade !== undefined) {
+    //try {
+    await upgrade(args.upgrade || "latest")
+    //} catch (e) {
+    //console.error(`Could not upgrade pup, error: ${e.message}`)
+    //Deno.exit(1)
+    //}
   }
 
   /**

@@ -41,6 +41,8 @@ function parseArguments(args: string[]): Args {
     "stop",
     "block",
     "unblock",
+
+    "upgrade",
   ]
 
   // And a list of aliases

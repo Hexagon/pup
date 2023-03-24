@@ -23,6 +23,12 @@ To install or upgrade Pup, open your terminal and execute the following command:
 deno install -Afr https://deno.land/x/pup/pup.ts
 ```
 
+If you already installed it, and want to upgrade to the latest version, you can use:
+
+```bash
+pup --upgrade
+```
+
 This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.
 
 After the installation is complete, you will see a message indicating the installation path of the Pup executable. To use the pup command from any location in your terminal, ensure the installation

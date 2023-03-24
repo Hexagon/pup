@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this section.
 - Change: IPC file for main process changed from `.*-tmp/.ipc` to `.*-tmp/.main.ipc`.
 - Feature: Add `LEAST_CONNECTIONS` strategy to load balancer.
 - Tests: Added tests for telemetry functionality.
+- Feature: Add command line flag `--upgrade <optional version>`
 
 ## [1.0.0-alpha-31] - 2023-03-23
 
