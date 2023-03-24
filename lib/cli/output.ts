@@ -24,6 +24,7 @@ export function printFlags() {
     { separator: "empty" },
     { short: "-h", long: "--help", description: "Display this help and exit" },
     { short: "-v", long: "--version", description: "Output version information and exit" },
+    { long: "--upgrade <version>", description: "Upgrade to latest or specifiec version, and exit." },
     { separator: "empty" },
     { content: "Configuration file", spanStart: 1 },
     { separator: "empty" },
