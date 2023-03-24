@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps.ts"
-import { FileIPC } from "../../lib/core/ipc.ts"
+import { FileIPC } from "../../lib/common/ipc.ts"
 import { fileExists } from "../../lib/common/utils.ts"
 
 const TEST_FILE_PATH = "./test_data_FileIPC.ipctest"

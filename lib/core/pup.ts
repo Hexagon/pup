@@ -6,7 +6,7 @@
  */
 
 import { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, validateConfiguration } from "./configuration.ts"
-import { FileIPC, IpcValidatedMessage } from "./ipc.ts"
+import { FileIPC, IpcValidatedMessage } from "../common/ipc.ts"
 import { Logger } from "./logger.ts"
 import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
@@ -49,7 +49,7 @@ class Pup {
       this.persistentStoragePath = toPersistentPath(this.configFilePath)
 
       statusFile = `${this.temporaryStoragePath}/.status`
-      ipcFile = `${this.temporaryStoragePath}/.ipc`
+      ipcFile = `${this.temporaryStoragePath}/.main.ipc`
     }
 
     // Throw on invalid configuration

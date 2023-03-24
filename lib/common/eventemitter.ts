@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-type EventHandler<t> = (eventData?: t) => void
+export type EventHandler<t> = (eventData?: t) => void
 
 class EventEmitter {
   // deno-lint-ignore no-explicit-any

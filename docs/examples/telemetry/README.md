@@ -1,28 +1,50 @@
 ---
 layout: page
-title: "Example: Telemetry"
+title: "Appendix: Telemetry"
 ---
 
-# Example: Telemetry
+# Appendix: Telemetry
 
 ---
 
 ### Getting started
 
-This example demonstrates the telemetry feature of pup, where a small script in your client processes report status, such as memory usage, back to Pup.
+This example demonstrates the telemetry feature of pup, which ...
 
-To use this feature, add the following lines at the entrypoint of your project
+- Automatically report process metrics, such as memory usage, back to Pup.
+- Opens a channel for managed processes to communicate using a slow polling IPC mechanism.
+
+The simplest use case, where you only want to monitor your client metrics is used like this:
 
 ```ts
 import { PupTelemetry } from "https://deno.land/x/pup/telemetry.ts" // Pin this to a specific version of pup
-PupTelemetry()
+new PupTelemetry()
 
 // The rest of your application
 ```
 
-This will make your process report memory usage and current working directory back to the Pup main process, no further configuration needed.
+This will make your process report memory usage and current working directory back to the Pup main process, no further configuration needed. Now you can see memory usage for all processes running
+telemetry (including main process) using `--status` on the cli.
 
-You can then display memory usage for all running processes (including main process) using `--status` con the cli, or through the web interface.
+**To use the IPC mechanism:**
+
+```ts
+// PupTelemetry is a singleton, so it can be imported one or many times in your application
+import { PupTelemetry } from "https://deno.land/x/pup/telemetry.ts" // Pin this to a specific version of pup
+const telemetry = new PupTelemetry()
+
+// One part of your application ...
+
+// Listen for ipc events
+telemetry.on("my-event", (data) => {
+  console.log(`Another process triggered 'my-event' with data ${JSON.stringify(data)}`)
+})
+
+// Send ipc events
+telemetry.emit("another-process-id", "my-event", { data: { to: "send" } })
+
+// ... another part of your application
+```
 
 ## Files
 

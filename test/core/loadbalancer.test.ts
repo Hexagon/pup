@@ -1,6 +1,6 @@
 // load_balancer_test.ts
 import { assertEquals, assertRejects } from "../deps.ts"
-import { Backend, BalancingStrategy, hashCode, LoadBalancer } from "../../lib/core/loadbalancer.ts"
+import { Backend, BalancingStrategy, hashCode, InternalBackend, LoadBalancer } from "../../lib/core/loadbalancer.ts"
 
 Deno.test("LoadBalancer initialization", () => {
   const backends: Backend[] = [
@@ -43,6 +43,12 @@ Deno.test("LoadBalancer selects backends with IP_HASH strategy", () => {
     { host: "192.168.1.3", port: 8080 },
   ]
 
+  const expectedBackends: InternalBackend[] = [
+    { host: "192.168.1.1", port: 8080, connections: 0 },
+    { host: "192.168.1.2", port: 8080, connections: 0 },
+    { host: "192.168.1.3", port: 8080, connections: 0 },
+  ]
+
   // Create a LoadBalancer with IP_HASH strategy
   const loadBalancer = new LoadBalancer(backends, BalancingStrategy.IP_HASH)
 
@@ -56,5 +62,14 @@ Deno.test("LoadBalancer selects backends with IP_HASH strategy", () => {
   // Calculate the expected index using the hashCode function
   const expectedIndex = hashCode(client.remoteAddr.hostname) % backends.length
 
-  assertEquals(selectedBackend, backends[expectedIndex])
+  assertEquals(selectedBackend, expectedBackends[expectedIndex])
+})
+
+Deno.test("LoadBalancer initializes with LEAST_CONNECTIONS strategy", () => {
+  const backends: Backend[] = [
+    { host: "localhost", port: 3000 },
+    { host: "localhost", port: 3001 },
+  ]
+  const lb = new LoadBalancer(backends, BalancingStrategy.LEAST_CONNECTIONS)
+  assertEquals(lb["strategy"], BalancingStrategy.LEAST_CONNECTIONS)
 })

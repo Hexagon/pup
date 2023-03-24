@@ -8,7 +8,7 @@
 // Import core dependencies
 import { Pup } from "../core/pup.ts"
 import { Configuration, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
-import { FileIPC } from "../core/ipc.ts"
+import { FileIPC } from "../common/ipc.ts"
 
 // Import CLI utilities
 import { printFlags, printHeader, printUsage } from "./output.ts"
@@ -164,7 +164,7 @@ async function main(inputArgs: string[]) {
 
   // Prepare for IPC
   let ipcFile
-  if (useConfigFile) ipcFile = `${toTempPath(configFile as string)}/.ipc`
+  if (useConfigFile) ipcFile = `${toTempPath(configFile as string)}/.main.ipc`
 
   // Prepare status file
   let statusFile
@@ -225,8 +225,16 @@ async function main(inputArgs: string[]) {
   }
 
   /**
+   * One last check before starting, is there any processes?
+   */
+  if (!configuration || configuration?.processes?.length < 1) {
+    console.error("No processes defined, exiting.")
+    Deno.exit(1)
+  }
+  /**
    * Ready to start pup!
    */
+
   try {
     const pup = new Pup(configuration, configFile ?? undefined)
 

@@ -3,6 +3,7 @@ import { copy } from "../../deps.ts"
 export enum BalancingStrategy {
   ROUND_ROBIN,
   IP_HASH,
+  LEAST_CONNECTIONS,
 }
 
 export interface Backend {
@@ -10,8 +11,12 @@ export interface Backend {
   port: number
 }
 
+export interface InternalBackend extends Backend {
+  connections: number
+}
+
 export class LoadBalancer {
-  private backends: Backend[]
+  private backends: InternalBackend[]
   private strategy: BalancingStrategy
   private currentIndex: number
 
@@ -19,15 +24,25 @@ export class LoadBalancer {
     backends: Backend[],
     strategy: BalancingStrategy = BalancingStrategy.ROUND_ROBIN,
   ) {
-    this.backends = backends
+    // Deep copy of incoming backend object, with additional property
+    // for current number of connections for LEAST_CONNECTIONS
+    this.backends = backends.map((backend) => ({
+      ...backend,
+      connections: 0, // Initialize connections to 0
+    }))
+
+    // Selected strategy for this instance
     this.strategy = strategy
+
+    // Current index used by ROUND_ROBIN
     this.currentIndex = 0
   }
 
-  private async proxy(client: Deno.Conn, backend: Backend): Promise<void> {
+  private async proxy(client: Deno.Conn, backend: InternalBackend): Promise<void> {
     let targetConn
     try {
       targetConn = await Deno.connect(backend)
+      backend.connections++ // Increment connections when connected LEAST_CONNECTIONS
     } catch (_e) {
       console.warn(`Could not connect to backend ${backend.host}:${backend.port}`)
     }
@@ -41,18 +56,25 @@ export class LoadBalancer {
         // Transport error, ignore
         //console.error("Proxy error:", err)
       } finally {
+        backend.connections-- // Decrement connections when closed LEAST_CONNECTIONS
         client.close()
         targetConn.close()
       }
     }
   }
 
-  private selectBackend(client: Deno.Conn): Backend {
+  private selectBackend(client: Deno.Conn): InternalBackend {
     const { remoteAddr } = client
     switch (this.strategy) {
       case BalancingStrategy.IP_HASH: {
         const hash = remoteAddr ? remoteAddr.transport === "tcp" ? hashCode(remoteAddr.hostname) : 0 : 0
         return this.backends[hash % this.backends.length]
+      }
+
+      case BalancingStrategy.LEAST_CONNECTIONS: {
+        // Find the backend with the least connections
+        const backend = this.backends.reduce((prev, curr) => prev.connections < curr.connections ? prev : curr)
+        return backend
       }
 
       case BalancingStrategy.ROUND_ROBIN:

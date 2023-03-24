@@ -64,6 +64,7 @@ interface ProcessInformation {
 interface ProcessInformationParsed {
   id: string
   status: ProcessState
+  type: string
   code?: number
   signal?: number
   pid?: number

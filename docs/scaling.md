@@ -70,20 +70,21 @@ include:
 To use Pup's process scaling with an external load balancer like NGINX, you would configure the load balancer to distribute incoming requests to the different instances of your application, using the
 `startPort` value as a starting point for the backend server ports.
 
-Pup supports two load balancing strategies:
+Pup supports three load balancing strategies:
 
 1. **round-robin**: The default strategy, where incoming connections are distributed sequentially among available instances.
-2. **ip-hash**: Incoming connections are distributed based on the hash of the client's IP address. This ensures that clients with the same IP address are consistently directed to the same instance.
+2. **least-connections**: Distributes incoming connections to the instance with the lowest number of active connections, ensuring workload is balanced and optimal resource utilization.
+3. **ip-hash**: Incoming connections are distributed based on the hash of the client's IP address. This ensures that clients with the same IP address are consistently directed to the same instance.
 
 ### Ip-hash for Stateful Applications
 
-For stateful applications, the ip-hash strategy is often a better choice than the round-robin strategy. This is because stateful applications maintain information about client sessions, and directing
-a client to a different instance may result in a loss of session data.
+For stateful applications, the `ip-hash` strategy is often a better choice than the round-robin strategy. This is because stateful applications maintain information about client sessions, and
+directing a client to a different instance may result in a loss of session data.
 
-The ip-hash strategy mitigates this issue by consistently directing clients with the same IP address to the same instance. However, this strategy is not perfect, as it may cause uneven load
+The `ip-hash` strategy mitigates this issue by consistently directing clients with the same IP address to the same instance. However, this strategy is not perfect, as it may cause uneven load
 distribution when a large number of clients share the same IP address, for example, when clients are behind a proxy server or a NAT device.
 
-## Scaling Processes
+## DRAFT: Scaling Processes
 
 > **Warning** This feature is not yet implemented
 

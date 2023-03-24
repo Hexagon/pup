@@ -1,0 +1,14 @@
+{
+  "processes": [
+    {
+      "id": "korv-2",
+      "cmd": [
+        "deno",
+        "run",
+        "-A",
+        "docs/examples/basic/server.js"
+      ],
+      "autostart": true
+    }
+  ]
+}

@@ -12,8 +12,8 @@
   },
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts test/deps.ts",
-    "build-schema": "deno run --allow-write tools/build-schema.ts",
-    "check": "deno fmt --check && deno lint && deno check pup.ts && deno test --allow-read --allow-write --allow-net",
-    "build": "deno task check && deno task build-schema && deno task fmt"
+    "build-schema": "deno run --allow-write tools/build-schema.ts && deno fmt",
+    "check": "deno fmt --check && deno lint && deno check pup.ts && deno test --allow-read --allow-write --allow-env --allow-net",
+    "build": "deno task check && deno task build-schema"
   }
 }

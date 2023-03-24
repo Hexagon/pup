@@ -7,7 +7,9 @@
 
 import { Application } from "../../application.meta.ts"
 import { Cluster } from "./cluster.ts"
-import { Process, ProcessInformation } from "./process.ts"
+import { Process, ProcessInformation, ProcessState } from "./process.ts"
+
+const started = new Date()
 
 class Status {
   /* Properties related to disk write */
@@ -23,11 +25,11 @@ class Status {
   public async writeToDisk(processes: Process[]) {
     if (this.statusFileName) {
       // Get status from all processes
-      const ProcessStatees: ProcessInformation[] = []
+      const processStates: ProcessInformation[] = []
       for (const p of processes) {
-        ProcessStatees.push(p.getStatus())
+        processStates.push(p.getStatus())
         if (p.isCluster()) {
-          for (const subP of (p as Cluster).processes) ProcessStatees.push(subP.getStatus())
+          for (const subP of (p as Cluster).processes) processStates.push(subP.getStatus())
         }
       }
 
@@ -35,9 +37,12 @@ class Status {
       const pupStatus = {
         pid: Deno.pid,
         version: Application.version,
+        status: ProcessState[ProcessState.RUNNING],
         updated: new Date().toISOString(),
+        started: started.toISOString(),
         memory: Deno.memoryUsage(),
-        processes: ProcessStatees,
+        type: "main",
+        processes: processStates,
       }
       const result = new TextEncoder().encode(JSON.stringify(pupStatus))
 

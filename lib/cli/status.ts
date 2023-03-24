@@ -41,6 +41,7 @@ export async function printStatus(configFile: string, statusFile: string) {
   // Add main process
   taskTable.push({
     Id: "Main",
+    Type: status.type || "N/A",
     Pid: status.pid?.toString(10) || "N/A",
     Status: status.status || "N/A",
     Started: status.started || "N/A",
@@ -56,6 +57,7 @@ export async function printStatus(configFile: string, statusFile: string) {
     const currentTask = taskInfo as ProcessInformationParsed
     taskTable.push({
       Id: currentTask.id,
+      Type: currentTask.type || "N/A",
       Pid: currentTask.pid?.toString(10) || "N/A",
       Status: ProcessState[currentTask.status] || "N/A",
       Started: currentTask.started || "N/A",
@@ -67,6 +69,7 @@ export async function printStatus(configFile: string, statusFile: string) {
 
   const tableColumns: Column[] = [
     { key: "Id", header: "Id", minWidth: 15, maxWidth: 24 },
+    { key: "Type", header: "Type", minWidth: 5 },
     { key: "Pid", header: "Pid", minWidth: 5 },
     { key: "Status", header: "Status", minWidth: 10 },
     { key: "Started", header: "Started", minWidth: 10 },

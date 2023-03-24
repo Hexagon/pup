@@ -1,5 +1,7 @@
+// See docs/examples/telemetry/README.md for full documentation on telemetry, including using the IPC
+
 import { PupTelemetry } from "../../../telemetry.ts"
-PupTelemetry()
+new PupTelemetry()
 
 console.log("Process running")
 
