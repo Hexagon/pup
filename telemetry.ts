@@ -53,7 +53,7 @@ export class PupTelemetry {
    * @param intervalSeconds - The interval in seconds between telemetry data transmissions (default: 15).
    *                          Value is clamped between 1 and 180 seconds.
    */
-  constructor(intervalSeconds = 15) {
+  constructor(intervalSeconds = 5) {
     // Use as a factory if called without the keyword `new`
     if (!(this instanceof PupTelemetry)) {
       return new PupTelemetry(intervalSeconds)

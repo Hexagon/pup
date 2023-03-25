@@ -11,6 +11,11 @@ title: " 11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-alpha-33] - 2023-03-25
+
+- Chore: Refactor updater
+- Chore: Fix documentation typos
+
 ## [1.0.0-alpha-32] - 2023-03-24
 
 - Feature: IPC functionality in the Telemetry client.

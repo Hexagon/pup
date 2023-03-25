@@ -67,12 +67,12 @@ async function main(inputArgs: string[]) {
   }
 
   if (args.upgrade !== undefined) {
-    //try {
-    await upgrade(args.upgrade || "latest")
-    //} catch (e) {
-    //console.error(`Could not upgrade pup, error: ${e.message}`)
-    //Deno.exit(1)
-    //}
+    try {
+      await upgrade(args.upgrade || "latest")
+    } catch (e) {
+      console.error(`Could not upgrade pup, error: ${e.message}`)
+      Deno.exit(1)
+    }
   }
 
   /**
