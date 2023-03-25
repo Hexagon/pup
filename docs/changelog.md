@@ -11,9 +11,9 @@ title: " 11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [Unreleased]
+## [1.0.0-alpha-34] - 2023-03-25
 
--  Fix telemetry IPC
+- Bugfix: Fix telemetry IPC
 
 ## [1.0.0-alpha-33] - 2023-03-25
 
