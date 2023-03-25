@@ -11,6 +11,10 @@ title: " 11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [Unreleased]
+
+-  Fix telemetry IPC
+
 ## [1.0.0-alpha-33] - 2023-03-25
 
 - Chore: Refactor updater

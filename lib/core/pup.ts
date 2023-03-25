@@ -385,8 +385,8 @@ class Pup {
         } else if (parsedMessage.unblock.length >= 1 && parsedMessage.unblock.length <= 64) {
           this.unblock(parsedMessage.unblock, "ipc")
         }
-      } else if (parsedMessage.telemetry) {
-        const telemetry = parsedMessage.telemetry
+      } else if (parsedMessage.event && parsedMessage.event === "telemetry") {
+        const telemetry = parsedMessage.eventData
         if (telemetry.sender && typeof telemetry.sender === "string") {
           const cleanedId = telemetry.sender.trim().toLocaleLowerCase()
           const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)

@@ -49,7 +49,10 @@ telemetry.emit("another-process-id", "my-event", { data: { to: "send" } })
 ## Files
 
 - [pup.json](https://github.com/Hexagon/pup/tree/main/docs/examples/telemetry/pup.json) - Pup configuration, sets up `task-with-telemetry.ts` to run forever. `server.ts` to be kept alive forever.
-- [task-with-telemetry.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/telemetry/task-with-telemetry.ts.ts) - The actual script to run, which include the pup telemetry client.
+- [task-with-telemetry-1.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/telemetry/task-with-telemetry-1.ts) - "task-1", script sending telemetry data to main process, and sending messages
+  over IPC to task-2
+- [task-with-telemetry-2.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/telemetry/task-with-telemetry-2.ts) - "task-2", script sending telemetry data to main process, and receiving
+  messages over IPC from task-1
 
 ## Running
 

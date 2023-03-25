@@ -107,8 +107,9 @@ export class PupTelemetry {
       // Process messages and emit events
       for (const message of messages) {
         try {
-          for (const [event, eventData] of Object.entries(message)) {
-            this.events.emit(event, eventData)
+          if (message.data) {
+            const parsedMessage = JSON.parse(message.data)
+            this.events.emit(parsedMessage.event, parsedMessage.eventData)
           }
         } catch (_e) {
           // Ignore errors in message parsing and processing
@@ -153,10 +154,10 @@ export class PupTelemetry {
       const ipc = new FileIPC(ipcPath)
 
       // Create the message with event and eventData
-      const message = JSON.stringify({ [event]: eventData })
+      const message = { event, eventData }
 
       // Send the message to the target process
-      ipc.sendData(message)
+      ipc.sendData(JSON.stringify(message))
     } else {
       // Ignore, process not run by Pup?
     }
