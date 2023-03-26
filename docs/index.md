@@ -3,6 +3,12 @@ layout: page
 title: " 1. Overview"
 ---
 
+<p align="center">
+<img src="https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/resources/pup_dark.png" alt="PUP"><br>
+Universal process manager.<br><br>
+This is the source code repository, documentation available at <a href="https://hexagon.github.io/pup">hexagon.github.io/pup</a>.
+</p>
+
 # 1. Overview
 
 ---
