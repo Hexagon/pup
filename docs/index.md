@@ -3,10 +3,6 @@ layout: page
 title: " 1. Overview"
 ---
 
-<p align="center">
-<img src="https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/resources/pup_dark.png" alt="PUP"><br>
-</p>
-
 # 1. Overview
 
 ---
