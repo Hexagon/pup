@@ -38,10 +38,10 @@ export function printFlags() {
     { short: "-i", long: "--init", description: "Initialize a new configuration file using the flags below." },
     { short: "-a", long: "--append proc-id", description: "Append a new process to the configuration file, " },
     { description: "configure using the flags below." },
-    
+
     { short: "-r", long: "--remove proc-id", description: "Remove a process from a configuration file," },
     { description: "specify process using '--id'." },
-    
+
     { separator: "empty" },
     { content: "Process configuration, used with above config helpers, or '--no-config'", spanStart: 1 },
     { separator: "empty" },

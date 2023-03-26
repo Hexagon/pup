@@ -97,15 +97,17 @@ You should also replace `/path/to/your/pup.json` with the actual path.
 
 Finally you should add a version specifier to `https://deno.land/x/pup/pup.ts`, like `https://deno.land/x/pup@1.0.0-alpha-25/pup.ts`, Find the latest version at <https://deno.land/x/pup>.
 
-Note that systemd always expects full paths. Also note that you will need to use full paths to executables in pup.json when running using systemd, alternatively you can use the `path` configuration key in each process to add the paths needed, like:
+Note that systemd always expects full paths. Also note that you will need to use full paths to executables in pup.json when running using systemd, alternatively you can use the `path` configuration
+key in each process to add the paths needed, like:
 
 ```json
-    {
-      "id": "my task",
-      "path": "/home/<user>/.deno/bin/",
-      "cmd": ["deno", "run", "-A", "script.ts"],
-      /* ... */
-    },
+{
+  "id": "my task",
+  "path": "/home/<user>/.deno/bin/",
+  "cmd": ["deno", "run", "-A", "script.ts"]
+  /* ... */
+}
+```
 
 Reload systemd user configuration using the following command:
 
