@@ -1,6 +1,6 @@
 ---
 layout: page
-title: " 11. Changelog"
+title: "11. Changelog"
 ---
 
 # 11. Changelog
