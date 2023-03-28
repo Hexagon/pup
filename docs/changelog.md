@@ -11,6 +11,10 @@ title: " 11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-alpha-35] - 2023-03-28
+
+- Bugfix: Make web-interface plugin work when used to run a real application (still WIP though)
+
 ## [1.0.0-alpha-34] - 2023-03-25
 
 - Bugfix: Fix telemetry IPC

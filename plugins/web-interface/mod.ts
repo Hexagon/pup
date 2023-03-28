@@ -8,8 +8,7 @@
 
 import { ProcessStateChangedEvent } from "../../lib/core/process.ts"
 import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
-
-import { Application, dirname, fromFileUrl, Router } from "./deps.ts"
+import { Application, Bundlee, dirname, Router } from "./deps.ts"
 
 interface Configuration {
   port: number
@@ -36,6 +35,7 @@ export class PupPlugin extends PluginImplementation {
   private app: Application
   private router: Router
   private logs: Map<string, Array<LogInventoryEntry>>
+  private staticFiles?: Record<string, string>
 
   constructor(pup: PluginApi, config: PluginConfiguration) {
     super(pup, config)
@@ -96,16 +96,17 @@ export class PupPlugin extends PluginImplementation {
       const id = context.params.id
       context.response.body = JSON.stringify(this.logs.get(id))
     })
-    // Set up route to serve static files (e.g., HTML, CSS, JS)
+
+    // Set up route to serve static files using Bundlee
     this.app.use(async (context: any, next: any) => {
-      const basePath = dirname(fromFileUrl(import.meta.url))
-      try {
-        await context.send({
-          root: `${basePath}/static`,
-          index: "web-interface.html",
-        })
-      } catch {
-        await next()
+      const staticFiles = await Bundlee.load(dirname(import.meta.url) + "/static/bundle.json", "import")
+      const url = "static" + context.request.url.pathname
+      if (staticFiles.has(url)) {
+        const fileData = await staticFiles.get(url)
+        context.response.headers.set("Content-Type", fileData.contentType)
+        context.response.body = fileData.content
+      } else {
+        next()
       }
     })
 
