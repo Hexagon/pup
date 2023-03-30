@@ -75,18 +75,3 @@ We appreciate all feedback and contributions that help make Pup better!
 - **Bugfixes**: Find bugs, report them, and optionally create a PR to fix the issue.
 - **Spread the word**: If you find Pup useful, spread the word to attract more users, developers, and testers to the community. Sharing your experiences and showcasing Pup's capabilities can help grow
   and strengthen the project.
-
-## Become a Sponsor
-
-The goal of Pup is to be a unique and powerful universal process manager for Deno, and it's an open-source project. By becoming a sponsor, you'll help support the development and maintenance of Pup,
-ensuring that it continues to improve and stay up-to-date with the latest technologies.
-
-Your sponsorship will enable us to:
-
-- Continue to develop new features and improve existing ones
-- Maintain compatibility with the latest platforms
-- Provide prompt bug fixes and support
-- Create comprehensive documentation and examples for users
-
-If you're interested in becoming a sponsor, please visit our [GitHub Sponsors page](https://github.com/sponsors/hexagon). You can also reach out to us directly at <hexagon@56k.guru> if you have any
-questions or would like to discuss custom sponsorship options, including getting mentioned in the documentation.
