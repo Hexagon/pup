@@ -13,11 +13,11 @@ logs to separate files.
 
 ## Files
 
-- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/examples/basic/pup.jsonc) - Pup configuration, sets up `task.ts` to run at cron schedule `0/20 * * * * *` (every fifth second), and
-  `server.ts` to be kept alive forever.
-- [task.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/basic/task.ts) - The actual script to run. Prints "Task starting and working ...." to console, and fails randomly to demonstrate how
+- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/examples/basic/pup.jsonc) - Pup configuration, sets up `task.js` to run at cron schedule `0/20 * * * * *` (every fifth second), and
+  `server.js` to be kept alive forever.
+- [task.js](https://github.com/Hexagon/pup/tree/main/docs/examples/basic/task.js) - The actual script to run. Prints "Task starting and working ...." to console, and fails randomly to demonstrate how
   restarts works.
-- [server.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/basic/task.ts) - Fake server, prints the value of env.TZ to demonstrate custom environment variables, runs for 10 seconds, then
+- [server.js](https://github.com/Hexagon/pup/tree/main/docs/examples/basic/task.js) - Fake server, prints the value of env.TZ to demonstrate custom environment variables, runs for 10 seconds, then
   exists, to demonstrade restart behaviour.
 
 ## Running
