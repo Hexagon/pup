@@ -81,8 +81,8 @@ You can define global configuration options that apply to all processes. In addi
 
 ### Logger
 
-The global logger configuration allows you to control the logging settings for pup, and the defaults of each process. To use the global logger, include the following properties within your configuration
-file:
+The global logger configuration allows you to control the logging settings for pup, and the defaults of each process. To use the global logger, include the following properties within your
+configuration file:
 
 - `console` (boolean): Set to true to enable logging to the console. Default is false.
 - `stdout` (string): The file path to write standard output logs.

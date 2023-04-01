@@ -6,7 +6,7 @@
 
 const Application = {
   name: "pup",
-  version: "1.0.0-beta-0",
+  version: "1.0.0-beta-1",
   repository: "https://github.com/hexagon/pup",
 }
 

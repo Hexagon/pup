@@ -64,8 +64,8 @@ class Runner {
     // Extend enviroment config with PUP_PROCESS_ID
     const env = this.processConfig.env ? structuredClone(this.processConfig.env) : {}
     env.PUP_PROCESS_ID = this.processConfig.id
-    env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
-    env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
+    if (this.pup.temporaryStoragePath) env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
+    if (this.pup.persistentStoragePath) env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
 
     // Extend path (if specified)
     if (this.processConfig.path) {
@@ -82,7 +82,7 @@ class Runner {
       {
         args: this.processConfig.cmd.slice(1),
         cwd: this.processConfig.cwd,
-        env,
+        env: env,
         stdout: "piped",
         stderr: "piped",
       },
