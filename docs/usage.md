@@ -26,7 +26,7 @@ The pup CLI can be used to control running instances, using the following comman
 - `--start all|process-id`: Starts the running processes `process-id`, or all processes if not already running
 - `--stop all|process-id`: Stops the process `process-id`, or all processes, if they are running. Process will restart instantly if configured to.
 - `--block all|process-id`: Block the process `process-id`, or all processes, completely from starting.
-- `--stop all|process-id`: Unblock the process `process-id`, or all processes, allowing it to start again. Will not start the process.
+- `--unblock all|process-id`: Unblock the process `process-id`, or all processes, allowing it to start again. Will not start the process.
 - `--terminate`: Stop all processes and exit.
 
 Example to restart task-1 started using `pup.json` in the current directory.
