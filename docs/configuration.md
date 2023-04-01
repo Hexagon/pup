@@ -64,7 +64,7 @@ You need to specify one of these for each process, else the process will never s
 **Clustering**
 
 - `cluster` (optional): An object specifying options to run this process in multiple instances, more on this at [6. Clusters and Load Balancer](/scaling.html)
-  - `instances`: The number if instances to run using this configuration.
+  - `instances`: The number of instances to run using this configuration.
   - `startPort` (optional): A number specifying the port on which each instance should listen. This is incremented for each instance and passed by environment variable `PUP_CLUSTER_PORT`.
   - `commonPort` (optional): A number specifying a common port for all instances, opened by the built in load balancer.
   - `strategy` (optional): Load balancing strategy, should be set to "round-robin" or "ip-hash".
@@ -81,7 +81,7 @@ You can define global configuration options that apply to all processes. In addi
 
 ### Logger
 
-The global logger configuration allows you to control the logging settings for pup, and the defaults of each process. To the global logger, include the following properties within your configuration
+The global logger configuration allows you to control the logging settings for pup, and the defaults of each process. To use the global logger, include the following properties within your configuration
 file:
 
 - `console` (boolean): Set to true to enable logging to the console. Default is false.
