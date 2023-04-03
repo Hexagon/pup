@@ -33,23 +33,6 @@ async function main(inputArgs: string[]) {
   const args = parseArguments(inputArgs)
 
   /**
-   * Before checking the arguments, extract part after "--",
-   * which can be used in place of --cmd
-   */
-  let postDelimiter: string[] = []
-  if (inputArgs.indexOf("--") >= 0) {
-    postDelimiter = inputArgs.slice(inputArgs.indexOf("--") + 1)
-  }
-  let checkedArgs
-  try {
-    checkedArgs = checkArguments(args, postDelimiter)
-  } catch (e) {
-    console.error(`Invalid combination of arguments: ${e.message}`)
-    Deno.exit(1)
-  }
-  const cmd = checkedArgs?.cmd?.split(" ") || postDelimiter
-
-  /**
    * Begin with --version, --upgrade and --help, as they have no dependencies on other
    * arguments, and just exit
    */
@@ -74,6 +57,18 @@ async function main(inputArgs: string[]) {
       Deno.exit(1)
     }
   }
+
+  /**
+   * check arguments
+   */
+  let checkedArgs
+  try {
+    checkedArgs = checkArguments(args)
+  } catch (e) {
+    console.error(`Invalid combination of arguments: ${e.message}`)
+    Deno.exit(1)
+  }
+  const cmd = checkedArgs?.cmd?.split(" ")
 
   /**
    * Now either

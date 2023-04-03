@@ -63,12 +63,12 @@ function parseArguments(args: string[]): Args {
     "cwd": "W",
   }
 
-  return parse(args, { alias, boolean: booleanArgs, string: stringArgs, stopEarly: true })
+  return parse(args, { alias, boolean: booleanArgs, string: stringArgs, stopEarly: true, "--": true })
 }
 
-function checkArguments(args: Args, postDelimiter: string[]): Args {
+function checkArguments(args: Args): Args {
   const configOptions = args.init || args.append || args["no-config"]
-  const hasCmd = postDelimiter.length > 0 || args.cmd
+  const hasCmd = args["--"] || args.cmd
 
   // Do not allow configuration creation options without --init and vice versa
   if (args.autostart && !configOptions) {
@@ -92,7 +92,7 @@ function checkArguments(args: Args, postDelimiter: string[]): Args {
   if (args["no-config"] && !hasCmd) {
     throw new Error("Argument '--no-config' requires '--cmd'")
   }
-  if (postDelimiter.length > 0 && args.cmd) {
+  if (args["--"] && args.cmd) {
     throw new Error("Both '--cmd' and '--' cannot be used at the same time.")
   }
 
