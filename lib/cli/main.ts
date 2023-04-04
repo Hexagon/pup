@@ -78,7 +78,7 @@ async function main(inputArgs: string[]) {
   if (checkedArgs) {
     if (checkedArgs.cmd) {
       cmd = checkedArgs.cmd.split(" ")
-    } else if (checkedArgs["--"]) {
+    } else if (checkedArgs["--"] && checkedArgs["--"].length > 0) {
       cmd = checkedArgs["--"]
     }
   }
@@ -94,6 +94,7 @@ async function main(inputArgs: string[]) {
   if (useConfigFile) {
     configFile = await findConfigFile(useConfigFile, checkedArgs.config)
   }
+  console.log(configFile, cmd, args.config)
 
   /**
    * Now, handle the argument to generate a new configuration file and exit
