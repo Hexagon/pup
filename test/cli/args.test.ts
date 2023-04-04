@@ -7,12 +7,12 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
   const inputArgs = [
     "--version",
     "--help",
-    "--init",
-    "--append",
+    "init",
+    "append",
     "--autostart",
     "--remove",
     "--status",
-    "--no-config",
+    "--cmd",
   ]
   const parsedArgs = parseArguments(inputArgs)
   const expectedArgs = {
@@ -22,12 +22,6 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
 
     help: true,
     h: true,
-
-    init: true,
-    i: true,
-
-    append: true,
-    a: true,
 
     autostart: true,
     A: true,
@@ -43,7 +37,7 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
 
     terminate: false,
 
-    _: [],
+    _: ["init", "append"],
     "--": [],
   }
   assertEquals(parsedArgs, expectedArgs)
@@ -110,14 +104,14 @@ Deno.test("String options and aliases are parsed correctly", () => {
   assertEquals(parsedArgs, expectedArgs)
 })
 
-Deno.test("checkArguments should throw error when autostart argument is provided without init, append or no-config", async () => {
+Deno.test("checkArguments should throw error when autostart argument is provided without init, append or --cmd", async () => {
   const args = { _: [], autostart: true }
   await assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Argument '--autostart' requires '--init', '--append' or '--no-config'",
+    "Argument '--autostart' requires 'init' or 'append'",
   )
 })
 
@@ -128,7 +122,7 @@ Deno.test("checkArguments should throw error when cron argument is provided with
       checkArguments(args)
     },
     Error,
-    "Argument '--cron' requires '--init', '--append' or '--no-config'",
+    "Argument '--cron' requires 'init', 'append' or '--cmd'",
   )
 })
 
@@ -139,7 +133,7 @@ Deno.test("checkArguments should throw error when watch argument is provided wit
       checkArguments(args)
     },
     Error,
-    "Argument '--watch' requires '--init', '--append' or '--no-config'",
+    "Argument '--watch' requires 'init', 'append' or '--cmd'",
   )
 })
 
@@ -150,7 +144,7 @@ Deno.test("checkArguments should throw error when cmd argument is provided witho
       checkArguments(args)
     },
     Error,
-    "Argument '--cmd' requires '--init', '--append' or '--no-config'",
+    "Argument '--cmd' requires 'init', 'append' or '--cmd'",
   )
 })
 
@@ -161,7 +155,7 @@ Deno.test("checkArguments should throw error when init or append argument is pro
       checkArguments(args)
     },
     Error,
-    "Arguments '--init', '--append', and '--no-config' require '--cmd'",
+    "Arguments 'init', 'append', and '--cmd' require '--cmd'",
   )
 })
 
@@ -172,7 +166,7 @@ Deno.test("checkArguments should throw error when both --cmd and -- is specified
       checkArguments(args)
     },
     Error,
-    "Both '--cmd' and '--' cannot be used at the same time.",
+    "'--cmd' and '--' cannot be used at the same time.",
   )
 })
 
@@ -183,7 +177,7 @@ Deno.test("checkArguments should throw error when id argument is missing with in
       checkArguments(args)
     },
     Error,
-    "Arguments '--init','--append', and '--remove' require '--id'",
+    "Arguments 'init','append', and '--remove' require '--id'",
   )
 })
 

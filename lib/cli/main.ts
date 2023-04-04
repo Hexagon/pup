@@ -68,19 +68,36 @@ async function main(inputArgs: string[]) {
     console.error(`Invalid combination of arguments: ${e.message}`)
     Deno.exit(1)
   }
-  const cmd = checkedArgs?.cmd?.split(" ")
+
+  // Extract command from arguments
+  let cmd
+  if (checkedArgs) {
+    if (checkedArgs.cmd) {
+      cmd = checkedArgs.cmd.split(" ")
+    } else if (checkedArgs["--"]) {
+      cmd = checkedArgs["--"]
+    }
+  }
+
+  // Extract base argument
+  const baseArgument = args._.length > 0 ? args._[0] : undefined
 
   /**
    * Now either
-   * - Use no configuration (--no-config)
+   * - Use no configuration (--cmd or -- set)
    * - Find configuration using (--config)
-   * - Or generate configuration using (--init)
+   * - Or generate configuration using (init)
    */
-  const useConfigFile = !(checkedArgs["no-config"])
-  let configFile = await findConfigFile(useConfigFile, checkedArgs.config)
+  const useConfigFile = !(cmd === undefined)
+  let configFile
+  if (useConfigFile) {
+    configFile = await findConfigFile(useConfigFile, checkedArgs.config)
+  }
 
-  // --init, Generate configuration
-  if (checkedArgs.init) {
+  /**
+   * Now, handle the argument to generate a new configuration file and exit
+   */
+  if (baseArgument === "init") {
     // Default new configuration file to pup.jsonc
     const fallbackedConfigFile = configFile ?? "pup.jsonc"
     if (await fileExists(fallbackedConfigFile)) {
@@ -101,10 +118,10 @@ async function main(inputArgs: string[]) {
 
   /**
    * Now, the arguments to modify existing configuration files and exit
-   * -- append - Append configuration to existing configuration file and exit
-   * -- remove - Remove process from existing configuration file and exit
+   * - append - Append configuration to existing configuration file and exit
+   * - remove - Remove process from existing configuration file and exit
    */
-  if (checkedArgs.append) {
+  if (baseArgument === "append") {
     if (configFile) {
       await appendConfigurationFile(configFile, checkedArgs, cmd)
       console.log(`Process '${args.id}' appended to configuration file '${configFile}'.`)
@@ -115,7 +132,7 @@ async function main(inputArgs: string[]) {
     }
   }
 
-  if (checkedArgs.remove) {
+  if (baseArgument === "remove") {
     if (configFile) {
       await removeFromConfigurationFile(configFile, checkedArgs)
       console.log(`Process '${args.id}' removed from configuration file '${configFile}'.`)
@@ -179,7 +196,7 @@ async function main(inputArgs: string[]) {
    * Now when the configuration file is located
    * --status, print status for current running instance, and exit.
    */
-  if (checkedArgs.status) {
+  if (baseArgument === "status") {
     if (!statusFile || !configFile) {
       console.error("Can not print status, no configuration file found")
       Deno.exit(1)
@@ -192,7 +209,7 @@ async function main(inputArgs: string[]) {
 
   // Handle --restart, --stop etc using IPC
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
-    if (args[op]) {
+    if (baseArgument === op) {
       // If status file doesn't exist, don't even try to communicate
       try {
         if (await getStatus(configFile, statusFile) && ipcFile) {
