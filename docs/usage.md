@@ -98,7 +98,7 @@ pup --no-config --cmd "npm run server" --autostart
 The same example, using short aliases for the command line parameters.
 
 ```bash
-pup -nAc "npm run server"
+pup -nAC "deno run server.ts"
 ```
 
 ## Working directory
