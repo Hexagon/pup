@@ -7,11 +7,12 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
   const inputArgs = [
     "--version",
     "--help",
+    "--autostart",
     "init",
     "append",
-    "--autostart",
-    "--remove",
-    "--status",
+    "status",
+    "remove",
+    "run",
     "--cmd",
   ]
   const parsedArgs = parseArguments(inputArgs)
@@ -26,20 +27,14 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
     autostart: true,
     A: true,
 
-    remove: true,
-    r: true,
+    cmd: "",
+    C: "",
 
-    status: true,
-    s: true,
-
-    "no-config": true,
-    n: true,
-
-    terminate: false,
-
-    _: ["init", "append"],
+    _: ["init", "append", "status", "remove", "run"],
     "--": [],
   }
+
+  console.log(parsedArgs)
   assertEquals(parsedArgs, expectedArgs)
 })
 
@@ -79,24 +74,14 @@ Deno.test("String options and aliases are parsed correctly", () => {
     cron: "cron",
     O: "cron",
 
+    A: false,
+    autostart: false,
+
     /* All boolean options will be included in output too */
     version: false,
     v: false,
     help: false,
     h: false,
-    init: false,
-    i: false,
-    append: false,
-    a: false,
-    autostart: false,
-    A: false,
-    remove: false,
-    r: false,
-    status: false,
-    s: false,
-    "no-config": false,
-    n: false,
-    terminate: false,
 
     _: [],
     "--": [],
@@ -137,14 +122,14 @@ Deno.test("checkArguments should throw error when watch argument is provided wit
   )
 })
 
-Deno.test("checkArguments should throw error when cmd argument is provided without init, append or no-config", async () => {
+Deno.test("checkArguments should throw error when cmd argument is provided without init, append or run", async () => {
   const args = { _: [], cmd: "command" }
   await assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Argument '--cmd' requires 'init', 'append' or '--cmd'",
+    "Argument '--cmd' requires 'init', 'append' or 'run' without config",
   )
 })
 
@@ -155,7 +140,7 @@ Deno.test("checkArguments should throw error when init or append argument is pro
       checkArguments(args)
     },
     Error,
-    "Arguments 'init', 'append', and '--cmd' require '--cmd'",
+    "Arguments 'init' and 'append' requires '--cmd'",
   )
 })
 
@@ -171,13 +156,35 @@ Deno.test("checkArguments should throw error when both --cmd and -- is specified
 })
 
 Deno.test("checkArguments should throw error when id argument is missing with init or append argument", async () => {
-  const args = { _: [], init: true, cmd: "command" }
+  const args = { _: ["init"], cmd: "command" }
   await assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Arguments 'init','append', and '--remove' require '--id'",
+    "Arguments 'init', 'append', and 'remove' require '--id'",
+  )
+})
+
+Deno.test("checkArguments should throw error when id argument is missing with init or append argument", async () => {
+  const args = { _: ["append"], cmd: "command" }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "Arguments 'init', 'append', and 'remove' require '--id'",
+  )
+})
+
+Deno.test("checkArguments should throw error when id argument is missing with init or remove argument", async () => {
+  const args = { _: ["remove"], cmd: "command" }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "Arguments 'init', 'append', and 'remove' require '--id'",
   )
 })
 
@@ -207,8 +214,7 @@ Deno.test("printUsage should output the usage of the application", () => {
 
 Deno.test("checkArguments should return the provided arguments when they are valid", () => {
   const expectedArgs = {
-    _: [],
-    init: true,
+    _: ["init"],
     cmd: "command",
     id: "taskId",
   }

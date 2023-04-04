@@ -22,20 +22,20 @@ General flags are used to control the basic behavior of Pup and can be combined 
 The pup CLI can be used to control running instances, using the following command line flags. Run in a directory with a `pup.json`, or point to the correct instance configuration using
 `--config "path/to/config"`.
 
-- `--restart all|process-id`: Restarts, or starts, the running processes `process-id`, or all processes
-- `--start all|process-id`: Starts the running processes `process-id`, or all processes if not already running
-- `--stop all|process-id`: Stops the process `process-id`, or all processes, if they are running. Process will restart instantly if configured to.
-- `--block all|process-id`: Block the process `process-id`, or all processes, completely from starting.
-- `--unblock all|process-id`: Unblock the process `process-id`, or all processes, allowing it to start again. Will not start the process.
-- `--terminate`: Stop all processes and exit.
+- `restart all|process-id`: Restarts, or starts, the running processes `process-id`, or all processes
+- `start all|process-id`: Starts the running processes `process-id`, or all processes if not already running
+- `stop all|process-id`: Stops the process `process-id`, or all processes, if they are running. Process will restart instantly if configured to.
+- `block all|process-id`: Block the process `process-id`, or all processes, completely from starting.
+- `unblock all|process-id`: Unblock the process `process-id`, or all processes, allowing it to start again. Will not start the process.
+- `terminate`: Stop all processes and exit.
 
 Example to restart task-1 started using `pup.json` in the current directory.
 
-`pup --restart task-1`
+`pup restart task-1`
 
 Example to stop task-2 started using `/root/pup.json` in the current directory. Requires write permission to `/root/`
 
-`pup --stop task-2 --config /root/pup.json`
+`pup stop task-2 --config /root/pup.json`
 
 ## Configuring using the cli
 
@@ -70,16 +70,16 @@ The `append` command is used to add a new process entry to an existing configura
 Example:
 
 ```bash
-pup --append --id anotherprocess --cmd "python script.py" --cwd /path/to/another/project
+pup append --id anotherprocess --cmd "python script.py" --cwd /path/to/another/project
 ```
 
-> **Warning** When using `--append` to modify an existing configuration file, any comments will be stripped.
+> **Warning** When using `append` to modify an existing configuration file, any comments will be stripped.
 
 ### Single command usage
 
-The `--no-config` or `-n` option allows you to start a single process using command line parameters without reading or writing any configuration file. This mode uses default options for logging.
+The `run` argument allows you to start a single process using command line parameters without reading or writing any configuration file. This mode uses default options for logging.
 
-To run Pup in no-config mode, use the `--no-config` or `-n` flag, followed by a command and a restart policy. `id` is optional in this mode.
+To run Pup in no-config mode, pass `--cmd`, followed by a command and a restart policy. `--id` is optional in this mode.
 
 - `--cmd <cmd>`: Specify the command to run the process.
 
@@ -92,13 +92,13 @@ And one of the start policies
 Example:
 
 ```bash
-pup --no-config --cmd "npm run server" --autostart
+pup run --cmd "deno run server.ts" --autostart
 ```
 
 The same example, using short aliases for the command line parameters.
 
 ```bash
-pup -nAC "deno run server.ts"
+pup run -AC "deno run server.ts"
 ```
 
 ## Working directory

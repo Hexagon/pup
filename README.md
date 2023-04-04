@@ -39,19 +39,25 @@ deno install -Afr https://deno.land/x/pup/pup.ts
 
 This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.
 
+**Single command example**
+
+Use `pup run` with `--cmd` and a restart policy, for example `--autostart`
+
+`pup run --cmd "deno run server.ts" --autostart`
+
 **Ecosystem example**
 
 Use the cli helpers to initialise a new configuration file `pup.json`
 
-`pup --init --id "my-server" --cmd "deno run -A server.ts" --autostart`
+`pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
 
 Add hourly task
 
-`pup --append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
+`pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
 Launch your ecosystem
 
-`pup`
+`pup run`
 
 For the full manual, see <https://hexagon.github.io/pup>
 

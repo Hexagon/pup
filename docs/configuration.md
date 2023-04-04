@@ -29,7 +29,7 @@ Then, add the following basic configuration to the file:
 This defines a single process named example that runs a Deno script (app.ts) with the `--allow-net` flag. You can customize the configuration to suit your needs by adding more processes or updating
 the existing process definition.
 
-> **Note**: If you quickly want to scaffold a new configuration file, you can use the cli helpers `pup --init`, `--append`, and `--remove`. More on this at
+> **Note**: If you quickly want to scaffold a new configuration file, you can use the cli helpers `pup init`, `append`, and `remove`. More on this at
 > [Configuring using the cli](/usage.html#configuring-using-the-cli).
 
 ## Process configuration

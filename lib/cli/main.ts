@@ -32,6 +32,10 @@ import { jsonc, path } from "../../deps.ts"
 async function main(inputArgs: string[]) {
   const args = parseArguments(inputArgs)
 
+  // Extract base argument
+  const baseArgument = args._.length > 0 ? args._[0] : undefined
+  const secondaryBaseArgument = args._.length > 1 ? args._[1] : undefined
+
   /**
    * Begin with --version, --upgrade and --help, as they have no dependencies on other
    * arguments, and just exit
@@ -42,7 +46,7 @@ async function main(inputArgs: string[]) {
     Deno.exit(0)
   }
 
-  if (args.help) {
+  if (args.help || !baseArgument) {
     printUsage()
     console.log("")
     printFlags()
@@ -79,16 +83,13 @@ async function main(inputArgs: string[]) {
     }
   }
 
-  // Extract base argument
-  const baseArgument = args._.length > 0 ? args._[0] : undefined
-
   /**
    * Now either
    * - Use no configuration (--cmd or -- set)
    * - Find configuration using (--config)
    * - Or generate configuration using (init)
    */
-  const useConfigFile = !(cmd === undefined)
+  const useConfigFile = ((cmd === undefined) && !args.config) || (!!baseArgument && !(baseArgument === "run" && args.cmd))
   let configFile
   if (useConfigFile) {
     configFile = await findConfigFile(useConfigFile, checkedArgs.config)
@@ -110,12 +111,6 @@ async function main(inputArgs: string[]) {
     }
   }
 
-  // Exit if no configuration file was found, or specified configuration file were not found
-  if (useConfigFile && !configFile) {
-    console.error("Configuration file not found.")
-    Deno.exit(1)
-  }
-
   /**
    * Now, the arguments to modify existing configuration files and exit
    * - append - Append configuration to existing configuration file and exit
@@ -127,7 +122,7 @@ async function main(inputArgs: string[]) {
       console.log(`Process '${args.id}' appended to configuration file '${configFile}'.`)
       Deno.exit(0)
     } else {
-      console.log(`Configuration file '${configFile}' not found, use --init if you want to create a new one. Exiting.`)
+      console.log(`Configuration file '${configFile}' not found, use init if you want to create a new one. Exiting.`)
       Deno.exit(1)
     }
   }
@@ -138,9 +133,15 @@ async function main(inputArgs: string[]) {
       console.log(`Process '${args.id}' removed from configuration file '${configFile}'.`)
       Deno.exit(0)
     } else {
-      console.log("Configuration file '${fallbackedConfigFile}' not found, use --init if you want to create a new one. Exiting.")
+      console.log("Configuration file '${fallbackedConfigFile}' not found, use init if you want to create a new one. Exiting.")
       Deno.exit(1)
     }
+  }
+
+  // Exit if no configuration file was found, or specified configuration file were not found
+  if (useConfigFile && !configFile) {
+    console.error("Configuration file not found.")
+    Deno.exit(1)
   }
 
   /**
@@ -194,7 +195,7 @@ async function main(inputArgs: string[]) {
 
   /**
    * Now when the configuration file is located
-   * --status, print status for current running instance, and exit.
+   * status, print status for current running instance, and exit.
    */
   if (baseArgument === "status") {
     if (!statusFile || !configFile) {
@@ -209,12 +210,16 @@ async function main(inputArgs: string[]) {
 
   // Handle --restart, --stop etc using IPC
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
+    if (baseArgument === op && !secondaryBaseArgument) {
+      console.error(`Control functions require an id, specify with '${baseArgument} all|<task-id>'`)
+      Deno.exit(1)
+    }
     if (baseArgument === op) {
       // If status file doesn't exist, don't even try to communicate
       try {
         if (await getStatus(configFile, statusFile) && ipcFile) {
           const ipc = new FileIPC(ipcFile)
-          await ipc.sendData(JSON.stringify({ [op]: args[op] || true }))
+          await ipc.sendData(JSON.stringify({ [op]: secondaryBaseArgument || true }))
           console.log("Command sent.")
           Deno.exit(0)
         } else {
@@ -253,9 +258,14 @@ async function main(inputArgs: string[]) {
     console.error("No processes defined, exiting.")
     Deno.exit(1)
   }
+
   /**
    * Ready to start pup!
    */
+  if (baseArgument !== "run") {
+    console.error("Trying to start pup without 'run' argument, this should not happen. Exiting.")
+    Deno.exit(1)
+  }
 
   try {
     const pup = new Pup(configuration, configFile ?? undefined)
