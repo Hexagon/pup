@@ -11,6 +11,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.3] - 2023-04-04
+
+- Bugfix, '--' not recognized as a command when running without configuration.
+
 ## [1.0.0-beta.2] - 2023-04-04
 
 - CLI refactor. Add 'run', make no argument print help instead of start. Remove -- from start/stop/... and status.

@@ -20,7 +20,7 @@ General flags are used to control the basic behavior of Pup and can be combined 
 ## Controlling running instances
 
 The pup CLI can be used to control running instances, using the following command line flags. Run in a directory with a `pup.json`, or point to the correct instance configuration using
-`--config "path/to/config"`.
+`--config "path/to/config"` or short option `-c "path/to/config"`.
 
 - `restart all|process-id`: Restarts, or starts, the running processes `process-id`, or all processes
 - `start all|process-id`: Starts the running processes `process-id`, or all processes if not already running
@@ -99,6 +99,12 @@ The same example, using short aliases for the command line parameters.
 
 ```bash
 pup run -AC "deno run server.ts"
+```
+
+It is also possible to specify command using '--' instead of '-C'. In this case, the command should be written without quotation marks. 
+
+```bash
+pup run -A -- deno run server.ts
 ```
 
 ## Working directory
