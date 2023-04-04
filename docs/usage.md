@@ -101,7 +101,7 @@ The same example, using short aliases for the command line parameters.
 pup run -AC "deno run server.ts"
 ```
 
-It is also possible to specify command using '--' instead of '-C'. In this case, the command should be written without quotation marks. 
+It is also possible to specify command using '--' instead of '-C'. In this case, the command should be written without quotation marks.
 
 ```bash
 pup run -A -- deno run server.ts
