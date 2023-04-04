@@ -11,6 +11,11 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.4] - 2023-04-04
+
+- Fix: Regression bug where `--upgrade` were not recognized at cli.
+- Add alias `--update` for `--upgrade`.
+
 ## [1.0.0-beta.3] - 2023-04-04
 
 - Bugfix, '--' not recognized as a command when running without configuration.

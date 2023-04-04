@@ -46,13 +46,6 @@ async function main(inputArgs: string[]) {
     Deno.exit(0)
   }
 
-  if (args.help || !baseArgument) {
-    printUsage()
-    console.log("")
-    printFlags()
-    Deno.exit(0)
-  }
-
   if (args.upgrade !== undefined) {
     try {
       await upgrade(args.upgrade || "latest")
@@ -60,6 +53,13 @@ async function main(inputArgs: string[]) {
       console.error(`Could not upgrade pup, error: ${e.message}`)
       Deno.exit(1)
     }
+  }
+
+  if (args.help || !baseArgument) {
+    printUsage()
+    console.log("")
+    printFlags()
+    Deno.exit(0)
   }
 
   /**

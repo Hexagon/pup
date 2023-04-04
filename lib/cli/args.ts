@@ -45,6 +45,7 @@ function parseArguments(args: string[]): Args {
     "watch": "w",
     "cron": "O",
     "cwd": "W",
+    "update": "upgrade",
   }
 
   return parse(args, { alias, boolean: booleanArgs, string: stringArgs, stopEarly: false, "--": true })

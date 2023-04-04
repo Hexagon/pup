@@ -34,7 +34,6 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
     "--": [],
   }
 
-  console.log(parsedArgs)
   assertEquals(parsedArgs, expectedArgs)
 })
 
