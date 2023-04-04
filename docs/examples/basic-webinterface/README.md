@@ -20,7 +20,7 @@ The **work-in-progress** web interface plugin is enabled and available at <http:
 
 `cd` to `/docs/examples/basic-webinterface` directory.
 
-Start example by running `pup` if pup is installed, or something like `deno run -A ../../../pup.ts` if not.
+Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 
 Browse to <http://localhost:5000/>
 
