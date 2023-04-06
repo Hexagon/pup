@@ -90,6 +90,24 @@ If you want to install multiple services, supply a name:
 
 `sudo pup service install --name my-service`
 
+**Full reference for service argument**
+
+`pup service <method> [...flags]`
+
+Available methods
+
+- `install` - Installs the configured pup instance as a system service, then verifies the installation by enabling and starting the service. Will roll back any changes on error.
+- `generate` - Generates the configuration, and prints it to stdout along with a suitable path. Will make no changes to the system.
+
+Available flags
+
+- `--config` - Points out the configuration file for the instance to be installed, defaults to `pup.json` or `pup.jsonc` in the current directory.
+- `--name` - Name for the service, defaults to `pup`.
+- `--system` - Installs the service on system level. Default is to install in user level.
+- `--home` - Use a specific home directory, defaults to $HOME of current user.
+- `--user` - Use a user other than current, only used in system-mode.
+- `--cwd` - Use a working directory other than default. Defaults to the location of `pup.json`.
+
 ### Installing a systemd user service manually
 
 Systemd is a system and service manager for Linux. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the systemd user mode, which
