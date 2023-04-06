@@ -15,51 +15,11 @@ Docker is a platform for running applications in containers, and it is the prefe
 > **Note** If you just need to start a single process and keep it alive, you probably don't need Pup at all. Just follow these instructions and replace the command for Pup with your own application
 > entrypoint.
 
-## Using Docker
-
-Docker is a platform for running applications in containers. A container is a lightweight, standalone, and executable package of software that includes everything needed to run an application. Docker
-provides an easy way to package and distribute applications.
-
-This works on all platforms (Mac, Windows and Linux), and is the preferred way of running pup instances.
-
-1. Make sure to have a working `pup.json` in your current directory.
-
-2. Add a file named `Dockerfile`
-
-```
-# Adjust this line to the deno version of your choice
-FROM denoland/deno:debian-1.31.1
-
-# This copies all files in the current working directory to /app in the
-# docker image. 
-RUN mkdir /app
-COPY . /app/
-
-# Install pup - Pin this url to a specific version in production
-RUN ["deno","install","-Afr","pup", "https://deno.land/x/pup/pup.ts"]
-
-# Go!
-ENTRYPOINT ["sh", "-c", "cd /app && pup run"]
-```
-
-Build the Docker image using the following command:
-
-```
-docker build -t my-pup-image .
-```
-
-This will build a Docker image named `my-pup-image` using the Dockerfile in the current directory.
-
-```
-docker run -d --restart=always --name my-pup-container my-pup-image
-```
-
-This will start a Docker container named my-pup-container using the my-pup-image image. The container will be started in the background (`-d`), and it will be restarted automatically if it fails
-(`--restart=always`).
-
-## Using a systemd service
+## Using the CLI
 
 ### Using the service configuration helper
+
+If you run systemd on Linux, or launchd on macOS, you can use `pup service install` to have your instance lanch at boot. Just follow the guide below.
 
 Set up a working environment, so that you can run `pup run` with a `pup.json` in the current directory, or so that you can start pup by using `pup run --config /path/to/pup.json`, then run the
 following command to install as a systemd service.
@@ -107,6 +67,50 @@ Available flags
 - `--home` - Use a specific home directory, defaults to $HOME of current user.
 - `--user` - Use a user other than current, only used in system-mode.
 - `--cwd` - Use a working directory other than default. Defaults to the location of `pup.json`.
+
+## Using Docker
+
+Docker is a platform for running applications in containers. A container is a lightweight, standalone, and executable package of software that includes everything needed to run an application. Docker
+provides an easy way to package and distribute applications.
+
+This works on all platforms (Mac, Windows and Linux), and is the preferred way of running pup instances.
+
+1. Make sure to have a working `pup.json` in your current directory.
+
+2. Add a file named `Dockerfile`
+
+```
+# Adjust this line to the deno version of your choice
+FROM denoland/deno:debian-1.31.1
+
+# This copies all files in the current working directory to /app in the
+# docker image. 
+RUN mkdir /app
+COPY . /app/
+
+# Install pup - Pin this url to a specific version in production
+RUN ["deno","install","-Afr","pup", "https://deno.land/x/pup/pup.ts"]
+
+# Go!
+ENTRYPOINT ["sh", "-c", "cd /app && pup run"]
+```
+
+Build the Docker image using the following command:
+
+```
+docker build -t my-pup-image .
+```
+
+This will build a Docker image named `my-pup-image` using the Dockerfile in the current directory.
+
+```
+docker run -d --restart=always --name my-pup-container my-pup-image
+```
+
+This will start a Docker container named my-pup-container using the my-pup-image image. The container will be started in the background (`-d`), and it will be restarted automatically if it fails
+(`--restart=always`).
+
+## Using a systemd service
 
 ### Installing a systemd user service manually
 
