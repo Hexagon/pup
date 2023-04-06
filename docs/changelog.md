@@ -11,6 +11,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.6 - 1.0.0-beta.9] - 2023-04-07
+
+- Add service installer, supporting systemd and launchd
+
 ## [1.0.0-beta.5] - 2023-04-04
 
 - Fix: Regression bug where `--config` were not recognized at cli.
