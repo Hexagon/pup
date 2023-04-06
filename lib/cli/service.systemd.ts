@@ -88,33 +88,36 @@ async function installServiceSystemd(options: InstallServiceOptions, onlyGenerat
     console.log("\nConfiguration:\n")
     console.log(serviceFileContent)
   } else {
-    // ToDo: Remember to rollback on failure
     await Deno.writeTextFile(servicePath, serviceFileContent)
 
-    // Additional steps to finish the installation
-    await Deno.writeTextFile(servicePath, serviceFileContent)
+    // Run systemctl daemon-reload
     const daemonReloadCommand = new Deno.Command("systemctl", { args: [system ? "" : "--user", "daemon-reload"], stderr: "piped", stdout: "piped" })
     const daemonReload = daemonReloadCommand.spawn()
-    const daemonStatus = await daemonReload.status
-    if (!daemonStatus.success) {
-      rollbackSystemd(serviceFileContent, system)
-      throw new Error("Failed to reload daemon, rolled back any changes.")
+    const daemonReloadOutput = await daemonReload.output()
+    const daemonReloadText = new TextDecoder().decode(daemonReloadOutput.stderr)
+    if (!daemonReloadOutput.success) {
+      await rollbackSystemd(servicePath, system)
+      throw new Error("Failed to reload daemon, rolled back any changes. Error: \n" + daemonReloadText)
     }
 
+    // Run systemctl enable
     const enableServiceCommand = new Deno.Command("systemctl", { args: [system ? "" : "--user", "enable", name], stderr: "piped", stdout: "piped" })
     const enableService = enableServiceCommand.spawn()
-    const enableServiceStatus = await enableService.status
-    if (!enableServiceStatus.success) {
-      rollbackSystemd(serviceFileContent, system)
-      throw new Error("Failed to enable service, rolled back any changes.")
+    const enableServiceOutput = await enableService.output()
+    const enableServiceText = new TextDecoder().decode(enableServiceOutput.stderr)
+    if (!enableServiceOutput.success) {
+      await rollbackSystemd(servicePath, system)
+      throw new Error("Failed to enable service, rolled back any changes. Error: \n" + enableServiceText)
     }
 
+    // Run systemctl start
     const startServiceCommand = new Deno.Command("systemctl", { args: [system ? "" : "--user", "start", name], stderr: "piped", stdout: "piped" })
     const startService = startServiceCommand.spawn()
-    const startServiceStatus = await startService.status
-    if (!startServiceStatus.success) {
-      rollbackSystemd(serviceFileContent, system)
-      throw new Error("Failed to start service, rolled back any changes.")
+    const startServiceOutput = await startService.output()
+    const startServiceText = new TextDecoder().decode(startServiceOutput.stderr)
+    if (!startServiceOutput.success) {
+      await rollbackSystemd(servicePath, system)
+      throw new Error("Failed to start service, rolled back any changes. Error: \n" + startServiceText)
     }
 
     console.log(`Service '${name}' installed at '${servicePath}' and enabled.`)
@@ -136,7 +139,7 @@ async function rollbackSystemd(servicePath: string, system: boolean) {
     const daemonReload = daemonReloadCommand.spawn()
     const daemonStatus = await daemonReload.status
     if (!daemonStatus.success) {
-      throw new Error("Failed to reload daemon.")
+      throw new Error("Failed to reload daemon while rolling back.")
     }
     console.log(`Changes rolled back: Removed '${servicePath}'.`)
   } catch (error) {

@@ -68,6 +68,18 @@ export function printFlags() {
     { separator: "empty" },
     { long: "status", description: "Display status for a running instance" },
     { separator: "empty" },
+    { separator: "empty" },
+    { content: "Service installation", spanStart: 1 },
+    { separator: "empty" },
+    { long: "service install", description: "Install pup as a service" },
+    { long: "service generate", description: "Generate and output service configuration, do not install" },
+    { separator: "empty" },
+    { long: "--system", description: "Optional. Install the service system-wide (requires root)." },
+    { long: "--cwd", description: "Optional. Set working directory for service" },
+    { long: "--name", description: "Optional. Set service name" },
+    { long: "--user", description: "Optional. Set service run-as user" },
+    { long: "--home", description: "Optional. Set service home directory" },
+    { separator: "empty" },
   ]
 
   const columns: Column[] = [
