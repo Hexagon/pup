@@ -39,7 +39,7 @@ COPY . /app/
 RUN ["deno","install","-Afr","pup", "https://deno.land/x/pup/pup.ts"]
 
 # Go!
-ENTRYPOINT ["sh", "-c", "cd /app && pup"]
+ENTRYPOINT ["sh", "-c", "cd /app && pup run"]
 ```
 
 Build the Docker image using the following command:
@@ -84,7 +84,7 @@ Description=Pup
 After=network.target
 
 [Service]
-ExecStart=/home/user/.deno/bin/deno run -A https://deno.land/x/pup/pup.ts --config /path/to/your/pup.json
+ExecStart=/home/user/.deno/bin/deno run -A https://deno.land/x/pup/pup.ts run --config /path/to/your/pup.json
 Restart=always
 
 [Install]
@@ -164,6 +164,7 @@ Create a Pup property list (plist) file in the ~/Library/LaunchAgents directory.
   <array>
     <string>/usr/bin/env</string>
     <string>pup</string>
+    <string>run</string>
     <string>--config</string>
     <string>/path/to/your/pup.json</string>
   </array>

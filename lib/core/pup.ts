@@ -236,7 +236,9 @@ class Pup {
 
     // Update process status
     try {
-      this.status.writeToDisk(this.processes)
+      const applicationState = this.status.applicationState(this.processes)
+      this.events.emit("application_state", applicationState)
+      this.status.writeToDisk(applicationState)
     } catch (e) {
       this.logger.error("watchdog", `Heartbeat update failed: ${e}`)
     }
@@ -391,6 +393,7 @@ class Pup {
           const cleanedId = telemetry.sender.trim().toLocaleLowerCase()
           const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
           if (foundProcess) {
+            this.events.emit("process_telemetry", structuredClone(telemetry))
             delete telemetry.sender
             foundProcess?.setTelemetry(telemetry)
           }

@@ -1,0 +1,10 @@
+{
+  "processes": [
+    {
+      "id": "asd",
+      "cmd": [
+        "asd"
+      ]
+    }
+  ]
+}

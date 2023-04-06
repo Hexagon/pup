@@ -20,8 +20,8 @@ directory (configuration `watch: ["."]`).
 
 `cd` to `/docs/examples/watcher` directory.
 
-Start example by running `pup` if pup is installed, pup will automatically pick up the configuration in`pup.jsonc`.
+Start example by running `pup run` if pup is installed, pup will automatically pick up the configuration in`pup.jsonc`.
 
-Run something like `deno run -A ../../../pup.ts` if pup is not installed globally.
+Run something like `deno run -A ../../../pup.ts run` if pup is not installed globally.
 
 Success!

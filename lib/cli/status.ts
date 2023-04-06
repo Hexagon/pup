@@ -1,5 +1,5 @@
 /**
- * Exports functions belonging to --status functionality
+ * Exports functions belonging to 'status' functionality
  * Belongs to Pup cli entrypoint
  *
  * @file      lib/cli/status.ts
@@ -13,8 +13,7 @@ import { Column, Columns, Row } from "./columns.ts"
  * Helper which print the status of all running processes,
  * including this main process
  *
- * Triggered by supplying `--status` or `-s` as a command
- * line argument
+ * Triggered by supplying cli parameter `status`
  *
  * @private
  * @async
@@ -75,7 +74,7 @@ export async function printStatus(configFile: string, statusFile: string) {
     { key: "Started", header: "Started", minWidth: 10 },
     { key: "Exited", header: "Exited", minWidth: 10 },
     { key: "RSS", header: "RSS (byte)", minWidth: 10 },
-    { key: "Signal", header: "Signal", minWidth: 10 },
+    { key: "Signal", header: "Code", minWidth: 10 },
   ]
 
   console.log(`\n${Columns(taskTable, tableColumns)}\n`)

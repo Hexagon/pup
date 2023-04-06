@@ -68,7 +68,8 @@ Deno.test("Status.writeToDisk should not write the status to disk if statusFileN
   const writeFileSpy = spy(Deno, "writeFile")
 
   const status = new Status()
-  status.writeToDisk([])
+  const applicationState = status.applicationState([])
+  status.writeToDisk(applicationState)
 
   assertEquals(writeFileSpy.calls.length, 0)
 
@@ -80,7 +81,8 @@ Deno.test("Status.writeToDisk should catch and log errors", async () => {
   const writeFileSpy = spy(Deno, "writeFile")
 
   const status = new Status(TEST_FILE_PATH)
-  await status.writeToDisk([expectedProcess])
+  const applicationState = status.applicationState([expectedProcess])
+  await status.writeToDisk(applicationState)
 
   assertEquals(writeFileSpy.calls.length, 1)
 

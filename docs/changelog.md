@@ -11,7 +11,30 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta-0] - 2023-03-30
+## [1.0.0-beta.5] - 2023-04-04
+
+- Fix: Regression bug where `--config` were not recognized at cli.
+
+## [1.0.0-beta.4] - 2023-04-04
+
+- Fix: Regression bug where `--upgrade` were not recognized at cli.
+- Add alias `--update` for `--upgrade`.
+
+## [1.0.0-beta.3] - 2023-04-04
+
+- Bugfix, '--' not recognized as a command when running without configuration.
+
+## [1.0.0-beta.2] - 2023-04-04
+
+- CLI refactor. Add 'run', make no argument print help instead of start. Remove -- from start/stop/... and status.
+
+## [1.0.0-beta.1] - 2023-03-30
+
+- Fix --no-config mode. Environment variables were set to undefined which crashed the process runner.
+- Add JavaScript extension to file links by @naltun in #12
+- Fix typos in docs by @Leokuma in #13
+
+## [1.0.0-beta.0] - 2023-03-30
 
 - All intended features in place and working, moving on to beta stage.
 

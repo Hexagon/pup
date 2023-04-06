@@ -24,7 +24,7 @@ new PupTelemetry()
 ```
 
 This will make your process report memory usage and current working directory back to the Pup main process, no further configuration needed. Now you can see memory usage for all processes running
-telemetry (including main process) using `--status` on the cli.
+telemetry (including main process) using `status` on the cli.
 
 **To use the IPC mechanism:**
 
@@ -58,8 +58,8 @@ telemetry.emit("another-process-id", "my-event", { data: { to: "send" } })
 
 `cd` to `/docs/examples/telemetry` directory.
 
-Start example by running `pup` if pup is installed, or something like `deno run -A ../../../pup.ts` if not.
+Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 
-Now open another terminal and issue `pup --status`, a brief overview of current status is shown, including memory usage.
+Now open another terminal and issue `pup status`, a brief overview of current status is shown, including memory usage.
 
 Success!

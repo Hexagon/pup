@@ -8,4 +8,4 @@ COPY . /app/
 RUN ["deno","install","-An","pup", "https://deno.land/x/pup/pup.ts"]
 
 # Go!
-ENTRYPOINT ["sh", "-c", "cd /app && pup"]
+ENTRYPOINT ["sh", "-c", "cd /app && pup run"]

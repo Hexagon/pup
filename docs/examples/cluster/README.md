@@ -21,7 +21,7 @@ Detailed documentation available at [5. Scaling applications](https://hexagon.gi
 
 `cd` to `/docs/examples/cluster` directory.
 
-Run using command `pup`
+Run using command `pup run`
 
 Browse to `http://localhost:3456`
 

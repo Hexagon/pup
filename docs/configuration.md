@@ -29,8 +29,8 @@ Then, add the following basic configuration to the file:
 This defines a single process named example that runs a Deno script (app.ts) with the `--allow-net` flag. You can customize the configuration to suit your needs by adding more processes or updating
 the existing process definition.
 
-> **Note**: If you quickly want to scaffold a new configuration file, you can use the cli helpers `pup --init`, `--append`, and `--remove`. More on this at
-> [Configuring using the cli](/usage.html#configuring-using-the-cli).
+> **Note**: If you quickly want to scaffold a new configuration file, you can use the cli helpers `pup init`, `append`, and `remove`. More on this at
+> [Configuring using the cli](usage.html#configuring-using-the-cli).
 
 ## Process configuration
 
@@ -183,8 +183,8 @@ To activate plugins, add your plugins to the configuration using this pattern:
 
 ## Validating the Configuration
 
-To ensure your configuration is valid, just run `pup` (or `pup --config custom/path/to/config.json`). If using pup as a library, you can use the `validateConfiguration()` function provided by the
-`/lib/core/configuration.ts` file. This function checks if the configuration adheres to the schema and will throw an error if it doesn't.
+To ensure your configuration is valid, just run `pup run` (or `pup run --config custom/path/to/config.json`). If using pup as a library, you can use the `validateConfiguration()` function provided by
+the `/lib/core/configuration.ts` file. This function checks if the configuration adheres to the schema and will throw an error if it doesn't.
 
 With a valid configuration in place, you're ready to use Pup to manage your processes.
 
