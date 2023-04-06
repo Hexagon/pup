@@ -12,8 +12,9 @@ const serviceFileTemplate = `[Unit]
 Description={{name}} (Pup Service)
 
 [Service]
-ExecStart={{pupCommand}}
+ExecStart=/bin/sh -c "{{pupCommand}}"
 Restart=always
+RestartSec=30
 Environment={{path}}
 WorkingDirectory={{workingDirectory}}
 {{extraServiceContent}}
