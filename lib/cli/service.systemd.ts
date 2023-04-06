@@ -66,7 +66,7 @@ async function installServiceSystemd(options: InstallServiceOptions, onlyGenerat
   }
 
   const denoPath = Deno.execPath()
-  const pupCommand = `pup ${config ? `--config ${config}` : ""}`
+  const pupCommand = `pup run ${config ? `--config ${config}` : ""}`
   const pupPath = `PATH=${denoPath}:${home}/.deno/bin`
   const workingDirectory = cwd ? cwd : (config ? new URL(".", config).pathname : Deno.cwd())
 
