@@ -10,9 +10,9 @@ title: " 7. Library usage"
 Pup can be build in in your application. Just import from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
 
 ```ts
-import { Pup, Configuration } from "https://deno.land/x/pup/mod.ts"
+import { Configuration, Pup } from "https://deno.land/x/pup/mod.ts"
 
-const configuration : Configuration = {
+const configuration: Configuration = {
   "logger": {
     /* optional */
   },

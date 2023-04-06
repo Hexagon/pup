@@ -1,93 +1,71 @@
 /**
- * Exports helper functions to install a pup instance as a systemd service
+ * Exports helper functions to install a pup instance as a systemd service on Linux or a launchd service on macOS.
+ * Throws an error on Windows.
  *
  * @file      lib/cli/service.ts
  * @license   MIT
  */
 
-import { existsSync } from "../../deps.ts"
-
 /**
  * Options for the installService function.
  *
  * @interface InstallServiceOptions
- * @property {boolean} [user=true] - Indicates whether to use user mode (default: true).
- * @property {string} [name='pup'] - Name of the systemd service (default: 'pup').
+ * @property {boolean} [system] - Indicates whether to use system mode (default is to use user mode).
+ * @property {string} [name='pup'] - Name of the service (default: 'pup').
  * @property {string} [config] - Path to the configuration file (default: undefined).
+ * @property {string} [user] - The username to run the service as (default: current user).
+ * @property {string} [home] - The user's home directory path (default: current user's home).
+ * @property {string} [cwd] - The working directory for the service (default: current working directory).
  */
 interface InstallServiceOptions {
-  user?: boolean
+  system?: boolean
   name?: string
   config?: string
+  user?: string
+  home?: string
+  cwd?: string
 }
 
-const serviceFileTemplate = `[Unit]
-Description={{name}} service
-
-[Service]
-ExecStart={{pupCommand}}
-Restart=always
-Environment={{path}}
-{{extraServiceContent}}
-
-[Install]
-WantedBy=multi-user.target
-`
-
 /**
- * Installs pup as a systemd service, checking for existing services with the same name
- * and enabling linger if running in user mode.
+ * Installs pup as a systemd service on Linux or a launchd service on macOS, checking for existing services with the same name
+ * and enabling linger if running in user mode on Linux.
  *
  * @async
  * @function installService
  * @param {InstallServiceOptions} options - Options for the installService function.
  */
-async function installService(options: InstallServiceOptions) {
-  // Default options
-  const { user = true, name = "pup", config } = options
-
-  const serviceFileName = `${name}.service`
-
-  // Different paths for user and system mode
-  const servicePathUser = `${Deno.env.get("HOME")}/.config/systemd/user/${serviceFileName}`
-  const servicePathSystem = `/etc/systemd/system/${serviceFileName}`
-  const servicePath = user ? servicePathUser : servicePathSystem
-
-  // Do not allow to overwrite existing services, regardless of mode
-  if (existsSync(servicePathUser)) {
-    console.error(`Service '${name}' already exists in '${servicePathUser}'. Exiting.`)
-    Deno.exit(1)
-  }
-  if (existsSync(servicePathSystem)) {
-    console.error(`Service '${name}' already exists in '${servicePathSystem}'. Exiting.`)
-    Deno.exit(1)
-  }
-
-  // Require linger to be enabled in user mode
-  if (user) {
-    const { success } = await run({ cmd: ["loginctl", "enable-linger"] })
-    if (!success) {
-      console.error("Failed to enable linger for user mode.")
-      Deno.exit(1)
+async function installService(options: InstallServiceOptions, onlyGenerate: boolean) {
+  if (Deno.build.os === "linux") {
+    const initSystem = await detectInitSystem()
+    if (initSystem === "systemd") {
+      const { installServiceSystemd } = await import("./service.systemd.ts")
+      await installServiceSystemd(options, onlyGenerate)
+    } else {
+      throw new Error("Unsupported init system. Service installation is only supported with systemd on Linux.")
     }
+  } else if (Deno.build.os === "darwin") {
+    const { installServiceLaunchd } = await import("./service.launchd.ts")
+    await installServiceLaunchd(options, onlyGenerate)
+  } else {
+    throw new Error("Unsupported operating system. Service installation is only supported on Linux and macOS.")
   }
+}
 
-  const denoPath = Deno.execPath()
-  const pupCommand = `${denoPath} run -A ${Deno.mainModule} ${config ? `--config ${config}` : ""}`
-  const pupPath = `PATH=$PATH:${denoPath}:$HOME/.deno/bin`
-
-  let serviceFileContent = serviceFileTemplate.replace("{{name}}", name)
-  serviceFileContent = serviceFileContent.replace("{{pupCommand}}", pupCommand)
-  serviceFileContent = serviceFileContent.replace("{{path}}", pupPath)
-
-  // Add user to service file if running in systen mode
-  if (!user) {
-    serviceFileContent = serviceFileContent.replace("{{extraServiceContent}}", user ? `User=${Deno.env.get("USER")}` : "")
+async function detectInitSystem(): Promise<string> {
+  const process = await new Deno.Command("ps", {
+    args: ["-p", "1", "-o", "comm="],
+    stdout: "piped",
+    stderr: "piped",
+  })
+  process.spawn()
+  const output = await process.output()
+  const outputText = new TextDecoder().decode(output.stdout)
+  if (outputText.includes("systemd")) {
+    return "systemd"
+  } else {
+    throw new Error("Unsupported init system.")
   }
-
-  await Deno.writeTextFile(servicePath, serviceFileContent)
-
-  console.log(`Service '${name}' installed at '${servicePath}'.`)
 }
 
 export { installService }
+export type { InstallServiceOptions }

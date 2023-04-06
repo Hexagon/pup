@@ -57,7 +57,40 @@ docker run -d --restart=always --name my-pup-container my-pup-image
 This will start a Docker container named my-pup-container using the my-pup-image image. The container will be started in the background (`-d`), and it will be restarted automatically if it fails
 (`--restart=always`).
 
-## Using a systemd user service
+## Using a systemd service
+
+### Using the service configuration helper
+
+Set up a working environment, so that you can run `pup run` with a `pup.json` in the current directory, or so that you can start pup by using `pup run --config /path/to/pup.json`, then run the
+following command to install as a systemd service.
+
+**User mode (recommended)**
+
+First, make sure `linger` is enabled for your user. This will make user services run without being logged in.
+
+`sudo loginctl enable-linger username`
+
+Replace `username` with your username.
+
+Then:
+
+`pup service install`
+
+If you want to install multiple services, supply a name:
+
+`pup service install --name my-service`
+
+**System mode**
+
+Installing a system service requires elevated privileges, the example uses sudo.
+
+`sudo pup service install --system`
+
+If you want to install multiple services, supply a name:
+
+`sudo pup service install --name my-service`
+
+### Installing a systemd user service manually
 
 Systemd is a system and service manager for Linux. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the systemd user mode, which
 will keep all configuration withing your home directory.

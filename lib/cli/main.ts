@@ -22,7 +22,7 @@ import { fileExists, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
 import { jsonc, path } from "../../deps.ts"
-import { installService } from "./service.ts";
+import { installService } from "./service.ts"
 
 /**
  * Define the main entry point of the CLI application
@@ -95,26 +95,37 @@ async function main(inputArgs: string[]) {
   if (useConfigFile) {
     configFile = await findConfigFile(useConfigFile, checkedArgs.config)
   }
-  console.log(configFile, cmd, args.config)
 
   /**
-   * Handle the install argument 
+   * Handle the install argument
    */
   if (baseArgument === "service") {
+    if (secondaryBaseArgument === "install" || secondaryBaseArgument === "generate") {
+      if (!configFile) {
+        console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
+        Deno.exit(1)
+      }
 
-    if(!configFile) {
-      console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
+      const system = args.system
+      const name = args.name
+      const config = args.config
+      const cwd = args.cwd
+      const user = args.user
+      const home = args.home
+
+      try {
+        await installService({ system, name, config, cwd, user, home }, secondaryBaseArgument === "generate")
+        Deno.exit(0)
+      } catch (e) {
+        console.error(`Could not install service, error: ${e.message}`)
+        Deno.exit(1)
+      }
+    } else {
+      console.error(`Unknown service maintenance command '${secondaryBaseArgument}', exiting.`)
       Deno.exit(1)
     }
-    
-    const user = args.user !== undefined ? args.user : true;
-    const name = args.name;
-    const config = args.config;
-
-    await installService({ user, name, config });
-    Deno.exit(0);
   }
-  
+
   /**
    * Now, handle the argument to generate a new configuration file and exit
    */
