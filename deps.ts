@@ -28,6 +28,8 @@ export { copy } from "https://deno.land/std@0.180.0/streams/mod.ts"
 // core - process
 export { StringReader } from "https://deno.land/std@0.180.0/io/string_reader.ts"
 export { readLines } from "https://deno.land/std@0.180.0/io/mod.ts"
+// service installer
+export { existsSync } from "https://deno.land/std@0.180.0/fs/mod.ts"
 
 /**
  * Third party dependencies

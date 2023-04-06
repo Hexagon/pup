@@ -22,6 +22,7 @@ import { fileExists, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
 import { jsonc, path } from "../../deps.ts"
+import { installService } from "./service.ts";
 
 /**
  * Define the main entry point of the CLI application
@@ -94,6 +95,24 @@ async function main(inputArgs: string[]) {
     configFile = await findConfigFile(useConfigFile, checkedArgs.config)
   }
 
+  /**
+   * Handle the install argument 
+   */
+  if (baseArgument === "service") {
+
+    if(!configFile) {
+      console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
+      Deno.exit(1)
+    }
+    
+    const user = args.user !== undefined ? args.user : true;
+    const name = args.name;
+    const config = args.config;
+
+    await installService({ user, name, config });
+    Deno.exit(0);
+  }
+  
   /**
    * Now, handle the argument to generate a new configuration file and exit
    */
