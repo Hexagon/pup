@@ -96,7 +96,7 @@ async function installServiceSystemd(options: InstallServiceOptions, onlyGenerat
     console.log(`\nStep 1: The systemd configuration has been saved to a temporary file, copy this file to the correct location using the following command:`)
     console.log(`\n  sudo cp ${tempFilePath} ${servicePath}`)
     console.log(`\nStep 2: Reload systemd configuration`)
-    console.log(`\n  sudo systemctl reload-daemon`)
+    console.log(`\n  sudo systemctl daemon-reload`)
     console.log(`\nStep 3: Enable the service`)
     console.log(`\n  sudo systemctl enable ${name}`)
     console.log(`\nStep 4: Start the service now`)
