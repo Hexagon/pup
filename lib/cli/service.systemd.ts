@@ -87,9 +87,21 @@ async function installServiceSystemd(options: InstallServiceOptions, onlyGenerat
     console.log("\nPath: ", servicePath)
     console.log("\nConfiguration:\n")
     console.log(serviceFileContent)
-  } else {
-    await Deno.writeTextFile(servicePath, serviceFileContent)
+  } else if (system) {
+    // Store temporary file
+    const tempFilePath = await Deno.makeTempFile()
+    await Deno.writeTextFile(tempFilePath, serviceFileContent)
 
+    console.log("\nPup do not have (and should not have) root permissions, so the next steps have to be carried out manually.")
+    console.log(`\nStep 1: The systemd configuration has been saved to a temporary file, copy this file to the correct location using the following command:`)
+    console.log(`\n  sudo cp ${tempFilePath} ${servicePath}`)
+    console.log(`\nStep 2: Reload systemd configuration`)
+    console.log(`\n  sudo systemctl reload-daemon`)
+    console.log(`\nStep 3: Enable the service`)
+    console.log(`\n  sudo systemctl enable ${name}`)
+    console.log(`\nStep 4: Start the service now`)
+    console.log(`\n  sudo systemctl start ${name}\n`)
+  } else {
     // Run systemctl daemon-reload
     const daemonReloadCommand = new Deno.Command("systemctl", { args: [system ? "" : "--user", "daemon-reload"], stderr: "piped", stdout: "piped" })
     const daemonReload = daemonReloadCommand.spawn()

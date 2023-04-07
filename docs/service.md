@@ -17,56 +17,60 @@ Docker is a platform for running applications in containers, and it is the prefe
 
 ## Using the CLI
 
-### Using the service configuration helper
+Follow the guide below to install Pup as a system service, which allows your instance to launch at boot, using either systemd on Linux or launchd on macOS. If you are using windows, there is no fully
+automated method available, but you can still do it using the Docker-method further down.
 
-If you run systemd on Linux, or launchd on macOS, you can use `pup service install` to have your instance lanch at boot. Just follow the guide below.
+### Prerequisites
 
-Set up a working environment, so that you can run `pup run` with a `pup.json` in the current directory, or so that you can start pup by using `pup run --config /path/to/pup.json`, then run the
-following command to install as a systemd service.
+Ensure that you have a working environment set up so that you can run `pup run` with a `pup.json` in the current directory, or that you can start Pup using `pup run --config path/to/pup.json`.
 
-**User mode (recommended)**
+Now there is two options, User Mode Installation, or System Installation. User Mode Installation is recommended as it rhymes best with Deno, which is installed for the current user.
 
-First, make sure `linger` is enabled for your user. This will make user services run without being logged in.
+### User Mode Installation (Recommended)
+
+1. Enable `linger` for your user to run user services without being logged in:
 
 `sudo loginctl enable-linger username`
 
-Replace `username` with your username.
+Replace `username` with your actual username.
 
-Then:
+2. Install Pup as a user mode service, named `pup`:
 
 `pup service install`
 
-If you want to install multiple services, supply a name:
+To install multiple services, provide a unique name for each instance:
 
 `pup service install --name my-service`
 
-**System mode**
+### System Mode Installation
 
-Installing a system service requires elevated privileges, the example uses sudo.
+**Note**: This method will include some manual steps, and will requiring privileged access (e.g. sudo).
 
-`sudo pup service install --system`
+1. Install Pup as a system service, by default named `pup`:
 
-If you want to install multiple services, supply a name:
+`pup service install --system`
 
-`sudo pup service install --name my-service`
+To install multiple services, provide a unique name for each instance:
 
-**Full reference for service argument**
+`pup service install --system --name my-service`
 
-`pup service <method> [...flags]`
+2. Follow the on-screen instructions to copy the generated configuration file to the correct location, and enable the service.
 
-Available methods
+### Service Argument Reference
 
-- `install` - Installs the configured pup instance as a system service, then verifies the installation by enabling and starting the service. Will roll back any changes on error.
-- `generate` - Generates the configuration, and prints it to stdout along with a suitable path. Will make no changes to the system.
+Use the `pup service <method> [...flags]` command with the following methods and flags:
 
-Available flags
+- Methods:
+  - `install`: Installs the configured Pup instance as a system service, then verifies the installation by enabling and starting the service. Rolls back any changes on error.
+  - `generate`: Generates the configuration and prints it to stdout along with a suitable path. Makes no changes to the system.
 
-- `--config` - Points out the configuration file for the instance to be installed, defaults to `pup.json` or `pup.jsonc` in the current directory.
-- `--name` - Name for the service, defaults to `pup`.
-- `--system` - Installs the service on system level. Default is to install in user level.
-- `--home` - Use a specific home directory, defaults to $HOME of current user.
-- `--user` - Use a user other than current, only used in system-mode.
-- `--cwd` - Use a working directory other than default. Defaults to the location of `pup.json`.
+- Flags:
+  - `--config`: Specifies the configuration file for the instance to be installed, defaulting to `pup.json` or `pup.jsonc` in the current directory.
+  - `--name`: Sets the service name, defaulting to `pup`.
+  - `--system`: Installs the service at the system level, with the default being user level.
+  - `--home`: Specifies a home directory, defaulting to the current user's $HOME.
+  - `--user`: Specifies a user other than the current user, only used in system-mode.
+  - `--cwd`: Specifies a working directory other than the default, defaulting to the location of `pup.json`.
 
 ## Using Docker
 
@@ -110,9 +114,9 @@ docker run -d --restart=always --name my-pup-container my-pup-image
 This will start a Docker container named my-pup-container using the my-pup-image image. The container will be started in the background (`-d`), and it will be restarted automatically if it fails
 (`--restart=always`).
 
-## Using a systemd service
+## Manual guide using systemd
 
-### Installing a systemd user service manually
+### Installing a systemd user service
 
 Systemd is a system and service manager for Linux. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the systemd user mode, which
 will keep all configuration withing your home directory.
@@ -198,7 +202,7 @@ Enable the Pup service to start at boot using the following command:
 systemctl --user enable pup
 ```
 
-## Using Launchd on macOS
+## Manual guide using launchd
 
 Launchd is a system and service manager for macOS. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the launchd user mode, which
 will keep all configuration withing your home directory, and avoid any need for root privileges.
