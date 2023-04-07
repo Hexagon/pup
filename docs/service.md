@@ -7,10 +7,8 @@ title: " 5. Run at boot"
 
 ---
 
-This section covers three options for running Pup at boot: using [Docker](#using-docker) (for Mac, Windows, and Linux), a [systemd user service](#using-a-systemd-user-service) (for Linux), and
+This section covers three options for running Pup at boot: using [Docker](#using-docker) (for Mac, Windows, and Linux),systemd/sysvinit/docker-init/upstart (for Linux), and
 [Launchd](#using-launchd-on-macos) (for macOS).
-
-Docker is a platform for running applications in containers, and it is the preferred way of running Pup instances. Systemd and Launchd are service managers for Linux and macOS, respectively.
 
 > **Note** If you just need to start a single process and keep it alive, you probably don't need Pup at all. Just follow these instructions and replace the command for Pup with your own application
 > entrypoint.
@@ -24,11 +22,12 @@ automated method available, but you can still do it using the Docker-method furt
 
 Ensure that you have a working environment set up so that you can run `pup run` with a `pup.json` in the current directory, or that you can start Pup using `pup run --config path/to/pup.json`.
 
-Now there is two options, User Mode Installation, or System Installation. User Mode Installation is recommended as it rhymes best with Deno, which is installed for the current user.
+Now there is two options, User Mode Installation, or System Installation. User Mode Installation is recommended as it rhymes best with Deno, which is installed for the current user. User mode is only
+supported with launchd or systemd.
 
 ### User Mode Installation (Recommended)
 
-1. Enable `linger` for your user to run user services without being logged in:
+1. If using systemd, enable `linger` for your user to run user services without being logged in:
 
 `sudo loginctl enable-linger username`
 

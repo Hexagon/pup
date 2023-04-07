@@ -11,6 +11,14 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.12] - 2023-04-08
+
+- Add experimental service installers for sysvinit, docker-init and upstart
+
+## [1.0.0-beta.11] - 2023-04-07
+
+- Fix regression bug affecting user mode service installer
+
 ## [1.0.0-beta.10] - 2023-04-07
 
 - Document manual steps needed to install pup as a system wide service

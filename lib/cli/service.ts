@@ -40,6 +40,12 @@ async function installService(options: InstallServiceOptions, onlyGenerate: bool
     if (initSystem === "systemd") {
       const { installServiceSystemd } = await import("./service.systemd.ts")
       await installServiceSystemd(options, onlyGenerate)
+    } else if (initSystem === "sysvinit" || initSystem === "docker-init") {
+      const { installServiceInit } = await import("./service.init.ts")
+      await installServiceInit(options, onlyGenerate)
+    } else if (initSystem === "upstart") {
+      const { installServiceUpstart } = await import("./service.upstart.ts")
+      await installServiceUpstart(options, onlyGenerate)
     } else {
       throw new Error("Unsupported init system. Service installation is only supported with systemd on Linux.")
     }
@@ -60,8 +66,19 @@ async function detectInitSystem(): Promise<string> {
   process.spawn()
   const output = await process.output()
   const outputText = new TextDecoder().decode(output.stdout)
+
   if (outputText.includes("systemd")) {
     return "systemd"
+  } else if (outputText.includes("init")) {
+    // Check for Upstart
+    if (Deno.statSync("/sbin/initctl").isFile) {
+      return "upstart"
+    }
+    return "sysvinit"
+  } else if (outputText.includes("openrc")) {
+    return "openrc"
+  } else if (outputText.includes("docker-init")) {
+    return "dockerinit"
   } else {
     throw new Error("Unsupported init system.")
   }

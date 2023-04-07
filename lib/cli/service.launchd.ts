@@ -26,7 +26,6 @@ const plistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
 </dict>
 </plist>
 `
-
 async function installServiceLaunchd(options: InstallServiceOptions, onlyGenerate: boolean) {
   // Default options
   // deno-lint-ignore no-unused-vars
@@ -46,13 +45,12 @@ async function installServiceLaunchd(options: InstallServiceOptions, onlyGenerat
   }
 
   const denoPath = Deno.execPath()
-  const pupCommand = `pup ${config ? `--config ${config}` : ""}`
+  const pupCommand = `run ${config ? `--config ${config}` : ""}`
   const pupPath = `PATH=$PATH:${denoPath}:${home}/.deno/bin`
   const workingDirectory = cwd ? cwd : (config ? new URL(".", config).pathname : Deno.cwd())
 
   let plistContent = plistTemplate.replace("{{name}}", name)
-  plistContent = plistContent.replace("{{denoPath}}", denoPath)
-  plistContent = plistContent.replace("{{pupCommand}}", `<string>${pupCommand}</string>`)
+  plistContent = plistContent.replace("{{pupCommand}}", `<string>${denoPath}</string><string>${pupCommand}</string>`)
   plistContent = plistContent.replace("{{path}}", pupPath)
   plistContent = plistContent.replace("{{workingDirectory}}", workingDirectory)
 
@@ -70,8 +68,7 @@ async function installServiceLaunchd(options: InstallServiceOptions, onlyGenerat
     // ToDo: Actually run the service and verify that it works, if not - use the rollback function
     if (system) {
       console.log("Please run the following command as root to load the service:")
-      console.log(`sudo launchctl load
-      ${plistPath}`)
+      console.log(`sudo launchctl load ${plistPath}`)
     } else {
       console.log("Please run the following command to load the service:")
       console.log(`launchctl load ${plistPath}`)
