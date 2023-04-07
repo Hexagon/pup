@@ -102,6 +102,9 @@ async function installServiceSystemd(options: InstallServiceOptions, onlyGenerat
     console.log(`\nStep 4: Start the service now`)
     console.log(`\n  sudo systemctl start ${name}\n`)
   } else {
+    // Write configuration
+    await Deno.writeTextFile(servicePath, serviceFileContent)
+
     // Run systemctl daemon-reload
     const daemonReloadCommand = new Deno.Command("systemctl", { args: [system ? "" : "--user", "daemon-reload"], stderr: "piped", stdout: "piped" })
     const daemonReload = daemonReloadCommand.spawn()
