@@ -61,6 +61,7 @@ interface ProcessConfiguration {
   watch?: string[]
   autostart?: boolean
   cron?: string
+  terminate?: string
   timeout?: number
   overrun?: boolean
   logger?: ProcessLoggerConfiguration
@@ -113,6 +114,7 @@ const ConfigurationSchema = z.object({
       autostart: z.optional(z.boolean()),
       watch: z.optional(z.array(z.string())),
       cron: z.optional(z.string().min(9).max(256)),
+      terminate: z.optional(z.string().min(9).max(256)),
       restart: z.optional(z.enum(["always", "error"])),
       restartDelayMs: z.number().min(0).max(24 * 60 * 60 * 1000 * 1).default(10000), // Max one day
       overrun: z.optional(z.boolean()),
@@ -144,7 +146,7 @@ function validateConfiguration(unsafeConfiguration: unknown): Configuration {
  * Configuration file generator
  */
 
-function generateConfiguration(id: string, commandArray: string[], cwd?: string, cron?: string, autostart?: boolean, watch?: string) {
+function generateConfiguration(id: string, commandArray: string[], cwd?: string, cron?: string, terminate?: string, autostart?: boolean, watch?: string) {
   const configuration: Configuration = {
     processes: [],
   }
@@ -158,6 +160,7 @@ function generateConfiguration(id: string, commandArray: string[], cwd?: string,
 
   if (cwd) processConfiguration.cwd = cwd
   if (cron) processConfiguration.cron = cron
+  if (terminate) processConfiguration.terminate = terminate
   if (autostart) processConfiguration.autostart = autostart
   if (watch) processConfiguration.watch = [watch]
 

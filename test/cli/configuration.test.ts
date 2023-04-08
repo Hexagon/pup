@@ -6,10 +6,11 @@ Deno.test("generateConfiguration: create a basic configuration", () => {
   const cmd = ["npm", "start"]
   const cwd = "/path/to/project"
   const cron = "* * * * *"
+  const terminate = "*/5 * * * *"
   const autostart = true
   const watch = ". test"
 
-  const config = generateConfiguration(id, cmd, cwd, cron, autostart, watch)
+  const config = generateConfiguration(id, cmd, cwd, cron, terminate, autostart, watch)
 
   assertEquals(config, {
     processes: [{
@@ -17,6 +18,7 @@ Deno.test("generateConfiguration: create a basic configuration", () => {
       cmd: ["npm", "start"],
       cwd,
       cron,
+      terminate,
       autostart,
       watch: [". test"],
     }],

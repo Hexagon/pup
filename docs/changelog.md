@@ -11,6 +11,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.13] - 2023-04-08
+
+- Add configuration option `terminate: "<cron pattern>"`, wich can be used to force-restart a process on a cron schedule.
+
 ## [1.0.0-beta.12] - 2023-04-08
 
 - Add experimental service installers for sysvinit, docker-init and upstart

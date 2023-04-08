@@ -51,6 +51,8 @@ Deno.test("String options and aliases are parsed correctly", () => {
     "id",
     "--cron",
     "cron",
+    "--terminate",
+    "terminate",
   ]
   const parsedArgs = parseArguments(inputArgs)
   const expectedArgs = {
@@ -72,6 +74,9 @@ Deno.test("String options and aliases are parsed correctly", () => {
 
     cron: "cron",
     O: "cron",
+
+    terminate: "terminate",
+    T: "terminate",
 
     A: false,
     autostart: false,
@@ -107,6 +112,17 @@ Deno.test("checkArguments should throw error when cron argument is provided with
     },
     Error,
     "Argument '--cron' requires 'init', 'append' or '--cmd'",
+  )
+})
+
+Deno.test("checkArguments should throw error when terminate argument is provided without init or append", async () => {
+  const args = { _: [], terminate: true }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "Argument '--terminate' requires 'init', 'append' or '--cmd'",
   )
 })
 

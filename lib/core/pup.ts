@@ -214,8 +214,7 @@ class Pup {
               /* Restart on error if ProcessState is ERRORED */
             } else if (
               restartPolicy === "error" &&
-              status.status === ProcessState.ERRORED &&
-              status.code !== 143
+              status.status === ProcessState.ERRORED
             ) {
               process.start("restart", true)
             }

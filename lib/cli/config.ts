@@ -18,7 +18,7 @@ import { fileExists } from "../common/utils.ts"
  */
 export async function createConfigurationFile(configFile: string, checkedArgs: Args, cmd: string[]) {
   try {
-    const config = generateConfiguration(checkedArgs.id, cmd, checkedArgs.cwd, checkedArgs.cron, checkedArgs.autostart, checkedArgs.watch)
+    const config = generateConfiguration(checkedArgs.id, cmd, checkedArgs.cwd, checkedArgs.cron, checkedArgs.terminate, checkedArgs.autostart, checkedArgs.watch)
     await Deno.writeTextFile(configFile, JSON.stringify(config, null, 2))
   } catch (e) {
     console.error("Could not create/write configuration file: ", e)
@@ -49,7 +49,7 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
     }
 
     // Generate new configuration
-    const newConfiguration = generateConfiguration(checkedArgs.id, cmd, checkedArgs.cwd, checkedArgs.cron, checkedArgs.autostart, checkedArgs.watch)
+    const newConfiguration = generateConfiguration(checkedArgs.id, cmd, checkedArgs.cwd, checkedArgs.cron, checkedArgs.terminate, checkedArgs.autostart, checkedArgs.watch)
     const newProcess = newConfiguration.processes[0]
 
     // Check that task id does not already exist

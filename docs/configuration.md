@@ -61,6 +61,10 @@ You need to specify one of these for each process, else the process will never s
 - `restartDelayMs` (optional): A number specifying the delay (in milliseconds) before restarting the process.
 - `restartLimit` (optional): A number specifying the maximum number of restarts allowed for the process.
 
+**Stop/restart policy**
+
+- `terminate` (optional): A cron expression specifying when the process should terminate. Combined with `restart: "always"` this effectively restarts the process on a cron schedule.
+
 **Clustering**
 
 - `cluster` (optional): An object specifying options to run this process in multiple instances, more on this at [6. Clusters and Load Balancer](/scaling.html)

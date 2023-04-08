@@ -24,7 +24,7 @@ The pup CLI can be used to control running instances, using the following comman
 
 - `restart all|process-id`: Restarts, or starts, the running processes `process-id`, or all processes
 - `start all|process-id`: Starts the running processes `process-id`, or all processes if not already running
-- `stop all|process-id`: Stops the process `process-id`, or all processes, if they are running. Process will restart instantly if configured to.
+- `stop all|process-id`: Stops the process `process-id`, or all processes, if they are running. Process will restart instantly if configured to. Avoid autorestart if needed by first calling block.
 - `block all|process-id`: Block the process `process-id`, or all processes, completely from starting.
 - `unblock all|process-id`: Unblock the process `process-id`, or all processes, allowing it to start again. Will not start the process.
 - `terminate`: Stop all processes and exit.
@@ -54,6 +54,10 @@ The `init` command is used to create a new configuration file with a single proc
 - `--cron <cron>` (optional): Set the cron schedule for the process.
 - `--autostart <autostart>` (optional): Enable or disable autostart for the process (true or false).
 - `--watch <watch>` (optional): Set a path to watch for changes, triggering a restart of the process.
+
+**Stop/restart policy**
+
+- `--terminate <cron>` (optional): Set a cron schedule for the process to terminate, combined with --autostart, this becomes a restart policy.
 
 Example:
 

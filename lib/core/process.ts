@@ -87,7 +87,10 @@ class Process {
   private blocked = false
 
   // Cron job
-  private job?: Cron
+  private cronJob?: Cron
+
+  // Cron job
+  private cronTerminateJob?: Cron
 
   // Status
   private status: ProcessState = ProcessState.CREATED
@@ -150,6 +153,8 @@ class Process {
   public init = () => {
     // Start using cron pattern
     if (this.config.cron) this.setupCron()
+    // Terminate using cron pattern
+    if (this.config.terminate) this.setupCronTerminate()
     // Restart on file/directory watcher
     if (this.config.watch) this.setupWatch(this.config.watch)
     // Send initial process status
@@ -222,18 +227,15 @@ class Process {
 
       /**
        * Exited - Update status
-       *
-       * Treat SIGTERM (Exit Code 143) as a non-error exit, to avoid restarts after
-       * a manual stop
        */
-      if (result.code === 0 || result.code === 143) {
+      if (result.code === 0) {
         this.setStatus(ProcessState.FINISHED)
         logger.log("finished", `Process finished with code ${result.code}`, this.config)
 
         /**
          * Exited - Update status
          *
-         * Treat all exit codes except 0 and 143(SIGTERM) as errors
+         * Treat all exit codes except 0 as errors
          */
       } else {
         this.setStatus(ProcessState.ERRORED)
@@ -289,7 +291,7 @@ class Process {
         this.start("Cron pattern")
         this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
         this.pup.events.emit("process_scheduled", {
-          next: this.job?.nextRun(),
+          next: this.cronJob?.nextRun(),
           status: this.getStatus(),
         })
         this.restarts = 0
@@ -298,14 +300,42 @@ class Process {
       // Initial next run time
       this.pup.logger.log("scheduler", `${this.config.id} is scheduled to run at '${this.config.cron} (${cronJob.nextRun()?.toLocaleString()})'`)
       this.pup.events.emit("process_scheduled", {
-        next: this.job?.nextRun(),
+        next: this.cronJob?.nextRun(),
         status: this.getStatus(),
       })
 
       // Initial next
-      this.job = cronJob
+      this.cronJob = cronJob
     } catch (e) {
       this.pup.logger.error("scheduled", `Fatal error setup up the cron job for '${this.config.id}', process will not autostart. Error: ${e}`)
+    }
+  }
+
+  private setupCronTerminate = () => {
+    try {
+      // ToDo: Take care of env TZ?
+      const cronTerminateJob = new Cron(this.config.terminate as string, { unref: true }, () => {
+        this.stop("Cron termination")
+
+        this.pup.logger.log("scheduler", `${this.config.id} is scheduled to terminate at '${this.config.terminate} (${cronTerminateJob.nextRun()?.toLocaleString()})'`)
+        this.pup.events.emit("process_scheduled_terminate", {
+          next: this.cronTerminateJob?.nextRun(),
+          status: this.getStatus(),
+        })
+        this.restarts = 0
+      })
+
+      // Initial next run time
+      this.pup.logger.log("scheduler", `${this.config.id} is scheduled to terminate at '${this.config.terminate} (${cronTerminateJob.nextRun()?.toLocaleString()})'`)
+      this.pup.events.emit("process_scheduled_terminate", {
+        next: this.cronTerminateJob?.nextRun(),
+        status: this.getStatus(),
+      })
+
+      // Initial next
+      this.cronTerminateJob = cronTerminateJob
+    } catch (e) {
+      this.pup.logger.error("scheduled", `Fatal error setup up the termination cron job for '${this.config.id}', process will not terminate on a schedule. Error: ${e}`)
     }
   }
 

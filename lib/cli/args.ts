@@ -30,6 +30,7 @@ function parseArguments(args: string[]): Args {
     "id",
 
     "cron",
+    "terminate",
 
     "upgrade",
   ]
@@ -44,6 +45,7 @@ function parseArguments(args: string[]): Args {
     "cmd": "C",
     "watch": "w",
     "cron": "O",
+    "terminate": "T",
     "cwd": "W",
     "update": "upgrade",
   }
@@ -82,6 +84,9 @@ function checkArguments(args: Args): Args {
   }
   if (args.cron && !configOptions) {
     throw new Error("Argument '--cron' requires 'init', 'append' or '--cmd'")
+  }
+  if (args.terminate && !configOptions) {
+    throw new Error("Argument '--terminate' requires 'init', 'append' or '--cmd'")
   }
   if (args.watch && !configOptions) {
     throw new Error("Argument '--watch' requires 'init', 'append' or '--cmd'")

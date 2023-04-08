@@ -53,6 +53,7 @@ export function printFlags() {
     { short: "-A", long: "--autostart", description: "Set the new process to start automatically." },
     { short: "-w", long: "--watch", description: "Location to watch for filesystem changes." },
     { short: "-O", long: "--cron", description: "Start according to a cron pattern." },
+    { short: "-T", long: "--terminate", description: "Terminate according to a cron pattern." },
     { short: "-W", long: "--cwd", description: "Working directory for the process." },
     { separator: "empty" },
     { content: "Control a running instance", spanStart: 1 },

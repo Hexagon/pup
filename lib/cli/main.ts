@@ -201,7 +201,7 @@ async function main(inputArgs: string[]) {
       Deno.exit(1)
     }
   } else {
-    configuration = generateConfiguration(args.id || "task", cmd, args.cwd, args.cron, args.autostart, args.watch)
+    configuration = generateConfiguration(args.id || "task", cmd, args.cwd, args.cron, args.terminate, args.autostart, args.watch)
 
     // Change working directory to configuration file directory
     if (args.cwd) {
