@@ -11,6 +11,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.14] - 2023-04-12
+
+- Break out service installer to https://deno.land/x/service
+
 ## [1.0.0-beta.13] - 2023-04-08
 
 - Add configuration option `terminate: "<cron pattern>"`, wich can be used to force-restart a process on a cron schedule.

@@ -38,3 +38,6 @@ export { existsSync } from "https://deno.land/std@0.180.0/fs/mod.ts"
  */
 export { Cron } from "https://deno.land/x/croner@6.0.3-dev.0/dist/croner.js"
 export { z } from "https://deno.land/x/zod@v3.21.4/mod.ts"
+export { installService, uninstallService } from "https://deno.land/x/service@1.0.0-alpha.1/mod.ts"
+export type { InstallServiceOptions, UninstallServiceOptions } from "https://deno.land/x/service@1.0.0-alpha.1/mod.ts"
+

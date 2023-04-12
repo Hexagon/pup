@@ -21,8 +21,7 @@ import { upgrade } from "./upgrade.ts"
 import { fileExists, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
-import { jsonc, path } from "../../deps.ts"
-import { installService } from "./service.ts"
+import { jsonc, path, installService } from "../../deps.ts"
 
 /**
  * Define the main entry point of the CLI application
@@ -110,11 +109,12 @@ async function main(inputArgs: string[]) {
       const name = args.name
       const config = args.config
       const cwd = args.cwd
+      const cmd = `pup run ${config ? `--config ${config}` : ""}`
       const user = args.user
       const home = args.home
 
       try {
-        await installService({ system, name, config, cwd, user, home }, secondaryBaseArgument === "generate")
+        await installService({ system, name, cmd, cwd, user, home }, secondaryBaseArgument === "generate")
         Deno.exit(0)
       } catch (e) {
         console.error(`Could not install service, error: ${e.message}`)
