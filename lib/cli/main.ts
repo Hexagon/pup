@@ -106,7 +106,7 @@ async function main(inputArgs: string[]) {
       }
 
       const system = args.system
-      const name = args.name
+      const name = args.name || "pup"
       const config = args.config
       const cwd = args.cwd
       const cmd = `pup run ${config ? `--config ${config}` : ""}`
