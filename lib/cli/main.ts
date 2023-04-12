@@ -21,7 +21,7 @@ import { upgrade } from "./upgrade.ts"
 import { fileExists, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
-import { jsonc, path, installService } from "../../deps.ts"
+import { installService, jsonc, path } from "../../deps.ts"
 
 /**
  * Define the main entry point of the CLI application
