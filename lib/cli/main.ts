@@ -21,7 +21,7 @@ import { upgrade } from "./upgrade.ts"
 import { fileExists, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
-import { installService, jsonc, path } from "../../deps.ts"
+import { installService, jsonc, path, uninstallService } from "../../deps.ts"
 
 /**
  * Define the main entry point of the CLI application
@@ -118,6 +118,19 @@ async function main(inputArgs: string[]) {
         Deno.exit(0)
       } catch (e) {
         console.error(`Could not install service, error: ${e.message}`)
+        Deno.exit(1)
+      }
+    } else if (secondaryBaseArgument === "uninstall") {
+      const system = args.system
+      const name = args.name || "pup"
+      const home = args.home
+
+      try {
+        await uninstallService({ system, name, home })
+        console.log(`Service '${name}' uninstalled.`)
+        Deno.exit(0)
+      } catch (e) {
+        console.error(`Could not uninstall service, error: ${e.message}`)
         Deno.exit(1)
       }
     } else {
