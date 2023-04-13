@@ -11,6 +11,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.15] - 2023-04-13
+
+- Add service uninstall feature of https://deno.land/x/service to CLI
+
 ## [1.0.0-beta.14] - 2023-04-12
 
 - Break out service installer to https://deno.land/x/service
