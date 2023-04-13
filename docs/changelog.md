@@ -7,8 +7,6 @@ title: "11. Changelog"
 
 ---
 
-# Changelog
-
 All notable changes to this project will be documented in this section.
 
 ## [1.0.0-beta.15] - 2023-04-13
