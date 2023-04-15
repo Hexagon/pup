@@ -187,6 +187,11 @@
                 "type": "number",
                 "minimum": 0
               },
+              "terminate": {
+                "type": "string",
+                "minLength": 9,
+                "maxLength": 256
+              },
               "timeout": {
                 "type": "number",
                 "minimum": 1
