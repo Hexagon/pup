@@ -10,13 +10,9 @@ title: " 5. Run at boot"
 This section covers three options for running Pup at boot: using [Docker](#using-docker) (for Mac, Windows, and Linux),systemd/sysvinit/docker-init/upstart (for Linux), and
 [Launchd](#using-launchd-on-macos) (for macOS).
 
-> **Note** If you just need to start a single process and keep it alive, you probably don't need Pup at all. Just follow these instructions and replace the command for Pup with your own application
-> entrypoint.
-
 ## Using the CLI
 
-Follow the guide below to install Pup as a system service, which allows your instance to launch at boot, using either systemd on Linux or launchd on macOS. If you are using windows, there is no fully
-automated method available, but you can still do it using the Docker-method further down.
+Follow the guide below to install Pup as a system service and launch at boot. The service installer supports Linux (systemd, sysvinit, upstart), Windows and macOS.
 
 ### Prerequisites
 
@@ -25,7 +21,9 @@ Ensure that you have a working environment set up so that you can run `pup run` 
 Now there is two options, User Mode Installation, or System Installation. User Mode Installation is recommended as it rhymes best with Deno, which is installed for the current user. User mode is only
 supported with launchd or systemd.
 
-### User Mode Installation (Recommended)
+### User Mode Installation
+
+> **Note** This mode is only supported with systemd or launchd, but will work witout root privileges.
 
 1. If using systemd, enable `linger` for your user to run user services without being logged in:
 
@@ -43,7 +41,7 @@ To install multiple services, provide a unique name for each instance:
 
 ### System Mode Installation
 
-**Note**: This method will include some manual steps, and will requiring privileged access (e.g. sudo).
+**Note**: This method works for all service managers, but may include some manual steps, and will require privileged access (e.g. sudo).
 
 1. Install Pup as a system service, by default named `pup`:
 

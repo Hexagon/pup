@@ -13,6 +13,7 @@ Pup is a powerful process manager for Deno, designed to simplify the management 
 - **Easy process management:** Define, control, and manage your processes with simple commands and configuration options.
 - **Multiple start policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
 - **Restart policies:** Configure processes to restart automatically, either always or only in case of errors, with optional delay and restart limits.
+- **Run as a service:** Built in service installer for Linux (sysvinit, systemd, upstart), macOS and Windows.
 - **Clustering and load balancing:** Scale your application seamlessly with built-in clustering and load balancing capabilities.
 - **Flexible configuration:** Define global settings and per-process configurations, including logging, working directories, environment variables, and more.
 - **Plugin support:** Extend Pup's functionality with custom plugins for additional features and integrations.
