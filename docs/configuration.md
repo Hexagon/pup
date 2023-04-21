@@ -135,7 +135,7 @@ To change default behavior of the global watcher, use the following properties w
 - `match` (array of strings): The patterns to match for watched files. Default is `["**/_._"]`.
 - `skip` (array of strings): The patterns to exclude from watching. Default is `["**/.git/**"]`.
 
-```json
+```jsonc
 {
   /* This entire section is optional, the defaults are shown below */
   "watcher": {

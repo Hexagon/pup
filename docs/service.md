@@ -156,7 +156,7 @@ Finally you should add a version specifier to `https://deno.land/x/pup/pup.ts`, 
 Note that systemd always expects full paths. Also note that you will need to use full paths to executables in pup.json when running using systemd, alternatively you can use the `path` configuration
 key in each process to add the paths needed, like:
 
-```json
+```jsonc
 {
   "id": "my task",
   "path": "/home/<user>/.deno/bin/",
