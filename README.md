@@ -32,10 +32,14 @@ This readme is primarily for the source code and development of Pup, if you're l
 Before using Pup, you need to have Deno installed on your system. You can download and install Deno with a single command following the instructions provided on the official website:
 <https://deno.land/#installation>
 
-With Deno in place, open your terminal and execute the following command to install or upgrade Pup:
+With Deno in place, open your terminal and execute the following commands to install or upgrade Pup:
 
 ```bash
+# Install
 deno install -Afr https://deno.land/x/pup/pup.ts
+
+# Upgrade/Downgrade
+pup --upgrade
 ```
 
 This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.
