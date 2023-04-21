@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.17] - 2023-04-21
+
+- Dependency update fixing plist generation
+
 ## [1.0.0-beta.16] - 2023-04-19
 
 - Add windows support to service installer
