@@ -1,38 +1,31 @@
-<br>
-<p align="center">
-<img src="https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/resources/pup_dark.png" alt="PUP"><br>
-Universal process manager.<br><br>
-This is the source code repository, documentation available at <a href="https://hexagon.github.io/pup">hexagon.github.io/pup</a>.
-</p>
-<br>
+# Pup - Universal Process Manager
 
-# Pup - The process manager
+![PUP](https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/resources/pup_dark.png)
 
-Pup is a powerful process manager for Deno, designed to simplify the management of your applications and services. Here are some of the key features:
+Pup is a powerful universal process manager developed with Deno, designed to keep your applications and services alive.
 
-- **Easy process management:** Define, control, and manage your processes with simple commands and configuration options.
-- **Multiple start policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
-- **Restart policies:** Configure processes to restart automatically, either always or only in case of errors, with optional delay and restart limits.
-- **Run as a service:** Built in service installer for Linux (sysvinit, systemd, upstart), macOS and Windows.
-- **Clustering and load balancing:** Scale your application seamlessly with built-in clustering and load balancing capabilities.
-- **Flexible configuration:** Define global settings and per-process configurations, including logging, working directories, environment variables, and more.
-- **Plugin support:** Extend Pup's functionality with custom plugins for additional features and integrations.
-- **CLI and programmatic usage:** Manage your processes using the Pup command-line interface, or integrate Pup directly into your Deno applications.
-- **Process Telemetry and IPC:** Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
-  telemetry feature also enables inter-process communication, allowing connected processes to interact with one another.
+*For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.github.io/pup).*
 
-This readme is primarily for the source code and development of Pup, if you're looking for instructions you should head over to <https://hexagon.github.io/pup>
+## Key Features
 
-> **Note** Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes.
+- **Process management**: Manage processes using CLI and/or a configuration file.
+- **Start and restart policies**: Set up processes to start automatically, on a schedule (using cron expressions), or when files change, and configure restart behavior, either always or on errors, with optional delay and limits.
+- **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.
+- **Clustering and load balancing**: Built-in features for application scaling.
+- **Logging**: Monitor and manage logs for your processes, with options for splitting, decoration, colors, and logging to files.
+- **Configuration**: Configure global settings and per-process options, such as logging, directories, and environment variables.
+- **Plugins**: Add custom plugins for more functionality and integrations.
+- **CLI and API**: Use the command-line interface or integrate Pup into Deno applications.
+- **Telemetry and IPC**: Collect data from Deno client processes and enable process communication.
 
-## Quick guide
+> **Note**: Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes.
 
-**Install/Upgrade Pup using deno**
+## Quick Start
 
-Before using Pup, you need to have Deno installed on your system. You can download and install Deno with a single command following the instructions provided on the official website:
-<https://deno.land/#installation>
+### Installation
 
-With Deno in place, open your terminal and execute the following commands to install or upgrade Pup:
+1. Install [Deno](https://deno.land/#installation) on your system.
+2. Install or upgrade Pup using Deno:
 
 ```bash
 # Install
@@ -44,25 +37,31 @@ pup --upgrade
 
 This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.
 
+### Usage Examples
+
 **Single command example**
 
-Use `pup run` with `--cmd` and a restart policy, for example `--autostart`
+Use `pup run` with `--cmd` and a restart policy, for example `--autostart`, this will keep your process running, and require no configuration.
 
 `pup run --cmd "deno run server.ts" --autostart`
 
 **Ecosystem example**
 
-Use the cli helpers to initialise a new configuration file `pup.json`
+1.  Initialise a new configuration file `pup.json`, running a server script using deno.
+    
+    `pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
 
-`pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
+2.  Add hourly task using the cron start policy.
+   
+    `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
-Add hourly task
+3.   Launch your ecosystem.
+    
+     `pup run`
+     
+4.   Optional: Install your ecosystem as a system service. Works systemd, sysvinit, upstart, launchd and Windows service manager.
 
-`pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
-
-Launch your ecosystem
-
-`pup run`
+     `pup service install --name my-service`
 
 For the full manual, see <https://hexagon.github.io/pup>
 
