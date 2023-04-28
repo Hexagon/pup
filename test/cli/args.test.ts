@@ -236,3 +236,50 @@ Deno.test("checkArguments should return the provided arguments when they are val
   const result = checkArguments(expectedArgs)
   assertEquals(result, expectedArgs)
 })
+
+Deno.test("checkArguments should throw error when --env argument is provided without service install", async () => {
+  const args = { _: [], env: "NODE_ENV=production" }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "Argument '--env' can only be used with 'service install' base argument",
+  )
+})
+
+Deno.test("checkArguments should return the provided arguments when service install and --env are used together", () => {
+  const expectedArgs = {
+    _: ["service", "install"],
+    env: "NODE_ENV=production",
+  }
+  const result = checkArguments(expectedArgs)
+  assertEquals(result, expectedArgs)
+})
+
+Deno.test("Collect env arguments formatted as KEY=VALUE", () => {
+  const inputArgs = [
+    "--env",
+    "KEY1=VALUE1",
+    "--env",
+    "KEY2=VALUE2",
+  ]
+  const parsedArgs = parseArguments(inputArgs)
+  const expectedArgs = {
+    env: ["KEY1=VALUE1", "KEY2=VALUE2"],
+    e: ["KEY1=VALUE1", "KEY2=VALUE2"],
+
+    /* All boolean options will be included in output too */
+    version: false,
+    v: false,
+    help: false,
+    h: false,
+    autostart: false,
+    A: false,
+
+    /* Unspecified string options will not be included */
+    _: [],
+    "--": [],
+  }
+  assertEquals(parsedArgs, expectedArgs)
+})

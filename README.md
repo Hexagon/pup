@@ -4,12 +4,13 @@
 
 Pup is a powerful universal process manager developed with Deno, designed to keep your applications and services alive.
 
-*For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.github.io/pup).*
+_For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.github.io/pup)._
 
 ## Key Features
 
 - **Process management**: Manage processes using CLI and/or a configuration file.
-- **Start and restart policies**: Set up processes to start automatically, on a schedule (using cron expressions), or when files change, and configure restart behavior, either always or on errors, with optional delay and limits.
+- **Start and restart policies**: Set up processes to start automatically, on a schedule (using cron expressions), or when files change, and configure restart behavior, either always or on errors,
+  with optional delay and limits.
 - **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.
 - **Clustering and load balancing**: Built-in features for application scaling.
 - **Logging**: Monitor and manage logs for your processes, with options for splitting, decoration, colors, and logging to files.
@@ -47,21 +48,21 @@ Use `pup run` with `--cmd` and a restart policy, for example `--autostart`, this
 
 **Ecosystem example**
 
-1.  Initialise a new configuration file `pup.json`, running a server script using deno.
-    
-    `pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
+1. Initialise a new configuration file `pup.json`, running a server script using deno.
 
-2.  Add hourly task using the cron start policy.
-   
-    `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
+   `pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
 
-3.   Launch your ecosystem.
-    
-     `pup run`
-     
-4.   Optional: Install your ecosystem as a system service. Works systemd, sysvinit, upstart, launchd and Windows service manager.
+2. Add hourly task using the cron start policy.
 
-     `pup service install --name my-service`
+   `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
+
+3. Launch your ecosystem.
+
+   `pup run`
+
+4. Optional: Install your ecosystem as a system service. Works systemd, sysvinit, upstart, launchd and Windows service manager.
+
+   `pup service install --name my-service`
 
 For the full manual, see <https://hexagon.github.io/pup>
 

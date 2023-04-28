@@ -35,6 +35,11 @@ function parseArguments(args: string[]): Args {
     "upgrade",
   ]
 
+  // All collection arguments
+  const collectArgs = [
+    "env",
+  ]
+
   // And a list of aliases
   const alias = {
     "version": "v",
@@ -48,9 +53,10 @@ function parseArguments(args: string[]): Args {
     "terminate": "T",
     "cwd": "W",
     "update": "upgrade",
+    "env": "e",
   }
 
-  return parse(args, { alias, boolean: booleanArgs, string: stringArgs, stopEarly: false, "--": true })
+  return parse(args, { alias, boolean: booleanArgs, string: stringArgs, collect: collectArgs, stopEarly: false, "--": true })
 }
 
 /**
@@ -99,6 +105,11 @@ function checkArguments(args: Args): Args {
   }
   if ((args.init || args.append) && !hasCmd) {
     throw new Error("Arguments 'init' and 'append' requires '--cmd'")
+  }
+
+  // Ensure --env flag can only be used with 'service install' base argument
+  if (args.env && (baseArgument !== "service" || args._[1] !== "install")) {
+    throw new Error("Argument '--env' can only be used with 'service install' base argument")
   }
 
   return args

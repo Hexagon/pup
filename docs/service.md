@@ -68,6 +68,8 @@ Use the `pup service <method> [...flags]` command with the following methods and
   - `--home`: Specifies a home directory, defaulting to the current user's $HOME.
   - `--user`: Specifies a user other than the current user, only used in system-mode.
   - `--cwd`: Specifies a working directory other than the default, defaulting to the location of `pup.json`.
+  - `--env`: Specifies environment variables to be passed to the service, in the format `KEY=VALUE`. Multiple variables can be passed by using the flag multiple times, e.g.,
+    `-e KEY1=VALUE1 -e KEY2=VALUE2`.
 
 ## Using Docker
 

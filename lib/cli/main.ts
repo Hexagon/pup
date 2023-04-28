@@ -112,9 +112,10 @@ async function main(inputArgs: string[]) {
       const cmd = `pup run ${config ? `--config ${config}` : ""}`
       const user = args.user
       const home = args.home
+      const env = args.env || []
 
       try {
-        await installService({ system, name, cmd, cwd, user, home }, secondaryBaseArgument === "generate")
+        await installService({ system, name, cmd, cwd, user, home, env }, secondaryBaseArgument === "generate")
         Deno.exit(0)
       } catch (e) {
         console.error(`Could not install service, error: ${e.message}`)

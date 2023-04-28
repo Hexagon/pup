@@ -26,6 +26,10 @@ export function printFlags() {
     { short: "-v", long: "--version", description: "Output version information and exit" },
     { long: "--upgrade <version>", description: "Upgrade to latest or specifiec version, and exit." },
     { separator: "empty" },
+    { content: "Start pup, use with configuration file, or process configuration flags below", spanStart: 1 },
+    { separator: "empty" },
+    { long: "run", description: "Run a pup instance" },
+    { separator: "empty" },
     { content: "Configuration file", spanStart: 1 },
     { separator: "empty" },
     { short: "-c", long: '--config "path"', description: "Use specific configuration file." },
@@ -36,15 +40,8 @@ export function printFlags() {
     { long: "init", description: "Initialize a new configuration file using the flags below." },
     { long: "append --id proc-id", description: "Append a new process to the configuration file, " },
     { description: "configure using the flags below." },
-
     { long: "remove --id proc-id", description: "Remove a process from a configuration file," },
     { description: "specify process using '--id'." },
-    { separator: "empty" },
-
-    { content: "Start pup, use with configuration file, or process configuration flags below", spanStart: 1 },
-    { separator: "empty" },
-    { long: "run", description: "Run a pup instance" },
-
     { separator: "empty" },
     { content: "Process configuration, used with above config helpers, or '--no-config'", spanStart: 1 },
     { separator: "empty" },
@@ -69,7 +66,6 @@ export function printFlags() {
     { separator: "empty" },
     { long: "status", description: "Display status for a running instance" },
     { separator: "empty" },
-    { separator: "empty" },
     { content: "Service installation", spanStart: 1 },
     { separator: "empty" },
     { long: "service install", description: "Install pup as a service" },
@@ -80,6 +76,9 @@ export function printFlags() {
     { long: "--name", description: "Optional. Set service name" },
     { long: "--user", description: "Optional. Set service run-as user" },
     { long: "--home", description: "Optional. Set service home directory" },
+    { long: "--env", short: "-e", description: "Optional. Set environment variables for service, in the format KEY=VALUE." },
+    { description: "Multiple variables can be passed by using the flag multiple times," },
+    { description: "e.g., --env KEY1=VALUE1 --env KEY2=VALUE2." },
     { separator: "empty" },
   ]
 

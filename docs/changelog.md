@@ -9,7 +9,12 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.18] - 2023-04-21
+## [1.0.0-beta.19] - 2023-04-28
+
+- Support passing one or more global environment variables to the service installer through `--env`
+- Update documentation
+
+## [1.0.0-beta.18] - 2023-04-25
 
 - Dependency update fixing stopping of windows services
 
