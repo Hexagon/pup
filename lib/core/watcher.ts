@@ -25,7 +25,7 @@ export interface WatcherConfig {
 
 export class Watcher implements AsyncIterable<FileEvent[]> {
   private signal = deferred()
-  private changes: { [key: string]: FileAction[] } = {}
+  private changes = new Map<string, FileAction[]>()
   private paths: string[] = []
   private interval = 350
   private exts?: string[] = []
@@ -49,27 +49,22 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
   isWatched(path: string): boolean {
     path = this.verifyPath(path)
 
-    if (this.exts?.length && this.exts?.every((ext) => !path.endsWith(ext))) {
+    if (this.exts?.length && this.exts.every((ext) => !path.endsWith(ext))) {
       return false
     }
 
-    if (
-      this.skip?.length &&
-      this.skip?.some((skip) => path.match(skip))
-    ) {
+    if (this.skip?.length && this.skip.some((skip) => path.match(skip))) {
       return false
     }
 
-    if (
-      this.match?.length && this.match?.every((match) => !path.match(match))
-    ) {
+    if (this.match?.length && this.match.every((match) => !path.match(match))) {
       return false
     }
     return true
   }
 
   private reset(): void {
-    this.changes = {}
+    this.changes.clear()
     this.signal = deferred()
   }
 
@@ -87,7 +82,7 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
     this.watch()
     while (true) {
       await this.signal
-      yield Object.entries(this.changes).map(([path, type]) => ({
+      yield Array.from(this.changes.entries()).map(([path, type]) => ({
         path,
         type,
       }))
@@ -111,8 +106,8 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
         const { kind, paths } = event
         for (const path of paths) {
           if (this.isWatched(path)) {
-            if (!this.changes[path]) this.changes[path] = []
-            this.changes[path].push(kind)
+            if (!this.changes.has(path)) this.changes.set(path, [])
+            this.changes.get(path)!.push(kind)
             debounce()
           }
         }

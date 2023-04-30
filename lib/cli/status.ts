@@ -23,9 +23,7 @@ export async function printStatus(configFile: string, statusFile: string) {
   try {
     status = await getStatus(configFile, statusFile)
     if (!status) {
-      console.error("")
-      console.error("No running instance found.")
-      console.error("")
+      console.error("\nNo running instance found.\n")
       Deno.exit(1)
     }
   } catch (e) {
@@ -106,14 +104,13 @@ export async function getStatus(configFile?: string, statusFile?: string) {
   // A valid status file were found, figure out if it is stale or not
   if (status && status.updated) {
     const parsedDate = Date.parse(status.updated)
-    // Watchdog interval is 2 seconds, allow an extra 8 seconds to pass before allowing a new instance to start after a dirty shutdown
-    if (new Date().getTime() - parsedDate > 20000) {
+    // Watchdog interval is 2 seconds, allow an extra 3 seconds to pass before allowing a new instance to start after a dirty shutdown
+    if (new Date().getTime() - parsedDate > 5000) {
       // Everything is ok, this is definitely a stale file, just continue
       return undefined
-    } else {
-      return status
     }
-  } else {
-    return undefined
+    return status
   }
+
+  return undefined
 }

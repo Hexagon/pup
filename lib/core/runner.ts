@@ -89,6 +89,7 @@ class Runner {
     )
 
     this.process = commander.spawn()
+    this.process.ref()
 
     // Process started, report pid to callback and file
     runningCallback(this.process.pid)
@@ -109,7 +110,7 @@ class Runner {
     return result
   }
 
-  public kill = (signal: Deno.Signal) => {
+  public kill = (signal?: Deno.Signal) => {
     this.process?.kill(signal)
   }
 }

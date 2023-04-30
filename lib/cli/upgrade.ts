@@ -27,53 +27,47 @@ async function getUrl(version: string): Promise<string | undefined> {
 }
 
 export async function upgrade(version?: string): Promise<void> {
-  // Select url
   const latestVersion = await getLatestVersion()
   const currentVersion = Application.version
   const requestedVersion = (!version || version === "latest") ? latestVersion : version
   const requestedVersionUrl = await getUrl(requestedVersion)
 
-  // Already at requested version
   if (currentVersion === requestedVersion) {
-    if (currentVersion === latestVersion) {
-      console.log("\nNothing to do, already at latest version.\n")
-    } else {
-      console.log("\nNothing to do, already at requested version.\n")
-    }
+    let message = "\nNothing to do, already at latest version.\n"
     if (currentVersion !== latestVersion && currentVersion < latestVersion) {
-      console.log(`NOTE: New version available: ${latestVersion}\n`)
+      message = `\nNothing to do, already at requested version.\nNOTE: New version available: ${latestVersion}\n`
     }
+    console.log(message)
     Deno.exit(0)
   }
 
-  // Requested version does not exist
   if (!requestedVersionUrl) {
     console.log(`\nUpgrade failed: Requested version (${requestedVersion}) does not exist.\n`)
     Deno.exit(1)
   }
 
-  // Print status
   const upgradeOrDowngrading = currentVersion > requestedVersion ? "Downgrading" : "Upgrading"
   console.log(`\n${upgradeOrDowngrading} from ${currentVersion} to ${requestedVersion}`)
 
-  console.info(`\nRunning: deno install -qAfr ${requestedVersionUrl}`)
+  console.info(`\nRunning: deno install -qAfr -n pup ${requestedVersionUrl}`)
 
   const childProcess = new Deno.Command(
     "deno",
     {
-      args: ["install", "-qAfr", `${requestedVersionUrl}`],
+      args: ["install", "-qAfr", "-n", "pup", `${requestedVersionUrl}`],
     },
   )
 
-  const result = childProcess.spawn()
+  const process = childProcess.spawn()
+  process.ref()
 
-  const status = await result.status
+  const status = await process.status
 
   if (status.success) {
     console.log(`\nSuccess! Now using ${requestedVersion}.\n`)
+    Deno.exit(0)
   } else {
     console.log(`\n${upgradeOrDowngrading} failed.\n`)
+    Deno.exit(1)
   }
-
-  Deno.exit(0)
 }

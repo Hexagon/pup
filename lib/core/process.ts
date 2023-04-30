@@ -150,7 +150,7 @@ class Process {
     return this.config
   }
 
-  public init = () => {
+  public init() {
     // Start using cron pattern
     if (this.config.cron) this.setupCron()
     // Terminate using cron pattern
@@ -165,7 +165,7 @@ class Process {
     })
   }
 
-  public start = async (reason?: string, restart?: boolean) => {
+  public async start(reason?: string, restart?: boolean) {
     const logger = this.pup.logger
 
     // Do not start if blocked
@@ -258,7 +258,7 @@ class Process {
       try {
         this.status = ProcessState.STOPPING
         this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
-        this.runner?.kill("SIGTERM")
+        this.runner?.kill()
         this.restarts = 0
         return true
       } catch (_e) {
