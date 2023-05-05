@@ -39,7 +39,8 @@ Here's a list of available configuration options for each process:
 **General**
 
 - `id` (**required**): A unique identifier for the process.
-- `cmd` (**required**): An array containing the command and its arguments to run the process.
+- `cmd` (optional): An array containing the command and its arguments to run the process.
+- `worker` (optional): An array containing the worker script as first entry, then any arguments to pass to the worker.
 - `cwd` (optional): The working directory for the process.
 - `env` (optional): An object containing environment variables for the process.
 - `path` (optional): Extra paths that will be **appended** to `PATH` for this process.

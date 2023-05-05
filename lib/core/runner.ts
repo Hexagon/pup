@@ -1,17 +1,13 @@
 import { ProcessConfiguration, Pup } from "./pup.ts"
 import { readLines, StringReader } from "../../deps.ts"
 
-type RunnerCallback = (pid: number) => void
+import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
 
-class Runner {
-  private readonly processConfig: ProcessConfiguration
-  private readonly pup: Pup
-
+class Runner extends BaseRunner {
   private process?: Deno.ChildProcess
 
   constructor(pup: Pup, processConfig: ProcessConfiguration) {
-    this.processConfig = processConfig
-    this.pup = pup
+    super(pup, processConfig)
   }
 
   private async writePidFile() {
@@ -61,6 +57,10 @@ class Runner {
   }
 
   async run(runningCallback: RunnerCallback) {
+    if (!this.processConfig.cmd) {
+      throw new Error("No command specified")
+    }
+
     // Extend enviroment config with PUP_PROCESS_ID
     const env = this.processConfig.env ? structuredClone(this.processConfig.env) : {}
     env.PUP_PROCESS_ID = this.processConfig.id
@@ -107,7 +107,14 @@ class Runner {
     // ... and clean up the pid file
     this.removePidFile()
 
-    return result
+    // Create a RunnerResult
+    const runnerResult: RunnerResult = {
+      code: result.code,
+      signal: result.signal,
+      success: result.success,
+    }
+
+    return runnerResult
   }
 
   public kill = (signal?: Deno.Signal) => {

@@ -45,6 +45,8 @@ Deno.test("String options and aliases are parsed correctly", () => {
     "watched.ts",
     "--cmd",
     "command",
+    "--worker",
+    "worker_script",
     "--cwd",
     "cwd",
     "--id",
@@ -66,8 +68,11 @@ Deno.test("String options and aliases are parsed correctly", () => {
     cmd: "command",
     C: "command",
 
+    worker: "worker_script",
+    W: "worker_script",
+
     cwd: "cwd",
-    W: "cwd",
+    d: "cwd",
 
     id: "id",
     I: "id",
@@ -100,7 +105,7 @@ Deno.test("checkArguments should throw error when autostart argument is provided
       checkArguments(args)
     },
     Error,
-    "Argument '--autostart' requires 'init' or 'append'",
+    "Argument '--autostart' requires 'init' or 'append', '--cmd' or '--worker'",
   )
 })
 
@@ -111,7 +116,7 @@ Deno.test("checkArguments should throw error when cron argument is provided with
       checkArguments(args)
     },
     Error,
-    "Argument '--cron' requires 'init', 'append' or '--cmd'",
+    "Argument '--cron' requires 'init', 'append', '--cmd' or '--worker'",
   )
 })
 
@@ -122,7 +127,7 @@ Deno.test("checkArguments should throw error when terminate argument is provided
       checkArguments(args)
     },
     Error,
-    "Argument '--terminate' requires 'init', 'append' or '--cmd'",
+    "Argument '--terminate' requires 'init', 'append', '--cmd' or '--worker'",
   )
 })
 
@@ -133,7 +138,7 @@ Deno.test("checkArguments should throw error when watch argument is provided wit
       checkArguments(args)
     },
     Error,
-    "Argument '--watch' requires 'init', 'append' or '--cmd'",
+    "Argument '--watch' requires 'init', 'append', '--cmd' or '--worker'",
   )
 })
 
@@ -144,7 +149,18 @@ Deno.test("checkArguments should throw error when cmd argument is provided witho
       checkArguments(args)
     },
     Error,
-    "Argument '--cmd' requires 'init', 'append' or 'run' without config",
+    "Argument '--cmd' or '--worker' requires 'init', 'append' or 'run' without config",
+  )
+})
+
+Deno.test("checkArguments should throw error when worker argument is provided without init, append or run", async () => {
+  const args = { _: [], worker: "command" }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "Argument '--cmd' or '--worker' requires 'init', 'append' or 'run' without config",
   )
 })
 
@@ -155,7 +171,7 @@ Deno.test("checkArguments should throw error when init or append argument is pro
       checkArguments(args)
     },
     Error,
-    "Arguments 'init' and 'append' requires '--cmd'",
+    "Arguments 'init' and 'append' requires '--cmd' or '--worker'",
   )
 })
 
@@ -166,7 +182,7 @@ Deno.test("checkArguments should throw error when both --cmd and -- is specified
       checkArguments(args)
     },
     Error,
-    "'--cmd' and '--' cannot be used at the same time.",
+    "'--cmd', '--worker' and '--' cannot be used at the same time.",
   )
 })
 
@@ -282,4 +298,15 @@ Deno.test("Collect env arguments formatted as KEY=VALUE", () => {
     "--": [],
   }
   assertEquals(parsedArgs, expectedArgs)
+})
+
+Deno.test("checkArguments should throw error when both --cmd and --worker are specified", async () => {
+  const args = { _: [], cmd: "command", worker: "worker_script", init: true, id: "test" }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "'--cmd', '--worker' and '--' cannot be used at the same time.",
+  )
 })

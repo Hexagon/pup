@@ -9,6 +9,17 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.20] - 2023-05-05
+
+- Add feature to run process as service workers (thread) instead of a full process
+- Add service worker example
+- Add `--worker` command line option, make `--cmd` optional, but require one of them.
+- Add `worker:` option, make `cmd:` optional, but require one of them
+- Ref processes, makes sure that child processes exit when pup exit
+- Add -n pup to upgrader
+- Remove explicit kill signal (fix for windows)
+- Use map instead of object in watcher (typescript fix)
+
 ## [1.0.0-beta.19] - 2023-04-28
 
 - Support passing one or more global environment variables to the service installer through `--env`

@@ -47,6 +47,7 @@ The `init` command is used to create a new configuration file with a single proc
 
 - `--id <id>`: Specify the unique identifier for the process.
 - `--cmd <cmd>`: Specify the command to run the process.
+- `--worker <path>`: Specify the path of the worker.
 - `--cwd <cwd>` (optional): Set the working directory for the process.
 
 **Start policy**

@@ -26,6 +26,7 @@ function parseArguments(args: string[]): Args {
     "config",
     "watch",
     "cmd",
+    "worker",
     "cwd",
     "id",
 
@@ -48,10 +49,11 @@ function parseArguments(args: string[]): Args {
     "autostart": "A",
     "config": "c",
     "cmd": "C",
+    "worker": "W",
     "watch": "w",
     "cron": "O",
     "terminate": "T",
-    "cwd": "W",
+    "cwd": "d",
     "update": "upgrade",
     "env": "e",
   }
@@ -73,38 +75,38 @@ function checkArguments(args: Args): Args {
     throw new Error(`Invalid base argument: ${baseArgument}`)
   }
 
-  // if --cmd or -- is used, then we don't use the config file
-  const hasCmd = (args["--"] && args["--"].length > 0) || args.cmd
+  // if --cmd or --worker or -- is used, then we don't use the config file
+  const hasCmd = (args["--"] && args["--"].length > 0) || args.cmd || args.worker
 
   const noConfig = !args.config
 
   const configOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "run" && noConfig)
 
-  if ((args["--"] && args["--"].length > 0) && args.cmd) {
-    throw new Error("'--cmd' and '--' cannot be used at the same time.")
+  if (((args["--"] && args["--"].length > 0) && args.cmd) || (args.cmd && args.worker)) {
+    throw new Error("'--cmd', '--worker' and '--' cannot be used at the same time.")
   }
 
   // Do not allow configuration creation options without init and vice versa
   if (args.autostart && !configOptions) {
-    throw new Error("Argument '--autostart' requires 'init' or 'append' or '--cmd'")
+    throw new Error("Argument '--autostart' requires 'init' or 'append', '--cmd' or '--worker'")
   }
   if (args.cron && !configOptions) {
-    throw new Error("Argument '--cron' requires 'init', 'append' or '--cmd'")
+    throw new Error("Argument '--cron' requires 'init', 'append', '--cmd' or '--worker'")
   }
   if (args.terminate && !configOptions) {
-    throw new Error("Argument '--terminate' requires 'init', 'append' or '--cmd'")
+    throw new Error("Argument '--terminate' requires 'init', 'append', '--cmd' or '--worker'")
   }
   if (args.watch && !configOptions) {
-    throw new Error("Argument '--watch' requires 'init', 'append' or '--cmd'")
+    throw new Error("Argument '--watch' requires 'init', 'append', '--cmd' or '--worker'")
   }
   if (!args.id && (baseArgument === "init" || baseArgument === "append" || baseArgument === "remove")) {
     throw new Error("Arguments 'init', 'append', and 'remove' require '--id'")
   }
   if (hasCmd && !configOptions) {
-    throw new Error("Argument '--cmd' requires 'init', 'append' or 'run' without config")
+    throw new Error("Argument '--cmd' or '--worker' requires 'init', 'append' or 'run' without config")
   }
   if ((args.init || args.append) && !hasCmd) {
-    throw new Error("Arguments 'init' and 'append' requires '--cmd'")
+    throw new Error("Arguments 'init' and 'append' requires '--cmd' or '--worker'")
   }
 
   // Ensure --env flag can only be used with 'service install' base argument

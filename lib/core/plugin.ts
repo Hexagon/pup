@@ -38,7 +38,7 @@ interface PluginProcessInformation {
   restarts?: number
   updated: Date
   pendingRestartReason?: string
-  type: "cluster" | "process"
+  type: "cluster" | "process" | "worker"
 }
 
 interface PluginClusterConfiguration {
@@ -50,7 +50,8 @@ interface PluginClusterConfiguration {
 
 interface PluginProcessConfiguration {
   id: string
-  cmd: string[]
+  cmd?: string[]
+  worker?: string[]
   env?: Record<string, string>
   cwd?: string
   cluster?: PluginClusterConfiguration

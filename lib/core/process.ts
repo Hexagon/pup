@@ -8,6 +8,7 @@
 import { Pup } from "./pup.ts"
 import { Cron } from "../../deps.ts"
 import { Runner } from "./runner.ts"
+import { WorkerRunner } from "./worker.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
 import { TelemetryData } from "../../telemetry.ts"
@@ -58,7 +59,7 @@ interface ProcessInformation {
   updated: Date
   pendingRestartReason?: string
   telemetry?: TelemetryData
-  type: "cluster" | "process"
+  type: "cluster" | "process" | "worker"
 }
 
 interface ProcessInformationParsed {
@@ -81,7 +82,7 @@ class Process {
   public readonly pup: Pup
 
   // Subprocess runner
-  private runner?: Runner
+  private runner?: Runner | WorkerRunner
 
   // Allow manual block
   private blocked = false
@@ -138,7 +139,7 @@ class Process {
       updated: this.updated,
       telemetry: this.telemetry,
       pendingRestartReason: this.pendingRestartReason,
-      type: "process",
+      type: this.config.worker ? "worker" : "process",
     }
   }
 
@@ -205,7 +206,13 @@ class Process {
     this.telemetry = undefined
 
     // Start process (await for it to exit)
-    this.runner = new Runner(this.pup, this.config)
+    if (this.config.worker) {
+      this.runner = new WorkerRunner(this.pup, this.config)
+    } else if (this.config.cmd) {
+      this.runner = new Runner(this.pup, this.config)
+    } else {
+      throw new Error("No command or worker specified")
+    }
 
     // Update restart counter, this is reset on successful exit, new cron run, or manual .stop()
     if (restart) {
@@ -215,7 +222,7 @@ class Process {
     // Try to start
     try {
       this.pendingRestartReason = undefined
-      const result = await this.runner.run((pid: number) => {
+      const result = await this.runner.run((pid?: number) => {
         // Process started
         this.setStatus(ProcessState.RUNNING)
         this.pid = pid

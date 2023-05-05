@@ -8,7 +8,7 @@ _For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.githu
 
 ## Key Features
 
-- **Process management**: Manage processes using CLI and/or a configuration file.
+- **Process management**: Manage processes and service workers using CLI and/or a configuration file.
 - **Start and restart policies**: Set up processes to start automatically, on a schedule (using cron expressions), or when files change, and configure restart behavior, either always or on errors,
   with optional delay and limits.
 - **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.

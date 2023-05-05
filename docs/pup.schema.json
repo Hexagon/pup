@@ -105,6 +105,12 @@
                   "type": "string"
                 }
               },
+              "worker": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
               "cwd": {
                 "type": "string"
               },
@@ -219,8 +225,7 @@
               }
             },
             "required": [
-              "id",
-              "cmd"
+              "id"
             ],
             "additionalProperties": false
           }

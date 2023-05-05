@@ -113,15 +113,13 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
 export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFile?: string): Promise<string | undefined> {
   if (!useConfigFile) return undefined
 
-  if (argumentsConfigFile && await fileExists(argumentsConfigFile)) {
+  if (argumentsConfigFile) {
     return argumentsConfigFile
   }
 
-  if (await fileExists("./pup.json")) {
-    return "./pup.json"
-  } else if (await fileExists("./pup.jsonc")) {
+  if (await fileExists("./pup.jsonc")) {
     return "./pup.jsonc"
   } else {
-    return undefined
+    return "./pup.json"
   }
 }

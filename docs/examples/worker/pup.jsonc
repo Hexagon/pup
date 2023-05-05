@@ -1,0 +1,32 @@
+{
+  // Global logger configuration, all options can be ovverridden per process
+  "logger": {
+    // Decorate console log entries?
+    "decorate": true, // default true
+
+    // Use colors in console?
+    "colors": true, // default true
+
+    // Decorate log file entries?
+    "decorateFiles": true, // default true
+
+    // Write logs to files, if stderr is undefined it will default to the stdout file
+    "stdout": "pup.log", // default undefined
+    "stderr": "pup.error.log" // default undefined or stdout, if defined
+  },
+
+  // Process configuration - Required to be an array, and at least one process definition is required
+  "processes": [
+    // One object per process ...
+    {
+      "id": "kept-alive-worker-server", // Required
+      "worker": ["./server.js"], // Required, first argument is the worker script relative to the config file/cwd, the rest is passed as arguments to the worker
+      "env": { // Default undefined
+        "PORT": "8083"
+      },
+      "autostart": true, // default undefined, process will not autostart by default
+      "restart": "always", // default undefined, process will not restart by default
+      "restartDelayMs": 10000 // default 10000
+    }
+  ]
+}

@@ -83,13 +83,21 @@ async function main(inputArgs: string[]) {
     }
   }
 
+  // Extract worker from arguments
+  let worker
+  if (checkedArgs) {
+    if (checkedArgs.worker) {
+      worker = checkedArgs.worker.split(" ")
+    }
+  }
+
   /**
    * Now either
    * - Use no configuration (--cmd or -- set)
    * - Find configuration using (--config)
    * - Or generate configuration using (init)
    */
-  const useConfigFile = ((cmd === undefined) && !args.config) || (!!baseArgument && !(baseArgument === "run" && cmd))
+  const useConfigFile = !(baseArgument == "run" && (cmd !== undefined || worker !== undefined)) && (checkedArgs.config || baseArgument === "init")
   let configFile
   if (useConfigFile) {
     configFile = await findConfigFile(useConfigFile, checkedArgs.config)
