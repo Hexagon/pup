@@ -9,8 +9,13 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.21] - 2023-05-05
+
+- Regression fix for running without `--config`
+
 ## [1.0.0-beta.20] - 2023-05-05
 
+- Regression fix for running without `--config`
 - Add feature to run process as service workers (thread) instead of a full process
 - Add service worker example
 - Add `--worker` command line option, make `--cmd` optional, but require one of them.
