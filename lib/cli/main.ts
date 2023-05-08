@@ -93,11 +93,12 @@ async function main(inputArgs: string[]) {
 
   /**
    * Now either
-   * - Use no configuration (--cmd or -- set)
+   * - Use no configuration (--cmd or -- set) together with run
    * - Find configuration using (--config)
    * - Or generate configuration using (init)
    */
-  const useConfigFile = !(baseArgument == "run" && (cmd !== undefined || worker !== undefined)) && (checkedArgs.config || baseArgument === "init" || baseArgument === "run")
+  const runWithoutConfig = baseArgument == "run" && (cmd !== undefined || worker !== undefined)
+  const useConfigFile = !runWithoutConfig
   let configFile
   if (useConfigFile) {
     configFile = await findConfigFile(useConfigFile, checkedArgs.config)
