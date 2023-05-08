@@ -70,7 +70,25 @@ function parseArguments(args: string[]): Args {
 function checkArguments(args: Args): Args {
   // Check if the base argument is undefined or valid
   const baseArgument = args._.length > 0 ? args._[0] : undefined
-  const validBaseArguments = ["init", "append", "remove", "status", "terminate", "start", "stop", "restart", "block", "unblock", "run", "service"]
+  const validBaseArguments = [
+    "init",
+    "append",
+    "remove",
+    "status",
+    "terminate",
+    "start",
+    "stop",
+    "restart",
+    "block",
+    "unblock",
+    "run",
+    "service",
+    // Aliases for --equivalent
+    "upgrade",
+    "update", // Allow to use update as alias for upgrade
+    "help",
+    "version",
+  ]
   if (baseArgument !== undefined && (typeof baseArgument !== "string" || !validBaseArguments.includes(baseArgument))) {
     throw new Error(`Invalid base argument: ${baseArgument}`)
   }

@@ -41,12 +41,12 @@ async function main(inputArgs: string[]) {
    * arguments, and just exit
    */
 
-  if (args.version) {
+  if (args.version || baseArgument === "version") {
     printHeader()
     Deno.exit(0)
   }
 
-  if (args.upgrade !== undefined) {
+  if (args.upgrade !== undefined || baseArgument === "upgrade" || baseArgument === "update") {
     try {
       await upgrade(args.upgrade || "latest")
     } catch (e) {
@@ -55,7 +55,7 @@ async function main(inputArgs: string[]) {
     }
   }
 
-  if (args.help || !baseArgument) {
+  if (args.help || !baseArgument || baseArgument === "help") {
     printUsage()
     console.log("")
     printFlags()

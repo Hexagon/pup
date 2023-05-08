@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.22] - 2023-05-08
+
+- Make `--` optional for `--help`, `--version` and `--upgrade`
+
 ## [1.0.0-beta.21] - 2023-05-05
 
 - Regression fix for running without `--config`

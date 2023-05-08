@@ -22,9 +22,9 @@ export function printFlags() {
   const rows: TableRow[] = [
     { content: "General", spanStart: 1, align: "left" },
     { separator: "empty" },
-    { short: "-h", long: "--help", description: "Display this help and exit" },
-    { short: "-v", long: "--version", description: "Output version information and exit" },
-    { long: "--upgrade <version>", description: "Upgrade to latest or specific version, and exit." },
+    { short: "-h", long: "help", description: "Display this help and exit" },
+    { short: "-v", long: "version", description: "Output version information and exit" },
+    { long: "upgrade <version>", description: "Upgrade to latest or specific version, and exit." },
     { separator: "empty" },
     { content: "Start pup, use with configuration file, or process configuration flags below", spanStart: 1 },
     { separator: "empty" },

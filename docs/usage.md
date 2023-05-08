@@ -14,8 +14,9 @@ group and provide examples of usage.
 
 General flags are used to control the basic behavior of Pup and can be combined with other command line parameters.
 
-- `-h, --help`: Display the help message with a list of available commands and options.
-- `-v, --version`: Show the current version of Pup.
+- `-h, help`: Display the help message with a list of available commands and options.
+- `-v, version`: Show the current version of Pup.
+- `upgrade <version>`: Upgrade pup to the lastest, or specified, version.
 
 ## Controlling running instances
 

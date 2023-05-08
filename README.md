@@ -33,7 +33,7 @@ _For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.githu
 deno install -Afr https://deno.land/x/pup/pup.ts
 
 # Upgrade/Downgrade
-pup --upgrade
+pup upgrade
 ```
 
 This command downloads the Pup executable and installs it on your system. The `A` flag grants all permissions, `f` overwrites any existing installation, and `r` ensures no cache is used.

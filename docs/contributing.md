@@ -21,6 +21,7 @@ Pup is an open-source project, and we welcome contributions from the community. 
 - Create a new branch for your changes and implement the desired feature or bug fix.
 - Write tests to ensure your changes are reliable and maintainable.
 - Update the documentation as needed to reflect your changes.
+- Run `deno task build` to check format, lint and test the code.
 - Create a pull request against the main branch of the Pup repository, describing your changes and providing any necessary context.
 - Address any feedback from the maintainers and make any requested changes.
 
