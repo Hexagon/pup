@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this section.
 ## [1.0.0-beta.22] - 2023-05-08
 
 - Make `--` optional for `--help`, `--version` and `--upgrade`
+- Bugfix: Always use config file
+- Feature: Allow to configure process cluster/load balancer using cli run init and append
+- Feature: Allow to configure process logger using cli
 
 ## [1.0.0-beta.21] - 2023-05-05
 

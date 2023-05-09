@@ -16,7 +16,7 @@ General flags are used to control the basic behavior of Pup and can be combined 
 
 - `-h, help`: Display the help message with a list of available commands and options.
 - `-v, version`: Show the current version of Pup.
-- `upgrade <version>`: Upgrade pup to the lastest, or specified, version.
+- `upgrade <version>`: Upgrade pup to the latest, or specified, version.
 
 ## Controlling running instances
 
@@ -51,6 +51,11 @@ The `init` command is used to create a new configuration file with a single proc
 - `--worker <path>`: Specify the path of the worker.
 - `--cwd <cwd>` (optional): Set the working directory for the process.
 
+**Logger**
+
+- `stdout` (optional): Enable logging to file by specify path to the log file, catches both stdout and stderr if stderr is not explicitly specified.
+- `stderr` (optional): Enable logging stderr to file by specify path to the log file.
+
 **Start policy**
 
 - `--cron <cron>` (optional): Set the cron schedule for the process.
@@ -60,6 +65,16 @@ The `init` command is used to create a new configuration file with a single proc
 **Stop/restart policy**
 
 - `--terminate <cron>` (optional): Set a cron schedule for the process to terminate, combined with --autostart, this becomes a restart policy.
+
+**Cluster**
+
+- `--instances <n>`: The number of instances to run using this configuration.
+
+**Load balancer**
+
+- `--start-port <port>`: A number specifying the port on which each instance should listen. This is incremented for each instance and passed by environment variable `PUP_CLUSTER_PORT`.
+- `commonPort <port>`: A number specifying a common port for all instances, opened by the built in load balancer.
+- `strategy <strategy-name>` (optional): Load balancing strategy, should be set to `round-robin`, `least-connections` or `ip-hash`. Defaults to `round-robin`.
 
 Example:
 
@@ -85,9 +100,10 @@ pup append --id anotherprocess --cmd "python script.py" --cwd /path/to/another/p
 
 The `run` argument allows you to start a single process using command line parameters without reading or writing any configuration file. This mode uses default options for logging.
 
-To run Pup in no-config mode, pass `--cmd`, followed by a command and a restart policy. `--id` is optional in this mode.
+To run Pup in no-config mode, pass `--cmd` or `--worker`, followed by a command and a restart policy. `--id` is optional in this mode.
 
 - `--cmd <cmd>`: Specify the command to run the process.
+- `--worker <path>`: Specify the path of the worker.
 
 And one of the start policies
 
@@ -112,6 +128,8 @@ It is also possible to specify command using '--' instead of '-C'. In this case,
 ```bash
 pup run -A -- deno run server.ts
 ```
+
+All of the flags listed in the init/append sections above are usable in this mode.
 
 ## Working directory
 

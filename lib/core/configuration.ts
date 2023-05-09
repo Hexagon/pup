@@ -38,9 +38,9 @@ interface ProcessLoggerConfiguration extends _BaseLoggerConfiguration {
 
 interface ClusterConfiguration {
   instances: number
-  commonPort: number
-  startPort: number
-  strategy: string
+  commonPort?: number
+  startPort?: number
+  strategy?: string
 }
 
 interface GlobalWatcherConfiguration {
@@ -106,9 +106,9 @@ const ConfigurationSchema = z.object({
       cwd: z.optional(z.string()),
       env: z.optional(z.object({})),
       cluster: z.optional(z.object({
-        instances: z.number().min(0).max(65535),
-        commonPort: z.number().min(1).max(65535),
-        startPort: z.number().min(1).max(65535),
+        instances: z.number().min(0).max(65535).default(1),
+        commonPort: z.number().min(1).max(65535).optional(),
+        startPort: z.number().min(1).max(65535).optional(),
         strategy: z.enum(["ip-hash", "round-robin"]).default("round-robin"),
       })),
       pidFile: z.optional(z.string()),
@@ -148,7 +148,21 @@ function validateConfiguration(unsafeConfiguration: unknown): Configuration {
  * Configuration file generator
  */
 
-function generateConfiguration(id: string, commandArray: string[], cwd?: string, cron?: string, terminate?: string, autostart?: boolean, watch?: string) {
+function generateConfiguration(
+  id: string,
+  commandArray: string[],
+  cwd?: string,
+  cron?: string,
+  terminate?: string,
+  autostart?: boolean,
+  watch?: string,
+  instances?: string,
+  startPort?: string,
+  commonPort?: string,
+  strategy?: string,
+  stdout?: string,
+  stderr?: string,
+) {
   const configuration: Configuration = {
     processes: [],
   }
@@ -165,7 +179,20 @@ function generateConfiguration(id: string, commandArray: string[], cwd?: string,
   if (terminate) processConfiguration.terminate = terminate
   if (autostart) processConfiguration.autostart = autostart
   if (watch) processConfiguration.watch = [watch]
-
+  if (instances || startPort || commonPort || strategy) {
+    processConfiguration.cluster = {
+      instances: instances ? parseInt(instances) : 1,
+      startPort: startPort ? parseInt(startPort) : undefined,
+      commonPort: commonPort ? parseInt(commonPort) : undefined,
+      strategy: strategy,
+    }
+  }
+  if (stderr || stdout) {
+    processConfiguration.logger = {
+      stderr,
+      stdout,
+    }
+  }
   configuration.processes.push(processConfiguration)
 
   // Validate configuration before returning

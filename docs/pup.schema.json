@@ -125,7 +125,8 @@
                   "instances": {
                     "type": "number",
                     "minimum": 0,
-                    "maximum": 65535
+                    "maximum": 65535,
+                    "default": 1
                   },
                   "commonPort": {
                     "type": "number",
@@ -146,11 +147,6 @@
                     "default": "round-robin"
                   }
                 },
-                "required": [
-                  "instances",
-                  "commonPort",
-                  "startPort"
-                ],
                 "additionalProperties": false
               },
               "pidFile": {

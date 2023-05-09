@@ -34,6 +34,13 @@ function parseArguments(args: string[]): Args {
     "terminate",
 
     "upgrade",
+
+    "instances",
+    "start-port",
+    "common-port",
+    "strategy",
+    "stdout",
+    "stderr",
   ]
 
   // All collection arguments
@@ -125,6 +132,34 @@ function checkArguments(args: Args): Args {
   }
   if ((args.init || args.append) && !hasCmd) {
     throw new Error("Arguments 'init' and 'append' requires '--cmd' or '--worker'")
+  }
+  if (args.instances && !configOptions) {
+    throw new Error("Argument '--instances' requires 'init', 'append', '--cmd' or '--worker'")
+  }
+  if (args["start-port"] && !configOptions) {
+    throw new Error("Argument '--start-port' requires 'init', 'append', '--cmd' or '--worker'")
+  }
+  if (args["common-port"] && !configOptions) {
+    throw new Error("Argument '--common-port' requires 'init', 'append', '--cmd' or '--worker'")
+  }
+  if (args.strategy && !configOptions) {
+    throw new Error("Argument '--strategy' requires 'init', 'append', '--cmd' or '--worker'")
+  }
+  if (args.stdout && !configOptions) {
+    throw new Error("Argument '--stdout' requires 'init', 'append', '--cmd' or '--worker'")
+  }
+  if (args.stderr && !configOptions) {
+    throw new Error("Argument '--stderr' requires 'init', 'append', '--cmd' or '--worker'")
+  }
+  // Ensure --instances, --start-port, and --common-port are numeric
+  if (args.instances && isNaN(Number(args.instances))) {
+    throw new Error("Argument '--instances' must be a numeric value")
+  }
+  if (args["start-port"] && isNaN(Number(args["start-port"]))) {
+    throw new Error("Argument '--start-port' must be a numeric value")
+  }
+  if (args["common-port"] && isNaN(Number(args["common-port"]))) {
+    throw new Error("Argument '--common-port' must be a numeric value")
   }
 
   // Ensure --env flag can only be used with 'service install' base argument

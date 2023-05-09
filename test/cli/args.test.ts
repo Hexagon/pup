@@ -310,3 +310,97 @@ Deno.test("checkArguments should throw error when both --cmd and --worker are sp
     "'--cmd', '--worker' and '--' cannot be used at the same time.",
   )
 })
+
+Deno.test("checkArguments should allow both --cwd and --id when used together", () => {
+  const args = { _: ["init"], cmd: "command", id: "test", cwd: "cwd" }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --terminate when used with --worker", () => {
+  const args = { _: ["init"], worker: "worker_script", id: "test", terminate: "terminate" }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --watch when used with --worker", () => {
+  const args = { _: ["init"], worker: "worker_script", id: "test", watch: "watched.ts" }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --instances when used with init", () => {
+  const args = { _: ["init"], cmd: "command", id: "test", instances: 2 }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --instances when used with append", () => {
+  const args = { _: ["append"], cmd: "command", id: "test", instances: 2 }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --instances when used with run", () => {
+  const args = { _: ["run"], cmd: "command", instances: 2 }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --start-port when used with init", () => {
+  const args = { _: ["init"], cmd: "command", id: "test", startPort: 3000 }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --start-port when used with append", () => {
+  const args = { _: ["append"], cmd: "command", id: "test", startPort: 3000 }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --start-port when used with run", () => {
+  const args = { _: ["run"], cmd: "command", startPort: 3000 }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should allow --instances and --start-port when used together", () => {
+  const args = { _: ["init"], cmd: "command", id: "test", instances: 2, startPort: 3000 }
+  const result = checkArguments(args)
+  assertEquals(result, args)
+})
+
+Deno.test("checkArguments should throw error when --start-port value is not a number", async () => {
+  const args = { _: ["init"], cmd: "command", id: "test", "start-port": "invalid" }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "Argument '--start-port' must be a numeric value",
+  )
+})
+
+Deno.test("checkArguments should throw error when --instances value is not a number", async () => {
+  const args = { _: ["init"], cmd: "command", id: "test", instances: "invalid" }
+  await assertThrows(
+    () => {
+      const result = checkArguments(args)
+      console.log(result)
+    },
+    Error,
+    "Argument '--instances' must be a numeric value",
+  )
+})
+
+Deno.test("checkArguments should throw error when --common-port value is not a number", async () => {
+  const args = { _: ["init"], cmd: "command", id: "test", "common-port": "invalid" }
+  await assertThrows(
+    () => {
+      checkArguments(args)
+    },
+    Error,
+    "Argument '--common-port' must be a numeric value",
+  )
+})

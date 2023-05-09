@@ -72,7 +72,7 @@ You need to specify one of these for each process, else the process will never s
   - `instances`: The number of instances to run using this configuration.
   - `startPort` (optional): A number specifying the port on which each instance should listen. This is incremented for each instance and passed by environment variable `PUP_CLUSTER_PORT`.
   - `commonPort` (optional): A number specifying a common port for all instances, opened by the built in load balancer.
-  - `strategy` (optional): Load balancing strategy, should be set to "round-robin" or "ip-hash".
+  - `strategy` (optional): Load balancing strategy, should be set to "round-robin", "least-connections" or "ip-hash".
 
 ## Global configuration
 

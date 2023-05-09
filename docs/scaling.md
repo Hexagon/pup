@@ -38,7 +38,7 @@ In this example, Pup will start 4 instances of the process with the ID `my-scala
 - `cluster`: An object containing the settings for the cluster of processes
   - `instances`: The number of instances to be started for the process.
   - `startPort`: The starting port number for the individual process instances.
-  - `commonPort` (optional): Sets the port for the load balancer. **Omitting this entry disables the built in load balancer**
+  - `commonPort`: Sets the port for the load balancer. **Omitting this entry disables the built in load balancer**
   - `strategy` (optional): Strategy for the load balancer, default is 'round-robin', an alternative is 'ip-hash'
 
 Each process will have two additional environment variables set
