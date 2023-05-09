@@ -9,7 +9,7 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.22] - 2023-05-08
+## [1.0.0-beta.22] - 2023-05-09
 
 - Make `--` optional for `--help`, `--version` and `--upgrade`
 - Bugfix: Always use config file
