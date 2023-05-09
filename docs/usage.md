@@ -18,6 +18,30 @@ General flags are used to control the basic behavior of Pup and can be combined 
 - `-v, version`: Show the current version of Pup.
 - `upgrade <version>`: Upgrade pup to the latest, or specified, version.
 
+## Running pup with an Existing Configuration File
+
+You can run Pup with an existing configuration file by using the `run` command, optionally followed by the `--config` option:
+
+```bash
+# This will use pup.json or pup.jsonc in current directory
+pup run
+
+# or
+pup run --config path/to/config-file
+```
+
+## Viewing Logs
+
+You can view the temporary logs stored by the default logger using the `logs` command:
+
+```bash
+# This will use pup.json or pup.jsonc in current directory
+pup logs
+
+# or
+pup logs --config path/to/config-file
+```
+
 ## Controlling running instances
 
 The pup CLI can be used to control running instances, using the following command line flags. Run in a directory with a `pup.json`, or point to the correct instance configuration using

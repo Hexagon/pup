@@ -239,6 +239,25 @@ async function main(inputArgs: string[]) {
     }
   }
 
+  // Prepare log file path
+  // Add a new condition for "logs" base command
+  if (baseArgument === "logs") {
+    if (useConfigFile && configFile) {
+      const logFile = `${toTempPath(configFile as string)}/.log`
+      try {
+        const logContent = await Deno.readTextFile(logFile)
+        console.log(logContent)
+        Deno.exit(0)
+      } catch (e) {
+        console.error(`Could not read log file: ${e.message}`)
+        Deno.exit(1)
+      }
+    } else {
+      console.error("Can not print logs, no configuration file found")
+      Deno.exit(1)
+    }
+  }
+
   // Prepare for IPC
   let ipcFile
   if (useConfigFile) ipcFile = `${toTempPath(configFile as string)}/.main.ipc`

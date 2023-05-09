@@ -90,6 +90,7 @@ function checkArguments(args: Args): Args {
     "unblock",
     "run",
     "service",
+    "logs",
     // Aliases for --equivalent
     "upgrade",
     "update", // Allow to use update as alias for upgrade

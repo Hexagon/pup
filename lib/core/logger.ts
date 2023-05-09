@@ -13,14 +13,27 @@ type AttachedLogger = (severity: string, category: string, text: string, process
 class Logger {
   private config: GlobalLoggerConfiguration = {}
   private attachedLogger?: AttachedLogger
+  private tempLogPath?: string
 
-  constructor(globalConfiguration: GlobalLoggerConfiguration) {
+  constructor(globalConfiguration: GlobalLoggerConfiguration, tempLogPath?: string) {
     this.config = globalConfiguration
+    this.tempLogPath = tempLogPath
   }
 
   // Used for attaching the logger hook
   public attach(pluginLogger: AttachedLogger) {
     this.attachedLogger = pluginLogger
+  }
+
+  public async getTempLogContents(): Promise<string> {
+    if (!this.tempLogPath) return ""
+
+    try {
+      return await Deno.readTextFile(this.tempLogPath)
+    } catch (error) {
+      console.error("Error reading temporary log file:", error)
+      return ""
+    }
   }
 
   private internalLog(severity: string, category: string, text: string, process?: ProcessConfiguration) {
@@ -91,6 +104,11 @@ class Logger {
       this.writeFile(this.config.stdout, decorateGlobalFiles ? decoratedLogText : text)
     }
 
+    // Write to temporary log file
+    if (this.tempLogPath) {
+      this.writeFile(this.tempLogPath, decorateGlobalFiles ? decoratedLogText : text)
+    }
+
     // Write process log file(s)
     const decorateProcessFiles = process?.logger?.decorateFiles ?? false
     // If stderr is not defined but stdout is, use the stdout file
@@ -112,9 +130,11 @@ class Logger {
       console.error(`Failed to write log '${fileName}'. The following message were not logged: ${text}.`)
     }
   }
+
   public log(category: string, text: string, process?: ProcessConfiguration) {
     this.internalLog("log", category, text, process)
   }
+
   public info(category: string, text: string, process?: ProcessConfiguration) {
     this.internalLog("info", category, text, process)
   }

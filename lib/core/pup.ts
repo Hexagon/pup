@@ -40,6 +40,7 @@ class Pup {
     // Setup paths
     let statusFile
     let ipcFile
+    let logFile
     if (configFilePath) {
       this.configFilePath = path.resolve(configFilePath)
 
@@ -50,13 +51,14 @@ class Pup {
 
       statusFile = `${this.temporaryStoragePath}/.status`
       ipcFile = `${this.temporaryStoragePath}/.main.ipc`
+      logFile = `${this.temporaryStoragePath}/.log`
     }
 
     // Throw on invalid configuration
     this.configuration = validateConfiguration(unvalidatedConfiguration)
 
     // Initialise core logger
-    this.logger = new Logger(this.configuration.logger ?? {})
+    this.logger = new Logger(this.configuration.logger ?? {}, logFile)
 
     // EventEmitter
     this.events = new EventEmitter()

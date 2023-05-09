@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this section.
 - Bugfix: Always use config file
 - Feature: Allow to configure process cluster/load balancer using cli run init and append
 - Feature: Allow to configure process logger using cli
+- Feature: Add command line argument logs, which show the logs of the current instance
 
 ## [1.0.0-beta.21] - 2023-05-05
 
