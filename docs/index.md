@@ -9,13 +9,12 @@ title: " 1. Overview"
 
 Pup is a powerful process manager for Deno, designed to simplify the management of your applications and services. Here are some of the key features:
 
-- **Easy process management:** Define, control, and manage your processes with simple commands and configuration options.
-- **Multiple start policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
-- **Restart policies:** Configure processes to restart automatically, either always or only in case of errors, with optional delay and restart limits.
+- **Cross-platform and wide OS compatibility:** Manage processes for various languages and platforms, such as Deno, Node.js, Python, and Ruby on Windows, macOS, and Linux.
+- **Process management:** Define, control, and manage your processes with simple commands and configuration options.
+- **Multiple start/restart policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
+- **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.
 - **Clustering and load balancing:** Scale your application seamlessly with built-in clustering and load balancing capabilities.
-- **Flexible configuration:** Define global settings and per-process configurations, including logging, working directories, environment variables, and more.
-- **Plugin support:** Extend Pup's functionality with custom plugins for additional features and integrations.
-- **CLI and programmatic usage:** Manage your processes using the Pup command-line interface, or integrate Pup directly into your Deno applications.
+- **Plugins:** Extend Pup's functionality with custom plugins for additional features and integrations.
 - **Process Telemetry and IPC:** Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
   telemetry feature also enables inter-process communication, allowing connected processes to interact with one another.
 

@@ -8,16 +8,14 @@ _For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.githu
 
 ## Key Features
 
-- **Process management**: Manage processes and service workers using CLI and/or a configuration file.
-- **Start and restart policies**: Set up processes to start automatically, on a schedule (using cron expressions), or when files change, and configure restart behavior, either always or on errors,
-  with optional delay and limits.
+- **Cross-platform and wide OS compatibility:** Manage processes for various languages and platforms, such as Deno, Node.js, Python, and Ruby on Windows, macOS, and Linux.
+- **Process management:** Define, control, and manage your processes with simple commands and configuration options.
+- **Multiple start/restart policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
 - **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.
-- **Clustering and load balancing**: Built-in features for application scaling.
-- **Logging**: Monitor and manage logs for your processes, with options for splitting, decoration, colors, and logging to files.
-- **Configuration**: Configure global settings and per-process options, such as logging, directories, and environment variables.
-- **Plugins**: Add custom plugins for more functionality and integrations.
-- **CLI and API**: Use the command-line interface or integrate Pup into Deno applications.
-- **Telemetry and IPC**: Collect data from Deno client processes and enable process communication.
+- **Clustering and load balancing:** Scale your application seamlessly with built-in clustering and load balancing capabilities.
+- **Plugins:** Extend Pup's functionality with custom plugins for additional features and integrations.
+- **Process Telemetry and IPC:** Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
+  telemetry feature also enables inter-process communication, allowing connected processes to interact with one another.
 
 > **Note**: Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes.
 

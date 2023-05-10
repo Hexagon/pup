@@ -9,13 +9,18 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.22] - 2023-05-09
+## [1.0.0-beta.22] - 2023-05-10
 
 - Make `--` optional for `--help`, `--version` and `--upgrade`
 - Bugfix: Always use config file
 - Feature: Allow to configure process cluster/load balancer using cli run init and append
 - Feature: Allow to configure process logger using cli
 - Feature: Add command line argument logs, which show the logs of the current instance
+- Refactor: Reorganize output of `pup help`
+- Docs: Various documentation fixes
+- Fix: Better error handling in Splunk HEC plugin
+- Docs: Add example for the Splunk HEC plugin
+- Cleanup: Remove non functional monitor plugin
 
 ## [1.0.0-beta.21] - 2023-05-05
 

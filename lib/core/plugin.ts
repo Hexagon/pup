@@ -42,10 +42,10 @@ interface PluginProcessInformation {
 }
 
 interface PluginClusterConfiguration {
-  instances: number
-  commonPort: number
-  startPort: number
-  strategy: string
+  instances?: number
+  commonPort?: number
+  startPort?: number
+  strategy?: string
 }
 
 interface PluginProcessConfiguration {
@@ -94,7 +94,7 @@ export class PluginApi {
       configFilePath: pup.configFilePath,
     }
   }
-  public allProcessStatees(): PluginProcessData[] {
+  public allProcessStates(): PluginProcessData[] {
     const statuses: PluginProcessData[] = this._pup.allProcesses().map((p) => {
       return {
         status: p.getStatus(),
@@ -120,6 +120,9 @@ export class PluginApi {
   }
   public unblock(id: string, reason: string) {
     this._pup.unblock(id, reason)
+  }
+  public log(severity: "log" | "error" | "info" | "warn", plugin: string, message: string) {
+    this._pup.logger[severity](`plugin-${plugin}`, message)
   }
 }
 

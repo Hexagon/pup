@@ -7,7 +7,7 @@
 import { PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
 import { HECClient } from "./hec.ts"
 
-export class SplunkReporterPlugin extends PluginImplementation {
+export class PupPlugin extends PluginImplementation {
   private hecClient: HECClient
 
   constructor(private pup: PluginApi, private config: PluginConfiguration) {
@@ -24,29 +24,47 @@ export class SplunkReporterPlugin extends PluginImplementation {
       hecToken: string
     }
 
-    this.hecClient = new HECClient(hecUrl, hecToken)
+    const url = hecUrl || Deno.env.get("PUP_SPLUNK_HEC_URL") || ""
+    const token = hecToken || Deno.env.get("PUP_SPLUNK_HEC_TOKEN") || ""
+
+    this.hecClient = new HECClient(url, token)
 
     this.setupEventListeners()
   }
 
   private setupEventListeners() {
     this.pup.events.on("process_status_changed", async (eventData) => {
-      await this.hecClient.sendEvent({
-        sourcetype: "pup:process_status_changed",
-        event: eventData,
-      })
+      try {
+        await this.hecClient.sendEvent({
+          sourcetype: "pup:process_status_changed",
+          event: eventData,
+        })
+      } catch (error) {
+        this.pup.log("error", "splunk-hec", `Failed to send process_status_changed log to Splunk HEC: ${error}`)
+      }
     })
     this.pup.events.on("log", async (eventData) => {
-      await this.hecClient.sendEvent({
-        sourcetype: "pup:log",
-        event: eventData,
-      })
+      // Avoid infinite loops
+      if ((eventData as Record<string, string>)["category"] === "plugin-splunk-hec") return
+
+      try {
+        await this.hecClient.sendEvent({
+          sourcetype: "pup:log",
+          event: eventData,
+        })
+      } catch (error) {
+        this.pup.log("error", "splunk-hec", `Failed to send log to Splunk HEC: ${error}`)
+      }
     })
     this.pup.events.on("ipc", async (eventData) => {
-      await this.hecClient.sendEvent({
-        sourcetype: "pup:ipc",
-        event: eventData,
-      })
+      try {
+        await this.hecClient.sendEvent({
+          sourcetype: "pup:ipc",
+          event: eventData,
+        })
+      } catch (error) {
+        this.pup.log("error", "splunk-hec", `Failed to send ipc log to Splunk HEC: ${error}`)
+      }
     })
   }
 }

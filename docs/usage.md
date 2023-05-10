@@ -77,8 +77,8 @@ The `init` command is used to create a new configuration file with a single proc
 
 **Logger**
 
-- `stdout` (optional): Enable logging to file by specify path to the log file, catches both stdout and stderr if stderr is not explicitly specified.
-- `stderr` (optional): Enable logging stderr to file by specify path to the log file.
+- `--stdout <stdout-path>` (optional): Enable logging to file by specifying the path to the log file, catches both stdout and stderr if stderr is not explicitly specified.
+- `--stderr <stderr-path>` (optional): Enable logging stderr to file by specifying the path to the log file.
 
 **Start policy**
 
@@ -97,8 +97,8 @@ The `init` command is used to create a new configuration file with a single proc
 **Load balancer**
 
 - `--start-port <port>`: A number specifying the port on which each instance should listen. This is incremented for each instance and passed by environment variable `PUP_CLUSTER_PORT`.
-- `commonPort <port>`: A number specifying a common port for all instances, opened by the built in load balancer.
-- `strategy <strategy-name>` (optional): Load balancing strategy, should be set to `round-robin`, `least-connections` or `ip-hash`. Defaults to `round-robin`.
+- `--commonPort <port>`: A number specifying a common port for all instances, opened by the built in load balancer.
+- `--strategy <strategy-name>` (optional): Load balancing strategy, should be set to `round-robin`, `least-connections` or `ip-hash`. Defaults to `round-robin`.
 
 Example:
 
@@ -124,7 +124,7 @@ pup append --id anotherprocess --cmd "python script.py" --cwd /path/to/another/p
 
 The `run` argument allows you to start a single process using command line parameters without reading or writing any configuration file. This mode uses default options for logging.
 
-To run Pup in no-config mode, pass `--cmd` or `--worker`, followed by a command and a restart policy. `--id` is optional in this mode.
+To run Pup in no-config mode, pass `--cmd` or `--worker`, followed by a command and a start policy. `--id` is optional in this mode.
 
 - `--cmd <cmd>`: Specify the command to run the process.
 - `--worker <path>`: Specify the path of the worker.
