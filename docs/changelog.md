@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.23] - 2023-05-11
+
+- Reduce `pup service install/uninstall/generate` to `pup install/uninstall [--dry-run]`
+
 ## [1.0.0-beta.22] - 2023-05-10
 
 - Make `--` optional for `--help`, `--version` and `--upgrade`

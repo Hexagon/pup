@@ -23,6 +23,7 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
 
     help: true,
     h: true,
+    "dry-run": false,
 
     autostart: true,
     A: true,
@@ -55,6 +56,7 @@ Deno.test("String options and aliases are parsed correctly", () => {
     "cron",
     "--terminate",
     "terminate",
+    "--dry-run",
   ]
   const parsedArgs = parseArguments(inputArgs)
   const expectedArgs = {
@@ -91,6 +93,7 @@ Deno.test("String options and aliases are parsed correctly", () => {
     v: false,
     help: false,
     h: false,
+    "dry-run": true,
 
     _: [],
     "--": [],
@@ -266,7 +269,7 @@ Deno.test("checkArguments should throw error when --env argument is provided wit
 
 Deno.test("checkArguments should return the provided arguments when service install and --env are used together", () => {
   const expectedArgs = {
-    _: ["service", "install"],
+    _: ["install"],
     env: "NODE_ENV=production",
   }
   const result = checkArguments(expectedArgs)
@@ -292,6 +295,7 @@ Deno.test("Collect env arguments formatted as KEY=VALUE", () => {
     h: false,
     autostart: false,
     A: false,
+    "dry-run": false,
 
     /* Unspecified string options will not be included */
     _: [],

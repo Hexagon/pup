@@ -19,6 +19,8 @@ function parseArguments(args: string[]): Args {
     "version",
     "help",
     "autostart",
+
+    "dry-run",
   ]
 
   // All string arguments
@@ -89,7 +91,8 @@ function checkArguments(args: Args): Args {
     "block",
     "unblock",
     "run",
-    "service",
+    "install",
+    "uninstall",
     "logs",
     // Aliases for --equivalent
     "upgrade",
@@ -164,7 +167,7 @@ function checkArguments(args: Args): Args {
   }
 
   // Ensure --env flag can only be used with 'service install' base argument
-  if (args.env && (baseArgument !== "service" || args._[1] !== "install")) {
+  if (args.env && (baseArgument !== "install")) {
     throw new Error("Argument '--env' can only be used with 'service install' base argument")
   }
 

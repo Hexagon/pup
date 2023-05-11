@@ -107,44 +107,39 @@ async function main(inputArgs: string[]) {
   /**
    * Handle the install argument
    */
-  if (baseArgument === "service") {
-    if (secondaryBaseArgument === "install" || secondaryBaseArgument === "generate") {
-      if (!configFile) {
-        console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
-        Deno.exit(1)
-      }
+  if (baseArgument === "install") {
+    if (!configFile) {
+      console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
+      Deno.exit(1)
+    }
 
-      const system = args.system
-      const name = args.name || "pup"
-      const config = args.config
-      const cwd = args.cwd
-      const cmd = `pup run ${config ? `--config ${config}` : ""}`
-      const user = args.user
-      const home = args.home
-      const env = args.env || []
+    const system = args.system
+    const name = args.name || "pup"
+    const config = args.config
+    const cwd = args.cwd
+    const cmd = `pup run ${config ? `--config ${config}` : ""}`
+    const user = args.user
+    const home = args.home
+    const env = args.env || []
 
-      try {
-        await installService({ system, name, cmd, cwd, user, home, env }, secondaryBaseArgument === "generate")
-        Deno.exit(0)
-      } catch (e) {
-        console.error(`Could not install service, error: ${e.message}`)
-        Deno.exit(1)
-      }
-    } else if (secondaryBaseArgument === "uninstall") {
-      const system = args.system
-      const name = args.name || "pup"
-      const home = args.home
+    try {
+      await installService({ system, name, cmd, cwd, user, home, env }, args["dry-run"])
+      Deno.exit(0)
+    } catch (e) {
+      console.error(`Could not install service, error: ${e.message}`)
+      Deno.exit(1)
+    }
+  } else if (secondaryBaseArgument === "uninstall") {
+    const system = args.system
+    const name = args.name || "pup"
+    const home = args.home
 
-      try {
-        await uninstallService({ system, name, home })
-        console.log(`Service '${name}' uninstalled.`)
-        Deno.exit(0)
-      } catch (e) {
-        console.error(`Could not uninstall service, error: ${e.message}`)
-        Deno.exit(1)
-      }
-    } else {
-      console.error(`Unknown service maintenance command '${secondaryBaseArgument}', exiting.`)
+    try {
+      await uninstallService({ system, name, home })
+      console.log(`Service '${name}' uninstalled.`)
+      Deno.exit(0)
+    } catch (e) {
+      console.error(`Could not uninstall service, error: ${e.message}`)
       Deno.exit(1)
     }
   }

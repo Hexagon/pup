@@ -33,11 +33,11 @@ Replace `username` with your actual username.
 
 2. Install Pup as a user mode service, named `pup`:
 
-`pup service install`
+`pup install`
 
 To install multiple services, provide a unique name for each instance:
 
-`pup service install --name my-service`
+`pup install --name my-service`
 
 ### System Mode Installation
 
@@ -45,24 +45,25 @@ To install multiple services, provide a unique name for each instance:
 
 1. Install Pup as a system service, by default named `pup`:
 
-`pup service install --system`
+`pup install --system`
 
 To install multiple services, provide a unique name for each instance:
 
-`pup service install --system --name my-service`
+`pup install --system --name my-service`
 
 2. Follow the on-screen instructions to copy the generated configuration file to the correct location, and enable the service.
 
 ### Service Argument Reference
 
-Use the `pup service <method> [...flags]` command with the following methods and flags:
+Use the `pup <method> [...flags]` command with the following methods and flags:
 
 - Methods:
   - `install`: Installs the configured Pup instance as a system service, then verifies the installation by enabling and starting the service. Rolls back any changes on error.
-  - `generate`: Generates the configuration and prints it to stdout along with a suitable path. Makes no changes to the system.
+  - `uninstall`: Uninstall service
 
 - Flags:
   - `--config`: Specifies the configuration file for the instance to be installed, defaulting to `pup.json` or `pup.jsonc` in the current directory.
+  - `--dry-run`: Generates the configuration and prints it to stdout along with a suitable path. Makes no changes to the system.
   - `--name`: Sets the service name, defaulting to `pup`.
   - `--system`: Installs the service at the system level, with the default being user level.
   - `--home`: Specifies a home directory, defaulting to the current user's $HOME.
