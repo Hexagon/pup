@@ -9,9 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.23] - 2023-05-11
+## [1.0.0-beta.23] - Unreleased
 
 - Reduce `pup service install/uninstall/generate` to `pup install/uninstall [--dry-run]`
+- Use dax to launch process, enabling shell functions and chaining of processes
 
 ## [1.0.0-beta.22] - 2023-05-10
 

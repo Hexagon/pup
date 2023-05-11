@@ -3,8 +3,11 @@ import { readLines, StringReader } from "../../deps.ts"
 
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
 
+import $ from "https://deno.land/x/dax@0.31.1/mod.ts";
+import { CommandChild } from "https://deno.land/x/dax@0.31.1/src/command.ts";
+
 class Runner extends BaseRunner {
-  private process?: Deno.ChildProcess
+  private process?: CommandChild
 
   constructor(pup: Pup, processConfig: ProcessConfiguration) {
     super(pup, processConfig)
@@ -57,6 +60,7 @@ class Runner extends BaseRunner {
   }
 
   async run(runningCallback: RunnerCallback) {
+
     if (!this.processConfig.cmd) {
       throw new Error("No command specified")
     }
@@ -76,42 +80,32 @@ class Runner extends BaseRunner {
       }
     }
 
-    // Start the process
-    const commander = new Deno.Command(
-      this.processConfig.cmd[0],
-      {
-        args: this.processConfig.cmd.slice(1),
-        cwd: this.processConfig.cwd,
-        env: env,
-        stdout: "piped",
-        stderr: "piped",
-      },
-    )
+    // Build command string
+    const commandString = this.processConfig.cmd.join(" ")
+    
+    // Optimally, every item of this.processConfig.cmd should be escaped
+    let child = $.raw`${commandString}`.stdout("piped").stderr("piped")
+    if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
+    if (env) child = child.env(env)
 
-    this.process = commander.spawn()
-    this.process.ref()
+    // Spawn the process
+    this.process = child.spawn()
 
-    // Process started, report pid to callback and file
-    runningCallback(this.process.pid)
-
+    runningCallback(/*pid*/0)
     this.writePidFile()
+    this.pipeToLogger("stdout", this.process.stdout())
+    this.pipeToLogger("stderr", this.process.stderr())
+    const result = await this.process
 
-    this.pipeToLogger("stdout", this.process.stdout)
-    this.pipeToLogger("stderr", this.process.stderr)
+    // ToDo: Is it possible to ref the process?
 
-    // Wait for process to stop and retrieve exit status
-    const result = await this.process.status
-
-    // Important! Close streams
-
-    // ... and clean up the pid file
     this.removePidFile()
 
     // Create a RunnerResult
     const runnerResult: RunnerResult = {
       code: result.code,
-      signal: result.signal,
-      success: result.success,
+      signal: null,
+      success: result.code === 0 ? true : false,
     }
 
     return runnerResult

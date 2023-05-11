@@ -20,7 +20,7 @@
     // One object per process ...
     {
       "id": "kept-alive-server", // Required
-      "cmd": ["deno", "run", "--allow-read", "--allow-env", "./server.js"], // Required
+      "cmd": ["echo ","server starting","&&","deno", "run", "--allow-read", "--allow-env", "./server.js"], // Required
       "env": { // Default undefined
         "TZ": "Europe/Berlin"
       },
