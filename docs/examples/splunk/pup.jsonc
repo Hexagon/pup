@@ -2,7 +2,7 @@
   "processes": [
     {
       "id": "kept-alive-server",
-      "cmd": ["deno", "run", "--allow-read", "--allow-env", "./server.js"], // Required
+      "cmd": "deno run --allow-read --allow-env ./server.js", // Required
       "env": {
         "TZ": "Europe/Berlin"
       },

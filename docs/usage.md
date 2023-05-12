@@ -71,7 +71,7 @@ The `init` command is used to create a new configuration file with a single proc
 **Basic settings**
 
 - `--id <id>`: Specify the unique identifier for the process.
-- `--cmd <cmd>`: Specify the command to run the process.
+- `--cmd <cmd>`: Specify the command to run the process, supports common shell features through [dax](https://github.com/dsherret/dax).
 - `--worker <path>`: Specify the path of the worker.
 - `--cwd <cwd>` (optional): Set the working directory for the process.
 

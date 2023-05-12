@@ -3,8 +3,8 @@ import { readLines, StringReader } from "../../deps.ts"
 
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
 
-import $ from "https://deno.land/x/dax@0.31.1/mod.ts";
-import { CommandChild } from "https://deno.land/x/dax@0.31.1/src/command.ts";
+import $ from "https://deno.land/x/dax@0.31.1/mod.ts"
+import { CommandChild } from "https://deno.land/x/dax@0.31.1/src/command.ts"
 
 class Runner extends BaseRunner {
   private process?: CommandChild
@@ -14,13 +14,14 @@ class Runner extends BaseRunner {
   }
 
   private async writePidFile() {
-    if (this.processConfig.pidFile && this.process?.pid) {
+    // Defunct since switch to dax
+    /*if (this.processConfig.pidFile && this.process?.pid) {
       try {
         await Deno.writeTextFile(this.processConfig.pidFile, this.process?.pid.toString())
       } catch (_e) {
         this.pup.logger.error("error", `Failed to write pid file '${this.processConfig.pidFile}'`, this.processConfig)
       }
-    }
+    }*/
   }
 
   private async removePidFile() {
@@ -60,7 +61,6 @@ class Runner extends BaseRunner {
   }
 
   async run(runningCallback: RunnerCallback) {
-
     if (!this.processConfig.cmd) {
       throw new Error("No command specified")
     }
@@ -82,7 +82,7 @@ class Runner extends BaseRunner {
 
     // Build command string
     const commandString = this.processConfig.cmd.join(" ")
-    
+
     // Optimally, every item of this.processConfig.cmd should be escaped
     let child = $.raw`${commandString}`.stdout("piped").stderr("piped")
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
@@ -91,11 +91,15 @@ class Runner extends BaseRunner {
     // Spawn the process
     this.process = child.spawn()
 
-    runningCallback(/*pid*/0)
+    runningCallback() // PID should be passed as an argument if available
+
     this.writePidFile()
     this.pipeToLogger("stdout", this.process.stdout())
     this.pipeToLogger("stderr", this.process.stderr())
+
     const result = await this.process
+
+    this.process = undefined
 
     // ToDo: Is it possible to ref the process?
 
@@ -104,15 +108,15 @@ class Runner extends BaseRunner {
     // Create a RunnerResult
     const runnerResult: RunnerResult = {
       code: result.code,
-      signal: null,
+      signal: null, // Signal not available in the dax CommandChild
       success: result.code === 0 ? true : false,
     }
 
     return runnerResult
   }
 
-  public kill = (signal?: Deno.Signal) => {
-    this.process?.kill(signal)
+  public kill = () => {
+    this.process?.abort()
   }
 }
 

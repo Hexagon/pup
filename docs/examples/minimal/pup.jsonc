@@ -2,7 +2,7 @@
   "processes": [
     {
       "id": "forever",
-      "cmd": ["deno", "run", "--allow-env", "server.js"],
+      "cmd": "deno run --allow-env server.js",
       "autostart": true,
       "restart": "always"
     }

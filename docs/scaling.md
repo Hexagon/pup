@@ -19,7 +19,7 @@ Example available in the GitHub Repository at [/docs/examples/cluster](https://g
   "processes": [
     {
       "id": "my-scalable-app",
-      "cmd": ["deno", "run", "--allow-net", "server.ts"],
+      "cmd": "deno run --allow-net server.ts",
       "cluster": {
         "instances": 4,
         "commonPort": 3000,
@@ -34,7 +34,7 @@ Example available in the GitHub Repository at [/docs/examples/cluster](https://g
 In this example, Pup will start 4 instances of the process with the ID `my-scalable-app`. The configuration properties are as follows:
 
 - `id`: A unique identifier for the process.
-- `cmd`: The command to run, arranged as an array of strings
+- `cmd`: The command to run
 - `cluster`: An object containing the settings for the cluster of processes
   - `instances`: The number of instances to be started for the process.
   - `startPort`: The starting port number for the individual process instances.

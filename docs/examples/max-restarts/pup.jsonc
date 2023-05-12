@@ -2,7 +2,7 @@
   "processes": [
     {
       "id": "max-3-times",
-      "cmd": ["deno", "run", "server.js"],
+      "cmd": "deno run server.js",
       "autostart": true,
       "restart": "always",
       "restartLimit": 3,

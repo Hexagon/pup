@@ -1,13 +1,13 @@
 {
   "processes": [
     {
-      "cmd": ["deno", "run", "-A", "task-with-telemetry-1.ts"],
+      "cmd": "deno run -A task-with-telemetry-1.ts",
       "id": "task-1",
       "autostart": true,
       "restart": "always"
     },
     {
-      "cmd": ["deno", "run", "-A", "task-with-telemetry-2.ts"],
+      "cmd": "deno run -A task-with-telemetry-2.ts",
       "id": "task-2",
       "autostart": true,
       "restart": "always"

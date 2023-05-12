@@ -19,7 +19,7 @@ Then, add the following basic configuration to the file:
   "processes": [
     {
       "id": "example",
-      "cmd": ["deno", "run", "--allow-net", "app.ts"],
+      "cmd": "deno run --allow-net app.ts",
       "autostart": true
     }
   ]
@@ -39,8 +39,8 @@ Here's a list of available configuration options for each process:
 **General**
 
 - `id` (**required**): A unique identifier for the process.
-- `cmd` (optional): An array containing the command and its arguments to run the process.
-- `worker` (optional): An array containing the worker script as first entry, then any arguments to pass to the worker.
+- `cmd` (optional): A string containing the full command to run, supporting common shell features such as `&&` for chaining through [dax](https://github.com/dsherret/dax).
+- `worker` (optional): A string containing the worker script as first entry.
 - `cwd` (optional): The working directory for the process.
 - `env` (optional): An object containing environment variables for the process.
 - `path` (optional): Extra paths that will be **appended** to `PATH` for this process.

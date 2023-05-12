@@ -163,7 +163,7 @@ key in each process to add the paths needed, like:
 {
   "id": "my task",
   "path": "/home/<user>/.deno/bin/",
-  "cmd": ["deno", "run", "-A", "script.ts"]
+  "cmd": "deno run -A script.ts"
   /* ... */
 }
 ```

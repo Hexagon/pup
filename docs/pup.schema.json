@@ -100,16 +100,10 @@
                 "pattern": "^[a-z0-9@._\\-]+$"
               },
               "cmd": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "type": "string"
               },
               "worker": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "type": "string"
               },
               "cwd": {
                 "type": "string"

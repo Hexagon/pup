@@ -2,7 +2,7 @@
   "processes": [
     {
       "id": "cluster-example",
-      "cmd": ["deno", "run", "-A", "app.ts"],
+      "cmd": "deno run -A app.ts",
       "cluster": {
         "instances": 3,
         "commonPort": 3456,

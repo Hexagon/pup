@@ -2,7 +2,7 @@
   "processes": [
     {
       "id": "demo-watch",
-      "cmd": ["deno", "run", "script.js"],
+      "cmd": "deno run script.js",
       "autostart": true, // When watching, we want autostart
       "restart": "always", // The process will just be killed when a file change is detected, configure to always restart
       "restartDelayMs": 1000, // Default is 10000, which is too long for development, set this to 1000

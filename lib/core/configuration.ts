@@ -52,8 +52,8 @@ interface GlobalWatcherConfiguration {
 
 interface ProcessConfiguration {
   id: string
-  cmd?: string[]
-  worker?: string[]
+  cmd?: string
+  worker?: string
   env?: Record<string, string>
   cwd?: string
   path?: string
@@ -101,8 +101,8 @@ const ConfigurationSchema = z.object({
   processes: z.array(
     z.object({
       id: z.string().min(1).max(64).regex(/^[a-z0-9@._\-]+$/i, "Process ID can only contain characters a-Z 0-9 . _ - or @"),
-      cmd: z.optional(z.array(z.string())),
-      worker: z.optional(z.array(z.string())),
+      cmd: z.optional(z.string()),
+      worker: z.optional(z.string()),
       cwd: z.optional(z.string()),
       env: z.optional(z.object({})),
       cluster: z.optional(z.object({
@@ -150,7 +150,7 @@ function validateConfiguration(unsafeConfiguration: unknown): Configuration {
 
 function generateConfiguration(
   id: string,
-  commandArray: string[],
+  cmd: string,
   cwd?: string,
   cron?: string,
   terminate?: string,
@@ -171,7 +171,7 @@ function generateConfiguration(
 
   const processConfiguration: ProcessConfiguration = {
     id,
-    cmd: commandArray,
+    cmd,
   }
 
   if (cwd) processConfiguration.cwd = cwd

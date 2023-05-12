@@ -3,7 +3,7 @@ import { generateConfiguration } from "../../lib/core/configuration.ts"
 
 Deno.test("generateConfiguration: create a basic configuration", () => {
   const id = "task"
-  const cmd = ["npm", "start"]
+  const cmd = "npm start"
   const cwd = "/path/to/project"
   const cron = "* * * * *"
   const terminate = "*/5 * * * *"
@@ -15,7 +15,7 @@ Deno.test("generateConfiguration: create a basic configuration", () => {
   assertEquals(config, {
     processes: [{
       id,
-      cmd: ["npm", "start"],
+      cmd: "npm start",
       cwd,
       cron,
       terminate,

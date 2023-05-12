@@ -20,7 +20,7 @@
     // One object per process ...
     {
       "id": "kept-alive-server", // Required
-      "cmd": ["echo ","server starting","&&","deno", "run", "--allow-read", "--allow-env", "./server.js"], // Required
+      "cmd": "deno run --allow-read --allow-env ./server.js", // Required
       "env": { // Default undefined
         "TZ": "Europe/Berlin"
       },
@@ -31,7 +31,7 @@
     },
     {
       "id": "periodic-example-task",
-      "cmd": ["deno", "run", "--allow-read", "./task.js"],
+      "cmd": "deno run --allow-read ./task.js",
       "cron": "*/20 * * * * *", // default undefined
       "restartDelayMs": 3000, // default 10000
       // Overrides to global logger

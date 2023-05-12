@@ -8,8 +8,8 @@ const TEST_FILE_PATH = "./test_data_Status.jsontest"
 
 class MockProcess extends Process {
   constructor() {
-    const pup = new Pup({ processes: [{ id: "task-1", cmd: ["deno", "run", "test"] }] })
-    super(pup, { id: "task-1", cmd: ["deno", "run", "test"] })
+    const pup = new Pup({ processes: [{ id: "task-1", cmd: "deno run test" }] })
+    super(pup, { id: "task-1", cmd: "deno run test" })
   }
   public getStatus(): ProcessInformation {
     return {
