@@ -1,10 +1,7 @@
 import { ProcessConfiguration, Pup } from "./pup.ts"
-import { readLines, StringReader } from "../../deps.ts"
+import { $, CommandChild, readLines, StringReader } from "../../deps.ts"
 
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
-
-import $ from "https://deno.land/x/dax@0.31.1/mod.ts"
-import { CommandChild } from "https://deno.land/x/dax@0.31.1/src/command.ts"
 
 class Runner extends BaseRunner {
   private process?: CommandChild
@@ -80,11 +77,8 @@ class Runner extends BaseRunner {
       }
     }
 
-    // Build command string
-    const commandString = this.processConfig.cmd.join(" ")
-
     // Optimally, every item of this.processConfig.cmd should be escaped
-    let child = $.raw`${commandString}`.stdout("piped").stderr("piped")
+    let child = $.raw`${this.processConfig.cmd}`.stdout("piped").stderr("piped")
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
     if (env) child = child.env(env)
 
