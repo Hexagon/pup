@@ -77,19 +77,14 @@ async function main(inputArgs: string[]) {
   let cmd
   if (checkedArgs) {
     if (checkedArgs.cmd) {
-      cmd = checkedArgs.cmd.split(" ")
+      cmd = checkedArgs.cmd
     } else if (checkedArgs["--"] && checkedArgs["--"].length > 0) {
       cmd = checkedArgs["--"]
     }
   }
 
   // Extract worker from arguments
-  let worker
-  if (checkedArgs) {
-    if (checkedArgs.worker) {
-      worker = checkedArgs.worker.split(" ")
-    }
-  }
+  const worker = checkedArgs.worker
 
   /**
    * Now either

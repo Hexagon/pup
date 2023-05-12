@@ -16,7 +16,7 @@ import { fileExists } from "../common/utils.ts"
  * @private
  * @async
  */
-export async function createConfigurationFile(configFile: string, checkedArgs: Args, cmd: string[]) {
+export async function createConfigurationFile(configFile: string, checkedArgs: Args, cmd: string) {
   try {
     const config = generateConfiguration(
       checkedArgs.id,
@@ -46,7 +46,7 @@ export async function createConfigurationFile(configFile: string, checkedArgs: A
  * @private
  * @async
  */
-export async function appendConfigurationFile(configFile: string, checkedArgs: Args, cmd: string[]) {
+export async function appendConfigurationFile(configFile: string, checkedArgs: Args, cmd: string) {
   try {
     // Read existing configuration
     let existingConfigurationObject
