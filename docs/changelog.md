@@ -11,8 +11,9 @@ All notable changes to this project will be documented in this section.
 
 ## [1.0.0-beta.23] - Unreleased
 
+- Change: **BREAKING:** Process configuration entry `cmd:` now expects string (`deno run -A script.ts`) instead of array of strings (`["deno","run",...]`)
+- Change: Use [dax](https://github.com/dsherret/dax) instead of `Deno.Command` to launch process, enabling shell functions and chaining of processes.
 - Reduce `pup service install/uninstall/generate` to `pup install/uninstall [--dry-run]`
-- Use dax to launch process, enabling shell functions and chaining of processes
 
 ## [1.0.0-beta.22] - 2023-05-10
 
