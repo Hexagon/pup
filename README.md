@@ -23,7 +23,7 @@ _For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.githu
 
 ### Installation
 
-1. Install [Deno](https://deno.land/#installation) on your system.
+1. Install [Deno](https://deno.com/manual/getting_started/installation) on your system.
 2. Install or upgrade Pup using Deno:
 
 ```bash

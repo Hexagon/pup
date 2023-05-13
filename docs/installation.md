@@ -13,7 +13,7 @@ This section will guide you through the installation process of Pup.
 
 Before proceeding with the installation, ensure that you have the following installed on your system:
 
-Deno (version `1.30.x` or higher): You can install Deno by following the official Deno [instructions](https://deno.land/manual/getting_started/installation).
+Deno (version `1.30.x` or higher): You can install Deno by following the official Deno [instructions](https://deno.com/manual/getting_started/installation).
 
 ## Installing or upgrading Pup
 
