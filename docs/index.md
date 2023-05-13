@@ -20,7 +20,8 @@ Pup is a powerful process manager for Deno, designed to simplify the management 
 
 > **Note** Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes.
 
-Pup is centered on a single configuration file, ideally named pup.json or pup.jsonc, which manages all aspects of the processes to be executed, including their execution methods and logging handling.
+Pup is centered on a single configuration file, ideally named `pup.json` or `pup.jsonc`, which manages all aspects of the processes to be executed, including their execution methods and logging
+handling.
 
 ## Table of Contents
 
@@ -32,11 +33,12 @@ Pup is centered on a single configuration file, ideally named pup.json or pup.js
   - [Single command usage](./usage.html#single-command-usage)
   - [The working directory](./usage.html#working-directory)
 - [Configuration](./configuration.html)
-  - [Creating the Configuration File](./configuration.html#creating-the-configuration-file)
-  - [Configuration Options](./configuration.html#configuration-options)
   - [Process configuration](./configuration.html#process-configuration)
+    - [General](./configuration.html#general)
     - [Start policy](./configuration.html#start-policy)
     - [Restart policy](./configuration.html#restart-policy)
+    - [Stop/restart policy](./configuration.html#stop-restart-policy)
+    - [Clustering](./configuration.html#clustering)
   - [Global configuration](./configuration.html#global-configuration)
     - [Logger](./configuration.html#watcher)
     - [Watcher](./configuration.html#logger)
@@ -44,14 +46,19 @@ Pup is centered on a single configuration file, ideally named pup.json or pup.js
   - [Validating the Configuration](./configuration.html#validating-the-configuration)
   - [VS Code Intellisense](./configuration.html#vs-code-intellisense)
 - [Run at boot](./service.html)
-  - [Using the CLI (systemd and launchd)](./service.html#using-the-cli)
-    - [service argument reference](./service.html#service-argument-reference)
+  - [Using the CLI](./service.html#using-the-cli)
+    - [Prerequisites](./service.html#prerequisites)
+    - [User mode installation](./service.html#user-mode-installation)
+    - [System mode installation](./service.html#system-mode-installation)
+    - [Service argument reference](./service.html#service-argument-reference)
   - [Using Docker](./service.html#using-docker)
   - [Installing manually using systemd](./service.html#manual-guide-using-systemd)
   - [Installing manually using launchd](./service.html#manual-guide-using-launchd)
 - [Clusters and Load Balancer](./scaling.html)
-  - [Creating a cluster](./scaling.html#creating-a-cluster)
+  - [Clustering](./scaling.html#clustering)
   - [Using the load balancer](./scaling.html#using-the-load-balancer)
+    - [Built-in vs External Load Balancer](./scaling.html#built-in-vs-external-load-balancer)
+    - [Ip-hash for Stateful Applications](./scaling.html#ip-hash-for-stateful-applications)
 - [Library usage](./library.html)
 - [FAQ](./faq.html#faq)
 - [Troubleshooting](./troubleshooting.html)

@@ -36,7 +36,7 @@ the existing process definition.
 
 Here's a list of available configuration options for each process:
 
-**General**
+### General
 
 - `id` (**required**): A unique identifier for the process.
 - `cmd` (optional): A string containing the full command to run, supporting common shell features such as `&&` for chaining through [dax](https://github.com/dsherret/dax).
@@ -48,7 +48,7 @@ Here's a list of available configuration options for each process:
 - `timeout` (optional): A number specifying the maximum time (in seconds) that the process is allowed to run before it's terminated.
 - `overrun` (optional): A boolean indicating whether a new instance of the process is allowed to start if the previous instance is still running. Default: false.
 
-**Start policy**
+### Start policy
 
 You need to specify one of these for each process, else the process will never start.
 
@@ -56,17 +56,17 @@ You need to specify one of these for each process, else the process will never s
 - `cron` (optional): A cron expression specifying the schedule for the process to run.
 - `watch` (optional): An array of locations to watch for file changes. Process will start/restart when a file or directory changes.
 
-**Restart policy**
+### Restart policy
 
 - `restart` (optional): A string specifying when the process should be restarted. Allowed values: "always" or "error".
 - `restartDelayMs` (optional): A number specifying the delay (in milliseconds) before restarting the process.
 - `restartLimit` (optional): A number specifying the maximum number of restarts allowed for the process.
 
-**Stop/restart policy**
+### Stop/restart policy
 
 - `terminate` (optional): A cron expression specifying when the process should terminate. Combined with `restart: "always"` this effectively restarts the process on a cron schedule.
 
-**Clustering**
+### Clustering
 
 - `cluster` (optional): An object specifying options to run this process in multiple instances, more on this at [6. Clusters and Load Balancer](/scaling.html)
   - `instances`: The number of instances to run using this configuration.
