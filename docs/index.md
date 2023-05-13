@@ -37,7 +37,7 @@ handling.
     - [General](./configuration.html#general)
     - [Start policy](./configuration.html#start-policy)
     - [Restart policy](./configuration.html#restart-policy)
-    - [Stop/restart policy](./configuration.html#stop-restart-policy)
+    - [Stop/restart policy](./configuration.html#stoprestart-policy)
     - [Clustering](./configuration.html#clustering)
   - [Global configuration](./configuration.html#global-configuration)
     - [Logger](./configuration.html#watcher)

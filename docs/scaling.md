@@ -83,15 +83,3 @@ directing a client to a different instance may result in a loss of session data.
 
 The `ip-hash` strategy mitigates this issue by consistently directing clients with the same IP address to the same instance. However, this strategy is not perfect, as it may cause uneven load
 distribution when a large number of clients share the same IP address, for example, when clients are behind a proxy server or a NAT device.
-
-## DRAFT: Scaling Processes
-
-> **Warning** This feature is not yet implemented
-
-During operations, the number of instances for a process can be increased or decreased using command-line options. For example, to change the number of instances for `my-scalable-app` to 6, use the
-following command:
-
-`pup --id my-scalable-app --instances 6`
-
-Pup will automatically adjust the number of instances to the specified value. Each instance will receive a unique identifier in the format `my-scalable-app-<n>`, where `<n>` is a sequential integer
-starting from 1.

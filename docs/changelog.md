@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.24] - Unreleased
+
+- Documentation fixes
+
 ## [1.0.0-beta.23] - 2023-05-12
 
 - Change: **BREAKING:** Process configuration entry `cmd:` now expects string (`deno run -A script.ts`) instead of array of strings (`["deno","run",...]`)
