@@ -9,7 +9,7 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.24] - Unreleased
+## [1.0.0-beta.24] - 2023-05-16
 
 - Documentation fixes
 - Improve IPC implementation (speed and security)
