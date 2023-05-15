@@ -5,6 +5,7 @@
  */
 
 import { fileExists } from "../common/utils.ts"
+import { basename, debounce, dirname, join, resolve } from "../../deps.ts"
 
 export interface IpcValidatedMessage {
   pid: number | null
@@ -15,41 +16,70 @@ export interface IpcValidatedMessage {
 
 export class FileIPC {
   public MAX_DATA_LENGTH = 1024
-
   private filePath: string
+  private dirPath: string
+  private fileName: string
   private staleMessageLimitMs: number
+  private debounceTimeMs: number
+  private messageQueue: IpcValidatedMessage[][] = []
+  private aborted = false
+  private watcher?: Deno.FsWatcher
 
-  constructor(filePath: string, staleMessageLimitMs?: number) {
+  constructor(filePath: string, staleMessageLimitMs?: number, debounceTimeMs?: number) {
     this.filePath = filePath
+    this.dirPath = resolve(dirname(filePath)) // Get directory of the file
+    this.fileName = basename(filePath) // Get name of the file
     this.staleMessageLimitMs = staleMessageLimitMs ?? 30000
+    this.debounceTimeMs = debounceTimeMs ?? 100
+  }
+
+  public getFilePath(): string {
+    return this.filePath
   }
 
   /**
-   * Send data using the file-based IPC.
-   *
-   * Will append to file in `this.filePath` if it exists, otherwise create a new one
-   *
-   * @param data - Data to be sent.
+   * startWatching method initiates a file watcher on the filePath.
+   * When a file modification event occurs, it will debounce the call to extractMessages to ensure it doesn't
+   * get called more than once in a short amount of time (as specified by debounceTimeMs). The received messages
+   * from the extractMessages call are then added to the messageQueue to be consumed by the receiveData generator.
    */
-  async sendData(data: string): Promise<void> {
-    try {
-      const fileContent = await Deno.readTextFile(this.filePath).catch(() => "")
-      const messages = JSON.parse(fileContent || "[]")
-      messages.push({ pid: Deno.pid, data, sent: new Date().toISOString() })
-      await Deno.writeTextFile(this.filePath, JSON.stringify(messages), { create: true })
-    } catch (_e) {
-      console.error("Error sending data, read or write failed.")
+  public async startWatching() {
+    // Create directory if it doesn't exist
+    await Deno.mkdir(this.dirPath, { recursive: true })
+
+    // Make an initial call to extractMessages to ensure that any existing messages are consumed
+    const messages = await this.extractMessages()
+    if (messages.length > 0) {
+      this.messageQueue.push(messages)
+    }
+
+    // Watch the directory, not the file
+    this.watcher = Deno.watchFs(this.dirPath)
+    for await (const event of this.watcher) {
+      // Check that the event pertains to the correct file
+      if (event.kind === "modify" && event.paths.includes(join(this.dirPath, this.fileName))) {
+        debounce(async () => {
+          try {
+            const messages = await this.extractMessages()
+            if (messages.length > 0) {
+              this.messageQueue.push(messages)
+            }
+          } catch (_e) { /* Ignore errors */ }
+        }, this.debounceTimeMs)()
+      }
     }
   }
 
   /**
-   * Receive data from the file-based IPC.
+   * extractMessages is a private helper function that reads from the IPC file, validates the messages
+   * and returns them as an array of IpcValidatedMessage. It also handles the removal of the file after
+   * reading and validates the data based on the staleMessageLimitMs.
    *
-   * Will throw away stale messages (older than staleMessageLimitMs)
+   * This function is called every time a 'modify' event is detected by the file watcher started in startWatching method.
    *
-   * @returns An array of [received message, or null if the message is invalid]
+   * Note: This function should only be used internally by the FileIPC class and is not meant to be exposed to external consumers.
    */
-  async receiveData(): Promise<IpcValidatedMessage[]> {
+  private async extractMessages(): Promise<IpcValidatedMessage[]> {
     if (await fileExists(this.filePath)) {
       let fileContent
       try {
@@ -58,7 +88,6 @@ export class FileIPC {
         throw new Error(`Could not read '${this.filePath}'`)
       }
 
-      // Remove the file instantly, so that any new messages can be queued
       try {
         await Deno.remove(this.filePath)
       } catch (_e) {
@@ -114,13 +143,48 @@ export class FileIPC {
             errors,
           })
         }
+        return receivedMessages
       } catch (_e) {
         throw new Error(`Invalid content in ${this.filePath}.ipc`)
       }
-
-      return receivedMessages
     } else {
       return []
+    }
+  }
+
+  /**
+   * Send data using the file-based IPC.
+   *
+   * Will append to file in `this.filePath` if it exists, otherwise create a new one
+   *
+   * @param data - Data to be sent.
+   */
+  async sendData(data: string): Promise<void> {
+    // Create directory if it doesn't exist
+    await Deno.mkdir(this.dirPath, { recursive: true })
+
+    try {
+      const fileContent = await Deno.readTextFile(this.filePath).catch(() => "")
+      const messages = JSON.parse(fileContent || "[]")
+      messages.push({ pid: Deno.pid, data, sent: new Date().toISOString() })
+      await Deno.writeTextFile(this.filePath, JSON.stringify(messages), { create: true })
+    } catch (_e) {
+      console.error("Error sending data, read or write failed.")
+    }
+  }
+
+  async *receiveData(): AsyncGenerator<IpcValidatedMessage[], void, unknown> {
+    if (!this.watcher) this.startWatching()
+
+    while (!this.aborted) {
+      if (this.messageQueue.length > 0) {
+        const messages = this.messageQueue.shift()
+        if (messages) {
+          yield messages
+        }
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, this.debounceTimeMs))
+      }
     }
   }
 
@@ -128,6 +192,13 @@ export class FileIPC {
    * Close the file-based IPC and remove the IPC file.
    */
   async close(): Promise<void> {
+    // Flag as aborted
+    this.aborted = true
+
+    // Stop watching
+    if (this.watcher) {
+      this.watcher.close()
+    }
     // Try to remove file, ignore failure
     try {
       await Deno.remove(this.filePath)

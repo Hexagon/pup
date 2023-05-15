@@ -56,7 +56,7 @@ telemetry.emit("another-process-id", "my-event", { data: { to: "send" } })
 
 ## Running
 
-`cd` to `/docs/examples/telemetry` directory.
+`cd` to `docs/examples/telemetry` directory.
 
 Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 

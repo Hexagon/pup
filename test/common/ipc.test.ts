@@ -21,13 +21,13 @@ Deno.test({
   async fn() {
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
-    const receivedMessages = await fileIPC.receiveData()
-    assertEquals(receivedMessages.length, 1)
-    assertEquals(receivedMessages[0].pid, Deno.pid)
-    assertEquals(receivedMessages[0].data, "test data")
-    assertEquals(receivedMessages[0].errors.length, 0)
-    //assertEquals(receivedMessages[0].sent, expectedMessage.sent)
-    await fileIPC.close()
+    for await (const receivedMessages of fileIPC.receiveData()) {
+      assertEquals(receivedMessages.length, 1)
+      assertEquals(receivedMessages[0].pid, Deno.pid)
+      assertEquals(receivedMessages[0].data, "test data")
+      assertEquals(receivedMessages[0].errors.length, 0)
+      await fileIPC.close()
+    }
   },
 })
 
@@ -38,16 +38,17 @@ Deno.test({
     await fileIPC.sendData("test data 1")
     await new Promise((resolve) => setTimeout(resolve, TEST_STALE_LIMIT + 100))
     await fileIPC.sendData("test data 2")
-    const receivedMessages = await fileIPC.receiveData()
-    assertEquals(receivedMessages.length, 2)
-    assertEquals(receivedMessages[0].pid, Deno.pid)
-    assertEquals(receivedMessages[0].data, null)
-    assertEquals(receivedMessages[0].errors.length, 1)
-    assertEquals(receivedMessages[0].errors[0], "Invalid data received: stale")
-    assertEquals(receivedMessages[1].pid, Deno.pid)
-    assertEquals(receivedMessages[1].data, "test data 2")
-    assertEquals(receivedMessages[1].errors.length, 0)
-    await fileIPC.close()
+    for await (const receivedMessages of fileIPC.receiveData()) {
+      assertEquals(receivedMessages.length, 2)
+      assertEquals(receivedMessages[0].pid, Deno.pid)
+      assertEquals(receivedMessages[0].data, null)
+      assertEquals(receivedMessages[0].errors.length, 1)
+      assertEquals(receivedMessages[0].errors[0], "Invalid data received: stale")
+      assertEquals(receivedMessages[1].pid, Deno.pid)
+      assertEquals(receivedMessages[1].data, "test data 2")
+      assertEquals(receivedMessages[1].errors.length, 0)
+      await fileIPC.close()
+    }
   },
 })
 
@@ -57,16 +58,17 @@ Deno.test({
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
     await fileIPC.sendData("a".repeat(fileIPC.MAX_DATA_LENGTH + 1))
-    const receivedMessages = await fileIPC.receiveData()
-    assertEquals(receivedMessages.length, 2)
-    assertEquals(receivedMessages[0].pid, Deno.pid)
-    assertEquals(receivedMessages[0].data, "test data")
-    assertEquals(receivedMessages[0].errors.length, 0)
-    assertEquals(receivedMessages[1].pid, Deno.pid)
-    assertEquals(receivedMessages[1].data, null)
-    assertEquals(receivedMessages[1].errors.length, 1)
-    assertEquals(receivedMessages[1].errors, ["Invalid data received: too long"])
-    await fileIPC.close()
+    for await (const receivedMessages of fileIPC.receiveData()) {
+      assertEquals(receivedMessages.length, 2)
+      assertEquals(receivedMessages[0].pid, Deno.pid)
+      assertEquals(receivedMessages[0].data, "test data")
+      assertEquals(receivedMessages[0].errors.length, 0)
+      assertEquals(receivedMessages[1].pid, Deno.pid)
+      assertEquals(receivedMessages[1].data, null)
+      assertEquals(receivedMessages[1].errors.length, 1)
+      assertEquals(receivedMessages[1].errors[0], "Invalid data received: too long")
+      await fileIPC.close()
+    }
   },
 })
 

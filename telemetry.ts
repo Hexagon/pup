@@ -22,6 +22,9 @@
  *     // To send messages to another process, use
  *     telemetry.emit('target-process-id', 'event_name', { any: { event: "data" }} );
  *
+ *     // To stop the telemetry and allow the process to exit, use the following:
+ *     telemetry.stop()
+ *
  * @file      telemetry.ts
  * @license   MIT
  */
@@ -46,6 +49,7 @@ export class PupTelemetry {
 
   private timer?: number
   private aborted = false
+  private ipc?: FileIPC
 
   /**
    * PupTelemetry singleton instance.
@@ -71,9 +75,10 @@ export class PupTelemetry {
     if (!intervalSeconds || intervalSeconds < 1) intervalSeconds = 1
     if (intervalSeconds > 180) intervalSeconds = 180
     this.intervalSeconds = intervalSeconds
-
     // Start the watchdog
     this.telemetryWatchdog()
+    // Start the IPC
+    this.checkIpc()
   }
 
   private async sendMainTelemetry() {
@@ -99,20 +104,22 @@ export class PupTelemetry {
 
     if (pupTempPath && (await dirExists(pupTempPath)) && pupProcessId) {
       const ipcPath = `${pupTempPath}/.${pupProcessId}.ipc` // Process-specific IPC path
-      const ipc = new FileIPC(ipcPath)
+      this.ipc = new FileIPC(ipcPath)
 
       // Read incoming messages
-      const messages = await ipc.receiveData()
-
-      // Process messages and emit events
-      for (const message of messages) {
-        try {
-          if (message.data) {
-            const parsedMessage = JSON.parse(message.data)
-            this.events.emit(parsedMessage.event, parsedMessage.eventData)
+      for await (const messages of this.ipc.receiveData()) {
+        if (messages.length > 0) {
+          // Process messages and emit events
+          for (const message of messages) {
+            try {
+              if (message.data) {
+                const parsedMessage = JSON.parse(message.data)
+                this.events.emit(parsedMessage.event, parsedMessage.eventData)
+              }
+            } catch (_e) {
+              // Ignore errors in message parsing and processing
+            }
           }
-        } catch (_e) {
-          // Ignore errors in message parsing and processing
         }
       }
     }
@@ -125,7 +132,6 @@ export class PupTelemetry {
   private async telemetryWatchdog() {
     try {
       await this.sendMainTelemetry()
-      await this.checkIpc()
     } catch (_e) {
       // Ignore errors
     } finally {
@@ -151,13 +157,17 @@ export class PupTelemetry {
     if (pupTempPath && (await dirExists(pupTempPath)) && targetProcessId) {
       const ipcPath = `${pupTempPath}/.${targetProcessId}.ipc` // Target process IPC path
 
+      // Create a temporary IPC to send the message
       const ipc = new FileIPC(ipcPath)
 
       // Create the message with event and eventData
       const message = { event, eventData }
 
       // Send the message to the target process
-      ipc.sendData(JSON.stringify(message))
+      await ipc.sendData(JSON.stringify(message))
+
+      // Close the temporary IPC
+      ipc.close()
     } else {
       // Ignore, process not run by Pup?
     }
@@ -165,8 +175,13 @@ export class PupTelemetry {
 
   close() {
     this.aborted = true
+
     if (this.timer) {
       clearTimeout(this.timer)
+    }
+
+    if (this.ipc) {
+      this.ipc.close()
     }
   }
 }

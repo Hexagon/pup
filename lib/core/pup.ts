@@ -12,9 +12,15 @@ import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
 import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
-import { path } from "../../deps.ts"
+import { path, uuid } from "../../deps.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
 import { toPersistentPath, toTempPath } from "../common/utils.ts"
+
+interface InstructionResponse {
+  success: boolean
+  action?: string
+  error?: string
+}
 
 class Pup {
   public configuration: Configuration
@@ -85,6 +91,9 @@ class Pup {
   }
 
   public init = async () => {
+    // Initilize ipc
+    this.receiveData()
+
     // Initialize plugins
     if (this.configuration.plugins) {
       for (const plugin of this.configuration.plugins) {
@@ -244,9 +253,6 @@ class Pup {
       this.logger.error("watchdog", `Heartbeat update failed: ${e}`)
     }
 
-    // Check IPC
-    if (this.ipc) this.processIpc()
-
     // Reschedule watchdog
     // ToDo: Exit if all processes are exhausted?
     if (!this.requestTerminate) {
@@ -257,72 +263,85 @@ class Pup {
     }
   }
 
-  private async processIpc() {
+  private async receiveData() {
     if (this.ipc) {
       try {
-        const data = await this.ipc.receiveData()
-        if (data.length) {
-          for (const message of data) {
-            try {
-              await this.processIpcMessage(message)
-            } catch (e) {
-              console.error("Error while processing IPC message: ", e.message)
+        await this.ipc.startWatching()
+
+        for await (const messages of this.ipc.receiveData()) {
+          if (messages.length > 0) {
+            for (const message of messages) {
+              try {
+                this.processIpcMessage(message)
+              } catch (e) {
+                this.logger.error("ipc", `Error while processing IPC message: ${e.message}`)
+              }
             }
           }
         }
       } catch (e) {
-        console.error("IPC error: ", e.message)
+        this.logger.error("ipc", `Error while starting IPC watcher: ${e.message}`)
       }
     }
   }
 
-  public restart(id: string, requestor: string) {
+  public restart(id: string, requestor: string): boolean {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.restart(requestor)
+      return true
     } else {
       console.error("Rpc: Got signal to restart process which does not exist.")
+      return false
     }
   }
 
-  public start(id: string, requestor: string) {
+  public start(id: string, requestor: string): boolean {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.start(requestor)
+      return true
     } else {
       console.error("Rpc: Got signal to stop process which does not exist.")
+      return false
     }
   }
 
-  public stop(id: string, requestor: string) {
+  public stop(id: string, requestor: string): boolean {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.stop(requestor)
+      return true
     } else {
       console.error("Rpc: Got signal to stop process which does not exist.")
+      return false
     }
   }
 
-  public block(id: string, requestor: string) {
+  public block(id: string, requestor: string): boolean {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.block(requestor)
+      return true
     } else {
       console.error("Rpc: Got signal to block process which does not exist.")
+      return false
     }
   }
 
-  public unblock(id: string, requestor: string) {
+  public unblock(id: string, requestor: string): boolean {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
       foundProcess.unblock(requestor)
+      return true
     } else {
       console.error("Rpc: Got signal to unblock process which does not exist.")
+      return false
     }
   }
 
@@ -338,81 +357,132 @@ class Pup {
     return result
   }
 
-  private processIpcMessage(message: IpcValidatedMessage) {
+  private async processIpcMessage(message: IpcValidatedMessage) {
+    if (!this.ipc) {
+      throw new Error("IPC not initialized")
+    }
+
     this.events.emit("ipc", message)
 
-    if (message.data !== null) {
-      const parsedMessage = JSON.parse(message.data)
-      if (parsedMessage.start) {
-        if (parsedMessage.start.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.allProcesses()) {
-            process.start("ipc")
-          }
-          // ToDo, also check valid characters
-        } else if (parsedMessage.start.length >= 1 && parsedMessage.start.length <= 64) {
-          this.start(parsedMessage.start, "ipc")
+    if (message.data) {
+      try {
+        const parsedMessage = JSON.parse(message.data)
+        const response = this.handleInstruction(message)
+
+        // If senderUuid is set, send response back to sender
+        if (parsedMessage.senderUuid && uuid.v4.validate(parsedMessage.senderUuid)) {
+          const fileIpc = new FileIPC(this.ipc.getFilePath() + "." + parsedMessage.senderUuid)
+          await fileIpc.sendData(JSON.stringify(response))
         }
-      } else if (parsedMessage.stop) {
-        if (parsedMessage.stop.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.allProcesses()) {
-            process.stop("ipc")
-          }
-          // ToDo, also check valid characters
-        } else if (parsedMessage.stop.length >= 1 && parsedMessage.stop.length <= 64) {
-          this.stop(parsedMessage.stop, "ipc")
-        }
-      } else if (parsedMessage.restart) {
-        if (parsedMessage.restart.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.allProcesses()) {
-            process.restart("ipc")
-          }
-          // ToDo, also check valid characters
-        } else if (parsedMessage.restart.length >= 1 && parsedMessage.restart.length <= 64) {
-          this.restart(parsedMessage.restart, "ipc")
-        }
-      } else if (parsedMessage.block) {
-        if (parsedMessage.block.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.allProcesses()) {
-            process.block("ipc")
-          }
-          // ToDo, also check valid characters
-        } else if (parsedMessage.block.length >= 1 && parsedMessage.block.length <= 64) {
-          this.block(parsedMessage.block, "ipc")
-        }
-      } else if (parsedMessage.unblock) {
-        if (parsedMessage.unblock.trim().toLocaleLowerCase() === "all") {
-          for (const process of this.allProcesses()) {
-            process.unblock("ipc")
-          }
-          // ToDo, also check valid characters
-        } else if (parsedMessage.unblock.length >= 1 && parsedMessage.unblock.length <= 64) {
-          this.unblock(parsedMessage.unblock, "ipc")
-        }
-      } else if (parsedMessage.event && parsedMessage.event === "telemetry") {
-        const telemetry = parsedMessage.eventData
-        if (telemetry.sender && typeof telemetry.sender === "string") {
-          const cleanedId = telemetry.sender.trim().toLocaleLowerCase()
-          const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
-          if (foundProcess) {
-            this.events.emit("process_telemetry", structuredClone(telemetry))
-            delete telemetry.sender
-            foundProcess?.setTelemetry(telemetry)
-          }
-        }
-      } else if (parsedMessage.terminate) {
-        this.terminate(30000)
+
+        // All is ok!
+      } catch (_error) {
+        // Ignore
+        this.logger.warn("ipc", "Received invalid IPC message (2)")
       }
+    } else {
+      // Ignore
+      this.logger.warn("ipc", "Received invalid IPC message (3)")
     }
   }
 
-  public terminate(forceQuitMs: number) {
+  private handleInstruction(message: IpcValidatedMessage) {
+    let response: InstructionResponse = { success: false, action: "", error: "No message data" }
+    if (message.data !== null) {
+      try {
+        const parsedMessage = JSON.parse(message.data)
+        if (parsedMessage.start) {
+          let success = true
+          if (parsedMessage.start.trim().toLocaleLowerCase() === "all") {
+            for (const process of this.allProcesses()) {
+              process.start("ipc")
+            }
+            // ToDo, also check valid characters
+          } else if (parsedMessage.start.length >= 1 && parsedMessage.start.length <= 64) {
+            success = this.start(parsedMessage.start, "ipc")
+          }
+          response = { success, action: "start" }
+        } else if (parsedMessage.stop) {
+          let success = true
+          if (parsedMessage.stop.trim().toLocaleLowerCase() === "all") {
+            for (const process of this.allProcesses()) {
+              process.stop("ipc")
+            }
+            // ToDo, also check valid characters
+          } else if (parsedMessage.stop.length >= 1 && parsedMessage.stop.length <= 64) {
+            success = this.stop(parsedMessage.stop, "ipc")
+          }
+          response = { success, action: "stop" }
+        } else if (parsedMessage.restart) {
+          let success = true
+          if (parsedMessage.restart.trim().toLocaleLowerCase() === "all") {
+            for (const process of this.allProcesses()) {
+              process.restart("ipc")
+            }
+            // ToDo, also check valid characters
+          } else if (parsedMessage.restart.length >= 1 && parsedMessage.restart.length <= 64) {
+            success = this.restart(parsedMessage.restart, "ipc")
+          }
+          response = { success, action: "restart" }
+        } else if (parsedMessage.block) {
+          let success = true
+          if (parsedMessage.block.trim().toLocaleLowerCase() === "all") {
+            for (const process of this.allProcesses()) {
+              process.block("ipc")
+            }
+            // ToDo, also check valid characters
+          } else if (parsedMessage.block.length >= 1 && parsedMessage.block.length <= 64) {
+            success = this.block(parsedMessage.block, "ipc")
+          }
+          response = { success, action: "block" }
+        } else if (parsedMessage.unblock) {
+          let success = true
+          if (parsedMessage.unblock.trim().toLocaleLowerCase() === "all") {
+            for (const process of this.allProcesses()) {
+              process.unblock("ipc")
+            }
+            // ToDo, also check valid characters
+          } else if (parsedMessage.unblock.length >= 1 && parsedMessage.unblock.length <= 64) {
+            success = this.unblock(parsedMessage.unblock, "ipc")
+          }
+          response = { success, action: "unblock" }
+        } else if (parsedMessage.event && parsedMessage.event === "telemetry") {
+          const telemetry = parsedMessage.eventData
+          let success = false
+          if (telemetry.sender && typeof telemetry.sender === "string") {
+            const cleanedId = telemetry.sender.trim().toLocaleLowerCase()
+            const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+            if (foundProcess) {
+              this.events.emit("process_telemetry", structuredClone(telemetry))
+              delete telemetry.sender
+              foundProcess?.setTelemetry(telemetry)
+              success = true
+            }
+          }
+          response = { success, action: "telemetry" }
+        } else if (parsedMessage.terminate) {
+          this.terminate(30000)
+          response = { success: true, action: "terminate" }
+        } else {
+          response = { success: false, action: "unknown" }
+        }
+      } catch (e) {
+        response = { success: false, action: "error", error: e.message }
+      }
+      return response
+    } else {
+      return response
+    }
+  }
+
+  public async terminate(forceQuitMs: number) {
     this.requestTerminate = true
 
     this.logger.log("terminate", "Termination requested")
 
     this.events.emit("terminating", forceQuitMs)
 
-    // ToDo: Log
+    // Block and stop all processes
     for (const process of this.processes) {
       process.block("terminating")
       process.stop("terminating")
@@ -426,8 +496,16 @@ class Pup {
 
     // Unref force quit timer to allow the process to exit earlier
     Deno.unrefTimer(timer)
+
+    // Close IPC
+    if (this.ipc) {
+      await this.ipc.close()
+    }
+
+    // Cleanup
+    this.cleanup()
   }
 }
 
 export { Pup }
-export type { GlobalLoggerConfiguration, ProcessConfiguration }
+export type { GlobalLoggerConfiguration, InstructionResponse, ProcessConfiguration }

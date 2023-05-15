@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this section.
 ## [1.0.0-beta.24] - Unreleased
 
 - Documentation fixes
+- Improve IPC implementation (speed and security)
+- Show outcome when running cli commands `start`, `stop`, `block`, `...`
+- Fix: `pup terminate` should not require specifying an process id
 
 ## [1.0.0-beta.23] - 2023-05-12
 

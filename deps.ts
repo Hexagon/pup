@@ -16,6 +16,8 @@
 export { parse } from "https://deno.land/std@0.180.0/flags/mod.ts"
 export type { Args } from "https://deno.land/std@0.180.0/flags/mod.ts"
 export * as path from "https://deno.land/std@0.180.0/path/mod.ts"
+export * as uuid from "https://deno.land/std@0.180.0/uuid/mod.ts"
+
 // logger
 export { stripColor } from "https://deno.land/std@0.180.0/fmt/colors.ts"
 // config
@@ -30,6 +32,9 @@ export { StringReader } from "https://deno.land/std@0.180.0/io/string_reader.ts"
 export { readLines } from "https://deno.land/std@0.180.0/io/mod.ts"
 // service installer
 export { existsSync } from "https://deno.land/std@0.180.0/fs/mod.ts"
+// ipc
+export { debounce } from "https://deno.land/std@0.180.0/async/mod.ts"
+export { basename, dirname, join, resolve } from "https://deno.land/std@0.180.0/path/mod.ts"
 
 /**
  * Third party dependencies

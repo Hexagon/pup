@@ -390,8 +390,7 @@ Deno.test("checkArguments should throw error when --instances value is not a num
   const args = { _: ["init"], cmd: "command", id: "test", instances: "invalid" }
   await assertThrows(
     () => {
-      const result = checkArguments(args)
-      console.log(result)
+      checkArguments(args)
     },
     Error,
     "Argument '--instances' must be a numeric value",

@@ -6,7 +6,7 @@
  */
 
 // Import core dependencies
-import { Pup } from "../core/pup.ts"
+import { InstructionResponse, Pup } from "../core/pup.ts"
 import { Configuration, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
 import { FileIPC } from "../common/ipc.ts"
 
@@ -273,7 +273,7 @@ async function main(inputArgs: string[]) {
 
   // Handle --restart, --stop etc using IPC
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
-    if (baseArgument === op && !secondaryBaseArgument) {
+    if (baseArgument === op && !secondaryBaseArgument && baseArgument !== "terminate") {
       console.error(`Control functions require an id, specify with '${baseArgument} all|<task-id>'`)
       Deno.exit(1)
     }
@@ -282,8 +282,36 @@ async function main(inputArgs: string[]) {
       try {
         if (await getStatus(configFile, statusFile) && ipcFile) {
           const ipc = new FileIPC(ipcFile)
-          await ipc.sendData(JSON.stringify({ [op]: secondaryBaseArgument || true }))
-          console.log("Command sent.")
+          const senderId = crypto.randomUUID()
+
+          const responseFile = `${ipcFile}.${senderId}`
+          const ipcResponse = new FileIPC(responseFile)
+
+          await ipc.sendData(JSON.stringify({ [op]: secondaryBaseArgument || true, senderUuid: senderId }))
+
+          const responseTimeout = setTimeout(() => {
+            console.error("Response timeout after 10 seconds")
+            Deno.exit(1)
+          }, 10000) // wait at most 10 seconds
+
+          for await (const message of ipcResponse.receiveData()) {
+            clearTimeout(responseTimeout) // clear the timeout when a response is received
+            if (message.length > 0 && message[0].data) {
+              const parsedMessage: InstructionResponse = JSON.parse(message[0].data)
+              if (parsedMessage.success) {
+                console.log("Action completed successfully")
+              } else {
+                console.error("Action failed.")
+                Deno.exit(1)
+              }
+            } else {
+              console.error("Action failed: Invalid response received.")
+              Deno.exit(1)
+            }
+
+            break // break out of the loop after receiving the response
+          }
+
           Deno.exit(0)
         } else {
           console.error(`No running instance found, cannot send command '${op}' over IPC.`)
