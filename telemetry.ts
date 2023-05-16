@@ -167,7 +167,7 @@ export class PupTelemetry {
       await ipc.sendData(JSON.stringify(message))
 
       // Close the temporary IPC
-      ipc.close()
+      ipc.close(true)
     } else {
       // Ignore, process not run by Pup?
     }

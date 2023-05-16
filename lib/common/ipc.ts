@@ -26,7 +26,7 @@ export class FileIPC {
   private watcher?: Deno.FsWatcher
 
   constructor(filePath: string, staleMessageLimitMs?: number, debounceTimeMs?: number) {
-    this.filePath = filePath
+    this.filePath = resolve(filePath)
     this.dirPath = resolve(dirname(filePath)) // Get directory of the file
     this.fileName = basename(filePath) // Get name of the file
     this.staleMessageLimitMs = staleMessageLimitMs ?? 30000
@@ -43,7 +43,7 @@ export class FileIPC {
    * get called more than once in a short amount of time (as specified by debounceTimeMs). The received messages
    * from the extractMessages call are then added to the messageQueue to be consumed by the receiveData generator.
    */
-  public async startWatching() {
+  private async startWatching() {
     // Create directory if it doesn't exist
     await Deno.mkdir(this.dirPath, { recursive: true })
 
@@ -191,7 +191,7 @@ export class FileIPC {
   /**
    * Close the file-based IPC and remove the IPC file.
    */
-  async close(): Promise<void> {
+  async close(leaveFile?: boolean): Promise<void> {
     // Flag as aborted
     this.aborted = true
 
@@ -200,10 +200,12 @@ export class FileIPC {
       this.watcher.close()
     }
     // Try to remove file, ignore failure
-    try {
-      await Deno.remove(this.filePath)
-    } catch (_e) {
-      // Ignore
+    if (!leaveFile) {
+      try {
+        await Deno.remove(this.filePath)
+      } catch (_e) {
+        // Ignore
+      }
     }
   }
 }

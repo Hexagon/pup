@@ -96,7 +96,7 @@ async function main(inputArgs: string[]) {
   const useConfigFile = !runWithoutConfig
   let configFile
   if (useConfigFile) {
-    configFile = await findConfigFile(useConfigFile, checkedArgs.config)
+    configFile = await findConfigFile(useConfigFile, checkedArgs.config, checkedArgs.cwd)
   }
 
   /**

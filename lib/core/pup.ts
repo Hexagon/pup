@@ -35,6 +35,7 @@ class Pup {
   private requestTerminate = false
 
   private WATCHDOG_INTERVAL_MS = 2000
+  private watchdogTimer?: number
 
   public temporaryStoragePath?: string
   public persistentStoragePath?: string
@@ -256,7 +257,7 @@ class Pup {
     // Reschedule watchdog
     // ToDo: Exit if all processes are exhausted?
     if (!this.requestTerminate) {
-      setTimeout(() => {
+      this.watchdogTimer = setTimeout(() => {
         // Exit watchdog if terminating
         this.watchdog()
       }, this.WATCHDOG_INTERVAL_MS)
@@ -266,8 +267,6 @@ class Pup {
   private async receiveData() {
     if (this.ipc) {
       try {
-        await this.ipc.startWatching()
-
         for await (const messages of this.ipc.receiveData()) {
           if (messages.length > 0) {
             for (const message of messages) {
@@ -461,7 +460,8 @@ class Pup {
           }
           response = { success, action: "telemetry" }
         } else if (parsedMessage.terminate) {
-          this.terminate(30000)
+          // Defer actual termination to allow response to be sent
+          setTimeout(() => this.terminate(30000), 500)
           response = { success: true, action: "terminate" }
         } else {
           response = { success: false, action: "unknown" }
@@ -476,7 +476,9 @@ class Pup {
   }
 
   public async terminate(forceQuitMs: number) {
+    // Stop watchdog
     this.requestTerminate = true
+    clearTimeout(this.watchdogTimer)
 
     this.logger.log("terminate", "Termination requested")
 
@@ -493,9 +495,7 @@ class Pup {
       this.logger.warn("terminate", "Terminating by force")
       Deno.exit(0)
     }, forceQuitMs)
-
-    // Unref force quit timer to allow the process to exit earlier
-    Deno.unrefTimer(timer)
+    Deno.unrefTimer(timer) // Unref force quit timer to allow the process to exit earlier
 
     // Close IPC
     if (this.ipc) {
@@ -503,7 +503,7 @@ class Pup {
     }
 
     // Cleanup
-    this.cleanup()
+    // this.cleanup()
   }
 }
 

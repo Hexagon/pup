@@ -7,7 +7,7 @@
  */
 
 import { Configuration, generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
-import { Args, jsonc } from "../../deps.ts"
+import { Args, join, jsonc, resolve } from "../../deps.ts"
 import { fileExists } from "../common/utils.ts"
 
 /**
@@ -138,16 +138,30 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
  *
  * @async
  */
-export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFile?: string): Promise<string | undefined> {
+export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFile?: string, cwd?: string): Promise<string | undefined> {
+  // If not using config file, return undefined
   if (!useConfigFile) return undefined
 
+  // If config file was specified in arguments, return it or throw if it does not exist
   if (argumentsConfigFile) {
-    return argumentsConfigFile
+    const resolvedPath = resolve(argumentsConfigFile)
+    if (await fileExists(resolvedPath)) {
+      return resolvedPath
+    } else {
+      throw new Error("Specified configuration file does not exist.")
+    }
   }
 
-  if (await fileExists("./pup.jsonc")) {
-    return "./pup.jsonc"
+  // Try to find configuration file, jsonc first. Take cwd into account.
+  let jsonPath = "./pup.json"
+  let jsoncPath = "./pup.jsonc"
+  if (cwd) {
+    jsonPath = join(resolve(cwd), jsonPath)
+    jsoncPath = join(resolve(cwd), jsoncPath)
+  }
+  if (await fileExists(jsoncPath)) {
+    return jsoncPath
   } else {
-    return "./pup.json"
+    return jsonPath
   }
 }

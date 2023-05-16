@@ -9,10 +9,17 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.24] - 2023-05-16
+## [1.0.0-beta.25] - 2023-05-16
+
+- Fix: Find default config files in working directory when using `--cwd` without specifying `--config`
+- Fix: Bugged cli <-> main process communication
+- Fix: Make --terminate even more graceful
+
+## [1.0.0-beta.24] - 2023-05-15
 
 - Documentation fixes
 - Improve IPC implementation (speed and security)
+- Improve cleanup functions and graceful shutdown
 - Show outcome when running cli commands `start`, `stop`, `block`, `...`
 - Fix: `pup terminate` should not require specifying an process id
 

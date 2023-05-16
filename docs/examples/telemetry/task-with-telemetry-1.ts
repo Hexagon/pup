@@ -4,7 +4,7 @@ const telemetry = new PupTelemetry(1)
 
 // The task
 let i = 0
-console.log("Task running running")
+console.log("Task running")
 
 // Send data every 5th second
 setInterval(() => {

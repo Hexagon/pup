@@ -106,7 +106,8 @@ class Logger {
 
     // Write to temporary log file
     if (this.tempLogPath) {
-      this.writeFile(this.tempLogPath, decorateGlobalFiles ? decoratedLogText : text)
+      // Ignore errors when writing to temp log file, as logs can occurr after the destination directory has been deleted
+      this.writeFile(this.tempLogPath, decorateGlobalFiles ? decoratedLogText : text, true)
     }
 
     // Write process log file(s)
@@ -121,13 +122,13 @@ class Logger {
     }
   }
 
-  private async writeFile(fileName: string, text: string) {
+  private async writeFile(fileName: string, text: string, quiet = false) {
     // Strip colors
     text = stripColor(text)
     try {
       await Deno.writeTextFile(fileName, `${text}\n`, { append: true })
     } catch (_e) {
-      console.error(`Failed to write log '${fileName}'. The following message were not logged: ${text}.`)
+      if (!quiet) console.error(`Failed to write log '${fileName}'. The following message were not logged: ${text}.`)
     }
   }
 
