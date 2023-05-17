@@ -6,7 +6,7 @@ const TEST_FILE_PATH = "./test_data_FileIPC.ipctest"
 const TEST_STALE_LIMIT = 2000
 
 Deno.test({
-  name: "FileIPC sendData writes data to file",
+  name: "FileIPC - sendData writes data to file",
   async fn() {
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
@@ -17,7 +17,7 @@ Deno.test({
 })
 
 Deno.test({
-  name: "FileIPC receiveData returns an array of ValidatedMessages",
+  name: "FileIPC - receiveData returns an array of ValidatedMessages",
   async fn() {
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
@@ -32,7 +32,7 @@ Deno.test({
 })
 
 Deno.test({
-  name: "FileIPC receiveData removes stale messages",
+  name: "FileIPC - receiveData removes stale messages",
   async fn() {
     const fileIPC = new FileIPC(TEST_FILE_PATH, TEST_STALE_LIMIT)
     await fileIPC.sendData("test data 1")
@@ -53,7 +53,7 @@ Deno.test({
 })
 
 Deno.test({
-  name: "FileIPC receiveData handles invalid messages",
+  name: "FileIPC - receiveData handles invalid messages",
   async fn() {
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
@@ -73,7 +73,7 @@ Deno.test({
 })
 
 Deno.test({
-  name: "FileIPC close removes IPC file",
+  name: "FileIPC - close removes IPC file",
   async fn() {
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")

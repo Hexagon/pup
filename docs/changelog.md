@@ -11,8 +11,9 @@ All notable changes to this project will be documented in this section.
 
 ## [1.0.0-beta.26] - Unreleased
 
-- Code cleanup: Simplify argument check
-- Fix: `least-connections` not used even if configured
+- Refactor(args): Simplify argument check
+- Fix(loadbalancer): `least-connections` not used even if configured
+- Refactor(tests): More consistent test names
 
 ## [1.0.0-beta.25] - 2023-05-16
 

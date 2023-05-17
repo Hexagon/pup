@@ -61,7 +61,7 @@ export class LoadBalancer {
       targetConn.close()
     }
   }
-  
+
   private selectBackend(client: Deno.Conn): InternalBackend {
     const { remoteAddr } = client
     switch (this.strategy) {

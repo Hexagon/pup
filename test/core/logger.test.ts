@@ -2,7 +2,7 @@ import { assertEquals } from "../deps.ts"
 import { AttachedLogger, Logger } from "../../lib/core/logger.ts"
 import { ProcessConfiguration } from "../../mod.ts"
 
-Deno.test("Creating Logger instance with global configuration", () => {
+Deno.test("Logger - Creation with Global Configuration", () => {
   const globalConfig = {
     console: false,
     colors: true,
@@ -16,7 +16,7 @@ Deno.test("Creating Logger instance with global configuration", () => {
   assertEquals(logger instanceof Logger, true)
 })
 
-Deno.test("Attaching an external logger", () => {
+Deno.test("Logger - Attachment of External Logger", () => {
   let externalLoggerCalled = false
   let externalLoggerText = ""
   const expectedExteralLoggerText = "Testing attached logger"
@@ -39,7 +39,7 @@ Deno.test("Attaching an external logger", () => {
   assertEquals(externalLoggerText, expectedExteralLoggerText)
 })
 
-Deno.test("Logging with different methods", () => {
+Deno.test("Logger - Logging with Different Methods", () => {
   const logger = new Logger({ console: false })
 
   logger.log("test", "Testing log method")
@@ -50,7 +50,7 @@ Deno.test("Logging with different methods", () => {
   assertEquals(true, true) // This is just to assert that the test passed if no errors are thrown
 })
 
-Deno.test("Writing to a file with writeFile", async () => {
+Deno.test("Logger - File Writing with writeFile Method", async () => {
   const logger = new Logger({ console: false })
   const testFileName = "test_writeFile.log"
   const testText = "Testing writeFile"

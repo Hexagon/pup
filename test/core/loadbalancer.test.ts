@@ -2,7 +2,7 @@
 import { assertEquals, assertRejects } from "../deps.ts"
 import { Backend, BalancingStrategy, hashCode, InternalBackend, LoadBalancer } from "../../lib/core/loadbalancer.ts"
 
-Deno.test("LoadBalancer initialization", () => {
+Deno.test("LoadBalancer - Initialization", () => {
   const backends: Backend[] = [
     { host: "backend1.example.com", port: 80 },
     { host: "backend2.example.com", port: 80 },
@@ -11,7 +11,7 @@ Deno.test("LoadBalancer initialization", () => {
   assertEquals(loadBalancer instanceof LoadBalancer, true)
 })
 
-Deno.test("LoadBalancer throws error when no backends are provided", async () => {
+Deno.test("LoadBalancer - Throws Error When No Backends are Provided", async () => {
   const backends: Backend[] = []
   const loadBalancer = new LoadBalancer(backends)
   await assertRejects(() => {
@@ -19,24 +19,26 @@ Deno.test("LoadBalancer throws error when no backends are provided", async () =>
   })
 })
 
-Deno.test("hashCode should return a unique value for different strings", () => {
+// Grouping tests related to hashCode
+Deno.test("LoadBalancer - HashCode Returns a Unique Value for Different Strings", () => {
   const hash1 = hashCode("hello world")
   const hash2 = hashCode("foo bar baz")
   assertEquals(hash1 !== hash2, true)
 })
 
-Deno.test("hashCode should return the same value for the same string", () => {
+Deno.test("LoadBalancer - HashCode Returns the Same Value for the Same String", () => {
   const hash1 = hashCode("hello world")
   const hash2 = hashCode("hello world")
   assertEquals(hash1 === hash2, true)
 })
 
-Deno.test("hashCode should return a value between 0 and 2^32-1 (inclusive)", () => {
+Deno.test("LoadBalancer - HashCode Returns a Value Between 0 and 2^32-1 (inclusive)", () => {
   const hash = hashCode("hello world")
   assertEquals(hash >= 0 && hash <= 4294967295, true)
 })
 
-Deno.test("LoadBalancer selects backends with IP_HASH strategy", () => {
+// Grouping tests related to LoadBalancer strategies
+Deno.test("LoadBalancer - Selects Backends with IP_HASH Strategy", () => {
   const backends: Backend[] = [
     { host: "192.168.1.1", port: 8080 },
     { host: "192.168.1.2", port: 8080 },
@@ -65,11 +67,12 @@ Deno.test("LoadBalancer selects backends with IP_HASH strategy", () => {
   assertEquals(selectedBackend, expectedBackends[expectedIndex])
 })
 
-Deno.test("LoadBalancer initializes with LEAST_CONNECTIONS strategy", () => {
+Deno.test("LoadBalancer - Initializes with LEAST_CONNECTIONS Strategy", () => {
   const backends: Backend[] = [
     { host: "localhost", port: 3000 },
     { host: "localhost", port: 3001 },
   ]
   const lb = new LoadBalancer(backends, BalancingStrategy.LEAST_CONNECTIONS)
+
   assertEquals(lb["strategy"], BalancingStrategy.LEAST_CONNECTIONS)
 })

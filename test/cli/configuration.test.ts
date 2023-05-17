@@ -1,7 +1,7 @@
 import { assertEquals } from "../deps.ts"
 import { generateConfiguration } from "../../lib/core/configuration.ts"
 
-Deno.test("generateConfiguration: create a basic configuration", () => {
+Deno.test("Configuration - generateConfiguration creates a basic configuration", () => {
   const id = "task"
   const cmd = "npm start"
   const cwd = "/path/to/project"

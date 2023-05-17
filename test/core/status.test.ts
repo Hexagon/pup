@@ -28,18 +28,18 @@ class MockProcess extends Process {
   }
 }
 
-Deno.test("Status should create an instance with statusFileName property if provided", () => {
+Deno.test("Status - Should create an instance with statusFileName property if provided", () => {
   const expectedFileName = TEST_FILE_PATH
   const status = new Status(expectedFileName)
   assertEquals(status["statusFileName"], expectedFileName)
 })
 
-Deno.test("Status should not have statusFileName property if not provided", () => {
+Deno.test("Status - Should not have statusFileName property if not provided", () => {
   const status = new Status()
   assertEquals(status["statusFileName"], undefined)
 })
 
-Deno.test("Status.writeToDisk should write the status to disk if statusFileName property is set", () => {
+Deno.test("Status - writeToDisk should write the status to disk if statusFileName property is set", () => {
   /*const expectedFileName = TEST_FILE_PATH
   const expectedProcess = new MockProcess()
   const expectedProcessState = expectedProcess.getStatus()
@@ -64,7 +64,7 @@ Deno.test("Status.writeToDisk should write the status to disk if statusFileName 
   writeFileSpy.restore()*/
 })
 
-Deno.test("Status.writeToDisk should not write the status to disk if statusFileName property is not set", () => {
+Deno.test("Status - writeToDisk should not write the status to disk if statusFileName property is not set", () => {
   const writeFileSpy = spy(Deno, "writeFile")
 
   const status = new Status()
@@ -76,7 +76,7 @@ Deno.test("Status.writeToDisk should not write the status to disk if statusFileN
   writeFileSpy.restore()
 })
 
-Deno.test("Status.writeToDisk should catch and log errors", async () => {
+Deno.test("Status - writeToDisk should catch and log errors", async () => {
   const expectedProcess = new MockProcess()
   const writeFileSpy = spy(Deno, "writeFile")
 
