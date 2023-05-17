@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.26] - Unreleased
+
+- Code cleanup: Simplify argument check
+
 ## [1.0.0-beta.25] - 2023-05-16
 
 - Fix: Find default config files in working directory when using `--cwd` without specifying `--config`

@@ -1,4 +1,12 @@
 /**
+ * Exports helper functions to format an array of rows into a table with specified columns.
+ * Belongs to Pup cli entrypoint
+ *
+ * @file      lib/cli/table.ts
+ * @license   MIT
+ */
+
+/**
  * Represents a column of the table.
  * @interface
  */

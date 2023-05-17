@@ -1,7 +1,12 @@
 /**
- * @fileoverview FileIPC is a compact file-based IPC mechanism for Deno.
- * It manages file permissions and ensures that the messages were sent within a reasonable amount of time. The class is used due to Deno's
- * current lack of support for secure cross-platform sockets.
+ * Compact file-based IPC mechanism for Deno.
+ *
+ * Manages file permissions and ensures that the messages were sent within a reasonable amount of time.
+ *
+ * The class is used due to Deno's current lack of support for secure cross-platform sockets.
+ *
+ * @file lib/common/ipc.ts
+ * @license MIT
  */
 
 import { fileExists } from "../common/utils.ts"

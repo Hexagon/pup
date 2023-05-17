@@ -77,8 +77,6 @@ function parseArguments(args: string[]): Args {
  * @throws - An error if any of the arguments are invalid.
  */
 function checkArguments(args: Args): Args {
-  // Check if the base argument is undefined or valid
-  const baseArgument = args._.length > 0 ? args._[0] : undefined
   const validBaseArguments = [
     "init",
     "append",
@@ -94,79 +92,76 @@ function checkArguments(args: Args): Args {
     "install",
     "uninstall",
     "logs",
-    // Aliases for --equivalent
     "upgrade",
-    "update", // Allow to use update as alias for upgrade
+    "update",
     "help",
     "version",
   ]
+
+  const numericArguments = [
+    "instances",
+    "start-port",
+    "common-port",
+  ]
+
+  const processOptions = [
+    "autostart",
+    "cron",
+    "terminate",
+    "watch",
+    "instances",
+    "start-port",
+    "common-port",
+    "strategy",
+    "stdout",
+    "stderr",
+  ]
+
+  // Check that the base argument is either undefined or valid
+  const baseArgument = args._[0]
   if (baseArgument !== undefined && (typeof baseArgument !== "string" || !validBaseArguments.includes(baseArgument))) {
     throw new Error(`Invalid base argument: ${baseArgument}`)
   }
 
-  // if --cmd or --worker or -- is used, then we don't use the config file
-  const hasCmd = (args["--"] && args["--"].length > 0) || args.cmd || args.worker
+  const hasDoubleDashCmd = args["--"] && args["--"].length > 0
+  const hasCmd = hasDoubleDashCmd || args.cmd || args.worker
+  const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "run" && hasCmd)
 
-  const noConfig = !args.config
-
-  const configOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "run" && noConfig)
-
-  if (((args["--"] && args["--"].length > 0) && args.cmd) || (args.cmd && args.worker)) {
+  // Only one type of command can be present at the same time
+  if ((hasDoubleDashCmd && args.cmd) || (args.cmd && args.worker) || (hasDoubleDashCmd && args.worker)) {
     throw new Error("'--cmd', '--worker' and '--' cannot be used at the same time.")
   }
 
-  // Do not allow configuration creation options without init and vice versa
-  if (args.autostart && !configOptions) {
-    throw new Error("Argument '--autostart' requires 'init' or 'append', '--cmd' or '--worker'")
-  }
-  if (args.cron && !configOptions) {
-    throw new Error("Argument '--cron' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  if (args.terminate && !configOptions) {
-    throw new Error("Argument '--terminate' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  if (args.watch && !configOptions) {
-    throw new Error("Argument '--watch' requires 'init', 'append', '--cmd' or '--worker'")
-  }
+  // Certain base arguments require --id
   if (!args.id && (baseArgument === "init" || baseArgument === "append" || baseArgument === "remove")) {
     throw new Error("Arguments 'init', 'append', and 'remove' require '--id'")
   }
-  if (hasCmd && !configOptions) {
-    throw new Error("Argument '--cmd' or '--worker' requires 'init', 'append' or 'run' without config")
-  }
+
+  // Init and append require a command
   if ((args.init || args.append) && !hasCmd) {
     throw new Error("Arguments 'init' and 'append' requires '--cmd' or '--worker'")
   }
-  if (args.instances && !configOptions) {
-    throw new Error("Argument '--instances' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  if (args["start-port"] && !configOptions) {
-    throw new Error("Argument '--start-port' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  if (args["common-port"] && !configOptions) {
-    throw new Error("Argument '--common-port' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  if (args.strategy && !configOptions) {
-    throw new Error("Argument '--strategy' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  if (args.stdout && !configOptions) {
-    throw new Error("Argument '--stdout' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  if (args.stderr && !configOptions) {
-    throw new Error("Argument '--stderr' requires 'init', 'append', '--cmd' or '--worker'")
-  }
-  // Ensure --instances, --start-port, and --common-port are numeric
-  if (args.instances && isNaN(Number(args.instances))) {
-    throw new Error("Argument '--instances' must be a numeric value")
-  }
-  if (args["start-port"] && isNaN(Number(args["start-port"]))) {
-    throw new Error("Argument '--start-port' must be a numeric value")
-  }
-  if (args["common-port"] && isNaN(Number(args["common-port"]))) {
-    throw new Error("Argument '--common-port' must be a numeric value")
+
+  // Do not allow configuration creation options without init and vice versa
+  if (hasCmd && !expectConfigOptions) {
+    throw new Error("Argument '--cmd' or '--worker' requires 'init', 'append' or 'run' without config")
   }
 
-  // Ensure --env flag can only be used with 'service install' base argument
+  // All arguments in processOptions require that init, append, cmd och worker is used
+  for (const opt of processOptions) {
+    if (args[opt] && !expectConfigOptions) {
+      throw new Error(`Argument '--${opt}' requires 'init', 'append', '--cmd' or '--worker'`)
+    }
+  }
+
+  // All arguments in numericArguments must be numeric
+  for (const opt of numericArguments) {
+    if (args[opt] && isNaN(Number(args[opt]))) {
+      throw new Error(`Argument '--${opt}' must be a numeric value`)
+    }
+  }
+
+  // --env flag can only be used with 'service install' base argument
   if (args.env && (baseArgument !== "install")) {
     throw new Error("Argument '--env' can only be used with 'service install' base argument")
   }

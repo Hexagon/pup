@@ -40,7 +40,6 @@ async function main(inputArgs: string[]) {
    * Begin with --version, --upgrade and --help, as they have no dependencies on other
    * arguments, and just exit
    */
-
   if (args.version || baseArgument === "version") {
     printHeader()
     Deno.exit(0)

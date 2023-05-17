@@ -108,7 +108,7 @@ Deno.test("checkArguments should throw error when autostart argument is provided
       checkArguments(args)
     },
     Error,
-    "Argument '--autostart' requires 'init' or 'append', '--cmd' or '--worker'",
+    "Argument '--autostart' requires 'init', 'append', '--cmd' or '--worker'",
   )
 })
 

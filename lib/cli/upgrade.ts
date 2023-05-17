@@ -1,3 +1,13 @@
+/**
+ * Exports a function which tries to upgrade/downgrade the version of Pup,
+ * then exit deno with the appropriate exit code
+ *
+ * Belongs to Pup cli entrypoint
+ *
+ * @file      lib/cli/upgrade.ts
+ * @license   MIT
+ */
+
 import { Application } from "../../application.meta.ts"
 
 async function getLatestVersion(): Promise<string> {
