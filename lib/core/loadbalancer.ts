@@ -45,24 +45,23 @@ export class LoadBalancer {
       backend.connections++ // Increment connections when connected LEAST_CONNECTIONS
     } catch (_e) {
       console.warn(`Could not connect to backend ${backend.host}:${backend.port}`)
+      return
     }
-    if (targetConn) {
-      try {
-        await Promise.all([
-          copy(client, targetConn),
-          copy(targetConn, client),
-        ])
-      } catch (_err) {
-        // Transport error, ignore
-        //console.error("Proxy error:", err)
-      } finally {
-        backend.connections-- // Decrement connections when closed LEAST_CONNECTIONS
-        client.close()
-        targetConn.close()
-      }
+    try {
+      await Promise.all([
+        copy(client, targetConn),
+        copy(targetConn, client),
+      ])
+    } catch (_err) {
+      // Transport error, ignore
+      //console.error("Proxy error:", err)
+    } finally {
+      backend.connections-- // Decrement connections when closed LEAST_CONNECTIONS
+      client.close()
+      targetConn.close()
     }
   }
-
+  
   private selectBackend(client: Deno.Conn): InternalBackend {
     const { remoteAddr } = client
     switch (this.strategy) {

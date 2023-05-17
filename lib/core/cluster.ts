@@ -70,6 +70,8 @@ class Cluster extends Process {
 
       if (this.config.cluster.strategy === "ip-hash") {
         strategy = BalancingStrategy.IP_HASH
+      } else if (this.config.cluster.strategy === "least-connections") {
+        strategy = BalancingStrategy.LEAST_CONNECTIONS
       } else {
         strategy = BalancingStrategy.ROUND_ROBIN
       }

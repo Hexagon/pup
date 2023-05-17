@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this section.
 ## [1.0.0-beta.26] - Unreleased
 
 - Code cleanup: Simplify argument check
+- Fix: `least-connections` not used even if configured
 
 ## [1.0.0-beta.25] - 2023-05-16
 
