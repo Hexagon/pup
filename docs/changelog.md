@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this section.
 - Refactor(args): Simplify argument check
 - Fix(loadbalancer): `least-connections` not used even if configured
 - Refactor(tests): More consistent test names
+- Fix(docs): Improve documentation on library usage
 
 ## [1.0.0-beta.25] - 2023-05-16
 

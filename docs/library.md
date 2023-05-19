@@ -7,14 +7,14 @@ title: " 7. Library usage"
 
 ---
 
-Pup can be build in in your application. Just import from your favorite cdn, we prefer [deno.land/x/pup](https://deno.land/x/pup), and set up your main script like this.
+Pup can be integrated into your application. Simply import it from your preferred CDN. We recommend [deno.land/x/pup](https://deno.land/x/pup). Here's how you can set up your main script:
 
 ```ts
 import { Configuration, Pup } from "https://deno.land/x/pup/mod.ts"
 
 const configuration: Configuration = {
   "logger": {
-    /* optional */
+    /* This is optional. If included, it can be used to specify custom logger settings */
   },
   "processes": [
     {/*...*/},
@@ -24,32 +24,33 @@ const configuration: Configuration = {
 
 const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
 
-// Go!
+// Kickstart the pup instance
 pup.init()
 ```
 
 ## Custom logger
 
-Pup supports plugging in an custom logger, use like this:
+Pup supports the integration of a custom logger. This allows for more flexible and adaptable logging, suitable to your specific requirements. Here's how you can implement it:
 
 ```ts
 // Create a pup instance
-const pup = new Pup() /* configuration */
+const pup = new Pup() /* The configuration object is optional when instantiating a new Pup */
 
-// Create a custom logger
+// Create a custom logger function
 const logger = (severity: string, category: string, text: string, _config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => {
-  // Initiator
+  // The initiator will be the process ID if a process is specified, otherwise it defaults to "core"
   const initiator = process ? process.id : "core"
 
-  // Custom log function
+  // Implement your custom log function here
   console.log(`${initiator}(${severity}:${category}): ${text}`)
 
-  // Block built in logger by returning true
+  // Block the built-in logger by returning true. This prevents the built-in logger from logging the same message.
   return true
 }
 
-// Attach the logger to pup
+// Attach the custom logger to the Pup instance
 pup.logger.attach(logger)
 
+// Kickstart the pup instance
 pup.init()
 ```
