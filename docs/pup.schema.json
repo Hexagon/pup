@@ -136,7 +136,8 @@
                     "type": "string",
                     "enum": [
                       "ip-hash",
-                      "round-robin"
+                      "round-robin",
+                      "least-connections"
                     ],
                     "default": "round-robin"
                   }

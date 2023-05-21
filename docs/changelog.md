@@ -9,12 +9,14 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.26] - Unreleased
+## [1.0.0-beta.26] - 2023-05-21
 
 - Refactor(args): Simplify argument check
 - Fix(loadbalancer): `least-connections` not used even if configured
 - Refactor(tests): More consistent test names
 - Fix(docs): Improve documentation on library usage
+- Fix(cli): Remove debug console log
+- Fix(build): Follow new flat convention of deno.json
 
 ## [1.0.0-beta.25] - 2023-05-16
 

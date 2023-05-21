@@ -207,9 +207,8 @@ async function main(inputArgs: string[]) {
     try {
       const rawConfig = await Deno.readTextFile(configFile)
       configuration = validateConfiguration(jsonc.parse(rawConfig))
-    } catch (e) {
+    } catch (_e) {
       console.error(`Could not start, error reading or parsing configuration file '${configFile}'`)
-      console.error(e)
       Deno.exit(1)
     }
   } else {

@@ -1,9 +1,7 @@
 {
   "fmt": {
-    "options": {
-      "lineWidth": 200,
-      "semiColons": false
-    }
+    "lineWidth": 200,
+    "semiColons": false
   },
   "lint": {
     "files": {
