@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.27] - Unreleased
+
+- Chore: Update std 0.180 -> 0.188
+
 ## [1.0.0-beta.26] - 2023-05-21
 
 - Refactor(args): Simplify argument check
