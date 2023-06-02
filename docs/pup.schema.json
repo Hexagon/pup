@@ -4,6 +4,9 @@
     "ConfigurationSchema": {
       "type": "object",
       "properties": {
+        "$schema": {
+          "type": "string"
+        },
         "logger": {
           "type": "object",
           "properties": {

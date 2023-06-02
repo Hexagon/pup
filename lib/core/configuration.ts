@@ -72,6 +72,7 @@ interface ProcessConfiguration {
 }
 
 const ConfigurationSchema = z.object({
+  $schema: z.optional(z.string()),
   logger: z.optional(
     z.object({
       console: z.optional(z.boolean()),
