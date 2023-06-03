@@ -27,7 +27,6 @@ enum ProcessState {
   FINISHED = 300,
   ERRORED = 400,
   EXHAUSTED = 450,
-  BLOCKED = 500,
 }
 
 interface ProcessStateChangedEvent {
@@ -240,6 +239,13 @@ class Process {
         logger.log("finished", `Process finished with code ${result.code}`, this.config)
 
         /**
+         * Forcefully stopped
+         */
+      } else if (result.code === 124) {
+        this.setStatus(ProcessState.FINISHED)
+        logger.log("finished", `Process manually stopped with code ${result.code}`, this.config)
+
+        /**
          * Exited - Update status
          *
          * Treat all exit codes except 0 as errors
@@ -283,7 +289,6 @@ class Process {
   public block = (reason: string) => {
     this.blocked = true
     this.pup.logger.log("block", `Process blocked, reason: ${reason}`, this.config)
-    this.setStatus(ProcessState.BLOCKED)
   }
 
   public unblock = (reason: string) => {

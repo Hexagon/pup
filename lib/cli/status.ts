@@ -38,12 +38,12 @@ export async function printStatus(configFile: string, statusFile: string) {
   // Add main process
   taskTable.push({
     Id: "Main",
-    Type: status.type || "N/A",
-    Pid: status.pid?.toString(10) || "N/A",
+    Type: status.type.slice(0, 4) || "N/A",
     Status: status.status || "N/A",
-    Started: status.started || "N/A",
-    Exited: status.exited || "N/A",
-    RSS: status.memory?.rss.toString(10) || "N/A",
+    Blocked: status.blocked ? "Y" : "N",
+    Started: status.started ? new Date(Date.parse(status.started)).toLocaleString() : "N/A",
+    Exited: status.exited ? new Date(Date.parse(status.exited)).toLocaleString() : "N/A",
+    RSS: (Math.round(status.memory?.rss / 1024)).toString(10) || "N/A",
     Signal: `${(status.code ?? "-")}${status.signal ? (" " + status.signal) : ""}`,
   })
 
@@ -54,12 +54,12 @@ export async function printStatus(configFile: string, statusFile: string) {
     const currentTask = taskInfo as ProcessInformationParsed
     taskTable.push({
       Id: currentTask.id,
-      Type: currentTask.type || "N/A",
-      Pid: currentTask.pid?.toString(10) || "N/A",
+      Type: currentTask.type.slice(0, 4) || "N/A",
       Status: ProcessState[currentTask.status] || "N/A",
-      Started: currentTask.started || "N/A",
-      Exited: currentTask.exited || "N/A",
-      RSS: (currentTask.telemetry?.memory?.rss || 0).toString(10) || "N/A",
+      Blocked: currentTask.blocked ? "Y" : "N",
+      Started: currentTask.started ? new Date(Date.parse(currentTask.started)).toLocaleString() : "N/A",
+      Exited: currentTask.exited ? new Date(Date.parse(currentTask.exited)).toLocaleString() : "N/A",
+      RSS: (Math.round(currentTask.telemetry?.memory?.rss || 0) / 1024).toString(10) || "N/A",
       Signal: `${(currentTask.code ?? "-")}${currentTask.signal ? (" " + currentTask.signal) : ""}`,
     })
   }
@@ -67,11 +67,11 @@ export async function printStatus(configFile: string, statusFile: string) {
   const tableColumns: Column[] = [
     { key: "Id", header: "Id", minWidth: 15, maxWidth: 24 },
     { key: "Type", header: "Type", minWidth: 5 },
-    { key: "Pid", header: "Pid", minWidth: 5 },
     { key: "Status", header: "Status", minWidth: 10 },
+    { key: "Blocked", header: "Blocked", minWidth: 8 },
     { key: "Started", header: "Started", minWidth: 10 },
     { key: "Exited", header: "Exited", minWidth: 10 },
-    { key: "RSS", header: "RSS (byte)", minWidth: 10 },
+    { key: "RSS", header: "RSS(kB)", minWidth: 6 },
     { key: "Signal", header: "Code", minWidth: 10 },
   ]
 

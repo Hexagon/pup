@@ -9,6 +9,12 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.28] - Unreleased
+
+- Refactor(cli): Cleanup of status output. Add column for blocked. Use local dates.
+- Refactor(process): Remove process status BLOCKED, as it is a state independent of process status
+- Fix(dax-runner): Handle exit code 124 (aborted by command stop) as process status FINISHED.
+
 ## [1.0.0-beta.27] - 2023-06-02
 
 - Fix(config): Support $schema in pup.json

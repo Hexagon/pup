@@ -91,7 +91,21 @@ class Runner extends BaseRunner {
     this.pipeToLogger("stdout", this.process.stdout())
     this.pipeToLogger("stderr", this.process.stderr())
 
-    const result = await this.process
+    // Dax will throw on abort, handle that explicitly
+    let result
+    try {
+      result = await this.process
+    } catch (e) {
+      if (e.message.includes("124")) {
+        result = {
+          code: 124,
+          signal: null,
+          success: false,
+        }
+      } else {
+        throw e
+      }
+    }
 
     this.process = undefined
 
