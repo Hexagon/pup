@@ -9,7 +9,7 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.28] - Unreleased
+## [1.0.0-beta.28] - 2023-06-03
 
 - Refactor(cli): Cleanup of status output. Add column for blocked. Use local dates.
 - Refactor(process): Remove process status BLOCKED, as it is a state independent of process status
