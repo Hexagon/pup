@@ -117,13 +117,10 @@ class Cluster extends Process {
     }
 
     const statuses = this.getStatuses()
-    const allBlocked = statuses.every((status) => status.blocked)
     const allRunning = statuses.every((status) => status.status === ProcessState.RUNNING)
     const anyRunning = statuses.some((status) => status.status === ProcessState.RUNNING)
 
-    if (allBlocked) {
-      clusterStatus.status = ProcessState.BLOCKED
-    } else if (allRunning) {
+    if (allRunning) {
       clusterStatus.status = ProcessState.RUNNING
     } else if (anyRunning) {
       clusterStatus.status = ProcessState.STARTING
