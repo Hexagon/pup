@@ -9,7 +9,8 @@ title: " 9. Troubleshooting"
 
 ## Known Issues
 
-- **Unstoppable Processes using deno task**: Processes initiated via `deno task` can't be halted due to a known issue in the Deno/deno_task_shell (#33), which causes 'ghost' processes to remain active. As a workaround, we recommend always using `deno run ...` instead `of deno task ...`
+- **Unstoppable Processes using deno task**: Processes initiated via `deno task` can't be halted due to a known issue in the Deno/deno_task_shell (#33), which causes 'ghost' processes to remain
+  active. As a workaround, we recommend always using `deno run ...` instead `of deno task ...`
 
 ## Common problems and their solutions
 
