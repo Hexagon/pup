@@ -12,8 +12,10 @@ All notable changes to this project will be documented in this section.
 ## [1.0.0-beta.29] - Unreleased
 
 - docs: Add Known Issues section in docs. Add Known Issue on problem starting a managed process using `deno task`.
-- fix(docs): Remove stray file `docs/resources/pup.schema.json`. Correct path has always been, and will always be `docs/pup.schema.json`.
+- docs: Remove stray file `docs/resources/pup.schema.json`. Correct path is `docs/pup.schema.json`.
 - docs: Add note on using "$schema"-section in `pup.json` for auto completion.
+- docs: Upgrade Deno version in example Dockerfile.
+- docs: Fix error in example Dockerfile.
 
 ## [1.0.0-beta.28] - 2023-06-03
 
