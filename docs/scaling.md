@@ -43,7 +43,7 @@ In this example, Pup will start 4 instances of the process with the ID `my-scala
 
 Each process will have two additional environment variables set
 
-- `PUP_CLUSTER_INDEX`: Index of the current instance, starting from `0`
+- `PUP_CLUSTER_INSTANCE`: Index of the current instance, starting from `0`
 - `PUP_CLUSTER_PORT`: The port to listen at, will be set to `startPort + n`, in this example `8000` for instance `0`, `8001` for instance `1` etc.
 
 ## Using the load balancer

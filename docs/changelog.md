@@ -9,11 +9,15 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.29] - Unreleased
+## [1.0.0-beta.30] - Unreleased
 
-- docs: Add Known Issues section in docs. Add Known Issue on problem starting a managed process using `deno task`.
-- docs: Remove stray file `docs/resources/pup.schema.json`. Correct path is `docs/pup.schema.json`.
-- docs: Add note on using "$schema"-section in `pup.json` for auto completion.
+- docs: Fix typo on environment variable `PUP_CLUSTER_INSTANCE`.
+
+## [1.0.0-beta.29] - 2023-06-04
+
+- docs: Add Known Issues section in docs. Add Known Issue on problem stopping a managed process using `deno task`.
+- docs: Remove stray outdated file `docs/resources/pup.schema.json`. Correct path is `docs/pup.schema.json`.
+- docs: Add note on using "$schema" in `pup.json` for auto completion.
 - docs: Upgrade Deno version in example Dockerfile.
 - docs: Fix error in example Dockerfile.
 
