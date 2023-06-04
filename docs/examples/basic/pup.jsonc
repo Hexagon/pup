@@ -1,4 +1,7 @@
 {
+  // Completely optional: Include $schema to get auto completion in VS Code etc...
+  "$schema": "https://deno.land/x/pup/docs/pup.schema.json",
+
   // Global logger configuration, all options can be ovverridden per process
   "logger": {
     // Decorate console log entries?

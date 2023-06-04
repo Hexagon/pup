@@ -85,7 +85,7 @@ This works on all platforms (Mac, Windows and Linux), and is the preferred way o
 
 ```
 # Adjust this line to the deno version of your choice
-FROM denoland/deno:debian-1.31.1
+FROM denoland/deno:debian-1.34.1
 
 # This copies all files in the current working directory to /app in the
 # docker image. 
@@ -93,7 +93,7 @@ RUN mkdir /app
 COPY . /app/
 
 # Install pup - Pin this url to a specific version in production
-RUN ["deno","install","-Afr","pup", "https://deno.land/x/pup/pup.ts"]
+RUN ["deno","install","-Afrn","pup", "https://deno.land/x/pup/pup.ts"]
 
 # Go!
 ENTRYPOINT ["sh", "-c", "cd /app && pup run"]

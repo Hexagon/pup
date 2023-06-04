@@ -195,8 +195,20 @@ With a valid configuration in place, you're ready to use Pup to manage your proc
 
 ## VS Code Intellisense
 
-If you want Intellisense and code completion for `pup.json`/`pup.jsonc` in VS Code, you can append the pup json schema to `json.schemas` in your user settings or project settings
-(`.vscode/settings.json`).
+If you want Intellisense and code completion for `pup.json`/`pup.jsonc` in VS Code, you have two options.
+
+1. Add `$schema` to your `pup.json` like this
+
+```jsonc
+{
+  "$schema": "https://deno.land/x/pup/docs/pup.schema.json",
+  "processes: [
+    /*...*/
+  ]
+}
+```
+
+2. Append the pup json schema to `json.schemas` in your user settings or project settings (`.vscode/settings.json`).
 
 It should look something like this:
 
