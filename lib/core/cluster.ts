@@ -82,7 +82,7 @@ class Cluster extends Process {
         this.config,
       )
 
-      this.loadBalancer = new LoadBalancer(backends, strategy)
+      this.loadBalancer = new LoadBalancer(this.pup, backends, strategy, 60)
       this.loadBalancer.start(this.config.cluster.commonPort)
     }
   }

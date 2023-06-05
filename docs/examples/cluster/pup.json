@@ -7,7 +7,7 @@
         "instances": 3,
         "commonPort": 3456,
         "startPort": 4000,
-        "strategy": "round-robin"
+        "strategy": "ip-hash"
       }
     }
   ]

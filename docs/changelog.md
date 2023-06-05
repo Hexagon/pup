@@ -9,9 +9,16 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.30] - Unreleased
+## [1.0.0-beta.30] - 2023-06-05
 
-- docs: Fix typo on environment variable `PUP_CLUSTER_INSTANCE`.
+- docs: Fix typo on environment variable `PUP_CLUSTER_INSTANCE`
+- deps: Full dependency update
+- security: Use stricter security flags in build process (`deno task build`)
+- chore: Improve the commenting of the code
+- feature(loadbalancer): Periodically track backend health.
+- feature(loadbalancer): Flag backend as down after 5 failed connections.
+- feature(loadbalancer): Redirect clients to next alive backend on error.
+- fix(loadbalancer): Use pup logging insted of console.log
 
 ## [1.0.0-beta.29] - 2023-06-04
 

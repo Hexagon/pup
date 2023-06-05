@@ -1,3 +1,11 @@
+/**
+ * Defines the default logger class, and related types.
+ * Also handles the currently attached logger of Pup.
+ *
+ * @file      lib/core/logger.ts
+ * @license   MIT
+ */
+
 import { stripColor } from "../../deps.ts"
 import { GlobalLoggerConfiguration, ProcessConfiguration } from "./configuration.ts"
 

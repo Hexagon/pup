@@ -1,22 +1,30 @@
 // load_balancer_test.ts
 import { assertEquals, assertRejects } from "../deps.ts"
 import { Backend, BalancingStrategy, hashCode, InternalBackend, LoadBalancer } from "../../lib/core/loadbalancer.ts"
+import { Pup } from "../../lib/core/pup.ts"
+
+const minimalPupConf = { processes: [] }
 
 Deno.test("LoadBalancer - Initialization", () => {
   const backends: Backend[] = [
     { host: "backend1.example.com", port: 80 },
     { host: "backend2.example.com", port: 80 },
   ]
-  const loadBalancer = new LoadBalancer(backends)
+  const loadBalancer = new LoadBalancer(new Pup(minimalPupConf), backends)
   assertEquals(loadBalancer instanceof LoadBalancer, true)
+  // Cleanup
+  loadBalancer.close()
 })
 
 Deno.test("LoadBalancer - Throws Error When No Backends are Provided", async () => {
   const backends: Backend[] = []
-  const loadBalancer = new LoadBalancer(backends)
+  const loadBalancer = new LoadBalancer(new Pup(minimalPupConf), backends)
   await assertRejects(() => {
     return loadBalancer.start(3000)
   })
+
+  // Cleanup
+  loadBalancer.close()
 })
 
 // Grouping tests related to hashCode
@@ -46,13 +54,13 @@ Deno.test("LoadBalancer - Selects Backends with IP_HASH Strategy", () => {
   ]
 
   const expectedBackends: InternalBackend[] = [
-    { host: "192.168.1.1", port: 8080, connections: 0 },
-    { host: "192.168.1.2", port: 8080, connections: 0 },
-    { host: "192.168.1.3", port: 8080, connections: 0 },
+    { host: "192.168.1.1", port: 8080, connections: 0, up: true, failedTransmissions: 0 },
+    { host: "192.168.1.2", port: 8080, connections: 0, up: true, failedTransmissions: 0 },
+    { host: "192.168.1.3", port: 8080, connections: 0, up: true, failedTransmissions: 0 },
   ]
 
   // Create a LoadBalancer with IP_HASH strategy
-  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.IP_HASH)
+  const loadBalancer = new LoadBalancer(new Pup(minimalPupConf), backends, BalancingStrategy.IP_HASH)
 
   // Mock a client with a remoteAddr property
   // deno-lint-ignore no-explicit-any
@@ -65,6 +73,9 @@ Deno.test("LoadBalancer - Selects Backends with IP_HASH Strategy", () => {
   const expectedIndex = hashCode(client.remoteAddr.hostname) % backends.length
 
   assertEquals(selectedBackend, expectedBackends[expectedIndex])
+
+  // Cleanup
+  loadBalancer.close()
 })
 
 Deno.test("LoadBalancer - Initializes with LEAST_CONNECTIONS Strategy", () => {
@@ -72,7 +83,9 @@ Deno.test("LoadBalancer - Initializes with LEAST_CONNECTIONS Strategy", () => {
     { host: "localhost", port: 3000 },
     { host: "localhost", port: 3001 },
   ]
-  const lb = new LoadBalancer(backends, BalancingStrategy.LEAST_CONNECTIONS)
-
+  const lb = new LoadBalancer(new Pup(minimalPupConf), backends, BalancingStrategy.LEAST_CONNECTIONS)
   assertEquals(lb["strategy"], BalancingStrategy.LEAST_CONNECTIONS)
+
+  // Cleanup
+  lb.close()
 })
