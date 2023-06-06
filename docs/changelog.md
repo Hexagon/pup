@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.32] - 2023-06-06
+
+- Fix service uninstall.
+
 ## [1.0.0-beta.31] - 2023-06-06
 
 - Update depency `hexagon/service`, resolves issue #27.

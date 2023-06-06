@@ -123,7 +123,7 @@ async function main(inputArgs: string[]) {
       console.error(`Could not install service, error: ${e.message}`)
       Deno.exit(1)
     }
-  } else if (secondaryBaseArgument === "uninstall") {
+  } else if (baseArgument === "uninstall") {
     const system = args.system
     const name = args.name || "pup"
     const home = args.home
