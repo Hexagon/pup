@@ -43,7 +43,7 @@ export { basename, dirname, join, resolve } from "https://deno.land/std@0.190.0/
  */
 export { Cron } from "https://deno.land/x/croner@6.0.3/dist/croner.js"
 export { z } from "https://deno.land/x/zod@v3.21.4/mod.ts"
-export { installService, uninstallService } from "https://deno.land/x/service@1.0.0-beta.5/mod.ts"
-export type { InstallServiceOptions, UninstallServiceOptions } from "https://deno.land/x/service@1.0.0-beta.5/mod.ts"
+export { installService, uninstallService } from "https://deno.land/x/service@1.0.0-beta.6/mod.ts"
+export type { InstallServiceOptions, UninstallServiceOptions } from "https://deno.land/x/service@1.0.0-beta.6/mod.ts"
 export { $ } from "https://deno.land/x/dax@0.32.0/mod.ts"
 export { CommandChild } from "https://deno.land/x/dax@0.32.0/src/command.ts"

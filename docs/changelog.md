@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.31] - 2023-06-06
+
+- Update depency `hexagon/service`, resolves issue #27.
+
 ## [1.0.0-beta.30] - 2023-06-05
 
 - docs: Fix typo on environment variable `PUP_CLUSTER_INSTANCE`
