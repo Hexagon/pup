@@ -6,6 +6,7 @@ deno.lock
 *.orig
 *.pyc
 *.swp
+gicore
 
 # Pup files
 test.json

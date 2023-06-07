@@ -55,7 +55,8 @@ function generateWebSocketURL() {
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
   const host = window.location.hostname
   const port = window.location.port ? `:${window.location.port}` : ""
-  const wsURL = `${protocol}//${host}${port}/ws`
+  const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")) + "/"
+  const wsURL = `${protocol}//${host}${port}${dir}ws`
   return wsURL
 }
 

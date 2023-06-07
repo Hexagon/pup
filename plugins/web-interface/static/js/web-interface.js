@@ -41,7 +41,7 @@ function updateProcessCard(data) {
 
 // Function to fetch the list of processes from the server
 async function fetchProcesses() {
-  const response = await fetch("/processes")
+  const response = await fetch("./processes")
   return response.json()
 }
 

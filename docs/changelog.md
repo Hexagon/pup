@@ -11,6 +11,12 @@ All notable changes to this project will be documented in this section.
 
 ## [1.0.0-beta.32] - 2023-06-06
 
+- fix(webinterface): Allow serving from sub-uri.
+- fix(webinterface): Fix script error.
+- chore(build): Add build step for bundling web interface assets.
+
+## [1.0.0-beta.32] - 2023-06-06
+
 - Fix service uninstall.
 
 ## [1.0.0-beta.31] - 2023-06-06

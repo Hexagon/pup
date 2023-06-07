@@ -88,7 +88,7 @@ export class PupPlugin extends PluginImplementation {
 
     // Set up endpoint to serve process data
     this.router.get("/processes", (context: any) => {
-      const ProcessStatees = this.pup.allProcessStatees()
+      const ProcessStatees = this.pup.allProcessStates()
       context.response.body = ProcessStatees
     })
     // Set up endpoint to serve process data
@@ -115,7 +115,11 @@ export class PupPlugin extends PluginImplementation {
   }
 
   private async startServer() {
-    console.log(`Web interface listening on http://localhost:${this.config.port}`)
+    this.pup.log(
+      "info",
+      "web-interface",
+      `Listening on http://localhost:${this.config.port}`,
+    )
     await this.app.listen({ port: this.config.port })
   }
 
