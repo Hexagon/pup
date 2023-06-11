@@ -91,10 +91,16 @@ export class PupPlugin extends PluginImplementation {
       const ProcessStatees = this.pup.allProcessStates()
       context.response.body = ProcessStatees
     })
+
     // Set up endpoint to serve process data
     this.router.get("/logs/:id", (context: any) => {
       const id = context.params.id
       context.response.body = JSON.stringify(this.logs.get(id))
+    })
+
+    // Set up endpoint to redirect / to /web-interface.html
+    this.router.get("/", (context: any) => {
+      context.response.redirect("/web-interface.html")
     })
 
     // Set up route to serve static files using Bundlee

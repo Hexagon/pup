@@ -78,7 +78,7 @@ We appreciate all feedback and contributions that help make Pup better!
 ### Examples of areas that need extra attention right now
 
 - **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://hexagon.github.io/pup/examples/plugins/README.html> to
-  get started.
+  get started on plugin development in general. See <https://github.com/Hexagon/pup/blob/main/plugins/web-interface/README.md> for instructions on how to re-build the web-interface.
 - **Testing**: Pup needs to be thoroughly tested; help out by using and testing it in various scenarios. Report any issues you find.
 - **Reading**: Review the documentation and report any issues or areas for improvement.
 - **Bugfixes**: Find bugs, report them, and optionally create a PR to fix the issue.

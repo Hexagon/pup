@@ -1,46 +1,165 @@
-/* General styles */
+:root {
+  /* Common variables */
+  --font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  --body-font-size: 14px;
+
+  /* Dark theme variables */
+  --bg-darker-dark: #07090c;
+  --bg-dark-dark: #0d1117;
+  --bg-medium-dark: #1c2128;
+  --bg-light-dark: #2d333b;
+  --bg-good-dark: #1e442b;
+  --bg-bad-dark: #45141e;
+  --bg-primary-dark: #1e2d44;
+  --bg-neutral-dark: #222831;
+  --bg-warning-dark: #44421e;
+  --fg-dark-dark: rgb(118, 131, 144);
+  --fg-light-dark: rgb(192, 204, 224);
+  --fg-good-dark: #60d88a;
+  --fg-bad-dark: #ce3c59;
+  --fg-primary-dark: #5b88cc;
+  --fg-neutral-dark: #a5a5a5;
+  --fg-warning-dark: #dbd55d;
+  --common-border-color-dark: rgb(82, 91, 100);
+
+  /* Light theme variables */
+  --bg-darker-light: #f2f2f2;
+  --bg-dark-light: #e0e0e0;
+  --bg-medium-light: #c0c0c0;
+  --bg-light-light: #a0a0a0;
+  --bg-good-light: #e9f7ea;
+  --bg-bad-light: #fae5e5;
+  --bg-primary-light: #e8f0fe;
+  --bg-neutral-light: #eeeeee;
+  --bg-warning-light: #fff4e5;
+  --fg-dark-light: rgb(38, 46, 54);
+  --fg-light-light: rgb(68, 76, 86);
+  --fg-good-light: #1e442b;
+  --fg-bad-light: #45141e;
+  --fg-primary-light: #1e2d44;
+  --fg-neutral-light: #222831;
+  --fg-warning-light: #44421e;
+  --common-border-color-light: rgb(128, 136, 144);
+}
+
+body.dark {
+  /* Using dark theme variables */
+  --bg-darker: var(--bg-darker-dark);
+  --bg-dark: var(--bg-dark-dark);
+  --bg-medium: var(--bg-medium-dark);
+  --bg-light: var(--bg-light-dark);
+  --bg-good: var(--bg-good-dark);
+  --bg-bad: var(--bg-bad-dark);
+  --bg-primary: var(--bg-primary-dark);
+  --bg-neutral: var(--bg-neutral-dark);
+  --bg-warning: var(--bg-warning-dark);
+  --fg-dark: var(--fg-dark-dark);
+  --fg-light: var(--fg-light-dark);
+  --fg-good: var(--fg-good-dark);
+  --fg-bad: var(--fg-bad-dark);
+  --fg-primary: var(--fg-primary-dark);
+  --fg-neutral: var(--fg-neutral-dark);
+  --fg-warning: var(--fg-warning-dark);
+  --common-border-color: var(--common-border-color-dark);
+}
+
+.fg-dark { color: var(--fg-dark); }
+.fg-light { color: var(--fg-light); }
+.fg-good { color: var(--fg-good); }
+.fg-bad { color: var(--fg-bad); }
+.fg-primary { color: var(--fg-primary); }
+.fg-neutral { color: var(--fg-neutral); }
+.fg-warning { color: var(--fg-warning); }
+
+.bg-dark { background-color: var(--bg-dark); }
+.bg-light { background-color: var(--bg-light); }
+.bg-good { background-color: var(--bg-good); }
+.bg-bad { background-color: var(--bg-bad); }
+.bg-primary { background-color: var(--bg-primary); }
+.bg-neutral { background-color: var(--bg-neutral); }
+.bg-warning { background-color: var(--bg-warning); }
+
+.border-dark { border-color: var(--fg-dark); }
+.border-light { border-color: var(--fg-light); }
+.border-good { border-color: var(--fg-good); }
+.border-bad { border-color: var(--fg-bad); }
+.border-primary { border-color: var(--fg-primary); }
+.border-neutral { border-color: var(--fg-neutral); }
+.border-warning { border-color: var(--fg-warning); }
+
+body.light {
+  /* Using light theme variables */
+  --bg-darker: var(--bg-darker-light);
+  --bg-dark: var(--bg-dark-light);
+  --bg-medium: var(--bg-medium-light);
+  --bg-light: var(--bg-light-light);
+  --bg-good: var(--bg-good-light);
+  --bg-bad: var(--bg-bad-light);
+  --bg-primary: var(--bg-primary-light);
+  --bg-neutral: var(--bg-neutral-light);
+  --bg-warning: var(--bg-warning-light);
+  --fg-dark: var(--fg-dark-light);
+  --fg-light: var(--fg-light-light);
+  --fg-good: var(--fg-good-light);
+  --fg-bad: var(--fg-bad-light);
+  --fg-primary: var(--fg-primary-light);
+  --fg-neutral: var(--fg-neutral-light);
+  --fg-warning: var(--fg-warning-light);
+  --common-border-color: var(--common-border-color-light);
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  background-color: #121212;
-  color: #ffffff;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: 1.5;
+  background-color: var(--bg-darker);
+  color: var(--fg-light);
   margin: 0;
   padding: 0;
   height: 100vh;
 }
 
-/* App container */
+h1,h2,h3,h4,h5,h6,.strong {
+  color: var(--fg-light);
+}
+
 #app {
   width: 400px;
   display: flex;
   flex-direction: column;
-  background-color: #1e1e1e;
+  background-color: var(--bg-dark);
   overflow-y: auto;
   max-height: calc(100vh - 2rem - 2rem);
+  padding: 1rem;
+  padding-right: 0rem;
 }
 
-/* Process card styles */
 .process-card {
-  background-color: #212121;
-  border-radius: 0.5rem;
+  background-color: var(--bg-medium);
   padding: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 0rem;
   min-width: 300px;
   display: flex;
   flex-direction: column;
   margin-bottom: 0.5rem;
+  border-radius: 0.25rem;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-left-width: 2px;
+  border-left-style: solid;
 }
 
 .process-card-selected {
-  background-color: #2b2b2b;
+  background-color: var(--bg-darker);
 }
 
 .process-card-selected .process-title {
   font-weight: bold;
-  color: #50fa7b;
+  color: var(--fg-highlight-primary);
 }
 
 .process-title {
-  font-size:1rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -50,33 +169,27 @@ body {
 
 .process-card .process-status {
   font-weight: bold;
-  color: #50fa7b;
 }
 
 .process-card .spark-chart {
   height: 50px;
-  background-color: #424242;
   border-radius: 0.25rem;
 }
 
-/* Header styles */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #1e1e1e;
+  background-color: var(--bg-medium);
   padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 header h1,
 header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #50fa7b;
 }
 
-/* Main content styles */
 main {
   display: flex;
   flex-direction: row;
@@ -85,10 +198,9 @@ main {
 
 #logs {
   flex: 1;
-  background-color: #171717;
   padding: 1rem;
-  border-left: 1px solid #424242;
-  overflow-y: auto;
+  background-color: var(--fg-highlight);
+  overflow: scroll;
   height: calc(100vh - 2rem - 2rem - 2rem);
 }
 
@@ -100,11 +212,23 @@ main {
 
 #toolbar {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  background-color: #1e1e1e;
-  padding: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  gap: 0.5rem;
+  padding: 1rem;
+  padding-top: 0;
+}
+
+#toolbar-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+#properties-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;  
+  width: 100%;
 }
 
 #logs pre {
@@ -122,39 +246,33 @@ main {
   flex-grow: 1;
 }
 
-/* Button styles */
+.strong {
+  font-weight: bold;
+}
+
 button {
-  background-color: #50fa7b;
-  color: #121212;
   border: none;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  transition: background-color 0.3s;
   margin-right:0.25rem;
+  border: 1px solid var(--fg-light);
+  background: var(--bg-dark);
+  color: var(--fg-light);
 }
-button:hover {
-  background-color: #69ff94;
-}
-button:active {
-  background-color: #37d367;
-  }
-  
-  button.small-button {
+
+button.small-button {
   font-size: 0.8rem;
   padding: 0.4rem 0.6rem;
-  }
+}
 
-  /* Process cards area header */
 .process-card-header {
-  background-color: #1e1e1e;
   padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .process-card-header h2 {
+}
+
+.process-card-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  }
+}

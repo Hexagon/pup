@@ -1,4 +1,4 @@
-function ansiToHtml(ansiText) {
+export function ansiToHtml(ansiText) {
   const ansiColorCodes = [
     { code: 30, color: "black" },
     { code: 31, color: "red" },
@@ -34,7 +34,19 @@ function ansiToHtml(ansiText) {
   return `<span>${html}</span>`
 }
 
-function showSpecificClassElements(containerId, targetClass) {
+const ProcessState = {
+  CREATED: 0,
+  STARTING: 100,
+  RUNNING: 200,
+  STOPPING: 250,
+  FINISHED: 300,
+  ERRORED: 400,
+  EXHAUSTED: 450,
+  BLOCKED: 500,
+}
+
+/* EXPORTED */
+export function showSpecificClassElements(containerId, targetClass) {
   // Get the container div
   const container = document.getElementById(containerId)
 
@@ -51,27 +63,7 @@ function showSpecificClassElements(containerId, targetClass) {
   }
 }
 
-function generateWebSocketURL() {
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-  const host = window.location.hostname
-  const port = window.location.port ? `:${window.location.port}` : ""
-  const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")) + "/"
-  const wsURL = `${protocol}//${host}${port}${dir}ws`
-  return wsURL
-}
-
-const ProcessState = {
-  CREATED: 0,
-  STARTING: 100,
-  RUNNING: 200,
-  STOPPING: 250,
-  FINISHED: 300,
-  ERRORED: 400,
-  EXHAUSTED: 450,
-  BLOCKED: 500,
-}
-
-function ProcessStateToString(status) {
+export function ProcessStateToString(status) {
   switch (status) {
     case ProcessState.CREATED:
       return "Created"
@@ -91,5 +83,32 @@ function ProcessStateToString(status) {
       return "Blocked"
     default:
       return "Unknown"
+  }
+}
+
+export function generateWebSocketURL() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+  const host = window.location.hostname
+  const port = window.location.port ? `:${window.location.port}` : ""
+  const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")) + "/"
+  const wsURL = `${protocol}//${host}${port}${dir}ws`
+  return wsURL
+}
+
+// Function to determine color based on status
+export function getStatusColor(status) {
+  switch (ProcessStateToString(status)) {
+    case "Running":
+      return "good"
+    case "Errored":
+      return "bad"
+    case "Stopped":
+      return "warning"
+    case "Stopping":
+      return "warning"
+    case "Starting":
+      return "warning"
+    default:
+      return "neutral" // Default border color
   }
 }
