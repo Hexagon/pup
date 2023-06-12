@@ -70,7 +70,7 @@ Full examples available at [/docs/examples](/docs/examples)
 
 ## Contributions and Development
 
-Contributions to Pup are very welcome! Please read [the contibuting section](https://hexagon.github.io/pup/contributing.html) of the manual, fork the repository, make your changes, and submit a pull
+Contributions to Pup are very welcome! Please read [the contributing section](https://hexagon.github.io/pup/contributing.html) of the manual, fork the repository, make your changes, and submit a pull
 request.
 
 We appreciate all feedback and contributions that help make Pup better!

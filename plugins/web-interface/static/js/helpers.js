@@ -1,3 +1,17 @@
+/**
+ * Helper functions for rendering UI and formatting data.
+ *
+ * @file static/js/helpers.js
+ */
+
+/**
+ * Converts ANSI color codes in text to corresponding HTML.
+ * Wraps colored sections of text in <span> tags with appropriate styles.
+ * Replaces line breaks with <br> for HTML display.
+ *
+ * @param {string} ansiText - Text containing ANSI color codes.
+ * @returns {string} HTML string with color codes replaced by styles.
+ */
 export function ansiToHtml(ansiText) {
   const ansiColorCodes = [
     { code: 30, color: "black" },
@@ -10,105 +24,96 @@ export function ansiToHtml(ansiText) {
     { code: 37, color: "white" },
   ]
 
-  let html = ansiText
-    .replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/g, (match, p1) => {
-      if (!p1) return "</span>"
-      const codes = p1.split(";")
-      let result = "<span style='"
-      codes.forEach((code) => {
-        if (code === "1") {
-          result += "font-weight:bold;"
-        } else {
-          const color = ansiColorCodes.find(({ code: colorCode }) => parseInt(code) === colorCode)
-          if (color) {
-            result += `color:${color.color};`
-          }
+  let html = ansiText.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/g, (match, p1) => {
+    if (!p1) return "</span>"
+    const codes = p1.split(";")
+    let result = "<span style='"
+    codes.forEach((code) => {
+      if (code === "1") {
+        result += "font-weight:bold;"
+      } else {
+        const color = ansiColorCodes.find(({ code: colorCode }) => parseInt(code) === colorCode)
+        if (color) {
+          result += `color:${color.color};`
         }
-      })
-      result += "'>"
-      return result
+      }
     })
+    result += "'>"
+    return result
+  })
     .replace(/\n/g, "<br>")
 
-  // Wrap the result in a default span to ensure any unclosed opening spans have matching closing tags
   return `<span>${html}</span>`
 }
 
-const ProcessState = {
-  CREATED: 0,
-  STARTING: 100,
-  RUNNING: 200,
-  STOPPING: 250,
-  FINISHED: 300,
-  ERRORED: 400,
-  EXHAUSTED: 450,
-  BLOCKED: 500,
-}
-
-/* EXPORTED */
+/**
+ * Shows elements of a specific class within a container.
+ * First, hides all elements within the container.
+ * Then, shows only elements of the specific class.
+ *
+ * @param {string} containerId - ID of the container element.
+ * @param {string} targetClass - Class of the elements to show.
+ */
 export function showSpecificClassElements(containerId, targetClass) {
-  // Get the container div
   const container = document.getElementById(containerId)
-
-  // Hide all elements within the container
   const allChildren = container.children
-  for (let i = 0; i < allChildren.length; i++) {
-    allChildren[i].classList.add("hidden")
-  }
+  Array.from(allChildren).forEach((child) => child.classList.add("hidden"))
 
-  // Show elements with the specific class within the container
   const targetElements = container.getElementsByClassName(targetClass)
-  for (let i = 0; i < targetElements.length; i++) {
-    targetElements[i].classList.remove("hidden")
-  }
+  Array.from(targetElements).forEach((el) => el.classList.remove("hidden"))
 }
 
+/**
+ * Converts a process status code to a human-readable string.
+ *
+ * @param {number} status - Status code of a process.
+ * @returns {string} Human-readable process status.
+ */
 export function ProcessStateToString(status) {
-  switch (status) {
-    case ProcessState.CREATED:
-      return "Created"
-    case ProcessState.STARTING:
-      return "Starting"
-    case ProcessState.RUNNING:
-      return "Running"
-    case ProcessState.STOPPING:
-      return "Stopping"
-    case ProcessState.FINISHED:
-      return "Finished"
-    case ProcessState.ERRORED:
-      return "Errored"
-    case ProcessState.EXHAUSTED:
-      return "Exhausted"
-    case ProcessState.BLOCKED:
-      return "Blocked"
-    default:
-      return "Unknown"
+  const ProcessState = {
+    CREATED: 0,
+    STARTING: 100,
+    RUNNING: 200,
+    STOPPING: 250,
+    FINISHED: 300,
+    ERRORED: 400,
+    EXHAUSTED: 450,
+    BLOCKED: 500,
   }
+
+  const statusMapping = {
+    [ProcessState.CREATED]: "Created",
+    [ProcessState.STARTING]: "Starting",
+    [ProcessState.RUNNING]: "Running",
+    [ProcessState.STOPPING]: "Stopping",
+    [ProcessState.FINISHED]: "Finished",
+    [ProcessState.ERRORED]: "Errored",
+    [ProcessState.EXHAUSTED]: "Exhausted",
+    [ProcessState.BLOCKED]: "Blocked",
+  }
+
+  return statusMapping[status] || "Unknown"
 }
 
-export function generateWebSocketURL() {
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-  const host = window.location.hostname
-  const port = window.location.port ? `:${window.location.port}` : ""
-  const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")) + "/"
-  const wsURL = `${protocol}//${host}${port}${dir}ws`
-  return wsURL
-}
-
-// Function to determine color based on status
+/**
+ * Determines a color identifier based on a process status.
+ *
+ * @param {number} status - Status code of a process.
+ * @returns {string} Color identifier ("good", "bad", "warning", "neutral").
+ */
 export function getStatusColor(status) {
   switch (ProcessStateToString(status)) {
     case "Running":
       return "good"
     case "Errored":
+    case "Exhausted":
       return "bad"
-    case "Stopped":
-      return "warning"
     case "Stopping":
-      return "warning"
+    case "Blocked":
     case "Starting":
       return "warning"
+
     default:
-      return "neutral" // Default border color
+      return "neutral" // Default color
   }
 }

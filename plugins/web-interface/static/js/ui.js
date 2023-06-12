@@ -1,3 +1,10 @@
+/**
+ * UI related functions including handling click events, creating HTML elements,
+ * updating statuses, and processing logs.
+ *
+ * @file static/js/ui.js
+ */
+
 import { ansiToHtml, getStatusColor, ProcessStateToString, showSpecificClassElements } from "./helpers.js"
 
 let selectedProcessId
@@ -5,6 +12,12 @@ let selectedProcessId
 const processStatusInventory = new Map()
 const processConfigInventory = new Map()
 
+/**
+ * Change the log scope to a specific process.
+ * This function also updates the UI to reflect the change.
+ *
+ * @param {string} processId - The id of the process.
+ */
 export function changeLogScope(processId) {
   selectedProcessId = processId
 
@@ -15,17 +28,31 @@ export function changeLogScope(processId) {
   })
 
   // Add the class to the selected process card
-  const selectedProcessCard = document.getElementById(`process-card-${processId}`)
-  selectedProcessCard.classList.add("process-card-selected")
+  const sanitizedId = sanitizeId(processId)
+  const selectedProcessCard = document.getElementById(`process-card-${sanitizedId}`)
+  if (selectedProcessCard) selectedProcessCard.classList.add("process-card-selected")
 
   // Show logs for the selected process only
-  showSpecificClassElements("logs", processId)
+  showSpecificClassElements("logs", sanitizedId)
+
+  // Update the text of #selected-process-id
+  const selectedProcessIdElement = document.getElementById("selected-process-id")
+  if (selectedProcessIdElement) {
+    selectedProcessIdElement.textContent = processId
+  } else {
+    console.warn("Cannot find #selected-process-id element to update text.")
+  }
 
   // Update the toolbar with the selected process details
-  updateToolbar(processId)
+  updateToolbar(sanitizedId)
 }
 
-// Function to add a log entry to the logs section
+/**
+ * Add a log entry to the logs section.
+ *
+ * @param {Object} log - Log entry.
+ * @param {string} selectedProcessId - The id of the selected process.
+ */
 function addLog(log, selectedProcessId) {
   const logsDiv = document.getElementById("logs")
   logsDiv.classList.remove("hidden")
@@ -35,91 +62,109 @@ function addLog(log, selectedProcessId) {
   logsDiv.innerHTML = logsHtml + logsDiv.innerHTML
 }
 
-function updateToolbar(processId) {
-  // Update selected process id
-  const selectedProcessIdElement = document.getElementById("selected-process-id")
-  selectedProcessIdElement.textContent = processId
+/**
+ * Helper function to set text content of DOM elements by selector.
+ * This function will not interpret the text as HTML.
+ *
+ * @param {string} selector - The selector for the DOM elements.
+ * @param {string} text - The text to be set.
+ */
+export function setTextContentBySelector(selector, text) {
+  const elements = document.querySelectorAll(selector)
+  if (elements.length > 0) {
+    elements.forEach((element) => {
+      element.textContent = text
+    })
+  } else {
+    console.warn(`No elements found with selector ${selector}.`)
+  }
+}
 
+/**
+ * Helper function to sanitize IDs for use as HTML IDs.
+ *
+ * @param {string} id - The original ID.
+ * @returns {string} The sanitized ID.
+ */
+function sanitizeId(id) {
+  // Replace all invalid characters with underscore
+  return id.replace(/[^a-zA-Z0-9-_:]/g, "_")
+}
+
+/**
+ * Update the toolbar with the details of a specific process.
+ *
+ * @param {string} processId - The id of the process.
+ */
+function updateToolbar(processId) {
   // Get process config and status data
   const processConfig = processConfigInventory.get(processId)
   const processStatus = processStatusInventory.get(processId)
 
   // Update process config values
-  const processConfigCommand = document.getElementById("process-config-command")
-  processConfigCommand.textContent = processConfig.cmd || processConfig.worker
-
-  const processConfigAutostart = document.getElementById("process-config-autostart")
-  processConfigAutostart.textContent = processConfig.autostart
-
-  const processConfigCron = document.getElementById("process-config-cron")
-  processConfigCron.textContent = processConfig.cron
-
-  const processConfigRestart = document.getElementById("process-config-restart")
-  processConfigRestart.textContent = processConfig.restart || "always"
-
-  const processConfigTerminate = document.getElementById("process-config-terminate")
-  processConfigTerminate.textContent = processConfig.terminate
+  setTextContentBySelector("#process-config-command", processConfig.cmd || processConfig.worker)
+  setTextContentBySelector("#process-config-autostart", processConfig.autostart)
+  setTextContentBySelector("#process-config-cron", processConfig.cron)
+  setTextContentBySelector("#process-config-restart", processConfig.restart || "always")
+  setTextContentBySelector("#process-config-terminate", processConfig.terminate)
 
   // Update process status values
-  const processStatusType = document.getElementById("process-status-type")
-  processStatusType.textContent = processStatus.type
-
-  const processStatusBlocked = document.getElementById("process-status-blocked")
-  processStatusBlocked.textContent = processStatus.blocked
-
-  const processStatusStatus = document.getElementById("process-status-status")
-  processStatusStatus.textContent = ProcessStateToString(processStatus.status)
-
-  const processStatusStarted = document.getElementById("process-status-started")
-  processStatusStarted.textContent = processStatus.started
-
-  const processStatusUpdated = document.getElementById("process-status-updated")
-  processStatusUpdated.textContent = processStatus.updated
+  setTextContentBySelector("#process-status-type", processStatus.type)
+  setTextContentBySelector("#process-status-blocked", processStatus.blocked)
+  setTextContentBySelector("#process-status-status", ProcessStateToString(processStatus.status))
+  setTextContentBySelector("#process-status-started", processStatus.started)
+  setTextContentBySelector("#process-status-updated", processStatus.updated)
 }
 
-// Function to update the process card with the new status
-function updateProcessCard(data) {
-  const processCard = document.getElementById(`process-card-${data.status.id}`)
+/**
+ * Update a process card element. Create it if it does not already exist.
+ *
+ * @param {Object} processData - Process data.
+ * @returns {HTMLDivElement} Process card element.
+ */
+function updateProcessCard(processData) {
+  const { status /*, config */ } = processData
+
+  const sanitizedId = sanitizeId(status.id)
+
+  // Get or create process card
+  let processCard = document.getElementById(`process-card-${sanitizedId}`)
   if (!processCard) {
-    return
+    processCard = document.createElement("div")
+    processCard.id = `process-card-${sanitizedId}`
+    processCard.addEventListener("click", () => {
+      changeLogScope(sanitizedId)
+    })
+
+    // Add process title
+    const title = document.createElement("span")
+    title.classList.add("process-title")
+    title.textContent = sanitizedId
+
+    // Add process status
+    const ProcessState = document.createElement("span")
+    ProcessState.classList.add("process-status")
+    title.appendChild(ProcessState)
+
+    processCard.appendChild(title)
+
+    // Add new process card to the DOM
+    const container = document.getElementById("process-card-container")
+    if (container) {
+      container.appendChild(processCard)
+    } else {
+      console.warn("Cannot find container element to append new process card.")
+    }
   }
 
   // Update process status
   const ProcessState = processCard.querySelector(".process-status")
-  ProcessState.textContent = ` - ${ProcessStateToString(data.status.status)}`
+  ProcessState.textContent = ` - ${ProcessStateToString(status.status)}`
 
   // Set border color depending on process status
-  processCard.className = `process-card border-${getStatusColor(data.status.status)}`
-}
-
-// Function to create a process card element
-function generateProcessCard(processData) {
-  const { status, config } = processData
-
-  // Create process card if it does not exist
-  const processCard = document.createElement("div")
-  processCard.classList.add("process-card")
-  processCard.classList.add(`border-${getStatusColor(status.status)}`)
-  processCard.id = `process-card-${config.id}`
-
-  // Add process title
-  const title = document.createElement("span")
-  title.classList.add("process-title")
-  title.textContent = config.id
-
-  // Add process status
-  const ProcessState = document.createElement("span")
-  ProcessState.textContent = ` - ${ProcessStateToString(status.status)}`
-  ProcessState.classList.add("process-status")
-  title.appendChild(ProcessState)
-
-  processCard.appendChild(title)
-
-  processCard.addEventListener("click", () => {
-    changeLogScope(config.id)
-  })
+  processCard.className = `process-card border-${getStatusColor(status.status)}`
 
   return processCard
 }
 
-export { addLog, generateProcessCard, processConfigInventory, processStatusInventory, selectedProcessId, updateProcessCard, updateToolbar }
+export { addLog, processConfigInventory, processStatusInventory, selectedProcessId, updateProcessCard, updateToolbar }
