@@ -18,10 +18,11 @@ import { getStatus, printStatus } from "./status.ts"
 import { upgrade } from "./upgrade.ts"
 
 // Import common utilities
-import { fileExists, toTempPath } from "../common/utils.ts"
+import { fileExists, toPersistentPath, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
 import { installService, jsonc, path, uninstallService } from "../../deps.ts"
+import { Logger } from "../core/logger.ts"
 
 /**
  * Define the main entry point of the CLI application
@@ -230,20 +231,37 @@ async function main(inputArgs: string[]) {
   // Prepare log file path
   // Add a new condition for "logs" base command
   if (baseArgument === "logs") {
-    if (useConfigFile && configFile) {
-      const logFile = `${toTempPath(configFile as string)}/.log`
-      try {
-        const logContent = await Deno.readTextFile(logFile)
-        console.log(logContent)
-        Deno.exit(0)
-      } catch (e) {
-        console.error(`Could not read log file: ${e.message}`)
-        Deno.exit(1)
+    const logStore = `${toPersistentPath(configFile as string)}/.log`
+    const logger = new Logger(configuration.logger || {}, logStore)
+    const logs = await logger.getLogContents(args.id, args.start, args.end, args.n)
+    if (logs && logs.length > 0) {
+      const logWithColors = configuration.logger?.colors ?? true
+      for (const log of logs) {
+        const { processId, severity, category, timeStamp, text } = log
+        const isStdErr = severity === "error" || category === "stderr"
+        const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${processId}:${category}] ${text}`
+        let color = null
+        // Apply coloring rules
+        if (logWithColors) {
+          if (processId === "core") color = "gray"
+          if (category === "starting") color = "green"
+          if (category === "finished") color = "yellow"
+          if (isStdErr) color = "red"
+        }
+        let logFn = console.log
+        if (severity === "warn") logFn = console.warn
+        if (severity === "info") logFn = console.info
+        if (severity === "error") logFn = console.error
+        if (color !== null) {
+          logFn(`%c${decoratedLogText}`, `color: ${color}`)
+        } else {
+          logFn(decoratedLogText)
+        }
       }
     } else {
-      console.error("Can not print logs, no configuration file found")
-      Deno.exit(1)
+      console.error("No logs found.")
     }
+    Deno.exit(0)
   }
 
   // Prepare for IPC
@@ -252,7 +270,7 @@ async function main(inputArgs: string[]) {
 
   // Prepare status file
   let statusFile
-  if (useConfigFile) statusFile = `${toTempPath(configFile as string)}/.status`
+  if (useConfigFile) statusFile = `${toTempPath(configFile as string)}/.main.status`
 
   /**
    * Now when the configuration file is located
@@ -329,7 +347,7 @@ async function main(inputArgs: string[]) {
     try {
       // A valid status file were found
       if (!await getStatus(configFile, statusFile)) {
-        console.warn(`WARNING! A stale or broken status file were found at '${statusFile}', there could be an existing instance of pup running, continuing anyway.`)
+        /* ignore */
       } else {
         console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
         Deno.exit(1)

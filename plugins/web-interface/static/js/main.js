@@ -8,8 +8,9 @@
  * @file static/js/main.js
  */
 
-import { changeLogScope, updateProcessCard } from "./ui.js"
-import { fetchProcesses } from "./network.js"
+import { changeLogScope, updateInstance, updateProcessCard } from "./ui.js"
+import { controlProcess, fetchInstance, fetchProcesses } from "./network.js"
+import { processSelector } from "./state.js"
 
 /**
  * Initializes the application.
@@ -21,18 +22,24 @@ import { fetchProcesses } from "./network.js"
  */
 async function main() {
   try {
-    // Make an initial request of all process status
-    const processes = await fetchProcesses()
+    // Connect buttons to actions
+    document.getElementById("start-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "start"))
+    document.getElementById("stop-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "stop"))
+    document.getElementById("block-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "block"))
+    document.getElementById("unblock-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "unblock"))
+    document.getElementById("restart-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "restart"))
 
-    // Generate and append process cards for each process
-    processes.forEach((processData) => {
-      updateProcessCard(processData)
+    // Update instance information every 10th second, and immediately
+    setInterval(async () => {
+      updateInstance(await fetchInstance(), await fetchProcesses())
+    }, 10_000)
+
+    // Do an initial update
+    updateInstance(await fetchInstance(), await fetchProcesses())
+
+    document.getElementById("aside-back").addEventListener("click", async () => {
+      changeLogScope()
     })
-
-    // If there are any processes, select the first one by default
-    if (processes.length > 0) {
-      changeLogScope(processes[0].config.id)
-    }
   } catch (error) {
     console.error("Failed to initialize the application:", error)
   }

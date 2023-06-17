@@ -92,6 +92,63 @@ export class PupPlugin extends PluginImplementation {
       context.response.body = ProcessStatees
     })
 
+    // Set up endpoint to serve main process information
+    this.router.get("/state", (context: any) => {
+      const ProcessStatees = this.pup.applicationState()
+      context.response.body = ProcessStatees
+    })
+
+    this.router.get("/start/:id", (context: any) => {
+      try {
+        context.response.body = JSON.stringify({
+          success: this.pup.start(context.params.id, "web-interface"),
+        })
+      } catch (e) {
+        context.response.code = 500
+        context.response.body = JSON.stringify({ success: false })
+      }
+    })
+    this.router.get("/stop/:id", (context: any) => {
+      try {
+        context.response.body = JSON.stringify({
+          success: this.pup.stop(context.params.id, "web-interface"),
+        })
+      } catch (e) {
+        context.response.code = 500
+        context.response.body = JSON.stringify({ success: false })
+      }
+    })
+    this.router.get("/restart/:id", (context: any) => {
+      try {
+        context.response.body = JSON.stringify({
+          success: this.pup.restart(context.params.id, "web-interface"),
+        })
+      } catch (e) {
+        context.response.code = 500
+        context.response.body = JSON.stringify({ success: false })
+      }
+    })
+    this.router.get("/block/:id", (context: any) => {
+      try {
+        context.response.body = JSON.stringify({
+          success: this.pup.block(context.params.id, "web-interface"),
+        })
+      } catch (e) {
+        context.response.code = 500
+        context.response.body = JSON.stringify({ success: false })
+      }
+    })
+    this.router.get("/unblock/:id", (context: any) => {
+      try {
+        context.response.body = JSON.stringify({
+          success: this.pup.unblock(context.params.id, "web-interface"),
+        })
+      } catch (e) {
+        context.response.code = 500
+        context.response.body = JSON.stringify({ success: false })
+      }
+    })
+
     // Set up endpoint to serve process data
     this.router.get("/logs/:id", (context: any) => {
       const id = context.params.id

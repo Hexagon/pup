@@ -61,21 +61,6 @@ interface ProcessInformation {
   type: "cluster" | "process" | "worker"
 }
 
-interface ProcessInformationParsed {
-  id: string
-  status: ProcessState
-  type: string
-  code?: number
-  signal?: number
-  pid?: number
-  started?: string
-  exited?: string
-  blocked?: boolean
-  restarts?: number
-  updated: string
-  telemetry?: TelemetryData
-}
-
 class Process {
   public readonly config: ProcessConfiguration
   public readonly pup: Pup
@@ -372,4 +357,4 @@ class Process {
 }
 
 export { Process, ProcessState }
-export type { ProcessInformation, ProcessInformationParsed, ProcessScheduledEvent, ProcessStateChangedEvent, ProcessWatchEvent }
+export type { ProcessInformation, ProcessScheduledEvent, ProcessStateChangedEvent, ProcessWatchEvent }

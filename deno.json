@@ -9,7 +9,7 @@
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-net=deno.land,cdn.deno.land https://deno.land/x/udd/main.ts --dry-run deps.ts test/deps.ts plugins/web-interface/deps.ts",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
-    "check": "deno fmt --check && deno lint && deno check pup.ts && deno test --allow-read --allow-write --allow-env --allow-net",
+    "check": "deno fmt --check && deno lint && deno check pup.ts --unstable && deno test --allow-read --allow-write --allow-env --allow-net --unstable",
     "build": "deno task check && deno task build-schema && deno task build-webinterface",
     "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts --bundle static static/bundle.json && deno fmt"
   }

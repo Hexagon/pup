@@ -31,12 +31,12 @@ class MockProcess extends Process {
 Deno.test("Status - Should create an instance with statusFileName property if provided", () => {
   const expectedFileName = TEST_FILE_PATH
   const status = new Status(expectedFileName)
-  assertEquals(status["statusFileName"], expectedFileName)
+  assertEquals(status["storeName"], expectedFileName)
 })
 
 Deno.test("Status - Should not have statusFileName property if not provided", () => {
   const status = new Status()
-  assertEquals(status["statusFileName"], undefined)
+  assertEquals(status["storeName"], undefined)
 })
 
 Deno.test("Status - writeToDisk should write the status to disk if statusFileName property is set", () => {
@@ -69,7 +69,7 @@ Deno.test("Status - writeToDisk should not write the status to disk if statusFil
 
   const status = new Status()
   const applicationState = status.applicationState([])
-  status.writeToDisk(applicationState)
+  status.writeToStore(applicationState)
 
   assertEquals(writeFileSpy.calls.length, 0)
 
@@ -82,7 +82,7 @@ Deno.test("Status - writeToDisk should catch and log errors", async () => {
 
   const status = new Status(TEST_FILE_PATH)
   const applicationState = status.applicationState([expectedProcess])
-  await status.writeToDisk(applicationState)
+  await status.writeToStore(applicationState)
 
   assertEquals(writeFileSpy.calls.length, 1)
 

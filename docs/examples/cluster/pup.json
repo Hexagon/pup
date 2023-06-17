@@ -9,6 +9,20 @@
         "startPort": 4000,
         "strategy": "ip-hash"
       }
+    },
+    {
+      "id": "periodic-example-task",
+      "cmd": "deno run --allow-read ../basic/task.js",
+      "cron": "*/20 * * * * *",
+      "restartDelayMs": 3000
+    }
+  ],
+  "plugins": [
+    {
+      "url": "../../plugins/web-interface/mod.ts",
+      "options": {
+        "port": 5000
+      }
     }
   ]
 }

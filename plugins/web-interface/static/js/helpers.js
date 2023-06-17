@@ -56,11 +56,89 @@ export function ansiToHtml(ansiText) {
  */
 export function showSpecificClassElements(containerId, targetClass) {
   const container = document.getElementById(containerId)
-  const allChildren = container.children
-  Array.from(allChildren).forEach((child) => child.classList.add("hidden"))
-
+  if (targetClass) {
+    const allChildren = container.children
+    Array.from(allChildren).forEach((child) => child.classList.add("hidden"))
+  }
   const targetElements = container.getElementsByClassName(targetClass)
   Array.from(targetElements).forEach((el) => el.classList.remove("hidden"))
+}
+/**
+ * Converts the given seconds into a string with a time unit.
+ * The units used are years, days, hours, minutes, and seconds.
+ *
+ * @param {number} seconds - The number of seconds to convert.
+ * @returns {string} The seconds converted to the appropriate unit(s), showing at most two levels.
+ *
+ * @example
+ * // returns "1 year, 2 days"
+ * formatTime(31539600);
+ *
+ * @example
+ * // returns "3 days, 2 hours"
+ * formatTime(263000);
+ *
+ * @example
+ * // returns "3 hours, 50 minutes"
+ * formatTime(13800);
+ */
+export function formatTime(seconds) {
+  const units = [
+    ["year", 31536000],
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+    ["second", 1],
+  ]
+
+  let result = []
+  for (let [name, value] of units) {
+    if (seconds >= value) {
+      let unitAmount = Math.floor(seconds / value)
+      result.push(`${unitAmount} ${unitAmount > 1 ? name + "s" : name}`)
+      seconds %= value
+    }
+
+    if (result.length === 2) break
+  }
+
+  return result.join(", ")
+}
+
+/**
+ * Converts the given bytes into a string with a unit. The units used are Bytes, KB, MB, GB and TB.
+ * The conversion is made to the smallest unit for which the value is greater than or equal to 1.
+ *
+ * @param {number} bytes - The number of bytes to convert.
+ * @param {boolean} [printUnit=true] - Whether or not to include the unit in the returned string.
+ * @param {string} [preferredUnit] - Preferred unit for the output ('Bytes', 'KB', 'MB', 'GB', 'TB').
+ * @returns {string} The bytes converted to the appropriate unit, rounded to 2 decimal places, with or without its unit.
+ *
+ * @example
+ * // returns "975 KB"
+ * formatBytes(1000000);
+ *
+ * @example
+ * // returns "0 Bytes"
+ * formatBytes(0);
+ *
+ * @example
+ * // returns "4.67 GB"
+ * formatBytes(5000000000);
+ */
+export function formatBytes(bytes, printUnit = true, preferredUnit) {
+  if (bytes === 0) return "0 Bytes"
+
+  const k = 1024
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
+  let i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  if (preferredUnit && sizes.includes(preferredUnit)) {
+    i = sizes.indexOf(preferredUnit)
+  }
+
+  const result = parseFloat((bytes / Math.pow(k, i)).toFixed(2))
+  return printUnit ? `${result} ${sizes[i]}` : `${result}`
 }
 
 /**

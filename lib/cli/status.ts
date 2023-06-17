@@ -6,7 +6,8 @@
  * @license   MIT
  */
 
-import { ProcessInformationParsed, ProcessState } from "../core/process.ts"
+import { ProcessInformation, ProcessState } from "../core/process.ts"
+import { ApplicationState } from "../core/status.ts"
 import { Column, Columns, Row } from "./columns.ts"
 
 /**
@@ -30,7 +31,6 @@ export async function printStatus(configFile: string, statusFile: string) {
     console.error(e.message)
     Deno.exit(1)
   }
-
   const taskTable: Row[] = []
 
   taskTable.push({ separator: "equals" })
@@ -40,25 +40,25 @@ export async function printStatus(configFile: string, statusFile: string) {
     Id: "Main",
     Type: status.type.slice(0, 4) || "N/A",
     Status: status.status || "N/A",
-    Blocked: status.blocked ? "Y" : "N",
+    Blocked: "N/A",
     Started: status.started ? new Date(Date.parse(status.started)).toLocaleString() : "N/A",
-    Exited: status.exited ? new Date(Date.parse(status.exited)).toLocaleString() : "N/A",
+    Exited: "N/A",
     RSS: (Math.round(status.memory?.rss / 1024)).toString(10) || "N/A",
-    Signal: `${(status.code ?? "-")}${status.signal ? (" " + status.signal) : ""}`,
+    Signal: "N/A",
   })
 
   taskTable.push({ separator: "dashed" })
 
   // Add all processes
   for (const taskInfo of Object.values(status.processes)) {
-    const currentTask = taskInfo as ProcessInformationParsed
+    const currentTask = taskInfo as ProcessInformation
     taskTable.push({
       Id: currentTask.id,
       Type: currentTask.type.slice(0, 4) || "N/A",
       Status: ProcessState[currentTask.status] || "N/A",
       Blocked: currentTask.blocked ? "Y" : "N",
-      Started: currentTask.started ? new Date(Date.parse(currentTask.started)).toLocaleString() : "N/A",
-      Exited: currentTask.exited ? new Date(Date.parse(currentTask.exited)).toLocaleString() : "N/A",
+      Started: currentTask.started ? currentTask.started.toLocaleString() : "N/A",
+      Exited: currentTask.exited ? currentTask.exited.toLocaleString() : "N/A",
       RSS: (Math.round(currentTask.telemetry?.memory?.rss || 0) / 1024).toString(10) || "N/A",
       Signal: `${(currentTask.code ?? "-")}${currentTask.signal ? (" " + currentTask.signal) : ""}`,
     })
@@ -87,18 +87,15 @@ export async function getStatus(configFile?: string, statusFile?: string) {
     throw new Error(`Could not read config file '${configFile}' from '${statusFile}'. Exiting.`)
   }
 
-  let statusData
+  let status: ApplicationState | undefined = undefined
   try {
-    statusData = await Deno.readTextFile(statusFile)
+    const kv = await Deno.openKv(statusFile)
+    const result = await kv.get(["last_application_state"])
+    if (result) {
+      status = result.value as ApplicationState
+    }
   } catch (_e) {
-    throw new Error(`Could not read status for config file '${configFile}' from '${statusFile}', no instance running.`)
-  }
-
-  let status
-  try {
-    status = JSON.parse(statusData)
-  } catch (_e) {
-    throw new Error(`Could not parse status for config file '${configFile}' from '${statusFile}, invalid file content.'`)
+    throw new Error(`Could not read status for config file '${configFile}' from '${statusFile}', could not read store.`)
   }
 
   // A valid status file were found, figure out if it is stale or not

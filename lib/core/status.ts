@@ -9,6 +9,11 @@ import { Application } from "../../application.meta.ts"
 import { Cluster } from "./cluster.ts"
 import { Process, ProcessInformation, ProcessState } from "./process.ts"
 
+const started = new Date()
+
+/**
+ * Represents the current status of the application.
+ */
 export interface ApplicationState {
   pid: number
   version: string
@@ -16,47 +21,60 @@ export interface ApplicationState {
   updated: string
   started: string
   memory: Deno.MemoryUsage
+  systemMemory: Deno.SystemMemoryInfo
+  loadAvg: number[]
+  osUptime: number
+  osRelease: string
+  denoVersion: { deno: string; v8: string; typescript: string }
   type: string
   processes: ProcessInformation[]
 }
 
-const started = new Date()
-
+/**
+ * Represents the status of the application and provides methods to write the status to disk or store.
+ */
 class Status {
-  /* Properties related to disk write */
-  private statusFileName?: string
+  private storeName?: string
 
-  constructor(fileName?: string) {
-    if (fileName) {
-      this.statusFileName = fileName
+  /**
+   * Constructs a new `Status` instance.
+   * @param storeName Optional name for the KV store. If not provided, a default name will be used.
+   */
+  constructor(storeName?: string) {
+    this.storeName = storeName
+  }
+
+  /**
+   * Writes the application status to the KV store with a timestamp as the key.
+   * @param applicationState The application state to be stored.
+   */
+  public async writeToStore(applicationState: ApplicationState) {
+    // Try to write to store
+    try {
+      const kv = await Deno.openKv(this.storeName)
+      await kv.set(["application_state", Date.now()], applicationState)
+      await kv.set(["last_application_state"], applicationState)
+      kv.close()
+    } catch (e) {
+      console.error("Error while writing status to kv store: " + e.message)
     }
   }
 
-  /* Internal methods */
-  public async writeToDisk(applicationState: ApplicationState) {
-    if (this.statusFileName) {
-      // Prepare the object to write
-      const result = new TextEncoder().encode(JSON.stringify(applicationState))
-
-      // Try to write to disk
-      try {
-        await Deno.writeFile(this.statusFileName, result)
-      } catch (e) {
-        console.error("Error while writing status to disk: " + e.message)
-      }
-    }
-  }
-
+  /**
+   * Generates the current application state based on the statuses of the processes.
+   * @param processes The list of processes to retrieve the statuses from.
+   * @returns The application state object.
+   */
   public applicationState(processes: Process[]): ApplicationState {
-    // Get status from all processes
     const processStates: ProcessInformation[] = []
     for (const p of processes) {
       processStates.push(p.getStatus())
       if (p.isCluster()) {
-        for (const subP of (p as Cluster).processes) processStates.push(subP.getStatus())
+        for (const subP of (p as Cluster).processes) {
+          processStates.push(subP.getStatus())
+        }
       }
     }
-
     return {
       pid: Deno.pid,
       version: Application.version,
@@ -64,6 +82,11 @@ class Status {
       updated: new Date().toISOString(),
       started: started.toISOString(),
       memory: Deno.memoryUsage(),
+      systemMemory: Deno.systemMemoryInfo(),
+      loadAvg: Deno.loadavg(),
+      osUptime: Deno.osUptime(),
+      osRelease: Deno.osRelease(),
+      denoVersion: Deno.version,
       type: "main",
       processes: processStates,
     }

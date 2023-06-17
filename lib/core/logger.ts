@@ -16,16 +16,24 @@ export interface LogEvent {
   process?: ProcessConfiguration
 }
 
-type AttachedLogger = (severity: string, category: string, text: string, process?: ProcessConfiguration) => boolean
+export interface LogEventData {
+  severity: string
+  category: string
+  text: string
+  processId: string
+  timeStamp: number
+}
+
+type AttachedLogger = (severity: string, category: string, text: string, process?: ProcessConfiguration, timeStamp?: number) => boolean
 
 class Logger {
   private config: GlobalLoggerConfiguration = {}
   private attachedLogger?: AttachedLogger
-  private tempLogPath?: string
+  private storeName?: string
 
-  constructor(globalConfiguration: GlobalLoggerConfiguration, tempLogPath?: string) {
+  constructor(globalConfiguration: GlobalLoggerConfiguration, storeName?: string) {
     this.config = globalConfiguration
-    this.tempLogPath = tempLogPath
+    this.storeName = storeName
   }
 
   // Used for attaching the logger hook
@@ -33,24 +41,79 @@ class Logger {
     this.attachedLogger = pluginLogger
   }
 
-  public async getTempLogContents(): Promise<string> {
-    if (!this.tempLogPath) return ""
-
-    try {
-      return await Deno.readTextFile(this.tempLogPath)
-    } catch (error) {
-      console.error("Error reading temporary log file:", error)
-      return ""
+  public async getLogContents(processId?: string, startTimeStamp?: number, endTimeStamp?: number, nRows?: number): Promise<LogEventData[]> {
+    const store = await Deno.openKv(this.storeName)
+    const key = []
+    if (processId) {
+      key.push("logs_by_process")
+      key.push(processId)
+    } else {
+      key.push("logs_by_time")
     }
+    const selector: {
+      prefix: string[]
+      start?: number
+      end?: number
+    } = {
+      prefix: key,
+    }
+    if (startTimeStamp) selector.start = structuredClone(key).push(startTimeStamp)
+    if (endTimeStamp) selector.end = structuredClone(key).push(endTimeStamp)
+    const result = await store.list<LogEventData>(selector)
+    const resultArray: LogEventData[] = []
+    for await (const res of result) resultArray.push(res.value as LogEventData)
+    if (nRows) {
+      let spliceNumber = resultArray.length - nRows
+      spliceNumber = spliceNumber < 0 ? 0 : spliceNumber
+      resultArray.splice(0, spliceNumber)
+    }
+    store.close()
+    return resultArray
   }
 
-  private internalLog(severity: string, category: string, text: string, process?: ProcessConfiguration) {
+  public async getLogsByProcess(processId: string, nRows?: number): Promise<LogEventData[]> {
+    return await this.getLogContents(processId, undefined, undefined, nRows)
+  }
+
+  public async getLogsByTime(startTimeStamp: number, endTimeStamp: number, nRows?: number): Promise<LogEventData[]> {
+    return await this.getLogContents(undefined, startTimeStamp, endTimeStamp, nRows)
+  }
+
+  public async getLogsByProcessAndTime(processId: string, startTimeStamp: number, endTimeStamp: number, nRows?: number): Promise<LogEventData[]> {
+    return await this.getLogContents(processId, startTimeStamp, endTimeStamp, nRows)
+  }
+
+  private async internalLog(severity: string, category: string, text: string, process?: ProcessConfiguration, timeStamp?: number) {
+    // Default initiator to
+    const initiator = process?.id || "core"
+
+    timeStamp = timeStamp || Date.now()
+
+    // Write to persistent log store (if a name is supplied)
+    if (this.storeName) {
+      // Ignore errors when writing to log store
+      try {
+        const logObj: LogEventData = {
+          severity,
+          category,
+          text,
+          processId: initiator,
+          timeStamp,
+        }
+        const store = await Deno.openKv(this.storeName)
+        await store.set(["logs_by_time", new Date().getTime(), initiator], logObj)
+        await store.set(["logs_by_process", initiator, new Date().getTime()], logObj)
+      } catch (error) {
+        console.error(`Failed to write log to store '${this.storeName}' due to '${error.message}'. The following message was not logged: ${text}.`)
+      }
+    }
+
     // Delegate to attached logger if there is one
     let blockedByAttachedLogger = false
     if (this.attachedLogger) {
       // Do not trust the attached logger
       try {
-        blockedByAttachedLogger = this.attachedLogger(severity, category, text, process)
+        blockedByAttachedLogger = this.attachedLogger(severity, category, text, process, timeStamp)
       } catch (e) {
         console.error("Error in attached logger: ", e)
       }
@@ -59,9 +122,6 @@ class Logger {
     // Quit early if an attached logger request it
     if (blockedByAttachedLogger) return
 
-    // Default initiator to
-    const initiator = process?.id || "core"
-
     // Log to console
     const logToConsoleProcess = (process?.logger?.console ?? true) === false
     const logToConsoleGlobal = (this.config?.console ?? true) === false
@@ -69,7 +129,7 @@ class Logger {
     const isStdErr = severity === "error" || category === "stderr"
 
     // Prepare decorated log text
-    const decoratedLogText = `${new Date().toISOString()} [${severity.toUpperCase()}] [${initiator}:${category}] ${text}`
+    const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${initiator}:${category}] ${text}`
 
     if (logToConsole) {
       const logWithColors = this.config.colors ?? true
@@ -112,12 +172,6 @@ class Logger {
       this.writeFile(this.config.stdout, decorateGlobalFiles ? decoratedLogText : text)
     }
 
-    // Write to temporary log file
-    if (this.tempLogPath) {
-      // Ignore errors when writing to temp log file, as logs can occurr after the destination directory has been deleted
-      this.writeFile(this.tempLogPath, decorateGlobalFiles ? decoratedLogText : text, true)
-    }
-
     // Write process log file(s)
     const decorateProcessFiles = process?.logger?.decorateFiles ?? false
     // If stderr is not defined but stdout is, use the stdout file
@@ -140,18 +194,17 @@ class Logger {
     }
   }
 
-  public log(category: string, text: string, process?: ProcessConfiguration) {
-    this.internalLog("log", category, text, process)
+  public log(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    this.internalLog("log", category, text, process, timestamp)
   }
-
-  public info(category: string, text: string, process?: ProcessConfiguration) {
-    this.internalLog("info", category, text, process)
+  public info(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    this.internalLog("info", category, text, process, timestamp)
   }
-  public warn(category: string, text: string, process?: ProcessConfiguration) {
-    this.internalLog("warn", category, text, process)
+  public warn(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    this.internalLog("warn", category, text, process, timestamp)
   }
-  public error(category: string, text: string, process?: ProcessConfiguration) {
-    this.internalLog("error", category, text, process)
+  public error(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    this.internalLog("error", category, text, process, timestamp)
   }
 }
 

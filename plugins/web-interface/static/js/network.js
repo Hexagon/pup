@@ -4,7 +4,8 @@
  * @file static/js/network.js
  */
 
-import { addLog, processConfigInventory, processStatusInventory, selectedProcessId, updateProcessCard, updateToolbar } from "./ui.js"
+import { addLog, updateProcessCard, updateSidebar } from "./ui.js"
+import { processConfigInventory, processSelector, processStatusInventory } from "./state.js"
 
 export function generateWebSocketURL() {
   const loc = window.location
@@ -47,8 +48,8 @@ function handleWebSocketMessage(message) {
       updateProcessCard(message.data)
 
       // If the updated process is currently selected, update the toolbar as well
-      if (selectedProcessId === message.data.status.id) {
-        updateToolbar(message.data.status.id)
+      if (processSelector.get() === message.data.status.id) {
+        updateSidebar(message.data.status.id)
       }
       break
     case "log":
@@ -60,7 +61,69 @@ function handleWebSocketMessage(message) {
 }
 
 /**
- * Fetches the list of processes from the server and updates the process inventories.
+ * Controls the processes by sending a request to a specific operation endpoint.
+ * @param {string} id - The ID of the process to control.
+ * @param {string} operation - The operation to perform on the process.
+ * @returns {Promise<object>} A promise that resolves to the server response.
+ * @throws {Error} When unable to perform the operation or if an invalid operation is specified.
+ */
+export async function controlProcess(id, operation) {
+  // Array of valid operations
+  const validOperations = ["start", "stop", "block", "unblock", "restart"]
+
+  // Validate operation
+  if (!validOperations.includes(operation)) {
+    throw new Error(`Invalid operation: ${operation}. Must be one of ${validOperations.join(", ")}.`)
+  }
+
+  let response
+  try {
+    response = await fetch(`./${operation}/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+  } catch (error) {
+    console.error(`Error performing ${operation} operation on process ${id}:`, error)
+    throw error
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  const result = await response.json()
+  if (result && result.success) {
+    updateInstanceInfo()
+  }
+  return result
+}
+
+/**
+ * Fetches instance data from the server
+ * @async
+ * @returns {Promise<object[]>} A promise that resolves to instance status data
+ * @throws {Error} When unable to fetch the processes.
+ */
+async function fetchInstance() {
+  let response
+  try {
+    response = await fetch("./state")
+  } catch (error) {
+    console.error("Error fetching processes:", error)
+    throw error // or return an empty array or default value
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+/**
+ * Fetches the list of processes from the server
  * @async
  * @returns {Promise<object[]>} A promise that resolves to the list of processes.
  * @throws {Error} When unable to fetch the processes.
@@ -91,4 +154,4 @@ async function fetchProcesses() {
   return processes
 }
 
-export { fetchProcesses }
+export { fetchInstance, fetchProcesses }

@@ -72,6 +72,22 @@ export interface PluginProcessData {
   config: PluginProcessConfiguration
 }
 
+export interface PluginApplicationState {
+  pid: number
+  version: string
+  status: string
+  updated: string
+  started: string
+  memory: Deno.MemoryUsage
+  systemMemory: Deno.SystemMemoryInfo
+  loadAvg: number[]
+  osUptime: number
+  osRelease: string
+  denoVersion: { deno: string; v8: string; typescript: string }
+  type: string
+  processes: PluginProcessInformation[]
+}
+
 export interface PluginPaths {
   temporaryStorage?: string
   persistentStorage?: string
@@ -102,6 +118,9 @@ export class PluginApi {
       }
     })
     return statuses
+  }
+  public applicationState(): PluginApplicationState {
+    return this._pup.status.applicationState(this._pup.allProcesses())
   }
   public terminate(forceQuitMs: number) {
     this._pup.terminate(forceQuitMs)

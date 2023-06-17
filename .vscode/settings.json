@@ -1,6 +1,6 @@
 {
   "deno.enable": true,
-  "deno.unstable": false,
+  "deno.unstable": true,
   "json.schemas": [
     {
       "fileMatch": [

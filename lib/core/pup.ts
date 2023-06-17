@@ -47,7 +47,7 @@ class Pup {
     // Setup paths
     let statusFile
     let ipcFile
-    let logFile
+    let logStore
     if (configFilePath) {
       this.configFilePath = path.resolve(configFilePath)
 
@@ -56,16 +56,17 @@ class Pup {
 
       this.persistentStoragePath = toPersistentPath(this.configFilePath)
 
-      statusFile = `${this.temporaryStoragePath}/.status`
-      ipcFile = `${this.temporaryStoragePath}/.main.ipc`
-      logFile = `${this.temporaryStoragePath}/.log`
+      ipcFile = `${this.temporaryStoragePath}/.main.ipc` // Plain text file (serialized js object)
+      statusFile = `${this.temporaryStoragePath}/.main.status` // Deno KV store
+
+      logStore = `${this.persistentStoragePath}/.main.log` // Deno KV store
     }
 
     // Throw on invalid configuration
     this.configuration = validateConfiguration(unvalidatedConfiguration)
 
     // Initialise core logger
-    this.logger = new Logger(this.configuration.logger ?? {}, logFile)
+    this.logger = new Logger(this.configuration.logger ?? {}, logStore)
 
     // EventEmitter
     this.events = new EventEmitter()
@@ -249,7 +250,7 @@ class Pup {
     try {
       const applicationState = this.status.applicationState(this.processes)
       this.events.emit("application_state", applicationState)
-      this.status.writeToDisk(applicationState)
+      this.status.writeToStore(applicationState)
     } catch (e) {
       this.logger.error("watchdog", `Heartbeat update failed: ${e}`)
     }
