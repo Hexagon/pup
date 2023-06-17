@@ -103,7 +103,7 @@ export class PupPlugin extends PluginImplementation {
         context.response.body = JSON.stringify({
           success: this.pup.start(context.params.id, "web-interface"),
         })
-      } catch (e) {
+      } catch (_e) {
         context.response.code = 500
         context.response.body = JSON.stringify({ success: false })
       }
@@ -113,7 +113,7 @@ export class PupPlugin extends PluginImplementation {
         context.response.body = JSON.stringify({
           success: this.pup.stop(context.params.id, "web-interface"),
         })
-      } catch (e) {
+      } catch (_e) {
         context.response.code = 500
         context.response.body = JSON.stringify({ success: false })
       }
@@ -123,7 +123,7 @@ export class PupPlugin extends PluginImplementation {
         context.response.body = JSON.stringify({
           success: this.pup.restart(context.params.id, "web-interface"),
         })
-      } catch (e) {
+      } catch (_e) {
         context.response.code = 500
         context.response.body = JSON.stringify({ success: false })
       }
@@ -133,7 +133,7 @@ export class PupPlugin extends PluginImplementation {
         context.response.body = JSON.stringify({
           success: this.pup.block(context.params.id, "web-interface"),
         })
-      } catch (e) {
+      } catch (_e) {
         context.response.code = 500
         context.response.body = JSON.stringify({ success: false })
       }
@@ -143,7 +143,7 @@ export class PupPlugin extends PluginImplementation {
         context.response.body = JSON.stringify({
           success: this.pup.unblock(context.params.id, "web-interface"),
         })
-      } catch (e) {
+      } catch (_e) {
         context.response.code = 500
         context.response.body = JSON.stringify({ success: false })
       }

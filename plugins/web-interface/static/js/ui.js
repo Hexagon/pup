@@ -150,11 +150,11 @@ function updateSidebar(processId) {
     setTextContentBySelector("#process-status-started", processStatus.started)
     setTextContentBySelector("#process-status-updated", processStatus.updated)
 
-    document.getElementById("aside-overview").className = "hidden"
-    document.getElementById("aside-process").className = ""
+    document.getElementById("aside-overview").classList.add("hidden")
+    document.getElementById("aside-process").classList.remove("hidden")
   } else {
-    document.getElementById("aside-overview").className = ""
-    document.getElementById("aside-process").className = "hidden"
+    document.getElementById("aside-overview").classList.remove("hidden")
+    document.getElementById("aside-process").classList.add("hidden")
   }
 }
 

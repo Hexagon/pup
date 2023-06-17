@@ -15,7 +15,6 @@ All notable changes to this project will be documented in this section.
 - fix(webinterface): Fix script error.
 - chore(build): Add build step for bundling web interface assets.
 - feature(webinterface): Add "toolbar" showing config/status details of selected process.
-- feature(webinterface): Give process "tabs" colors visualising process status.
 - chore(webinterface): Code refactor, convert js to esm etc.
 - chore(webinterface): Add separate README.md (plugins/web-interface/README.md) with docs for developers/contributors.
 - feature(status,logger): Use Deno KV instead of plain file, for keeping status and internal logs.

@@ -56,12 +56,14 @@ export function ansiToHtml(ansiText) {
  */
 export function showSpecificClassElements(containerId, targetClass) {
   const container = document.getElementById(containerId)
+  const allChildren = container.children
   if (targetClass) {
-    const allChildren = container.children
     Array.from(allChildren).forEach((child) => child.classList.add("hidden"))
+    const targetElements = container.getElementsByClassName(targetClass)
+    Array.from(targetElements).forEach((el) => el.classList.remove("hidden"))
+  } else {
+    Array.from(allChildren).forEach((child) => child.classList.remove("hidden"))
   }
-  const targetElements = container.getElementsByClassName(targetClass)
-  Array.from(targetElements).forEach((el) => el.classList.remove("hidden"))
 }
 /**
  * Converts the given seconds into a string with a time unit.
