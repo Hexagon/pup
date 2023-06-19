@@ -78,7 +78,6 @@ Deno.test("Logger - getLogContents: Fetch all logs", async () => {
   }
 
   const logs = await logger.getLogContents()
-  console.log(logs)
   assertEquals(logs, expectedLogs)
 })
 

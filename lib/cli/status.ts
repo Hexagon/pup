@@ -91,13 +91,13 @@ export async function getStatus(configFile?: string, statusFile?: string) {
   try {
     const kv = await Deno.openKv(statusFile)
     const result = await kv.get(["last_application_state"])
+    kv.close()
     if (result) {
       status = result.value as ApplicationState
     }
   } catch (_e) {
     throw new Error(`Could not read status for config file '${configFile}' from '${statusFile}', could not read store.`)
   }
-
   // A valid status file were found, figure out if it is stale or not
   if (status && status.updated) {
     const parsedDate = Date.parse(status.updated)

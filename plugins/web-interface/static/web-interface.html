@@ -1,164 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pup</title>
-  <link rel="stylesheet" href="css/web-interface.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
-<body class="dark bg-dark fg-dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pup</title>
+    <link rel="stylesheet" href="css/web-interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body class="dark bg-dark fg-dark">
 
-    <!-- Pup overview -->
-    <aside class="bg-medium" id="aside-overview">
-      <section>
-        <h1><i class="fa-duotone fa-chart-network"></i> PUP</h1>
-      </section>
-      <section>
-        <table>
-          <tr>
-            <td>Total Processes</td>
-            <td><span id="pup-processes" class="strong"></span></td>
-          </tr>            
-          <tr>
-            <td>Memory usage</td>
-            <td><span id="pup-memory-usage" class="strong"></span></td>
-          </tr>            
-          <tr>
-            <td>Uptime</td>
-            <td><span id="pup-uptime"  class="strong"></span></td>
-          </tr>            
-          <tr>
-            <td>Deno version</td>
-            <td><span id="pup-deno-version" class="strong"></span></td>
-          </tr>            
-          <tr>
-            <td>Pup version</td>
-            <td><span id="pup-version" class="strong"></span></td>
-          </tr>
-        </table>
-      </section>
-      <section>
-        <h2>Processes</h2>
-      </section>
-      <section id="process-card-container">
-        <!-- Process cards will be generated here -->
-      </section>
+      <!-- Pup overview -->
+      <aside class="bg-medium" id="aside-overview">
+        <section>
+          <h1><i class="fa-duotone fa-chart-network"></i> PUP</h1>
+        </section>
+        <section>
+          <table>
+            <tr>
+              <td>Total Processes</td>
+              <td><span id="pup-processes" class="strong"></span></td>
+            </tr>            
+            <tr>
+              <td>Memory usage</td>
+              <td><span id="pup-memory-usage" class="strong"></span></td>
+            </tr>            
+            <tr>
+              <td>Uptime</td>
+              <td><span id="pup-uptime"  class="strong"></span></td>
+            </tr>            
+            <tr>
+              <td>Deno version</td>
+              <td><span id="pup-deno-version" class="strong"></span></td>
+            </tr>            
+            <tr>
+              <td>Pup version</td>
+              <td><span id="pup-version" class="strong"></span></td>
+            </tr>
+          </table>
+        </section>
+        <section>
+          <h2>Processes</h2>
+        </section>
+        <section id="process-card-container">
+          <!-- Process cards will be generated here -->
+        </section>
+      </aside>
+
+      <!-- Process Details View -->
+      <aside class="bg-medium hidden" id="aside-process">
+        <section>
+          <button id="aside-back">&lt;&lt; Back</button>
+          <h1><i class="fa-duotone fa-chart-network"></i> Process details</h1>
+        </section>
+        <section>
+          <div>
+            <h4>Configuration</h4>
+            <table>
+              <tr>
+                <td class="strong">Command</td>
+                <td id="process-config-command"></td>
+              </tr>
+              <tr>
+                <td class="strong">Working dir</td>
+                <td id="process-config-cwd"></td>
+              </tr>
+              <tr>
+                <td class="strong">Autostart</td>
+                <td id="process-config-autostart"></td>
+              </tr>
+              <tr>
+                <td class="strong">Restart</td>
+                <td id="process-config-restart"></td>
+              </tr>
+              <tr>
+                <td class="strong">Cron</td>
+                <td id="process-config-cron"></td>
+              </tr>
+              <tr>
+                <td class="strong">Cron terminate</td>
+                <td id="process-config-terminate"></td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <h4>Status</h4>
+            <table>
+              <tr>
+                <td class="strong">Type</td>
+                <td id="process-status-type"></td>
+              </tr>
+              <tr>
+                <td class="strong">Blocked</td>
+                <td id="process-status-blocked"></td>
+              </tr>
+              <tr>
+                <td class="strong">Status</td>
+                <td id="process-status-status"></td>
+              </tr>
+              <tr>
+                <td class="strong">Started</td>
+                <td id="process-status-started"></td>
+              </tr>
+              <tr>
+                <td class="strong">Updated</td>
+                <td id="process-status-updated"></td>
+              </tr>
+            </table>
+          </div>
+        </section>
     </aside>
-
-    <!-- Process Details View -->
-    <aside class="bg-medium hidden" id="aside-process">
-      <section>
-        <button id="aside-back">&lt;&lt; Back</button>
-        <h1><i class="fa-duotone fa-chart-network"></i> Process details</h1>
-      </section>
-      <section>
-        <div>
-          <h4>Configuration</h4>
-          <table>
-            <tr>
-              <td class="strong">Command</td>
-              <td id="process-config-command"></td>
-            </tr>
-            <tr>
-              <td class="strong">Working dir</td>
-              <td id="process-config-cwd"></td>
-            </tr>
-            <tr>
-              <td class="strong">Autostart</td>
-              <td id="process-config-autostart"></td>
-            </tr>
-            <tr>
-              <td class="strong">Restart</td>
-              <td id="process-config-restart"></td>
-            </tr>
-            <tr>
-              <td class="strong">Cron</td>
-              <td id="process-config-cron"></td>
-            </tr>
-            <tr>
-              <td class="strong">Cron terminate</td>
-              <td id="process-config-terminate"></td>
-            </tr>
-          </table>
+    <main>
+      <div class="bg-darker fg-darker toolbar">
+        <div class="toolbar-content">
+          <h2 id="toolbar-header">-</h2>
+          <div id="actions-container">
+            <button id="start-process" class="bg-light border-light"><i class="fas fa-play fg-good"></i></button>
+            <button id="stop-process" class="bg-light border-light"><i class="fas fa-stop fg-bad"></i></button>
+            <button id="restart-process" class="bg-light border-light"><i class="fas fa-redo fg-primary"></i></button>
+            <button id="block-process" class="bg-light border-light"><i class="fas fa-traffic-light fg-bad"></i></button>
+            <button id="unblock-process" class="bg-light border-light"><i class="fas fa-traffic-light fg-good"></i></button>
+          </div>
         </div>
-        <div>
-          <h4>Status</h4>
-          <table>
-            <tr>
-              <td class="strong">Type</td>
-              <td id="process-status-type"></td>
-            </tr>
-            <tr>
-              <td class="strong">Blocked</td>
-              <td id="process-status-blocked"></td>
-            </tr>
-            <tr>
-              <td class="strong">Status</td>
-              <td id="process-status-status"></td>
-            </tr>
-            <tr>
-              <td class="strong">Started</td>
-              <td id="process-status-started"></td>
-            </tr>
-            <tr>
-              <td class="strong">Updated</td>
-              <td id="process-status-updated"></td>
-            </tr>
-          </table>
+      </div>
+      <div id="logs"></div>
+    </main>
+    <!-- System Info View -->
+    <footer class="bg-medium fg-medium border-bottom border-darker">
+      <section class="border-left border-darker border-top">
+        <div id="system-memory-container">
+          Physical Memory
+          <span id="system-memory-usage-percent" class="strong"></span>
+          <span id="system-memory-usage" class="strong"></span>
         </div>
       </section>
-  </aside>
-  <main>
-    <div class="bg-darker fg-darker toolbar">
-      <div class="toolbar-content">
-        <h2 id="toolbar-header">-</h2>
-        <div id="actions-container">
-          <button id="start-process" class="bg-light border-light"><i class="fas fa-play fg-good"></i></button>
-          <button id="stop-process" class="bg-light border-light"><i class="fas fa-stop fg-bad"></i></button>
-          <button id="restart-process" class="bg-light border-light"><i class="fas fa-redo fg-primary"></i></button>
-          <button id="block-process" class="bg-light border-light"><i class="fas fa-traffic-light fg-bad"></i></button>
-          <button id="unblock-process" class="bg-light border-light"><i class="fas fa-traffic-light fg-good"></i></button>
+      <section class="border-left border-darker  border-top">
+        <div>
+          Swap
+          <span id="system-swap-usage-percent" class="strong"></span>
+          <span id="system-swap-usage" class="strong"></span>
         </div>
-      </div>
-    </div>
-    <div id="logs"></div>
-  </main>
-  <!-- System Info View -->
-  <footer class="bg-medium fg-medium border-bottom border-darker">
-    <section class="border-left border-darker border-top">
-      <div id="system-memory-container">
-        Physical Memory
-        <span id="system-memory-usage-percent" class="strong"></span>
-        <span id="system-memory-usage" class="strong"></span>
-      </div>
-    </section>
-    <section class="border-left border-darker  border-top">
-      <div>
-        Swap
-        <span id="system-swap-usage-percent" class="strong"></span>
-        <span id="system-swap-usage" class="strong"></span>
-      </div>
-    </section>
-    <section class="border-left border-darker border-top">
-      <div>
-        Up
-        <span id="system-uptime" class="strong"></span>
-      </div>
-    </section>
-    <section class="border-left border-darker border-top">
-      <div>
-        OS
-        <span id="system-os-release" class="strong"></span>
-      </div>
-    </section>
-    <section class="border-left border-darker border-top">
-      <div>
-        Load Average
-        <span id="system-load" class="strong"></span>
-      </div>
-    </section>
-  </footer>
-  <script src="js/main.js" type="module"></script>
-</body>
+      </section>
+      <section class="border-left border-darker border-top">
+        <div>
+          Up
+          <span id="system-uptime" class="strong"></span>
+        </div>
+      </section>
+      <section class="border-left border-darker border-top">
+        <div>
+          OS
+          <span id="system-os-release" class="strong"></span>
+        </div>
+      </section>
+      <section class="border-left border-darker border-top">
+        <div>
+          Load Average
+          <span id="system-load" class="strong"></span>
+        </div>
+      </section>
+    </footer>
+    <script src="js/main.js" type="module"></script>
+  </body>
 </html>

@@ -1,4 +1,7 @@
 {
+  "logger": {
+    "internalLogHours": 0.5
+  },
   "processes": [
     {
       "id": "cluster-example",

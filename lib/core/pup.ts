@@ -37,6 +37,9 @@ class Pup {
   private WATCHDOG_INTERVAL_MS = 2000
   private watchdogTimer?: number
 
+  private MAINTENANCE_INTERVAL_MS = 900 * 1000
+  private maintenanceTimer?: number
+
   public temporaryStoragePath?: string
   public persistentStoragePath?: string
   public configFilePath?: string
@@ -57,7 +60,7 @@ class Pup {
       this.persistentStoragePath = toPersistentPath(this.configFilePath)
 
       ipcFile = `${this.temporaryStoragePath}/.main.ipc` // Plain text file (serialized js object)
-      statusFile = `${this.temporaryStoragePath}/.main.status` // Deno KV store
+      statusFile = `${this.persistentStoragePath}/.main.status` // Deno KV store
 
       logStore = `${this.persistentStoragePath}/.main.log` // Deno KV store
     }
@@ -90,6 +93,9 @@ class Pup {
         this.logger.error("cleanup", `${cleanupFilePath} could not be removed, will be left.`)
       }
     }
+
+    // Unset last application state
+    this.status.cleanup()
   }
 
   public init = async () => {
@@ -165,6 +171,7 @@ class Pup {
     }
 
     this.watchdog()
+    this.maintenance()
   }
 
   public allProcesses(): Process[] {
@@ -250,19 +257,50 @@ class Pup {
     try {
       const applicationState = this.status.applicationState(this.processes)
       this.events.emit("application_state", applicationState)
-      this.status.writeToStore(applicationState)
+      const logHours = this.configuration.logger?.internalLogHours === undefined ? 24 : this.configuration.logger?.internalLogHours
+      if (logHours > 0) {
+        this.status.writeToStore(applicationState)
+      }
     } catch (e) {
       this.logger.error("watchdog", `Heartbeat update failed: ${e}`)
     }
 
     // Reschedule watchdog
-    // ToDo: Exit if all processes are exhausted?
     if (!this.requestTerminate) {
       this.watchdogTimer = setTimeout(() => {
         // Exit watchdog if terminating
         this.watchdog()
       }, this.WATCHDOG_INTERVAL_MS)
     }
+  }
+
+  /**
+   * Performs periodic maintenance tasks in Pup.
+   * Purges logs and state information older than the specified `keepHours`.
+   * This method is scheduled to run every hour.
+   *
+   * @private
+   */
+  private maintenance = async () => {
+    this.logger.log("maintenance", "Performing periodic maintenance")
+
+    const keepHours = this.configuration.logger?.internalLogHours === undefined ? 24 : this.configuration.logger?.internalLogHours
+
+    // Purge logs
+    const logsPurged = await this.logger.purge(keepHours)
+    this.logger.log("maintenance", `Purged log entries: ${logsPurged}`)
+
+    // Purge state
+    const statusPurged = await this.status.purge(keepHours)
+    this.logger.log("maintenance", `Purged status entries: ${statusPurged}`)
+
+    // Schedule next maintenance
+    this.maintenanceTimer = setTimeout(() => {
+      this.maintenance()
+    }, this.MAINTENANCE_INTERVAL_MS)
+
+    // Make maintenance timer non-blocking
+    Deno.unrefTimer(this.maintenanceTimer)
   }
 
   private async receiveData() {
@@ -480,6 +518,7 @@ class Pup {
     // Stop watchdog
     this.requestTerminate = true
     clearTimeout(this.watchdogTimer)
+    clearTimeout(this.maintenanceTimer)
 
     this.logger.log("terminate", "Termination requested")
 
@@ -504,7 +543,7 @@ class Pup {
     }
 
     // Cleanup
-    // this.cleanup()
+    this.cleanup()
   }
 }
 

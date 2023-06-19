@@ -95,8 +95,10 @@ configuration file:
 - `decorateFiles` (boolean): Set to true to enable decoration in the output files. Default is false.
 - `decorate` (boolean): **Only available in global scope.** Set to true to enable decoration in the logs. Default is false.
 - `colors` (boolean): **Only available in global scope.** Set to true to enable colored output. Default is false.
+- `internalLogHours` (number): **Only available in global scope.** Keep internal logs and metrics (used for `pup logs` and varius plugins for selected number of hours. Lowest value is 0 (disable
+  interna logging) and highest valid value is 366 (two weeks).
 
-These options can be used in both the global scope logger, and for each process like:
+Most options can be used in both the global scope logger, and for each process like:
 
 ```jsonc
 {
@@ -106,7 +108,8 @@ These options can be used in both the global scope logger, and for each process 
     "stderr": "/path/to/stderr.log",
     "colors": true,
     "decorateFiles": true,
-    "decorate": true
+    "decorate": true,
+    "internalLogHours": 24
   },
   "processes": [
     {

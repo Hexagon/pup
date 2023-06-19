@@ -50,16 +50,27 @@ class Logger {
     } else {
       key.push("logs_by_time")
     }
-    const selector: {
-      prefix: string[]
-      start?: number
-      end?: number
-    } = {
-      prefix: key,
+    let selector: {
+      prefix: Deno.KvKey
+    } | {
+      start: Deno.KvKey
+      end: Deno.KvKey
     }
-    if (startTimeStamp) selector.start = structuredClone(key).push(startTimeStamp)
-    if (endTimeStamp) selector.end = structuredClone(key).push(endTimeStamp)
-    const result = await store.list<LogEventData>(selector)
+    if (startTimeStamp || endTimeStamp) {
+      const startKey: (string | number)[] = [...key]
+      startKey.push(startTimeStamp || 0)
+      const endKey: (string | number)[] = [...key]
+      endKey.push(endTimeStamp || Infinity)
+      selector = {
+        start: startKey,
+        end: endKey,
+      }
+    } else if (!startTimeStamp && !endTimeStamp) {
+      selector = { prefix: key }
+    } else {
+      throw new Error("Invalid combination of arguments for getLogContent")
+    }
+    const result = await store.list(selector)
     const resultArray: LogEventData[] = []
     for await (const res of result) resultArray.push(res.value as LogEventData)
     if (nRows) {
@@ -89,8 +100,9 @@ class Logger {
 
     timeStamp = timeStamp || Date.now()
 
-    // Write to persistent log store (if a name is supplied)
-    if (this.storeName) {
+    // Write to persistent log store (if a name is supplied and internal logging is enabled)
+    const logHours = this.config.internalLogHours === undefined ? 72 : this.config.internalLogHours
+    if (this.storeName && logHours > 0) {
       // Ignore errors when writing to log store
       try {
         const logObj: LogEventData = {
@@ -101,8 +113,9 @@ class Logger {
           timeStamp,
         }
         const store = await Deno.openKv(this.storeName)
-        await store.set(["logs_by_time", new Date().getTime(), initiator], logObj)
-        await store.set(["logs_by_process", initiator, new Date().getTime()], logObj)
+        await store.set(["logs_by_time", timeStamp], logObj)
+        await store.set(["logs_by_process", initiator, timeStamp], logObj)
+        store.close()
       } catch (error) {
         console.error(`Failed to write log to store '${this.storeName}' due to '${error.message}'. The following message was not logged: ${text}.`)
       }
@@ -194,17 +207,41 @@ class Logger {
     }
   }
 
-  public log(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    this.internalLog("log", category, text, process, timestamp)
+  public async log(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("log", category, text, process, timestamp)
   }
-  public info(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    this.internalLog("info", category, text, process, timestamp)
+  public async info(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("info", category, text, process, timestamp)
   }
-  public warn(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    this.internalLog("warn", category, text, process, timestamp)
+  public async warn(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("warn", category, text, process, timestamp)
   }
-  public error(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    this.internalLog("error", category, text, process, timestamp)
+  public async error(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("error", category, text, process, timestamp)
+  }
+  public async purge(keepHours: number): Promise<number> {
+    if (!this.storeName) {
+      return 0
+    }
+    try {
+      const store = await Deno.openKv(this.storeName)
+      const now = Date.now()
+      const startTime = now - keepHours * 60 * 60 * 1000
+      const logsByTimeSelector = {
+        prefix: ["logs_by_time"],
+        end: ["logs_by_time", startTime],
+      }
+      let rowsDeleted = 0
+      for await (const entry of store.list(logsByTimeSelector)) {
+        await store.delete(entry.key)
+        rowsDeleted++
+      }
+      store.close()
+      return rowsDeleted
+    } catch (error) {
+      this.log("error", `Failed to purge logs from store '${this.storeName}': ${error.message}`)
+      return 0
+    }
   }
 }
 

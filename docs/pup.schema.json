@@ -27,6 +27,12 @@
             },
             "decorate": {
               "type": "boolean"
+            },
+            "internalLogHours": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 366,
+              "default": 24
             }
           },
           "additionalProperties": false

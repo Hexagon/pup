@@ -59,6 +59,45 @@ class Status {
       console.error("Error while writing status to kv store: " + e.message)
     }
   }
+  /**
+   * Writes the application status to the KV store with a timestamp as the key.
+   * @param applicationState The application state to be stored.
+   */
+  public async cleanup() {
+    // Try to write to store
+    try {
+      const kv = await Deno.openKv(this.storeName)
+      await kv.delete(["last_application_state"])
+      kv.close()
+    } catch (e) {
+      console.error("Error while writing status to kv store: " + e.message)
+    }
+  }
+
+  public async purge(keepHours: number): Promise<number> {
+    if (!this.storeName) {
+      return 0
+    }
+    try {
+      const store = await Deno.openKv(this.storeName)
+      const now = Date.now()
+      const startTime = now - keepHours * 60 * 60 * 1000
+      const logsByTimeSelector = {
+        prefix: ["application_state"],
+        end: ["application_state", startTime],
+      }
+      let rowsDeleted = 0
+      for await (const entry of store.list(logsByTimeSelector)) {
+        rowsDeleted++
+        await store.delete(entry.key)
+      }
+      store.close()
+      return rowsDeleted
+    } catch (error) {
+      console.error(`Failed to purge logs from store '${this.storeName}': ${error.message}`)
+      return 0
+    }
+  }
 
   /**
    * Generates the current application state based on the statuses of the processes.

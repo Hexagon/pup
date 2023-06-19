@@ -29,6 +29,7 @@ interface GlobalLoggerConfiguration extends _BaseLoggerConfiguration {
   colors?: boolean
   decorateFiles?: boolean
   decorate?: boolean
+  internalLogHours?: number
 }
 
 interface ProcessLoggerConfiguration extends _BaseLoggerConfiguration {
@@ -81,6 +82,7 @@ const ConfigurationSchema = z.object({
       colors: z.optional(z.boolean()),
       decorateFiles: z.optional(z.boolean()),
       decorate: z.optional(z.boolean()),
+      internalLogHours: z.number().min(0).max(366).default(24),
     }).strict(),
   ),
   watcher: z.optional(

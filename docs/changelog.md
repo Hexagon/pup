@@ -18,6 +18,9 @@ All notable changes to this project will be documented in this section.
 - chore(webinterface): Code refactor, convert js to esm etc.
 - chore(webinterface): Add separate README.md (plugins/web-interface/README.md) with docs for developers/contributors.
 - feature(status,logger): Use Deno KV instead of plain file, for keeping status and internal logs.
+- feature(logger): Move internal logs from temporary to persistent storage.
+- feature(core): Add maintenance loop, currently purging internal logs and status after a set number of hours. Running every 15 minutes.
+- feature(configuration): Add option to global logger `logger.internalLogHours` defaulting to 24.
 
 ## [1.0.0-beta.32] - 2023-06-06
 

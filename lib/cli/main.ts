@@ -231,9 +231,21 @@ async function main(inputArgs: string[]) {
   // Prepare log file path
   // Add a new condition for "logs" base command
   if (baseArgument === "logs") {
-    const logStore = `${toPersistentPath(configFile as string)}/.log`
+    const logStore = `${toPersistentPath(configFile as string)}/.main.log`
     const logger = new Logger(configuration.logger || {}, logStore)
-    const logs = await logger.getLogContents(args.id, args.start, args.end, args.n)
+    const startTimestamp = args.start ? new Date(Date.parse(args.start)).getTime() : undefined
+    const endTimestamp = args.end ? new Date(Date.parse(args.end)).getTime() : undefined
+    const numberOfRows = args.n ? parseInt(args.n, 10) : undefined
+    let logs = await logger.getLogContents(args.id, startTimestamp, endTimestamp)
+    logs = logs.filter((log) => {
+      const { processId, severity } = log
+      const severityFilter = !args.severity || args.severity.toLowerCase() === severity.toLowerCase()
+      const processFilter = !args.id || args.id.toLowerCase() === processId.toLowerCase()
+      return severityFilter && processFilter
+    })
+    if (numberOfRows) {
+      logs = logs.slice(-numberOfRows)
+    }
     if (logs && logs.length > 0) {
       const logWithColors = configuration.logger?.colors ?? true
       for (const log of logs) {
@@ -270,7 +282,7 @@ async function main(inputArgs: string[]) {
 
   // Prepare status file
   let statusFile
-  if (useConfigFile) statusFile = `${toTempPath(configFile as string)}/.main.status`
+  if (useConfigFile) statusFile = `${toPersistentPath(configFile as string)}/.main.status`
 
   /**
    * Now when the configuration file is located
