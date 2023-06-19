@@ -32,22 +32,27 @@ pup run --config path/to/config-file
 
 ## Viewing Logs
 
-You can view the temporary logs stored by the build in logger using the `logs` command:
+Pup enables you to inspect its internally stored logs through the `logs` command. This command provides several options to help filter the logs and customize the output:
 
-- `-n`: (optional) Number of log entries to show.
-- `--id <process-id>`: Filter on process-id.
-- `--severity <severity>`: Filter on a specific severity (error, warning, info, log)
-- `--start <iso860-timestamp>`: Show logs after this timestamp, entered in ISO8601-format.
-- `--end <iso860-timestamp>`: Show logs after this timestamp, entered in ISO8601-format.
+- `-n`: (optional) Defines the number of log entries to display.
+- `--id <process-id>`: (optional) Allows filtering of logs based on the process ID.
+- `--severity <severity>`: (optional) Enables filtering logs based on the severity level. The acceptable severity levels include error, warning, info, and log.
+- `--start <iso860-timestamp>`: (optional) Allows you to display logs that were generated after a specified timestamp. The timestamp should be in the ISO8601 format.
+- `--end <iso860-timestamp>`: (optional) Lets you display logs generated before a particular timestamp. The timestamp should be in the ISO8601 format.
 
-> **Note**: By default, 24 hours of logs are kept by the internal logger. This can be changed with the global logger configuration.
+> **Note**: The internal logger keeps logs for a default period of 24 hours. You can modify this setting via the global logger configuration.
+
+To use the `logs` command, execute the following commands:
 
 ```bash
-# This will use pup.json or pup.jsonc in current directory
+# This will use pup.json or pup.jsonc in the current directory
 pup logs
 
 # or
 pup logs --config path/to/config-file
+
+# or
+pup logs --cwd path/where/config/file/is
 ```
 
 ## Controlling running instances
