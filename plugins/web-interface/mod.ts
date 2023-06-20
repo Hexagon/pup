@@ -222,7 +222,6 @@ export class PupPlugin extends PluginImplementation {
 
   public async cleanup(): Promise<boolean> {
     this.controller.abort()
-
-    return true
+    return await true
   }
 }
