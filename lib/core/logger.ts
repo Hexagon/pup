@@ -41,45 +41,34 @@ class Logger {
     this.attachedLogger = pluginLogger
   }
 
-  public async getLogContents(processId?: string, startTimeStamp?: number, endTimeStamp?: number, nRows?: number): Promise<LogEventData[]> {
-    const store = await Deno.openKv(this.storeName)
-    const key = []
-    if (processId) {
-      key.push("logs_by_process")
-      key.push(processId)
-    } else {
-      key.push("logs_by_time")
-    }
-    let selector: {
-      prefix: Deno.KvKey
-    } | {
-      start: Deno.KvKey
-      end: Deno.KvKey
-    }
+  // Prepare log event selector
+  private prepareSelector(processId?: string, startTimeStamp?: number, endTimeStamp?: number): { prefix: Deno.KvKey } | { start: Deno.KvKey; end: Deno.KvKey } {
+    const key = processId ? ["logs_by_process", processId] : ["logs_by_time"]
     if (startTimeStamp || endTimeStamp) {
-      const startKey: (string | number)[] = [...key]
-      startKey.push(startTimeStamp || 0)
-      const endKey: (string | number)[] = [...key]
-      endKey.push(endTimeStamp || Infinity)
-      selector = {
-        start: startKey,
-        end: endKey,
-      }
-    } else if (!startTimeStamp && !endTimeStamp) {
-      selector = { prefix: key }
-    } else {
-      throw new Error("Invalid combination of arguments for getLogContent")
+      const startKey: (string | number)[] = [...key, startTimeStamp || 0]
+      const endKey: (string | number)[] = [...key, endTimeStamp || Infinity]
+      return { start: startKey, end: endKey }
     }
+    return { prefix: key }
+  }
+
+  // Fetch logs from store
+  private async fetchLogsFromStore(selector: { prefix: Deno.KvKey } | { start: Deno.KvKey; end: Deno.KvKey }, nRows?: number): Promise<LogEventData[]> {
+    const store = await Deno.openKv(this.storeName)
     const result = await store.list(selector)
     const resultArray: LogEventData[] = []
     for await (const res of result) resultArray.push(res.value as LogEventData)
     if (nRows) {
-      let spliceNumber = resultArray.length - nRows
-      spliceNumber = spliceNumber < 0 ? 0 : spliceNumber
+      const spliceNumber = Math.max(0, resultArray.length - nRows)
       resultArray.splice(0, spliceNumber)
     }
     store.close()
     return resultArray
+  }
+
+  public async getLogContents(processId?: string, startTimeStamp?: number, endTimeStamp?: number, nRows?: number): Promise<LogEventData[]> {
+    const selector = this.prepareSelector(processId, startTimeStamp, endTimeStamp)
+    return await this.fetchLogsFromStore(selector, nRows)
   }
 
   public async getLogsByProcess(processId: string, nRows?: number): Promise<LogEventData[]> {
@@ -236,8 +225,17 @@ class Logger {
         await store.delete(entry.key)
         rowsDeleted++
       }
+      const logsByProcessSelector = {
+        prefix: ["logs_by_process"],
+        end: ["logs_by_process", startTime],
+      }
+      let rowsDeletedProcess = 0
+      for await (const entry of store.list(logsByProcessSelector)) {
+        await store.delete(entry.key)
+        rowsDeletedProcess++
+      }
       store.close()
-      return rowsDeleted
+      return rowsDeleted + rowsDeletedProcess
     } catch (error) {
       this.log("error", `Failed to purge logs from store '${this.storeName}': ${error.message}`)
       return 0

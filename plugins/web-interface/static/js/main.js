@@ -23,11 +23,11 @@ import { processSelector } from "./state.js"
 async function main() {
   try {
     // Connect buttons to actions
-    document.getElementById("start-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "start"))
-    document.getElementById("stop-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "stop"))
-    document.getElementById("block-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "block"))
-    document.getElementById("unblock-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "unblock"))
-    document.getElementById("restart-process").addEventListener("click", async () => controlProcess(selectedProcessId.get(), "restart"))
+    document.getElementById("start-process").addEventListener("click", async () => controlProcess(processSelector.get(), "start"))
+    document.getElementById("stop-process").addEventListener("click", async () => controlProcess(processSelector.get(), "stop"))
+    document.getElementById("block-process").addEventListener("click", async () => controlProcess(processSelector.get(), "block"))
+    document.getElementById("unblock-process").addEventListener("click", async () => controlProcess(processSelector.get(), "unblock"))
+    document.getElementById("restart-process").addEventListener("click", async () => controlProcess(processSelector.get(), "restart"))
 
     // Update instance information every 10th second, and immediately
     setInterval(async () => {

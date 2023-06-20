@@ -1,9 +1,7 @@
 /**
  * Classes and interfaces related to the load balancing feature of the application
  *
- * This is a DRAFT for api version 1
- *
- * @file      lib/core/load_balancer.ts
+ * @file      lib/core/loadbalancer.ts
  * @license   MIT
  */
 
@@ -43,134 +41,161 @@ export class LoadBalancer {
     validationInterval: number = 120, // Default to 120 seconds
   ) {
     // Deep copy of incoming backend object, with additional properties
-    this.backends = backends.map((backend) => ({
+    this.backends = this.initializeBackends(backends)
+    this.pup = pup
+    this.strategy = strategy
+    this.currentIndex = 0
+    this.validationInterval = validationInterval
+    // Validate backends every 120 seconds
+    this.validationTimer = this.setupValidationTimer() // Continuously validate backends
+  }
+
+  private initializeBackends(backends: Backend[]): InternalBackend[] {
+    return backends.map((backend) => ({
       ...backend,
       connections: 0, // Initialize connections to 0
       up: true,
       failedTransmissions: 0,
     }))
+  }
 
-    this.pup = pup
-
-    this.strategy = strategy
-    this.currentIndex = 0
-    this.validationInterval = validationInterval
-
-    // Validate backends every 120 seconds
-    this.validationTimer = setInterval(() => this.validateBackends(), this.validationInterval * 1000) // Continuously validate backends
-
+  private setupValidationTimer(): number {
+    const timer = setInterval(() => this.validateBackends(), this.validationInterval * 1000)
     // Make the timer non-blocking
-    Deno.unrefTimer(this.validationTimer)
+    Deno.unrefTimer(timer)
+    return timer
   }
 
   private async proxy(client: Deno.Conn, backend: InternalBackend): Promise<void> {
-    const logger = this.pup.logger
-
     let targetConn
     try {
       targetConn = await Deno.connect(backend)
-      backend.connections++ // Increment connections when connected
-      backend.failedTransmissions = 0 // Reset failed transmissions
+      this.updateBackendConnectionStatus(backend, true)
     } catch (_e) {
-      backend.failedTransmissions++ // Increment failed transmissions
-      if (backend.failedTransmissions >= 5) { // Check if backend should be marked as down
-        backend.up = false
-        logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
-      }
-      logger.warn("loadbalancer", `Could not connect to backend ${backend.host}:${backend.port}`)
+      this.handleConnectionFailure(backend)
       return
     }
+    await this.handleProxyCommunication(client, targetConn, backend)
+  }
+
+  private updateBackendConnectionStatus(backend: InternalBackend, isConnected: boolean): void {
+    // Increment connections when connected
+    // Decrement connections when closed
+    if (isConnected) {
+      backend.connections++
+      backend.failedTransmissions = 0 // Reset failed transmissions
+    } else {
+      backend.connections--
+    }
+  }
+
+  private handleConnectionFailure(backend: InternalBackend): void {
+    backend.failedTransmissions++ // Increment failed transmissions
+    if (backend.failedTransmissions >= 5) { // Check if backend should be marked as down
+      backend.up = false
+      this.pup.logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
+    }
+    this.pup.logger.warn("loadbalancer", `Could not connect to backend ${backend.host}:${backend.port}`)
+  }
+
+  private async handleProxyCommunication(client: Deno.Conn, targetConn: Deno.Conn, backend: InternalBackend): Promise<void> {
     try {
       await Promise.all([
         copy(client, targetConn),
         copy(targetConn, client),
       ])
     } catch (_err) {
-      // Transport error, ignore
+      // Handle transport error if needed
       // logger.warn("loadbalancer", "Proxy error:", err)
     } finally {
-      backend.connections-- // Decrement connections when closed
+      this.updateBackendConnectionStatus(backend, false)
       client.close()
       targetConn.close()
     }
   }
 
   private async validateBackends(): Promise<void> {
-    const logger = this.pup.logger
-
     for (const backend of this.backends) {
       try {
         const connection = await Deno.connect(backend)
         connection.close()
         if (!backend.up) {
           backend.up = true
-          logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as up`)
+          this.pup.logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as up`)
         }
       } catch (_err) {
-        if (backend.up) {
-          backend.up = false
-          logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
-        }
+        this.markBackendAsDown(backend)
       }
+    }
+  }
+
+  private markBackendAsDown(backend: InternalBackend): void {
+    if (backend.up) {
+      backend.up = false
+      this.pup.logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
     }
   }
 
   private selectBackend(client: Deno.Conn): InternalBackend | null {
-    const { remoteAddr } = client
     switch (this.strategy) {
-      case BalancingStrategy.IP_HASH: {
-        const hash = remoteAddr ? remoteAddr.transport === "tcp" ? hashCode(remoteAddr.hostname) : 0 : 0
-        const startIndex = hash % this.backends.length
-        for (let i = 0; i < this.backends.length; i++) {
-          const index = (startIndex + i) % this.backends.length
-          if (this.backends[index].up) {
-            return this.backends[index]
-          }
-        }
-        return null
-      }
-
-      case BalancingStrategy.LEAST_CONNECTIONS: {
-        let minConnection = Infinity
-        let backend: InternalBackend | null = null
-        for (let i = 0; i < this.backends.length; i++) {
-          if (this.backends[i].up && this.backends[i].connections < minConnection) {
-            minConnection = this.backends[i].connections
-            backend = this.backends[i]
-          }
-        }
-        return backend
-      }
-
+      case BalancingStrategy.IP_HASH:
+        return this.selectIpHashBackend(client)
+      case BalancingStrategy.LEAST_CONNECTIONS:
+        return this.selectLeastConnectionsBackend()
       case BalancingStrategy.ROUND_ROBIN:
-      default: {
-        for (let i = 0; i < this.backends.length; i++) {
-          const index = (this.currentIndex + i) % this.backends.length
-          if (this.backends[index].up) {
-            this.currentIndex = (this.currentIndex + 1) % this.backends.length
-            return this.backends[index]
-          }
-        }
-        return null
-      }
+      default:
+        return this.selectRoundRobinBackend()
     }
   }
 
-  async start(port: number): Promise<void> {
-    const logger = this.pup.logger
+  private selectIpHashBackend(client: Deno.Conn): InternalBackend | null {
+    const { remoteAddr } = client
+    const hash = remoteAddr ? remoteAddr.transport === "tcp" ? hashCode(remoteAddr.hostname) : 0 : 0
+    const startIndex = hash % this.backends.length
+    for (let i = 0; i < this.backends.length; i++) {
+      const index = (startIndex + i) % this.backends.length
+      if (this.backends[index].up) {
+        return this.backends[index]
+      }
+    }
+    return null
+  }
 
+  private selectLeastConnectionsBackend(): InternalBackend | null {
+    let minConnection = Infinity
+    let backend: InternalBackend | null = null
+    for (let i = 0; i < this.backends.length; i++) {
+      if (this.backends[i].up && this.backends[i].connections < minConnection) {
+        minConnection = this.backends[i].connections
+        backend = this.backends[i]
+      }
+    }
+    return backend
+  }
+
+  private selectRoundRobinBackend(): InternalBackend | null {
+    for (let i = 0; i < this.backends.length; i++) {
+      const index = (this.currentIndex + i) % this.backends.length
+      if (this.backends[index].up) {
+        this.currentIndex = (this.currentIndex + 1) % this.backends.length
+        return this.backends[index]
+      }
+    }
+    return null
+  }
+
+  async start(port: number): Promise<void> {
     if (!this.backends || this.backends.length === 0) {
       throw new Error("No backends defined")
     }
 
     const listener = Deno.listen({ port })
-
     for await (const client of listener) {
       const backend = this.selectBackend(client)
       if (backend) {
         this.proxy(client, backend)
       } else {
-        logger.warn("loadbalancer", "No available backend for client")
+        this.pup.logger.warn("loadbalancer", "No available backend for client")
         client.close()
       }
     }
