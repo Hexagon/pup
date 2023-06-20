@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this section.
 - feature(logger): Move internal logs from temporary to persistent storage.
 - feature(core): Add maintenance loop, currently purging internal logs and status after a set number of hours. Running every 15 minutes.
 - feature(configuration): Add option to global logger `logger.internalLogHours` defaulting to 24.
+- fix(upgrader): Refactor upgrader with various fixes. `use std/semver` instead of flawed logic. Add confirmation. Add changelog reference.
 
 ## [1.0.0-beta.32] - 2023-06-06
 

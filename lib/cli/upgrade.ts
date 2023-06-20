@@ -7,14 +7,10 @@
  * @file      lib/cli/upgrade.ts
  * @license   MIT
  */
-
 import { Application } from "../../application.meta.ts"
+import { gt } from "../../deps.ts"
 
 async function getLatestVersion(): Promise<string> {
-  /**
-   * When requesting this URL, we'll get redirected to the latest version automatically,
-   * use the redirected result to get the latest version
-   */
   const url = "https://deno.land/x/pup/pup.ts"
   const result = await fetch(url)
   let newVersion = "unknown"
@@ -22,10 +18,7 @@ async function getLatestVersion(): Promise<string> {
     throw new Error("Request to deno.land/x failed, check network connection.")
   } else {
     const match = result.url.match(/@(.*)\//)
-    newVersion = (match && match.length > 1) ? match[1] : "unkown"
-    if (match && match.length > 1) {
-      newVersion = match[1]
-    }
+    newVersion = (match && match.length > 1) ? match[1] : "unknown"
   }
   return newVersion
 }
@@ -33,18 +26,32 @@ async function getLatestVersion(): Promise<string> {
 async function getUrl(version: string): Promise<string | undefined> {
   const url = `https://deno.land/x/pup@${version}/pup.ts`
   const result = await fetch(url)
-  return result.status === 200 ? result.url : undefined
+  if (result.status !== 200) {
+    throw new Error(`Failed to fetch the URL for version: ${version}. Check the version exists and network connection.`)
+  }
+  return result.url
 }
 
 export async function upgrade(version?: string): Promise<void> {
   const latestVersion = await getLatestVersion()
   const currentVersion = Application.version
   const requestedVersion = (!version || version === "latest") ? latestVersion : version
+
+  const upgradeOrDowngrading = gt(currentVersion, requestedVersion) ? "Downgrade" : "Upgrade"
+
+  if (!version) {
+    const confirmed = confirm(`\nYou're about to ${upgradeOrDowngrading.toLowerCase()} to the latest version: ${latestVersion}.\n\nDo you want to proceed?`)
+    if (!confirmed) {
+      console.log(`${upgradeOrDowngrading} cancelled.`)
+      Deno.exit(0)
+    }
+  }
+
   const requestedVersionUrl = await getUrl(requestedVersion)
 
   if (currentVersion === requestedVersion) {
     let message = "\nNothing to do, already at latest version.\n"
-    if (currentVersion !== latestVersion && currentVersion < latestVersion) {
+    if (gt(latestVersion, currentVersion)) {
       message = `\nNothing to do, already at requested version.\nNOTE: New version available: ${latestVersion}\n`
     }
     console.log(message)
@@ -52,12 +59,12 @@ export async function upgrade(version?: string): Promise<void> {
   }
 
   if (!requestedVersionUrl) {
-    console.log(`\nUpgrade failed: Requested version (${requestedVersion}) does not exist.\n`)
+    console.log(`\nError: Requested version (${requestedVersion}) does not exist.\n`)
     Deno.exit(1)
   }
 
-  const upgradeOrDowngrading = currentVersion > requestedVersion ? "Downgrading" : "Upgrading"
-  console.log(`\n${upgradeOrDowngrading} from ${currentVersion} to ${requestedVersion}`)
+  const upgradeOrDowngradingAction = gt(currentVersion, requestedVersion) ? "Downgrading" : "Upgrading"
+  console.log(`\n${upgradeOrDowngradingAction} from ${currentVersion} to ${requestedVersion}`)
 
   console.info(`\nRunning: deno install -qAfr -n pup ${requestedVersionUrl}`)
 
@@ -74,10 +81,11 @@ export async function upgrade(version?: string): Promise<void> {
   const status = await process.status
 
   if (status.success) {
-    console.log(`\nSuccess! Now using ${requestedVersion}.\n`)
+    console.log(`\nSuccess! Now using ${requestedVersion}.`)
+    console.log(`\nFor any potential changes that might affect your setup in this new version, please review the changelog at ${Application.changelog}\n`)
     Deno.exit(0)
   } else {
-    console.log(`\n${upgradeOrDowngrading} failed.\n`)
+    console.log(`\n${upgradeOrDowngradingAction} failed.\n`)
     Deno.exit(1)
   }
 }

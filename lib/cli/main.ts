@@ -48,7 +48,7 @@ async function main(inputArgs: string[]) {
 
   if (args.upgrade !== undefined || baseArgument === "upgrade" || baseArgument === "update") {
     try {
-      await upgrade(args.upgrade || "latest")
+      await upgrade(args.upgrade)
     } catch (e) {
       console.error(`Could not upgrade pup, error: ${e.message}`)
       Deno.exit(1)
