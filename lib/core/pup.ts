@@ -80,17 +80,20 @@ class Pup {
     // Initialize file ipc, if a path were passed
     if (ipcFile) this.ipc = new FileIPC(ipcFile)
   }
-
+  /**
+   * This is intended to be called by global unload event
+   * and clears any stray files
+   *
+   * NOTE: The unload event is stricly synchronous, it will not
+   *       work to use asynchronous methods to do cleanup work.
+   */
   public cleanup = () => {
-    // This is intended to be called by global unload event
-    // and clears any stray files
     for (const cleanupFilePath of this.cleanupQueue) {
       try {
-        Deno.remove(cleanupFilePath, { recursive: true })
-        this.logger.log("cleanup", `${cleanupFilePath} removed.`)
-        // Ignore errors
+        Deno.removeSync(cleanupFilePath, { recursive: true })
+        console.info(`Cleanup: ${cleanupFilePath} removed.`)
       } catch (_e) {
-        this.logger.error("cleanup", `${cleanupFilePath} could not be removed, will be left.`)
+        // Ignore errors
       }
     }
 
