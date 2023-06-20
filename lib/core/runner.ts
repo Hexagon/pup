@@ -124,7 +124,11 @@ class Runner extends BaseRunner {
   }
 
   public kill = () => {
-    this.process?.abort()
+    try {
+      this.process?.abort()
+    } catch (_e) {
+      // Ignore
+    }
   }
 }
 

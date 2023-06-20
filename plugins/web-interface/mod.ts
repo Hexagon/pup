@@ -34,6 +34,7 @@ export class PupPlugin extends PluginImplementation {
   private config: Configuration
   private app: Application
   private router: Router
+  private controller: AbortController
   private logs: Map<string, Array<LogInventoryEntry>>
   private staticFiles?: Record<string, string>
 
@@ -44,6 +45,7 @@ export class PupPlugin extends PluginImplementation {
     this.config = config.options as Configuration
     this.app = new Application()
     this.router = new Router()
+    this.controller = new AbortController()
 
     // Store and validate plugin configuration
     if (!(this.config.port > 1 && this.config.port < 65535)) {
@@ -183,7 +185,7 @@ export class PupPlugin extends PluginImplementation {
       "web-interface",
       `Listening on http://localhost:${this.config.port}`,
     )
-    await this.app.listen({ port: this.config.port })
+    await this.app.listen({ port: this.config.port, signal: this.controller.signal })
   }
 
   private handleWebSocketConnection(ws: WebSocket) {
@@ -216,5 +218,11 @@ export class PupPlugin extends PluginImplementation {
       this.pup.events.off("log", logStreamer)
       this.pup.events.off("process_status_changed", ProcessStateStreamer)
     }
+  }
+
+  public async cleanup(): Promise<boolean> {
+    this.controller.abort()
+
+    return true
   }
 }

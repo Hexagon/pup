@@ -80,25 +80,23 @@ class Pup {
     // Initialize file ipc, if a path were passed
     if (ipcFile) this.ipc = new FileIPC(ipcFile)
   }
+
   /**
    * This is intended to be called by global unload event
    * and clears any stray files
-   *
-   * NOTE: The unload event is stricly synchronous, it will not
-   *       work to use asynchronous methods to do cleanup work.
    */
-  public cleanup = () => {
+  public cleanup = async () => {
     for (const cleanupFilePath of this.cleanupQueue) {
       try {
-        Deno.removeSync(cleanupFilePath, { recursive: true })
-        console.info(`Cleanup: ${cleanupFilePath} removed.`)
+        await Deno.remove(cleanupFilePath, { recursive: true })
+        this.logger.info("cleanup", `${cleanupFilePath} removed.`)
       } catch (_e) {
         // Ignore errors
       }
     }
 
     // Unset last application state
-    this.status.cleanup()
+    await this.status.cleanup()
   }
 
   public init = async () => {
@@ -298,11 +296,10 @@ class Pup {
     this.logger.log("maintenance", `Purged status entries: ${statusPurged}`)
 
     // Schedule next maintenance
+    // - also ake maintenance timer non-blocking using Deno.unrefTimer
     this.maintenanceTimer = setTimeout(() => {
       this.maintenance()
     }, this.MAINTENANCE_INTERVAL_MS)
-
-    // Make maintenance timer non-blocking
     Deno.unrefTimer(this.maintenanceTimer)
   }
 
@@ -518,8 +515,16 @@ class Pup {
   }
 
   public async terminate(forceQuitMs: number) {
+    // Point of no return
+
+    // Bail out if termination has already started
+    if (this.requestTerminate) {
+      return
+    }
+
     // Stop watchdog
     this.requestTerminate = true
+
     clearTimeout(this.watchdogTimer)
     clearTimeout(this.maintenanceTimer)
 
@@ -531,22 +536,29 @@ class Pup {
     for (const process of this.processes) {
       process.block("terminating")
       process.stop("terminating")
+      process.cleanup()
     }
-
-    // Force quit after 30 seconds
-    const timer = setTimeout(() => {
-      this.logger.warn("terminate", "Terminating by force")
-      Deno.exit(0)
-    }, forceQuitMs)
-    Deno.unrefTimer(timer) // Unref force quit timer to allow the process to exit earlier
 
     // Close IPC
     if (this.ipc) {
       await this.ipc.close()
     }
 
+    // Terminate all plugins
+    for (const plugin of this.plugins) {
+      await plugin.terminate()
+    }
+
     // Cleanup
-    this.cleanup()
+    await this.cleanup()
+
+    // Now the process should exit gracefully after som time - if not,
+    // Force quit after 30 seconds
+    const timer = setTimeout(async () => {
+      await this.logger.warn("terminate", "Terminating by force")
+      Deno.exit(0)
+    }, forceQuitMs)
+    Deno.unrefTimer(timer) // Unref force quit timer to allow the process to exit earlier
   }
 }
 

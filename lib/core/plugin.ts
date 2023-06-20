@@ -180,6 +180,9 @@ export class Plugin {
       throw new Error("Plugin version not supported")
     }
   }
+  async terminate() {
+    await this.impl?.cleanup()
+  }
 }
 
 /**
@@ -212,5 +215,9 @@ export class PluginImplementation {
   // Default implemetation of hook
   public hook(_signal: string, _parameters: unknown): boolean {
     return false
+  }
+  // Default implemetation of the cleanup function
+  public async cleanup() {
+    return await false
   }
 }

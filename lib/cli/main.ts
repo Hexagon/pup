@@ -392,15 +392,21 @@ async function main(inputArgs: string[]) {
     // Start the watchdog
     pup.init()
 
-    // Register for running pup.cleanup() on exit
-    addEventListener("unload", () => {
-      pup.cleanup()
+    // Register for running pup.terminate() if not already run on clean exit
+    let hasRunShutdownCode = false
+    globalThis.addEventListener("beforeunload", (evt) => {
+      if (!hasRunShutdownCode) {
+        evt.preventDefault()
+        hasRunShutdownCode = true
+        ;(async () => await pup.terminate(30000))()
+      }
     })
 
-    // This is needed to trigger unload event on CTRL+C
+    // This is needed to trigger termination, as CTRL+C
+    // does not run the beforeunload event
     // See https://github.com/denoland/deno/issues/11752
-    Deno.addSignalListener("SIGINT", () => {
-      Deno.exit(0)
+    Deno.addSignalListener("SIGINT", async () => {
+      await pup.terminate(30000)
     })
 
     // Let program end gracefully, no Deno.exit here

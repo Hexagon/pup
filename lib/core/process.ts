@@ -354,6 +354,8 @@ class Process {
   }
 
   public isPendingRestart = () => this.pendingRestartReason !== undefined
+
+  public cleanup = () => {}
 }
 
 export { Process, ProcessState }

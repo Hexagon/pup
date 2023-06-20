@@ -129,6 +129,10 @@ class Cluster extends Process {
     clusterStatus.updated = new Date()
     return clusterStatus
   }
+
+  public cleanup = () => {
+    this.loadBalancer?.close()
+  }
 }
 
 export { Cluster }

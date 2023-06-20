@@ -62,18 +62,12 @@ class Status {
   /**
    * Should make any changes necessary when the application exits, like
    * unsetting last_application_state in the kv store.
-   *
-   * NOTE: This method will be called by the unload event, which is strictly
-   *       synchronous.
    */
-  public cleanup() {
+  public async cleanup() {
     try {
-      // Below is commented out as it doesn't work due to being asynchronous
-      /*
       const kv = await Deno.openKv(this.storeName)
       await kv.delete(["last_application_state"])
       kv.close()
-      */
     } catch (e) {
       console.error("Error while writing status to kv store: " + e.message)
     }

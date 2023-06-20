@@ -28,6 +28,8 @@ export interface InternalBackend extends Backend {
 export class LoadBalancer {
   public readonly pup: Pup
 
+  private listener: Deno.Listener | null = null
+
   private backends: InternalBackend[]
   private strategy: BalancingStrategy
   private currentIndex: number
@@ -189,8 +191,8 @@ export class LoadBalancer {
       throw new Error("No backends defined")
     }
 
-    const listener = Deno.listen({ port })
-    for await (const client of listener) {
+    this.listener = Deno.listen({ port })
+    for await (const client of this.listener) {
       const backend = this.selectBackend(client)
       if (backend) {
         this.proxy(client, backend)
@@ -203,6 +205,10 @@ export class LoadBalancer {
 
   close(): void {
     clearInterval(this.validationTimer)
+    if (this.listener) {
+      this.listener.close()
+      this.listener = null
+    }
   }
 }
 
