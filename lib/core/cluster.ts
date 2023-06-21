@@ -10,14 +10,16 @@
 import { Process, ProcessInformation, ProcessState } from "./process.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Pup } from "./pup.ts"
-import { BalancingStrategy, LoadBalancer } from "./loadbalancer.ts"
+import { BalancingStrategy, LoadBalancerStartOperation } from "./loadbalancer.ts"
 
 class Cluster extends Process {
   public processes: Process[] = []
-  public loadBalancer?: LoadBalancer
+  public loadBalancerWorker: Worker | null
 
   constructor(pup: Pup, config: ProcessConfiguration) {
     super(pup, config)
+
+    this.loadBalancerWorker = null
 
     this.setInstances(this.config.cluster?.instances || 1)
   }
@@ -82,8 +84,30 @@ class Cluster extends Process {
         this.config,
       )
 
-      this.loadBalancer = new LoadBalancer(this.pup, backends, strategy, 60)
-      this.loadBalancer.start(this.config.cluster.commonPort)
+      if (this.loadBalancerWorker !== null) {
+        this.loadBalancerWorker.terminate()
+      }
+
+      const startOperation: LoadBalancerStartOperation = {
+        operation: "start",
+        backends,
+        strategy,
+        validationInterval: 60,
+        commonPort: this.config.cluster.commonPort,
+      }
+
+      this.loadBalancerWorker = new Worker(new URL("../workers/loadbalancer.js", import.meta.url).href, { type: "module" })
+
+      // handle log messages from worker
+      this.loadBalancerWorker.onmessage = (event) => {
+        if (event.data && event.data.operation === "log") {
+          const { severity, category, text } = event.data
+          this.pup.logger.generic(severity, category, text)
+        }
+        if (event.data && event.data.operation === "ready") {
+          this.loadBalancerWorker?.postMessage(startOperation)
+        }
+      }
     }
   }
 
@@ -131,7 +155,8 @@ class Cluster extends Process {
   }
 
   public cleanup = () => {
-    this.loadBalancer?.close()
+    this.loadBalancerWorker?.terminate()
+    this.loadBalancerWorker = null
   }
 }
 

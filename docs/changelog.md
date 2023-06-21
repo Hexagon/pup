@@ -22,6 +22,8 @@ All notable changes to this project will be documented in this section.
 - feature(core): Add maintenance loop, currently purging internal logs and status after a set number of hours. Running every 15 minutes.
 - feature(configuration): Add option to global logger `logger.internalLogHours` defaulting to 24.
 - fix(upgrader): Refactor upgrader with various fixes. `use std/semver` instead of flawed logic. Add confirmation. Add changelog reference.
+- feature(loadbalancer): Run load balancer-instances as separate workers instead of in main thread.
+- fix(core): Allow core to shut down gracefully.
 
 ## [1.0.0-beta.32] - 2023-06-06
 

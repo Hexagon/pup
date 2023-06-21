@@ -196,6 +196,14 @@ class Logger {
     }
   }
 
+  public async generic(severity: string, category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+    if (severity === "log" || severity === "info" || severity === "warn" || severity === "error") {
+      await this.internalLog(severity, category, text, process, timestamp)
+    } else {
+      this.warn("logger", "Log with invalid severity received, text: ${text}")
+    }
+  }
+
   public async log(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
     await this.internalLog("log", category, text, process, timestamp)
   }

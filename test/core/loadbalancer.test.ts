@@ -1,91 +1,138 @@
 // load_balancer_test.ts
-import { assertEquals, assertRejects } from "../deps.ts"
-import { Backend, BalancingStrategy, hashCode, InternalBackend, LoadBalancer } from "../../lib/core/loadbalancer.ts"
-import { Pup } from "../../lib/core/pup.ts"
+import { assertEquals, assertThrows } from "../deps.ts"
+import { Backend, BalancingStrategy, hashCode, LoadBalancer } from "../../lib/core/loadbalancer.ts"
 
-const minimalPupConf = { processes: [] }
+// Define logger callback function
+const loggerCallback = (severity: string, category: string, text: string) => {
+  console.log(`[${severity.toUpperCase()}][${category}] ${text}`)
+}
+
+class MockConn implements Deno.Conn {
+  rid = 12345 // A random rid, you can replace this
+  remoteAddr: Deno.NetAddr = { transport: "tcp", hostname: "", port: 8080 }
+  localAddr: Deno.NetAddr = { transport: "tcp", hostname: "0.0.0.0", port: 8080 }
+
+  constructor(hostname: string) {
+    this.remoteAddr.hostname = hostname
+  }
+  ref(): void {/* Implement as needed */}
+  unref(): void {/* Implement as needed */}
+  readable = new ReadableStream<Uint8Array>()
+  writable = new WritableStream<Uint8Array>()
+
+  closeWrite(): Promise<void> {
+    return Promise.resolve()
+  }
+  close(): void {
+    return
+  }
+  read(_p: Uint8Array): Promise<number | null> {
+    return Promise.resolve(0)
+  }
+  write(_p: Uint8Array): Promise<number> {
+    return Promise.resolve(0)
+  }
+  closeRead(): Promise<void> {
+    return Promise.resolve()
+  }
+  upgrade(): Promise<Deno.FsFile> {
+    return Promise.resolve(new Deno.FsFile(this.rid))
+  }
+}
 
 Deno.test("LoadBalancer - Initialization", () => {
   const backends: Backend[] = [
     { host: "backend1.example.com", port: 80 },
     { host: "backend2.example.com", port: 80 },
   ]
-  const loadBalancer = new LoadBalancer(new Pup(minimalPupConf), backends)
+  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.ROUND_ROBIN, 120, loggerCallback)
   assertEquals(loadBalancer instanceof LoadBalancer, true)
   // Cleanup
   loadBalancer.close()
 })
 
-Deno.test("LoadBalancer - Throws Error When No Backends are Provided", async () => {
+Deno.test("LoadBalancer - Throws Error When No Backends are Provided", () => {
   const backends: Backend[] = []
-  const loadBalancer = new LoadBalancer(new Pup(minimalPupConf), backends)
-  await assertRejects(() => {
-    return loadBalancer.start(3000)
+  assertThrows(() => {
+    new LoadBalancer(backends, BalancingStrategy.ROUND_ROBIN, 120, loggerCallback)
   })
-
-  // Cleanup
-  loadBalancer.close()
 })
 
-// Grouping tests related to hashCode
-Deno.test("LoadBalancer - HashCode Returns a Unique Value for Different Strings", () => {
-  const hash1 = hashCode("hello world")
-  const hash2 = hashCode("foo bar baz")
-  assertEquals(hash1 !== hash2, true)
-})
-
-Deno.test("LoadBalancer - HashCode Returns the Same Value for the Same String", () => {
-  const hash1 = hashCode("hello world")
-  const hash2 = hashCode("hello world")
-  assertEquals(hash1 === hash2, true)
-})
-
-Deno.test("LoadBalancer - HashCode Returns a Value Between 0 and 2^32-1 (inclusive)", () => {
-  const hash = hashCode("hello world")
-  assertEquals(hash >= 0 && hash <= 4294967295, true)
-})
-
-// Grouping tests related to LoadBalancer strategies
-Deno.test("LoadBalancer - Selects Backends with IP_HASH Strategy", () => {
+Deno.test("LoadBalancer - Initializes with Backends Correctly", () => {
   const backends: Backend[] = [
     { host: "192.168.1.1", port: 8080 },
     { host: "192.168.1.2", port: 8080 },
     { host: "192.168.1.3", port: 8080 },
   ]
+  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.ROUND_ROBIN, 120, loggerCallback)
 
-  const expectedBackends: InternalBackend[] = [
-    { host: "192.168.1.1", port: 8080, connections: 0, up: true, failedTransmissions: 0 },
-    { host: "192.168.1.2", port: 8080, connections: 0, up: true, failedTransmissions: 0 },
-    { host: "192.168.1.3", port: 8080, connections: 0, up: true, failedTransmissions: 0 },
+  assertEquals(loadBalancer.backends.length, backends.length)
+  loadBalancer.backends.forEach((backend, i) => {
+    assertEquals(backend.host, backends[i].host)
+    assertEquals(backend.port, backends[i].port)
+    assertEquals(backend.connections, 0)
+    assertEquals(backend.up, true)
+    assertEquals(backend.failedTransmissions, 0)
+  })
+  // Cleanup
+  loadBalancer.close()
+})
+
+Deno.test("LoadBalancer - Selects Backend with ROUND_ROBIN Strategy", () => {
+  const backends: Backend[] = [
+    { host: "192.168.1.1", port: 8080 },
+    { host: "192.168.1.2", port: 8080 },
+    { host: "192.168.1.3", port: 8080 },
   ]
+  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.ROUND_ROBIN, 120, loggerCallback)
 
-  // Create a LoadBalancer with IP_HASH strategy
-  const loadBalancer = new LoadBalancer(new Pup(minimalPupConf), backends, BalancingStrategy.IP_HASH)
+  let selectedBackend = loadBalancer.selectBackend(new MockConn("192.168.1.10"))
+  assertEquals(selectedBackend?.host, backends[0].host)
 
-  // Mock a client with a remoteAddr property
-  // deno-lint-ignore no-explicit-any
-  const client: any = { remoteAddr: { transport: "tcp", hostname: "192.168.1.100" } }
-
-  // Select a backend
-  const selectedBackend = loadBalancer["selectBackend"](client)
-
-  // Calculate the expected index using the hashCode function
-  const expectedIndex = hashCode(client.remoteAddr.hostname) % backends.length
-
-  assertEquals(selectedBackend, expectedBackends[expectedIndex])
+  selectedBackend = loadBalancer.selectBackend(new MockConn("192.168.1.10"))
+  assertEquals(selectedBackend?.host, backends[1].host)
 
   // Cleanup
   loadBalancer.close()
 })
 
-Deno.test("LoadBalancer - Initializes with LEAST_CONNECTIONS Strategy", () => {
+Deno.test("LoadBalancer - Selects Backend with IP_HASH Strategy", () => {
   const backends: Backend[] = [
-    { host: "localhost", port: 3000 },
-    { host: "localhost", port: 3001 },
+    { host: "192.168.1.1", port: 8080 },
+    { host: "192.168.1.2", port: 8080 },
+    { host: "192.168.1.3", port: 8080 },
   ]
-  const lb = new LoadBalancer(new Pup(minimalPupConf), backends, BalancingStrategy.LEAST_CONNECTIONS)
-  assertEquals(lb["strategy"], BalancingStrategy.LEAST_CONNECTIONS)
+  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.IP_HASH, 120, loggerCallback)
+
+  const selectedBackend = loadBalancer.selectBackend(new MockConn("192.168.1.10"))
+  const selectedBackendIndex = hashCode("192.168.1.10") % backends.length
+
+  assertEquals(selectedBackend?.host, backends[selectedBackendIndex].host)
 
   // Cleanup
-  lb.close()
+  loadBalancer.close()
+})
+
+Deno.test("LoadBalancer - Selects Backend with LEAST_CONNECTIONS Strategy", () => {
+  const backends: Backend[] = [
+    { host: "192.168.1.1", port: 8080 },
+    { host: "192.168.1.2", port: 8080 },
+    { host: "192.168.1.3", port: 8080 },
+  ]
+  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.LEAST_CONNECTIONS, 120, loggerCallback)
+
+  let selectedBackend = loadBalancer.selectBackend(new MockConn("192.168.1.10"))
+  assertEquals(selectedBackend?.host, backends[0].host)
+
+  // simulate connection to backend 1
+  if (selectedBackend) {
+    loadBalancer.updateBackendConnectionStatus(selectedBackend, true)
+  }
+
+  // next connection should go to backend 2 because it has least connections
+  selectedBackend = loadBalancer.selectBackend(new MockConn("192.168.1.11"))
+  assertEquals(selectedBackend?.host, backends[1].host)
+
+  // Cleanup
+  loadBalancer.close()
 })

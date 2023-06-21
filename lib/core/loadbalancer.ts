@@ -1,12 +1,11 @@
 /**
- * Classes and interfaces related to the load balancing feature of the application
+ * Classes and interfaces related to the load balancing feature of the application. Intended to be run through a worker.
  *
  * @file      lib/core/loadbalancer.ts
  * @license   MIT
  */
 
 import { copy } from "../../deps.ts"
-import { Pup } from "./pup.ts"
 
 export enum BalancingStrategy {
   ROUND_ROBIN,
@@ -25,31 +24,45 @@ export interface InternalBackend extends Backend {
   failedTransmissions: number
 }
 
+export interface LoadBalancerStartOperation {
+  operation: "start"
+  backends: Backend[]
+  strategy: BalancingStrategy
+  validationInterval: number
+  commonPort: number
+}
+
 export class LoadBalancer {
-  public readonly pup: Pup
+  //public readonly pup: Pup
 
   private listener: Deno.Listener | null = null
 
-  private backends: InternalBackend[]
+  public backends: InternalBackend[]
   private strategy: BalancingStrategy
   private currentIndex: number
   private validationInterval: number
   private validationTimer: number
 
+  private loggerCallback: (severity: string, category: string, text: string) => void
+
   constructor(
-    pup: Pup,
     backends: Backend[],
     strategy: BalancingStrategy = BalancingStrategy.ROUND_ROBIN,
     validationInterval: number = 120, // Default to 120 seconds
+    loggerCallback: (severity: string, category: string, text: string) => void,
   ) {
     // Deep copy of incoming backend object, with additional properties
     this.backends = this.initializeBackends(backends)
-    this.pup = pup
+    if (this.backends.length < 1) {
+      throw new Error("No backends supplied")
+    }
     this.strategy = strategy
     this.currentIndex = 0
     this.validationInterval = validationInterval
     // Validate backends every 120 seconds
-    this.validationTimer = this.setupValidationTimer() // Continuously validate backends
+    this.validationTimer = this.setupValidationTimer() // Continuously validate
+
+    this.loggerCallback = loggerCallback
   }
 
   private initializeBackends(backends: Backend[]): InternalBackend[] {
@@ -80,7 +93,7 @@ export class LoadBalancer {
     await this.handleProxyCommunication(client, targetConn, backend)
   }
 
-  private updateBackendConnectionStatus(backend: InternalBackend, isConnected: boolean): void {
+  public updateBackendConnectionStatus(backend: InternalBackend, isConnected: boolean): void {
     // Increment connections when connected
     // Decrement connections when closed
     if (isConnected) {
@@ -95,9 +108,9 @@ export class LoadBalancer {
     backend.failedTransmissions++ // Increment failed transmissions
     if (backend.failedTransmissions >= 5) { // Check if backend should be marked as down
       backend.up = false
-      this.pup.logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
+      this.loggerCallback("warn", "loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
     }
-    this.pup.logger.warn("loadbalancer", `Could not connect to backend ${backend.host}:${backend.port}`)
+    this.loggerCallback("warn", "loadbalancer", `Could not connect to backend ${backend.host}:${backend.port}`)
   }
 
   private async handleProxyCommunication(client: Deno.Conn, targetConn: Deno.Conn, backend: InternalBackend): Promise<void> {
@@ -108,7 +121,7 @@ export class LoadBalancer {
       ])
     } catch (_err) {
       // Handle transport error if needed
-      // logger.warn("loadbalancer", "Proxy error:", err)
+      // logger("warn","loadbalancer", "Proxy error:", err)
     } finally {
       this.updateBackendConnectionStatus(backend, false)
       client.close()
@@ -123,7 +136,7 @@ export class LoadBalancer {
         connection.close()
         if (!backend.up) {
           backend.up = true
-          this.pup.logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as up`)
+          this.loggerCallback("warn", "loadbalancer", `Backend ${backend.host}:${backend.port} marked as up`)
         }
       } catch (_err) {
         this.markBackendAsDown(backend)
@@ -134,11 +147,11 @@ export class LoadBalancer {
   private markBackendAsDown(backend: InternalBackend): void {
     if (backend.up) {
       backend.up = false
-      this.pup.logger.warn("loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
+      this.loggerCallback("warn", "loadbalancer", `Backend ${backend.host}:${backend.port} marked as down`)
     }
   }
 
-  private selectBackend(client: Deno.Conn): InternalBackend | null {
+  public selectBackend(client: Deno.Conn): InternalBackend | null {
     switch (this.strategy) {
       case BalancingStrategy.IP_HASH:
         return this.selectIpHashBackend(client)
@@ -197,7 +210,7 @@ export class LoadBalancer {
       if (backend) {
         this.proxy(client, backend)
       } else {
-        this.pup.logger.warn("loadbalancer", "No available backend for client")
+        this.loggerCallback("warn", "loadbalancer", "No available backend for client")
         client.close()
       }
     }
