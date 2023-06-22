@@ -32,7 +32,7 @@
               "type": "number",
               "minimum": 0,
               "maximum": 366,
-              "default": 24
+              "default": 48
             }
           },
           "additionalProperties": false

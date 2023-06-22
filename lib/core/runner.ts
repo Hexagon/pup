@@ -10,33 +10,6 @@ class Runner extends BaseRunner {
     super(pup, processConfig)
   }
 
-  private async writePidFile() {
-    // Defunct since switch to dax
-    /*if (this.processConfig.pidFile && this.process?.pid) {
-      try {
-        await Deno.writeTextFile(this.processConfig.pidFile, this.process?.pid.toString())
-      } catch (_e) {
-        this.pup.logger.error("error", `Failed to write pid file '${this.processConfig.pidFile}'`, this.processConfig)
-      }
-    }*/
-  }
-
-  private async removePidFile() {
-    if (this.processConfig.pidFile) {
-      try {
-        // Make sure pid file exists
-        const fileInfo = await Deno.stat(this.processConfig.pidFile)
-
-        // First check that the pid file is actually a file, then try to delete
-        if (fileInfo.isFile) {
-          await Deno.remove(this.processConfig.pidFile, { recursive: false })
-        }
-      } catch (e) {
-        this.pup.logger.error("error", `Failed to remove pid file '${this.processConfig.pidFile}', file will be left on the filesystem. Error: ${e.message}`, this.processConfig)
-      }
-    }
-  }
-
   private async pipeToLogger(category: string, reader: ReadableStream<Uint8Array>) {
     const logger = this.pup.logger
 
@@ -87,7 +60,6 @@ class Runner extends BaseRunner {
 
     runningCallback() // PID should be passed as an argument if available
 
-    this.writePidFile()
     this.pipeToLogger("stdout", this.process.stdout())
     this.pipeToLogger("stderr", this.process.stderr())
 
@@ -110,8 +82,6 @@ class Runner extends BaseRunner {
     this.process = undefined
 
     // ToDo: Is it possible to ref the process?
-
-    this.removePidFile()
 
     // Create a RunnerResult
     const runnerResult: RunnerResult = {

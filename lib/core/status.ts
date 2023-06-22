@@ -7,6 +7,7 @@
 
 import { Application } from "../../application.meta.ts"
 import { Cluster } from "./cluster.ts"
+import { APPLICATION_STATE_WRITE_LIMIT_MS } from "./configuration.ts"
 import { Process, ProcessInformation, ProcessState } from "./process.ts"
 
 const started = new Date()
@@ -35,6 +36,7 @@ export interface ApplicationState {
  */
 class Status {
   private storeName?: string
+  private lastWrite = Date.now()
 
   /**
    * Constructs a new `Status` instance.
@@ -46,13 +48,22 @@ class Status {
 
   /**
    * Writes the application status to the KV store with a timestamp as the key.
+   *
+   * Key ["last_application_state"] is written every iteration.
+   * Key ["application_state", <timestamp] is written at most once per 20 seconds.
    * @param applicationState The application state to be stored.
    */
   public async writeToStore(applicationState: ApplicationState) {
-    // Try to write to store
     try {
       const kv = await Deno.openKv(this.storeName)
-      await kv.set(["application_state", Date.now()], applicationState)
+
+      // Write application_state at most once per APPLICATION_STATE_WRITE_LIMIT_MS
+      if (Date.now() - this.lastWrite > APPLICATION_STATE_WRITE_LIMIT_MS) {
+        this.lastWrite = Date.now()
+        await kv.set(["application_state", Date.now()], applicationState)
+      }
+
+      // Always write last_application_state
       await kv.set(["last_application_state"], applicationState)
       kv.close()
     } catch (e) {

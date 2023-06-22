@@ -9,6 +9,12 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.35] - Unreleased
+
+- fix(core): Decrease watchdog interval from 2000ms to 1000ms.
+- fix(core): Write status history to internal store at most once per 20 seconds.
+- fix(core): Gather all constants in configuration.ts
+
 ## [1.0.0-beta.34] - 2023-06-22
 
 - fix(upgrader): Fix small regression bugs.

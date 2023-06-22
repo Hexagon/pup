@@ -8,7 +8,7 @@
  */
 
 import { Process, ProcessInformation, ProcessState } from "./process.ts"
-import { ProcessConfiguration } from "./configuration.ts"
+import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S, ProcessConfiguration } from "./configuration.ts"
 import { Pup } from "./pup.ts"
 import { BalancingStrategy, LoadBalancerStartOperation } from "./loadbalancer.ts"
 
@@ -92,7 +92,7 @@ class Cluster extends Process {
         operation: "start",
         backends,
         strategy,
-        validationInterval: 60,
+        validationInterval: LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S,
         commonPort: this.config.cluster.commonPort,
       }
 

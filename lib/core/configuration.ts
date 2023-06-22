@@ -1,11 +1,17 @@
 /**
  * Functions and interfaces related to core configuration of pup
  *
- * @file      lib/core/process.ts
+ * @file      lib/core/configuration.ts
  * @license   MIT
  */
 
 import { z } from "../../deps.ts"
+
+export const DEFAULT_INTERNAL_LOG_HOURS = 48
+export const MAINTENANCE_INTERVAL_MS = 900_000
+export const WATCHDOG_INTERVAL_MS = 1_000
+export const APPLICATION_STATE_WRITE_LIMIT_MS = 20_000
+export const LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S = 60
 
 interface Configuration {
   logger?: GlobalLoggerConfiguration
@@ -82,7 +88,7 @@ const ConfigurationSchema = z.object({
       colors: z.optional(z.boolean()),
       decorateFiles: z.optional(z.boolean()),
       decorate: z.optional(z.boolean()),
-      internalLogHours: z.number().min(0).max(366).default(24),
+      internalLogHours: z.number().min(0).max(366).default(DEFAULT_INTERNAL_LOG_HOURS),
     }).strict(),
   ),
   watcher: z.optional(

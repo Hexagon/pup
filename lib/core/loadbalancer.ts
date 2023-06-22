@@ -6,6 +6,7 @@
  */
 
 import { copy } from "../../deps.ts"
+import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S } from "./configuration.ts"
 
 export enum BalancingStrategy {
   ROUND_ROBIN,
@@ -48,7 +49,7 @@ export class LoadBalancer {
   constructor(
     backends: Backend[],
     strategy: BalancingStrategy = BalancingStrategy.ROUND_ROBIN,
-    validationInterval: number = 120, // Default to 120 seconds
+    validationInterval: number = LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S,
     loggerCallback: (severity: string, category: string, text: string) => void,
   ) {
     // Deep copy of incoming backend object, with additional properties

@@ -5,7 +5,7 @@
  * @license   MIT
  */
 
-import { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, validateConfiguration } from "./configuration.ts"
+import { Configuration, DEFAULT_INTERNAL_LOG_HOURS, GlobalLoggerConfiguration, MAINTENANCE_INTERVAL_MS, ProcessConfiguration, validateConfiguration, WATCHDOG_INTERVAL_MS } from "./configuration.ts"
 import { FileIPC, IpcValidatedMessage } from "../common/ipc.ts"
 import { Logger } from "./logger.ts"
 import { Process, ProcessState } from "./process.ts"
@@ -34,10 +34,8 @@ class Pup {
 
   private requestTerminate = false
 
-  private WATCHDOG_INTERVAL_MS = 2000
   private watchdogTimer?: number
 
-  private MAINTENANCE_INTERVAL_MS = 900 * 1000
   private maintenanceTimer?: number
 
   public temporaryStoragePath?: string
@@ -264,7 +262,7 @@ class Pup {
     try {
       const applicationState = this.status.applicationState(this.processes)
       this.events.emit("application_state", applicationState)
-      const logHours = this.configuration.logger?.internalLogHours === undefined ? 24 : this.configuration.logger?.internalLogHours
+      const logHours = this.configuration.logger?.internalLogHours === undefined ? DEFAULT_INTERNAL_LOG_HOURS : this.configuration.logger?.internalLogHours
       if (logHours > 0) {
         this.status.writeToStore(applicationState)
       }
@@ -277,7 +275,7 @@ class Pup {
       this.watchdogTimer = setTimeout(() => {
         // Exit watchdog if terminating
         this.watchdog()
-      }, this.WATCHDOG_INTERVAL_MS)
+      }, WATCHDOG_INTERVAL_MS)
     }
   }
 
@@ -291,7 +289,7 @@ class Pup {
   private maintenance = async () => {
     this.logger.log("maintenance", "Performing periodic maintenance")
 
-    const keepHours = this.configuration.logger?.internalLogHours === undefined ? 24 : this.configuration.logger?.internalLogHours
+    const keepHours = this.configuration.logger?.internalLogHours === undefined ? DEFAULT_INTERNAL_LOG_HOURS : this.configuration.logger?.internalLogHours
 
     // Purge logs
     const logsPurged = await this.logger.purge(keepHours)
@@ -302,10 +300,10 @@ class Pup {
     this.logger.log("maintenance", `Purged status entries: ${statusPurged}`)
 
     // Schedule next maintenance
-    // - also ake maintenance timer non-blocking using Deno.unrefTimer
+    // - also make maintenance timer non-blocking using Deno.unrefTimer
     this.maintenanceTimer = setTimeout(() => {
       this.maintenance()
-    }, this.MAINTENANCE_INTERVAL_MS)
+    }, MAINTENANCE_INTERVAL_MS)
     Deno.unrefTimer(this.maintenanceTimer)
   }
 
