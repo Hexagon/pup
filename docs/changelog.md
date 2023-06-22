@@ -9,7 +9,7 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.33] - Unreleased
+## [1.0.0-beta.33] - 2023-06-22
 
 **A note on breaking changes**
 
