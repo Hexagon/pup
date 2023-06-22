@@ -1,0 +1,18 @@
+{
+  "canary_url": "https://raw.githubusercontent.com/Hexagon/pup/main/pup.ts",
+  "stable": [],
+  "prerelease": [
+    {
+      "version": "1.0.0-beta.33",
+      "url": "https://deno.land/x/pup@1.0.0-beta.33/pup.ts",
+      "deno": null,
+      "deno_unstable": "1.33.0"
+    },
+    {
+      "version": "1.0.0-beta.32",
+      "url": "https://deno.land/x/pup@1.0.0-beta.32/pup.ts",
+      "deno": "1.33.0",
+      "deno_unstable": "1.30.0"
+    }
+  ]
+}

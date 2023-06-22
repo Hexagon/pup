@@ -27,6 +27,8 @@ handling.
 
 - [Overview](./)
 - [Installation](./installation.html)
+  - [Prerequisites](./installation.html#prerequisites)
+  - [Release channels](./installation.html#release-channels)
 - [Usage](./usage.html)
   - [General flags](./usage.html#general-flags)
   - [Configuring using the cli](./usage.html#configuring-using-the-cli)

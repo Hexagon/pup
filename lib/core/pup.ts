@@ -46,18 +46,24 @@ class Pup {
 
   public cleanupQueue: string[] = []
 
-  constructor(unvalidatedConfiguration: unknown, configFilePath?: string) {
+  static async init(unvalidatedConfiguration: unknown, configFilePath?: string) {
+    const temporaryStoragePath: string | undefined = configFilePath ? await toTempPath(configFilePath) : undefined
+    const persistentStoragePath: string | undefined = configFilePath ? await toPersistentPath(configFilePath) : undefined
+    return new Pup(unvalidatedConfiguration, configFilePath, temporaryStoragePath, persistentStoragePath)
+  }
+
+  constructor(unvalidatedConfiguration: unknown, configFilePath?: string, temporaryStoragePath?: string, persistentStoragePath?: string) {
     // Setup paths
     let statusFile
     let ipcFile
     let logStore
-    if (configFilePath) {
+    if (configFilePath && temporaryStoragePath && persistentStoragePath) {
       this.configFilePath = path.resolve(configFilePath)
 
-      this.temporaryStoragePath = toTempPath(this.configFilePath)
+      this.temporaryStoragePath = temporaryStoragePath
       this.cleanupQueue.push(this.temporaryStoragePath)
 
-      this.persistentStoragePath = toPersistentPath(this.configFilePath)
+      this.persistentStoragePath = persistentStoragePath
 
       ipcFile = `${this.temporaryStoragePath}/.main.ipc` // Plain text file (serialized js object)
       statusFile = `${this.persistentStoragePath}/.main.status` // Deno KV store

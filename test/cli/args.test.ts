@@ -18,8 +18,10 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
   const parsedArgs = parseArguments(inputArgs)
   const expectedArgs = {
     /* Specified */
-    version: true,
-    v: true,
+    version: "",
+    v: "",
+
+    setup: false,
 
     help: true,
     h: true,
@@ -30,6 +32,9 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
 
     cmd: "",
     C: "",
+
+    update: false,
+    upgrade: false,
 
     _: ["init", "append", "status", "remove", "run"],
     "--": [],
@@ -89,11 +94,12 @@ Deno.test("String options and aliases are parsed correctly", () => {
     autostart: false,
 
     /* All boolean options will be included in output too */
-    version: false,
-    v: false,
     help: false,
     h: false,
     "dry-run": true,
+    setup: false,
+    upgrade: false,
+    update: false,
 
     _: [],
     "--": [],
@@ -289,13 +295,14 @@ Deno.test("Collect env arguments formatted as KEY=VALUE", () => {
     e: ["KEY1=VALUE1", "KEY2=VALUE2"],
 
     /* All boolean options will be included in output too */
-    version: false,
-    v: false,
     help: false,
     h: false,
     autostart: false,
     A: false,
     "dry-run": false,
+    setup: false,
+    upgrade: false,
+    update: false,
 
     /* Unspecified string options will not be included */
     _: [],

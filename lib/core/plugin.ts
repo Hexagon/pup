@@ -7,6 +7,7 @@
  * @license   MIT
  */
 
+import { Application } from "../../application.meta.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
 import { PluginConfiguration, ProcessLoggerConfiguration } from "./configuration.ts"
 import { ProcessState } from "./process.ts"
@@ -160,7 +161,8 @@ export class Plugin {
    * Will throw on any error
    */
   public async load() {
-    const { PupPlugin } = await import(this.config.url)
+    const url = this.config.url.replace("$VERSION", Application.version)
+    const { PupPlugin } = await import(url)
     this.impl = new PupPlugin(new PluginApi(this.pup), this.config) as PluginImplementation
   }
   public verify() {

@@ -63,10 +63,10 @@ export async function dirExists(dirPath: string): Promise<boolean> {
  * @param {string} configFile - The path to the configuration file.
  * @returns {string} The temporary path associated with the configuration file.
  */
-export function toTempPath(configFile: string) {
+export async function toTempPath(configFile: string) {
   const resolvedPath = path.parse(path.resolve(configFile))
   const tempPath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-tmp`)
-  Deno.mkdir(tempPath, { recursive: true })
+  await Deno.mkdir(tempPath, { recursive: true })
   return tempPath
 }
 
@@ -76,9 +76,9 @@ export function toTempPath(configFile: string) {
  * @param {string} configFile - The path to the configuration file.
  * @returns {string} The persistent storage path associated with the configuration file.
  */
-export function toPersistentPath(configFile: string) {
+export async function toPersistentPath(configFile: string) {
   const resolvedPath = path.parse(path.resolve(configFile))
   const persistentStoragePath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-data`)
-  Deno.mkdir(persistentStoragePath, { recursive: true })
+  await Deno.mkdir(persistentStoragePath, { recursive: true })
   return persistentStoragePath
 }

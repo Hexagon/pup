@@ -29,13 +29,13 @@ export { copy } from "https://deno.land/std@0.190.0/streams/mod.ts"
 // core - process
 export { StringReader } from "https://deno.land/std@0.190.0/io/string_reader.ts"
 export { readLines } from "https://deno.land/std@0.190.0/io/mod.ts"
-// service installer
+// service installer, release tool
 export { existsSync } from "https://deno.land/std@0.190.0/fs/mod.ts"
 // ipc
 export { debounce } from "https://deno.land/std@0.190.0/async/mod.ts"
 export { basename, dirname, join, resolve } from "https://deno.land/std@0.190.0/path/mod.ts"
 // upgrader
-export { gt } from "https://deno.land/std@0.190.0/semver/mod.ts"
+export { gt, lt, parse as parseVersion, SemVer } from "https://deno.land/std@0.190.0/semver/mod.ts"
 
 /**
  * Third party dependencies

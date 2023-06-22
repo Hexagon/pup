@@ -22,7 +22,7 @@ const configuration: Configuration = {
   ],
 }
 
-const pup = await new Pup(configuration /* OPTIONAL: , statusFile */)
+const pup = await Pup.init(configuration /* OPTIONAL: , statusFile */)
 
 // Kickstart the pup instance
 pup.init()
@@ -34,7 +34,7 @@ Pup supports the integration of a custom logger. This allows for more flexible a
 
 ```ts
 // Create a pup instance
-const pup = new Pup() /* The configuration object is optional when instantiating a new Pup */
+const pup = await Pup.init() /* The configuration object is optional when instantiating a new Pup */
 
 // Create a custom logger function
 const logger = (severity: string, category: string, text: string, _config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => {

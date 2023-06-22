@@ -38,21 +38,32 @@ async function main(inputArgs: string[]) {
   const secondaryBaseArgument = args._.length > 1 ? args._[1] : undefined
 
   /**
-   * Begin with --version, --upgrade and --help, as they have no dependencies on other
+   * Begin with --setup, --upgrade, --version and --help, as they have no dependencies on other
    * arguments, and just exit
    */
-  if (args.version || baseArgument === "version") {
-    printHeader()
-    Deno.exit(0)
+
+  if (args.setup || baseArgument === "setup") {
+    console.log(args.setup)
+    try {
+      await upgrade(args.version, args.channel, args.local, true)
+    } catch (e) {
+      console.error(`Could not install pup, error: ${e.message}`)
+      Deno.exit(1)
+    }
   }
 
-  if (args.upgrade !== undefined || baseArgument === "upgrade" || baseArgument === "update") {
+  if (args.upgrade || baseArgument === "upgrade" || baseArgument === "update") {
     try {
-      await upgrade(args.upgrade)
+      await upgrade(args.version, args.channel, args.local)
     } catch (e) {
       console.error(`Could not upgrade pup, error: ${e.message}`)
       Deno.exit(1)
     }
+  }
+
+  if (args.version !== undefined || baseArgument === "version") {
+    printHeader()
+    Deno.exit(0)
   }
 
   if (args.help || !baseArgument || baseArgument === "help") {
@@ -231,7 +242,7 @@ async function main(inputArgs: string[]) {
   // Prepare log file path
   // Add a new condition for "logs" base command
   if (baseArgument === "logs") {
-    const logStore = `${toPersistentPath(configFile as string)}/.main.log`
+    const logStore = `${await toPersistentPath(configFile as string)}/.main.log`
     const logger = new Logger(configuration.logger || {}, logStore)
     const startTimestamp = args.start ? new Date(Date.parse(args.start)).getTime() : undefined
     const endTimestamp = args.end ? new Date(Date.parse(args.end)).getTime() : undefined
@@ -278,11 +289,11 @@ async function main(inputArgs: string[]) {
 
   // Prepare for IPC
   let ipcFile
-  if (useConfigFile) ipcFile = `${toTempPath(configFile as string)}/.main.ipc`
+  if (useConfigFile) ipcFile = `${await toTempPath(configFile as string)}/.main.ipc`
 
   // Prepare status file
   let statusFile
-  if (useConfigFile) statusFile = `${toPersistentPath(configFile as string)}/.main.status`
+  if (useConfigFile) statusFile = `${await toPersistentPath(configFile as string)}/.main.status`
 
   /**
    * Now when the configuration file is located
@@ -387,7 +398,7 @@ async function main(inputArgs: string[]) {
   }
 
   try {
-    const pup = new Pup(configuration, configFile ?? undefined)
+    const pup = await Pup.init(configuration, configFile ?? undefined)
 
     // Start the watchdog
     pup.init()

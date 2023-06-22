@@ -16,7 +16,8 @@ import { Args, parse } from "../../deps.ts"
 function parseArguments(args: string[]): Args {
   // All boolean arguments
   const booleanArgs = [
-    "version",
+    "setup",
+    "upgrade",
     "help",
     "autostart",
 
@@ -25,6 +26,7 @@ function parseArguments(args: string[]): Args {
 
   // All string arguments
   const stringArgs = [
+    "version",
     "config",
     "watch",
     "cmd",
@@ -34,8 +36,6 @@ function parseArguments(args: string[]): Args {
 
     "cron",
     "terminate",
-
-    "upgrade",
 
     "instances",
     "start-port",
@@ -94,6 +94,7 @@ function checkArguments(args: Args): Args {
     "logs",
     "upgrade",
     "update",
+    "setup",
     "help",
     "version",
   ]
@@ -117,6 +118,11 @@ function checkArguments(args: Args): Args {
     "stderr",
   ]
 
+  const installerOptions = [
+    "channel",
+    "local",
+  ]
+
   // Check that the base argument is either undefined or valid
   const baseArgument = args._[0]
   if (baseArgument !== undefined && (typeof baseArgument !== "string" || !validBaseArguments.includes(baseArgument))) {
@@ -126,6 +132,7 @@ function checkArguments(args: Args): Args {
   const hasDoubleDashCmd = args["--"] && args["--"].length > 0
   const hasCmd = hasDoubleDashCmd || args.cmd || args.worker
   const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "run" && hasCmd)
+  const expectInstallerOptions = baseArgument === "setup" || baseArgument === "upgrade" || baseArgument === "update"
 
   // Only one type of command can be present at the same time
   if ((hasDoubleDashCmd && args.cmd) || (args.cmd && args.worker) || (hasDoubleDashCmd && args.worker)) {
@@ -151,6 +158,13 @@ function checkArguments(args: Args): Args {
   for (const opt of processOptions) {
     if (args[opt] && !expectConfigOptions) {
       throw new Error(`Argument '--${opt}' requires 'init', 'append', '--cmd' or '--worker'`)
+    }
+  }
+
+  // All arguments in installerOptions require that setup or upgrade (or update) is used
+  for (const opt of installerOptions) {
+    if (args[opt] && !expectInstallerOptions) {
+      throw new Error(`Argument '--${opt}' requires 'setup' or 'upgrade'`)
     }
   }
 

@@ -11,19 +11,36 @@ All notable changes to this project will be documented in this section.
 
 ## [1.0.0-beta.33] - Unreleased
 
+**A note on breaking changes**
+
+This release contains breaking changes. Starting from this version, Deno KV is used for storing internal states and logs. Deno KV is an experimental feature that requires Deno to run with the
+`--unstable` flag.
+
+You cannot update from a previous version using the built-in installer, as it would install Pup without the `--unstable` flag. Instead, please follow the instructions for a fresh install in the
+manual, and the old version of Pup will be overwritten.
+
+From now on, the upgrader will check your installed Deno version and the need for using `--unstable`, and it will act/suggest actions accordingly.
+
+Also not that the `stable` installation channel will be empty until the first stable release. From now on, you will have to pass `--channel prerelease` when using the `setup` or `upgrade` commands.
+
+## Changes
+
+- **BREAKING** feature(upgrader): Support upgrade channels `stable`, `prerelease` and `canary`. Default to `stable`, select with `upgrade --channel <channel-name>`.
+- **BREAKING** feature(status,logger): Use Deno KV instead of plain file, for keeping status and internal logs.
 - fix(webinterface): Allow serving from sub-uri.
 - fix(webinterface): Fix script error.
 - chore(build): Add build step for bundling web interface assets.
 - feature(webinterface): Add "toolbar" showing config/status details of selected process.
 - chore(webinterface): Code refactor, convert js to esm etc.
 - chore(webinterface): Add separate README.md (plugins/web-interface/README.md) with docs for developers/contributors.
-- feature(status,logger): Use Deno KV instead of plain file, for keeping status and internal logs.
 - feature(logger): Move internal logs from temporary to persistent storage.
 - feature(core): Add maintenance loop, currently purging internal logs and status after a set number of hours. Running every 15 minutes.
 - feature(configuration): Add option to global logger `logger.internalLogHours` defaulting to 24.
 - fix(upgrader): Refactor upgrader with various fixes. `use std/semver` instead of flawed logic. Add confirmation. Add changelog reference.
 - feature(loadbalancer): Run load balancer-instances as separate workers instead of in main thread.
 - fix(core): Allow core to shut down gracefully.
+- feature(upgrader): Support fresh installs using the upgrader to select channels using `install [--channel <channel-name>] etc.`
+- fix(core): Wrap Pup constructor in an static async factory function `new Pup()` -> `await Pup.init(...)` to avoid unawaited calls.
 
 ## [1.0.0-beta.32] - 2023-06-06
 
