@@ -42,7 +42,7 @@ async function getVersions(local = false): Promise<Versions> {
 
 // Determine if the current Deno version meets the required version
 function denoVersionCheck(requiredVersion: string | null): boolean {
-  if (requiredVersion === null) return true
+  if (requiredVersion === null) return false
   const denoVersion = parseVersion(Deno.version.deno)
   const required = parseVersion(requiredVersion)
   if (denoVersion !== null && required !== null && !lt(denoVersion, required)) {
@@ -168,7 +168,7 @@ export async function upgrade(
 
   const status = await process.status
   if (status.success) {
-    console.log(`\nSuccess! Now using ${channelName !== "canary" ? (requestedVersion as Version).version : "canary"}.`)
+    console.log(`\nSuccess! Now using ${channelName !== "canary" ? (requestedVersion as Version).version : "canary"}.\n`)
     if (!freshInstall) {
       console.log(
         `\nFor any potential changes that might affect your setup in this new version, please review the changelog at ${Application.changelog}\n`,

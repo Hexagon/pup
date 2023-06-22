@@ -43,7 +43,6 @@ async function main(inputArgs: string[]) {
    */
 
   if (args.setup || baseArgument === "setup") {
-    console.log(args.setup)
     try {
       await upgrade(args.version, args.channel, args.local, true)
     } catch (e) {

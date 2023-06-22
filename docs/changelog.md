@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.34] - 2023-06-22
+
+- fix(upgrader): Fix small regression bugs.
+
 ## [1.0.0-beta.33] - 2023-06-22
 
 **A note on breaking changes**
