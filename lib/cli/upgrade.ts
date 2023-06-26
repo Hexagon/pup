@@ -55,6 +55,7 @@ function denoVersionCheck(requiredVersion: string | null): boolean {
 export async function upgrade(
   version: string | undefined,
   channelName: string | undefined,
+  ignoreCertficateErrors: string | undefined,
   local = false,
   freshInstall = false,
 ): Promise<void> {
@@ -144,12 +145,22 @@ export async function upgrade(
     )
   }
 
+  // Pass along --unsafely-ignore-certificate-errors when installing
+  let ignoreCertificateErrorsString = ""
+  if (ignoreCertficateErrors !== undefined) {
+    ignoreCertificateErrorsString = "--unsafely-ignore-certificate-errors"
+    if (ignoreCertficateErrors !== "") {
+      ignoreCertificateErrorsString += "=" + ignoreCertficateErrors
+    }
+  }
+
   // Install
   const installCmd = [
     "install",
     "-qAfr",
     "-n",
     "pup",
+    ignoreCertificateErrorsString,
     unstableInstall ? "--unstable" : "",
     canaryInstall ? versions.canary_url : (requestedVersion as Version).url,
   ].filter(Boolean)

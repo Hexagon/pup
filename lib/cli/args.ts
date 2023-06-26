@@ -43,6 +43,8 @@ function parseArguments(args: string[]): Args {
     "strategy",
     "stdout",
     "stderr",
+
+    "unsafely-ignore-certificate-errors",
   ]
 
   // All collection arguments

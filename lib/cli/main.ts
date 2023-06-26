@@ -44,7 +44,7 @@ async function main(inputArgs: string[]) {
 
   if (args.setup || baseArgument === "setup") {
     try {
-      await upgrade(args.version, args.channel, args.local, true)
+      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args.local, true)
     } catch (e) {
       console.error(`Could not install pup, error: ${e.message}`)
       Deno.exit(1)
@@ -53,7 +53,7 @@ async function main(inputArgs: string[]) {
 
   if (args.upgrade || baseArgument === "upgrade" || baseArgument === "update") {
     try {
-      await upgrade(args.version, args.channel, args.local)
+      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args.local)
     } catch (e) {
       console.error(`Could not upgrade pup, error: ${e.message}`)
       Deno.exit(1)

@@ -39,6 +39,8 @@ Both the `setup` and `upgrade` commands support the following parameters:
 
 - `--version`: Install, upgrade, or downgrade to a specific version.
 - `--channel <channel>`: Defaults to stable, but you can also install the `prerelease` or `canary` channel.
+- `--unsafely-ignore-certificate-errors[=list,of,hosts]`: **Should almost never be used, and certainly not in production.** This parameter is passed along to Deno as-is, and makes Pup and all Deno
+  subprocess ignore certificate errors. Has to be speficied on both setup and upgrade. It is better to pass this parameter to selected processes using the command in `pup.json` if you really need it.
 
 The upgrader will check if your currently installed version of Deno is compatible with Pup and suggest an upgrade if necessary.
 
