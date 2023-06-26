@@ -68,7 +68,7 @@ async function main(inputArgs: string[]) {
   if (args.help || !baseArgument || baseArgument === "help") {
     printUsage()
     console.log("")
-    printFlags()
+    printFlags(args["external-installer"])
     Deno.exit(0)
   }
 

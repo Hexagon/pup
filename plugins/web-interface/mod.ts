@@ -198,17 +198,33 @@ export class PupPlugin extends PluginImplementation {
           severity: d.severity,
           text: d.text,
         }
-        ws.send(JSON.stringify({
-          type: "log",
-          data: logRow,
-        }))
+        try {
+          ws.send(JSON.stringify({
+            type: "log",
+            data: logRow,
+          }))
+        } catch (_e) {
+          this.pup.log(
+            "error",
+            "web-interface",
+            `ProcessStateStreamer: Error sending log update`,
+          )
+        }
       }
     }
     const ProcessStateStreamer = (d?: ProcessStateChangedEvent) => {
-      ws.send(JSON.stringify({
-        type: "process_status_changed",
-        data: d,
-      }))
+      try {
+        ws.send(JSON.stringify({
+          type: "process_status_changed",
+          data: d,
+        }))
+      } catch (_e) {
+        this.pup.log(
+          "error",
+          "web-interface",
+          `ProcessStateStreamer: Error sending process status update`,
+        )
+      }
     }
     ws.onopen = () => {
       this.pup.events.on("log", logStreamer)

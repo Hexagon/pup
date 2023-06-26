@@ -29,6 +29,11 @@ async function main() {
     document.getElementById("unblock-process").addEventListener("click", async () => controlProcess(processSelector.get(), "unblock"))
     document.getElementById("restart-process").addEventListener("click", async () => controlProcess(processSelector.get(), "restart"))
 
+    document.getElementById("toolbar-all-processes").addEventListener("click", async () => {
+      // Change to the global scope by passing nothing
+      changeLogScope()
+    })
+
     // Update instance information every 10th second, and immediately
     setInterval(async () => {
       updateInstance(await fetchInstance(), await fetchProcesses())

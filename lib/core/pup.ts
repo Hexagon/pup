@@ -276,6 +276,7 @@ class Pup {
         // Exit watchdog if terminating
         this.watchdog()
       }, WATCHDOG_INTERVAL_MS)
+      Deno.unrefTimer(this.watchdogTimer)
     }
   }
 

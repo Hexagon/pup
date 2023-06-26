@@ -9,11 +9,17 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.35] - Unreleased
+## [1.0.0-beta.35] - 2023-06-27
 
 - fix(core): Decrease watchdog interval from 2000ms to 1000ms.
 - fix(core): Write status history to internal store at most once per 20 seconds.
-- fix(core): Gather all constants in configuration.ts
+- fix(core): Assign exit signal 1 when child process makes an unclean exit.
+- fix(core): Unref watchdog timer.
+- fix(process-runner): Handle sub process errors more gracefully, do not print "Pipe error".
+- refactor(core): Gather all core constants in configuration.ts
+- refactor(webinterface): UI cleanup, move process state/config to sidebar, adjust colors etc.
+- fix(webinterface): Do not throw on websocket send errors.
+- docs(contributing): Add documentation on how to contribute in packaging Pup.
 
 ## [1.0.0-beta.34] - 2023-06-22
 

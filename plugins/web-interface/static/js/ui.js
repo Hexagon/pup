@@ -64,12 +64,13 @@ export function changeLogScope(processId) {
     const selectedProcessCard = document.getElementById(`process-card-${sanitizedId}`)
     if (selectedProcessCard) selectedProcessCard.classList.add("process-card-selected")
 
-    setTextContentBySelector("#toolbar-header", processId)
+    setTextContentBySelector("#toolbar-current-process", processId)
+    document.getElementById("toolbar-current-process").classList.remove("hidden")
 
     // Update the toolbar with the selected process details
     updateSidebar(sanitizedId)
   } else {
-    setTextContentBySelector("#toolbar-header", "Global Pup logs")
+    document.getElementById("toolbar-current-process").classList.add("hidden")
 
     // Hide actions
     document.getElementById("actions-container").classList.add("hidden")
@@ -150,11 +151,11 @@ function updateSidebar(processId) {
     setTextContentBySelector("#process-status-started", processStatus.started)
     setTextContentBySelector("#process-status-updated", processStatus.updated)
 
-    document.getElementById("aside-overview").classList.add("hidden")
-    document.getElementById("aside-process").classList.remove("hidden")
+    document.getElementById("process-details").classList.remove("hidden")
+    document.getElementById("process-details-header").classList.remove("hidden")
   } else {
-    document.getElementById("aside-overview").classList.remove("hidden")
-    document.getElementById("aside-process").classList.add("hidden")
+    document.getElementById("process-details").classList.add("hidden")
+    document.getElementById("process-details-header").classList.remove("hidden")
   }
 }
 

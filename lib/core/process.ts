@@ -240,10 +240,10 @@ class Process {
         logger.log("errored", `Process exited with code ${result.code}`, this.config)
       }
     } catch (e) {
-      this.code = undefined
+      this.code = 1
       this.signal = undefined
       this.setStatus(ProcessState.ERRORED)
-      logger.log("errored", `Process could not start, error: ${e}`, this.config)
+      logger.log("errored", `Process exited with error: ${e}`, this.config)
     }
 
     this.exited = new Date()

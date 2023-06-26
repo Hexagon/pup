@@ -18,18 +18,25 @@ export function printUsage() {
   console.log(`Usage: ${Application.name} [OPTIONS...]`)
 }
 
-export function printFlags() {
-  const rows: TableRow[] = [
+export function printFlags(externalInstaller: boolean) {
+  const rows: TableRow[] = []
+  rows.push(
     { short: "-h", long: "help", description: "Display this help and exit" },
     { short: "-v", long: "version", description: "Output version information and exit" },
-    { separator: "empty" },
-    { content: "Install or upgrade pup", spanStart: 1 },
-    { separator: "empty" },
-    { long: "upgrade", description: "Upgrade pup and exit." },
-    { long: "setup", description: "Install pup and exit." },
-    { separator: "empty" },
-    { long: "--channel <name>", description: "Select channel. stable (default), prerelease or canary." },
-    { long: "--version <version>", description: "Install or upgrade to a specific version." },
+  )
+  if (!externalInstaller) {
+    rows.push(
+      { separator: "empty" },
+      { content: "Install or upgrade pup", spanStart: 1 },
+      { separator: "empty" },
+      { long: "upgrade", description: "Upgrade pup and exit." },
+      { long: "setup", description: "Install pup and exit." },
+      { separator: "empty" },
+      { long: "--channel <name>", description: "Select channel. stable (default), prerelease or canary." },
+      { long: "--version <version>", description: "Install or upgrade to a specific version." },
+    )
+  }
+  rows.push(
     { separator: "empty" },
     { content: "Start, control and monitor instances", spanStart: 1 },
     { separator: "empty" },
@@ -96,7 +103,7 @@ export function printFlags() {
     { description: "Multiple variables can be passed by using the flag multiple times," },
     { description: "e.g., --env KEY1=VALUE1 --env KEY2=VALUE2." },
     { separator: "empty" },
-  ]
+  )
 
   const columns: Column[] = [
     { key: "short", align: "right", minWidth: 8 },

@@ -26,7 +26,7 @@ class Runner extends BaseRunner {
         }
       }
     } catch (_e) {
-      logger.error("error", "Pipe error")
+      /* Ignore, message will be caught by master process */
     }
   }
 
