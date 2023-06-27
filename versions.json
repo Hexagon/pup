@@ -3,6 +3,12 @@
   "stable": [],
   "prerelease": [
     {
+      "version": "1.0.0-beta.36",
+      "url": "https://deno.land/x/pup@1.0.0-beta.36/pup.ts",
+      "deno": null,
+      "deno_unstable": "1.33.0"
+    },
+    {
       "version": "1.0.0-beta.35",
       "url": "https://deno.land/x/pup@1.0.0-beta.35/pup.ts",
       "deno": null,

@@ -38,33 +38,31 @@ async function main(inputArgs: string[]) {
   const secondaryBaseArgument = args._.length > 1 ? args._[1] : undefined
 
   /**
-   * Begin with --setup, --upgrade, --version and --help, as they have no dependencies on other
-   * arguments, and just exit
+   * setup, upgrade
    */
-
-  if (args.setup || baseArgument === "setup") {
+  const upgradeCondition = args.setup || baseArgument === "setup"
+  const setupCondition = args.upgrade || baseArgument === "upgrade" || baseArgument === "update"
+  if (upgradeCondition || setupCondition) {
     try {
-      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args.local, true)
+      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args.local, setupCondition)
     } catch (e) {
-      console.error(`Could not install pup, error: ${e.message}`)
-      Deno.exit(1)
+      console.error(`Could not ${setupCondition ? "install" : "upgrade"} pup, error: ${e.message}`)
     }
+    // upgrader(...) will normally handle exiting with signal 0, so we exit with code 1 if getting here
+    Deno.exit(1)
   }
 
-  if (args.upgrade || baseArgument === "upgrade" || baseArgument === "update") {
-    try {
-      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args.local)
-    } catch (e) {
-      console.error(`Could not upgrade pup, error: ${e.message}`)
-      Deno.exit(1)
-    }
-  }
-
+  /**
+   * version
+   */
   if (args.version !== undefined || baseArgument === "version") {
     printHeader()
     Deno.exit(0)
   }
 
+  /**
+   * help
+   */
   if (args.help || !baseArgument || baseArgument === "help") {
     printUsage()
     console.log("")
@@ -249,8 +247,8 @@ async function main(inputArgs: string[]) {
     let logs = await logger.getLogContents(args.id, startTimestamp, endTimestamp)
     logs = logs.filter((log) => {
       const { processId, severity } = log
-      const severityFilter = !args.severity || args.severity.toLowerCase() === severity.toLowerCase()
-      const processFilter = !args.id || args.id.toLowerCase() === processId.toLowerCase()
+      const severityFilter = !args.severity || args.severity === "" || args.severity.toLowerCase() === severity.toLowerCase()
+      const processFilter = !args.id || args.id === "" || args.id.toLowerCase() === processId.toLowerCase()
       return severityFilter && processFilter
     })
     if (numberOfRows) {

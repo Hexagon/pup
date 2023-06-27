@@ -5,7 +5,7 @@
  * @file static/js/ui.js
  */
 
-import { ansiToHtml, formatBytes, formatTime, getStatusColor, ProcessStateToString, showSpecificClassElements } from "./helpers.js"
+import { ansiToHtml, formatBytes, formatTime, getStatusColor, ProcessStateToString, showSpecificClassElements, timeAgo } from "./helpers.js"
 import { processConfigInventory, processSelector, processStatusInventory } from "./state.js"
 
 async function updateInstance(instanceData, processData) {
@@ -139,23 +139,39 @@ function updateSidebar(processId) {
 
     // Update process config values
     setTextContentBySelector("#process-config-command", processConfig.cmd || processConfig.worker)
-    setTextContentBySelector("#process-config-autostart", processConfig.autostart)
-    setTextContentBySelector("#process-config-cron", processConfig.cron)
+    setTextContentBySelector("#process-config-autostart", processConfig.autostart ? "Yes" : "No")
+    setTextContentBySelector("#process-config-cron", processConfig.cron || "N/A")
     setTextContentBySelector("#process-config-restart", processConfig.restart || "always")
-    setTextContentBySelector("#process-config-terminate", processConfig.terminate)
+    setTextContentBySelector("#process-config-terminate", processConfig.terminate || "N/A")
+    setTextContentBySelector("#process-config-cwd", ((processStatus.telemetry && processStatus.telemetry.cwd) ? processStatus.telemetry.cwd + " (telemetry)" : processConfig.cwd) || "N/A")
 
     // Update process status values
-    setTextContentBySelector("#process-status-type", processStatus.type)
-    setTextContentBySelector("#process-status-blocked", processStatus.blocked)
+    setTextContentBySelector("#process-status-type", processStatus.type || "Unknown")
+    setTextContentBySelector("#process-status-blocked", processStatus.blocked ? "Yes" : "No")
     setTextContentBySelector("#process-status-status", ProcessStateToString(processStatus.status))
-    setTextContentBySelector("#process-status-started", processStatus.started)
-    setTextContentBySelector("#process-status-updated", processStatus.updated)
+    setTextContentBySelector("#process-status-restarts", processStatus.restarts || 0)
+    setTextContentBySelector("#process-status-started", processStatus.started ? timeAgo(new Date(Date.parse(processStatus.started))) : "N/A")
+    setTextContentBySelector("#process-status-exited", processStatus.exited ? timeAgo(new Date(Date.parse(processStatus.exited))) : "N/A")
+    setTextContentBySelector("#process-status-updated", processStatus.updated ? timeAgo(new Date(Date.parse(processStatus.updated))) : "N/A")
+    setTextContentBySelector("#process-status-telemetry", processStatus.telemetry ? "Connected" : "N/A")
+    setTextContentBySelector(
+      "#process-status-memory",
+      (processStatus.telemetry && processStatus.telemetry.memory) ? formatBytes(processStatus.telemetry.memory.rss || 0) : "N/A",
+    )
+    setTextContentBySelector(
+      "#process-status-memory-heap-total",
+      (processStatus.telemetry && processStatus.telemetry.memory)
+        ? formatBytes(processStatus.telemetry.memory.heapUsed || 0) + " / " + formatBytes(processStatus.telemetry.memory.heapTotal || 0)
+        : "N/A",
+    )
+    setTextContentBySelector(
+      "#process-status-memory-external",
+      (processStatus.telemetry && processStatus.telemetry.memory) ? formatBytes(processStatus.telemetry.memory.external || 0) : "N/A",
+    )
 
     document.getElementById("process-details").classList.remove("hidden")
-    document.getElementById("process-details-header").classList.remove("hidden")
   } else {
     document.getElementById("process-details").classList.add("hidden")
-    document.getElementById("process-details-header").classList.remove("hidden")
   }
 }
 

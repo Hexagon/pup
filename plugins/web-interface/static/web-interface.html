@@ -20,7 +20,7 @@
         <section id="process-card-container">
           <!-- Process cards will be generated here -->
         </section>
-        <section id="process-details"> 
+        <section id="process-details" class="hidden"> 
           <p class="fg-neutral">PROCESS CONFIGURATION</p>
           <table>
             <tr>
@@ -55,6 +55,10 @@
               <td id="process-status-type"></td>
             </tr>
             <tr>
+              <td class="strong">Restarts</td>
+              <td id="process-status-restarts"></td>
+            </tr>
+            <tr>
               <td class="strong">Blocked</td>
               <td id="process-status-blocked"></td>
             </tr>
@@ -67,8 +71,28 @@
               <td id="process-status-started"></td>
             </tr>
             <tr>
+              <td class="strong">Exited</td>
+              <td id="process-status-exited"></td>
+            </tr>
+            <tr>
               <td class="strong">Updated</td>
               <td id="process-status-updated"></td>
+            </tr>
+            <tr>
+              <td class="strong">Telemetry</td>
+              <td id="process-status-telemetry"></td>
+            </tr>
+            <tr>
+              <td class="strong">Memory usage (RSS)</td>
+              <td id="process-status-memory"></td>
+            </tr>
+            <tr>
+              <td class="strong">Memory usage (Heap used/total)</td>
+              <td id="process-status-memory-heap-total"></td>
+            </tr>
+            <tr>
+              <td class="strong">Memory usage (External)</td>
+              <td id="process-status-memory-external"></td>
             </tr>
           </table>
         </section>
@@ -104,7 +128,7 @@
           <div class="fg-neutral tab">LOGS</div>
           <div id="toolbar-all-processes" class="fg-fg-dark tab"><a href="#" id="toolbar-all-processes" class="fg-dark">All processes</a></div>
           <div id="toolbar-current-process" class="hidden fg-dark tab"></div>
-          <div id="actions-container">
+          <div id="actions-container" class="hidden">
             <button id="start-process" class="bg-light border-light"><i class="fas fa-play fg-good"></i></button>
             <button id="stop-process" class="bg-light border-light"><i class="fas fa-stop fg-bad"></i></button>
             <button id="restart-process" class="bg-light border-light"><i class="fas fa-redo fg-primary"></i></button>

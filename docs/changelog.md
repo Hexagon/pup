@@ -9,6 +9,12 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.36] - 2023-06-28
+
+- feature(webinterface): Add process telemetry to sidebar.
+- fix(webinterface): Hide unused elements while loading interface.
+- fix(logger): Fix purging of logs
+
 ## [1.0.0-beta.35] - 2023-06-27
 
 - fix(core): Decrease watchdog interval from 2000ms to 1000ms.

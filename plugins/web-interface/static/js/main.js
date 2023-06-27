@@ -41,10 +41,6 @@ async function main() {
 
     // Do an initial update
     updateInstance(await fetchInstance(), await fetchProcesses())
-
-    document.getElementById("aside-back").addEventListener("click", async () => {
-      changeLogScope()
-    })
   } catch (error) {
     console.error("Failed to initialize the application:", error)
   }

@@ -19,7 +19,7 @@ If you have experience with software packaging, your contribution can greatly en
 
   - Pup can be compiled into an executable prior to packaging using `deno compile`. The procedure is described at
     [https://deno.com/manual@v1.34.3/tools/compiler](https://deno.com/manual@v1.34.3/tools/compiler). The command should be similar to
-    `deno compile --allow-all --reload --unstable --output pup pup.ts -- --external-installer`. The `--unstable` flag should be included if the version you are packaging (mostly pre-releases) requires
+    `deno compile --allow-all --reload --unstable --output pup pup.ts --external-installer`. The `--unstable` flag should be included if the version you are packaging (mostly pre-releases) requires
     unstable features according to `versions.json`.
 
   - The `--external-installer` argument to the Pup script disables the built-in installer, hiding `setup` and `upgrade` options from `--help`.

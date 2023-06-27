@@ -197,3 +197,43 @@ export function getStatusColor(status) {
       return "neutral" // Default color
   }
 }
+
+/**
+ * Calculate the difference between a given date and the current date and
+ * format the difference as a string.
+ *
+ * @param {Date} date - The date to compare with the current date.
+ * @returns {string} The formatted string representing the time difference.
+ * The returned string will be in the format '[value] [unit] ago' if the given
+ * date is in the past, or '[value] [unit] from now' if the given date is in
+ * the future, where [value] is the numerical difference and [unit] is the
+ * appropriate unit of time ('seconds', 'minutes', 'hours', or 'days').
+ */
+export function timeAgo(date) {
+  const now = new Date()
+  let secondsPast = (now.getTime() - date.getTime()) / 1000
+  let suffix = " ago"
+
+  if (secondsPast < 0) {
+    secondsPast = -secondsPast
+    suffix = " from now"
+  }
+
+  if (secondsPast < 60) {
+    let value = parseInt(secondsPast)
+    return value + (value === 1 ? " second" : " seconds") + suffix
+  }
+
+  if (secondsPast < 3600) {
+    let value = parseInt(secondsPast / 60)
+    return value + (value === 1 ? " minute" : " minutes") + suffix
+  }
+
+  if (secondsPast < 86400) {
+    let value = parseInt(secondsPast / 3600)
+    return value + (value === 1 ? " hour" : " hours") + suffix
+  }
+
+  let value = parseInt(secondsPast / 86400)
+  return value + (value === 1 ? " day" : " days") + suffix
+}

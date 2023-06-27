@@ -104,6 +104,7 @@ class Logger {
         const store = await Deno.openKv(this.storeName)
         await store.set(["logs_by_time", timeStamp], logObj)
         await store.set(["logs_by_process", initiator, timeStamp], logObj)
+        await store.set(["logs_by_process_lookup", timeStamp], ["logs_by_process", initiator, timeStamp])
         store.close()
       } catch (error) {
         console.error(`Failed to write log to store '${this.storeName}' due to '${error.message}'. The following message was not logged: ${text}.`)
@@ -234,11 +235,13 @@ class Logger {
         rowsDeleted++
       }
       const logsByProcessSelector = {
-        prefix: ["logs_by_process"],
-        end: ["logs_by_process", startTime],
+        prefix: ["logs_by_process_lookup"],
+        end: ["logs_by_process_lookup", startTime],
       }
       let rowsDeletedProcess = 0
       for await (const entry of store.list(logsByProcessSelector)) {
+        // Delete both the lookup key and the actual key
+        await store.delete(entry.value as Deno.KvKey)
         await store.delete(entry.key)
         rowsDeletedProcess++
       }
