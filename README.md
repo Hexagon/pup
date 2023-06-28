@@ -28,10 +28,44 @@ _For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.githu
 To install Pup, open your terminal and execute the following command:
 
 ```bash
-deno install -Afr https://deno.land/x/pup/pup.ts setup --channel prerelease
+deno run -Ar https://deno.land/x/pup/pup.ts setup --channel prerelease
 ```
 
-This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet.
+This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
+channels [here](https://hexagon.github.io/pup/installation.html#release-channels).
+
+### Configuration
+
+1. Start by generating a new configuration file called pup.json at your project root. This can be achieved using Pup's built-in helper with the following command:
+
+   `pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
+
+2. (Optional) In case you have an additional task to execute, such as a cleanup script, you can make use of `pup append`. The following example shows how to add an extra task that use the cron start
+   policy:
+
+   `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
+
+3. Now, start your ecosystem:
+
+   `pup run`
+
+4. (Optional) To make your ecosystem function as a system service, install it using `pup install`. This works with systemd, sysvinit, upstart, launchd, and Windows service manager:
+
+   `pup install --name my-service`
+
+For the full manual, see <https://hexagon.github.io/pup>
+
+#### Single command example
+
+It is also possible to use pup to keep a process alive temporary, without a `pup.json` or system service.
+
+To achieve this, use `pup run` with `--cmd` and a start policy, for example `--autostart`.
+
+`pup run --cmd "deno run server.ts" --autostart`
+
+## Example setups
+
+Full examples available at [/docs/examples](/docs/examples)
 
 ## Release channels
 
@@ -44,38 +78,6 @@ This command downloads the latest version of Pup and installs it on your system.
   for developers and early adopters who want to stay on the bleeding edge of Pup's development. Based on the current state of the `main` repo of the github repository.
 
 Each channel serves different purposes, so choose the one that best fits your needs and requirements.
-
-### Usage Examples
-
-**Single command example**
-
-Use `pup run` with `--cmd` and a restart policy, for example `--autostart`, this will keep your process running, and require no configuration.
-
-`pup run --cmd "deno run server.ts" --autostart`
-
-**Ecosystem example**
-
-1. Initialise a new configuration file `pup.json`, running a server script using deno.
-
-   `pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
-
-2. Add hourly task using the cron start policy.
-
-   `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
-
-3. Launch your ecosystem.
-
-   `pup run`
-
-4. Optional: Install your ecosystem as a system service. Works with systemd, sysvinit, upstart, launchd and Windows service manager.
-
-   `pup install --name my-service`
-
-For the full manual, see <https://hexagon.github.io/pup>
-
-## Example setups
-
-Full examples available at [/docs/examples](/docs/examples)
 
 ## Contributions and Development
 
