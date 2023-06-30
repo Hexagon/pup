@@ -3,15 +3,25 @@
     "lineWidth": 200,
     "semiColons": false
   },
+
   "lint": {
     "exclude": ["plugins/web-interface/static/js"]
   },
+
   "tasks": {
-    "update-deps": "deno run --allow-read=. --allow-net=deno.land,cdn.deno.land https://deno.land/x/udd/main.ts --dry-run deps.ts test/deps.ts plugins/web-interface/deps.ts",
+    "update-deps": "deno run --allow-read=. --allow-net=deno.land,cdn.deno.land https://deno.land/x/udd/main.ts --dry-run deno.json deps.ts test/deps.ts plugins/web-interface/deps.ts",
     "check": "deno fmt --check && deno lint && deno check pup.ts --unstable && deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --unstable",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env --unstable tools/release.ts && deno fmt",
     "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts --bundle static static/bundle.json && deno fmt",
     "build": "deno task check && deno task build-schema && deno task build-webinterface && deno task build-versions"
+  },
+
+  "imports": {
+    "std/": "https://deno.land/std@0.192.0/",
+    "croner/": "https://deno.land/x/croner@6.0.5/",
+    "zod/": "https://deno.land/x/zod@v3.21.4/",
+    "service/": "https://deno.land/x/service@1.0.0-beta.6/",
+    "dax/": "https://deno.land/x/dax@0.32.0/"
   }
 }

@@ -47,15 +47,20 @@ class Status {
   }
 
   /**
-   * Writes the application status to the KV store with a timestamp as the key.
+   * Writes the application status to the KV store with a timestamp as part of the key.
    *
    * Key ["last_application_state"] is written every iteration.
-   * Key ["application_state", <timestamp] is written at most once per 20 seconds.
+   * Key ["application_state", <timestamp>] is written at most once per 20 seconds.
    * @param applicationState The application state to be stored.
    */
   public async writeToStore(applicationState: ApplicationState) {
     try {
       const kv = await Deno.openKv(this.storeName)
+
+      // Initialize lastWrite if it's not set
+      if (!this.lastWrite) {
+        this.lastWrite = 0
+      }
 
       // Write application_state at most once per APPLICATION_STATE_WRITE_LIMIT_MS
       if (Date.now() - this.lastWrite > APPLICATION_STATE_WRITE_LIMIT_MS) {
@@ -70,6 +75,7 @@ class Status {
       console.error("Error while writing status to kv store: " + e.message)
     }
   }
+
   /**
    * Should make any changes necessary when the application exits, like
    * unsetting last_application_state in the kv store.
@@ -84,6 +90,12 @@ class Status {
     }
   }
 
+  /**
+   * Deletes the application_state logs older than the given number of hours.
+   *
+   * @param keepHours The number of hours worth of logs to keep.
+   * @returns The number of rows deleted.
+   */
   public async purge(keepHours: number): Promise<number> {
     if (!this.storeName) {
       return 0

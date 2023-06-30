@@ -1,8 +1,18 @@
+/**
+ * Class that run tasks as regular processes using Dax
+ *
+ * @file      lib/core/runner.ts
+ * @license   MIT
+ */
+
 import { ProcessConfiguration, Pup } from "./pup.ts"
 import { $, CommandChild, readLines, StringReader } from "../../deps.ts"
-
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
 
+/**
+ * Represents a task runner that executes tasks as regular processes.
+ * Extends the BaseRunner class.
+ */
 class Runner extends BaseRunner {
   private process?: CommandChild
 
@@ -10,10 +20,63 @@ class Runner extends BaseRunner {
     super(pup, processConfig)
   }
 
+  /**
+   * Executes the command specified in the process configuration.
+   *
+   * @param runningCallback The callback to be called once the process starts running.
+   * @returns The result of the running process.
+   */
+  public async run(runningCallback: RunnerCallback): Promise<RunnerResult> {
+    if (!this.processConfig.cmd) {
+      throw new Error("No command specified")
+    }
+
+    const env = this.createEnvironmentConfig()
+    const child = this.prepareCommand(env)
+
+    this.process = child.spawn()
+
+    runningCallback()
+
+    this.pipeToLogger("stdout", this.process.stdout())
+    this.pipeToLogger("stderr", this.process.stderr())
+
+    const result = await this.waitForProcessEnd()
+
+    this.process = undefined
+
+    // Create a RunnerResult
+    const runnerResult: RunnerResult = {
+      code: result?.code,
+      signal: null, // Signal not available in the dax CommandChild
+      success: result?.code === 0 ? true : false,
+    }
+
+    return runnerResult
+  }
+
+  /**
+   * Aborts the running process.
+   *
+   * @param signal The signal to use when killing the process.
+   */
+  public kill(_signal?: Deno.Signal) {
+    try {
+      this.process?.abort() // Note: the abort method does not accept a signal parameter.
+    } catch (_e) {
+      // Ignore
+    }
+  }
+
+  /**
+   * Pipes the output of the running process to the logger.
+   *
+   * @param category The category of the output (stdout/stderr).
+   * @param reader The stream to read the output from.
+   */
   private async pipeToLogger(category: string, reader: ReadableStream<Uint8Array>) {
     const logger = this.pup.logger
 
-    // Write to log
     try {
       for await (const chunk of reader) {
         const r = new StringReader(new TextDecoder().decode(chunk))
@@ -26,22 +89,31 @@ class Runner extends BaseRunner {
         }
       }
     } catch (_e) {
-      /* Ignore, message will be caught by master process */
+      /* Ignore, error message will be caught by the master process */
     }
   }
 
-  async run(runningCallback: RunnerCallback) {
-    if (!this.processConfig.cmd) {
-      throw new Error("No command specified")
-    }
-
-    // Extend enviroment config with PUP_PROCESS_ID
+  /**
+   * Creates the environment configuration for the process.
+   *
+   * @returns The environment configuration.
+   */
+  private createEnvironmentConfig() {
     const env = this.processConfig.env ? structuredClone(this.processConfig.env) : {}
     env.PUP_PROCESS_ID = this.processConfig.id
+
     if (this.pup.temporaryStoragePath) env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
     if (this.pup.persistentStoragePath) env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
 
-    // Extend path (if specified)
+    this.extendPath()
+
+    return env
+  }
+
+  /**
+   * Extends the PATH environment variable with the path specified in the process configuration.
+   */
+  private extendPath() {
     if (this.processConfig.path) {
       if (Deno.env.has("PATH")) {
         Deno.env.set("PATH", `${Deno.env.get("PATH")}:${this.processConfig.path}`)
@@ -49,21 +121,28 @@ class Runner extends BaseRunner {
         Deno.env.set("PATH", `${this.processConfig.path}`)
       }
     }
+  }
 
-    // Optimally, every item of this.processConfig.cmd should be escaped
+  /**
+   * Prepares the command to be executed based on the process configuration.
+   *
+   * @param env The environment configuration for the command.
+   * @returns The command to be executed.
+   */
+  private prepareCommand(env: Record<string, string>) {
     let child = $.raw`${this.processConfig.cmd}`.stdout("piped").stderr("piped")
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
     if (env) child = child.env(env)
 
-    // Spawn the process
-    this.process = child.spawn()
+    return child
+  }
 
-    runningCallback() // PID should be passed as an argument if available
-
-    this.pipeToLogger("stdout", this.process.stdout())
-    this.pipeToLogger("stderr", this.process.stderr())
-
-    // Dax will throw on abort, handle that explicitly
+  /**
+   * Waits for the process to end and catches any errors that might occur.
+   *
+   * @returns The result of the process.
+   */
+  private async waitForProcessEnd() {
     let result
     try {
       result = await this.process
@@ -79,26 +158,7 @@ class Runner extends BaseRunner {
       }
     }
 
-    this.process = undefined
-
-    // ToDo: Is it possible to ref the process?
-
-    // Create a RunnerResult
-    const runnerResult: RunnerResult = {
-      code: result.code,
-      signal: null, // Signal not available in the dax CommandChild
-      success: result.code === 0 ? true : false,
-    }
-
-    return runnerResult
-  }
-
-  public kill = () => {
-    try {
-      this.process?.abort()
-    } catch (_e) {
-      // Ignore
-    }
+    return result
   }
 }
 

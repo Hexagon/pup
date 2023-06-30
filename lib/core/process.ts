@@ -135,6 +135,9 @@ class Process {
     return this.config
   }
 
+  /**
+   * Initialize process setup, watchers and events.
+   */
   public init() {
     // Start using cron pattern
     if (this.config.cron) this.setupCron()
@@ -150,6 +153,11 @@ class Process {
     })
   }
 
+  /**
+   * Starts the process after validating the conditions for start.
+   * @param {string} [reason] - The reason for starting the process.
+   * @param {boolean} [restart] - If the process is a restart.
+   */
   public async start(reason?: string, restart?: boolean) {
     const logger = this.pup.logger
 
@@ -251,31 +259,53 @@ class Process {
     this.runner = undefined
   }
 
+  /**
+   * Stops the process and cleans up the resources.
+   * @param {string} reason - The reason for stopping the process.
+   * @returns {boolean} - Returns true if the process was stopped successfully, false otherwise.
+   */
   public stop = (reason: string): boolean => {
+    return this.killRunner(reason)
+  }
+
+  /**
+   * Kills the current runner and performs cleanup.
+   * @param {string} reason - The reason for killing the runner.
+   * @returns {boolean} - Returns true if the runner was killed successfully, false otherwise.
+   */
+  private killRunner = (reason: string): boolean => {
     if (this.runner) {
-      try {
-        this.status = ProcessState.STOPPING
-        this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
-        this.runner?.kill()
-        this.restarts = 0
-        return true
-      } catch (_e) {
-        return false
-      }
+      this.runner.kill()
+      this.pup.logger.log("stop", `Process stopped, reason: ${reason}`, this.config)
+      this.setStatus(ProcessState.STOPPING)
+      this.restarts = 0
+      return true
     }
     return false
   }
 
+  /**
+   * Restarts the process.
+   * @param {string} reason - The reason for restarting the process.
+   */
   public restart = (reason: string) => {
     this.stop(reason)
     this.pendingRestartReason = reason
   }
 
+  /**
+   * Blocks the process.
+   * @param {string} reason - The reason for blocking the process.
+   */
   public block = (reason: string) => {
     this.blocked = true
     this.pup.logger.log("block", `Process blocked, reason: ${reason}`, this.config)
   }
 
+  /**
+   * Unblocks the process.
+   * @param {string} reason - The reason for unblocking the process.
+   */
   public unblock = (reason: string) => {
     this.blocked = false
     this.pup.logger.log("unblock", `Process unblocked, reason: ${reason}`, this.config)

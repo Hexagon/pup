@@ -1,3 +1,10 @@
+/**
+ * Class that run tasks as web workers
+ *
+ * @file      lib/core/worker.ts
+ * @license   MIT
+ */
+
 import { ProcessConfiguration, Pup } from "./pup.ts"
 import { path, readLines, StringReader } from "../../deps.ts"
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
@@ -9,6 +16,12 @@ class WorkerRunner extends BaseRunner {
     super(pup, processConfig)
   }
 
+  /**
+   * Runs the worker with the provided configuration.
+   *
+   * @param runningCallback Callback function to be called when the worker is running.
+   * @returns RunnerResult object indicating the result of the worker run.
+   */
   private async pipeToLogger(category: string, message: string) {
     const logger = this.pup.logger
     try {
@@ -25,7 +38,13 @@ class WorkerRunner extends BaseRunner {
     }
   }
 
-  async run(runningCallback: RunnerCallback): Promise<RunnerResult> {
+  /**
+   * Runs the worker with the provided configuration.
+   *
+   * @param runningCallback Callback function to be called when the worker is running.
+   * @returns RunnerResult object indicating the result of the worker run.
+   */
+  public async run(runningCallback: RunnerCallback): Promise<RunnerResult> {
     if (!this.processConfig.worker) {
       throw new Error("No worker specified")
     }
@@ -83,8 +102,17 @@ class WorkerRunner extends BaseRunner {
     })
   }
 
-  public kill = () => {
-    this.worker?.terminate()
+  /**
+   * Aborts the running process.
+   *
+   * @param _signal The signal to use when killing the process.
+   */
+  public kill(_signal?: Deno.Signal) {
+    try {
+      this.worker?.terminate() // Note: the abort method does not accept a signal parameter.
+    } catch (_e) {
+      // Ignore
+    }
   }
 }
 

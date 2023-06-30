@@ -9,6 +9,13 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-beta.37] - Unreleased
+
+- refactor(core): Refactor and jsdoc improvements of several modules.
+- fix(process): Add missing call to `setState()` on status change to `STOPPING`.
+- fix(build): DRY by moving `https://...std/` etc to single imports in `deno.json`
+- chore(build): Full dependency update
+
 ## [1.0.0-beta.36] - 2023-06-28
 
 - feature(webinterface): Add process telemetry to sidebar.
