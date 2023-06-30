@@ -15,13 +15,5 @@
     "build-versions": "deno run --allow-read --allow-write --allow-env --unstable tools/release.ts && deno fmt",
     "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts --bundle static static/bundle.json && deno fmt",
     "build": "deno task check && deno task build-schema && deno task build-webinterface && deno task build-versions"
-  },
-
-  "imports": {
-    "std/": "https://deno.land/std@0.192.0/",
-    "croner/": "https://deno.land/x/croner@6.0.5/",
-    "zod/": "https://deno.land/x/zod@v3.21.4/",
-    "service/": "https://deno.land/x/service@1.0.0-beta.6/",
-    "dax/": "https://deno.land/x/dax@0.32.0/"
   }
 }

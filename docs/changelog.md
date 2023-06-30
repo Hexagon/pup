@@ -13,7 +13,6 @@ All notable changes to this project will be documented in this section.
 
 - refactor(core): Refactor and jsdoc improvements of several modules.
 - fix(process): Add missing call to `setState()` on status change to `STOPPING`.
-- fix(build): DRY by moving `https://...std/` etc to single imports in `deno.json`
 - chore(build): Full dependency update
 
 ## [1.0.0-beta.36] - 2023-06-28
