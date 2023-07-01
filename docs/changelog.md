@@ -9,7 +9,7 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-beta.37] - Unreleased
+## [1.0.0-beta.37] - 2023-07-01
 
 - refactor(core): Refactor and jsdoc improvements of several modules.
 - fix(process): Add missing call to `setState()` on status change to `STOPPING`.
