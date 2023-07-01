@@ -75,6 +75,9 @@ class Pup {
     // Initialise core logger
     this.logger = new Logger(this.configuration.logger ?? {}, logStore)
 
+    // Global error handler
+    this.registerGlobalErrorHandler()
+
     // EventEmitter
     this.events = new EventEmitter()
 
@@ -564,6 +567,13 @@ class Pup {
       Deno.exit(0)
     }, forceQuitMs)
     Deno.unrefTimer(timer) // Unref force quit timer to allow the process to exit earlier
+  }
+
+  private registerGlobalErrorHandler() {
+    addEventListener("error", (event) => {
+      this.logger.error("fatal", `Unhandled error caught by core: ${event.error.message}`)
+      event.preventDefault()
+    })
   }
 }
 

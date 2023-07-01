@@ -25,6 +25,7 @@ type Version = {
   url: string
   deno: string | null
   deno_unstable: string
+  default_permissions: string[]
 }
 
 // Fetch and return application versions
@@ -56,6 +57,7 @@ export async function upgrade(
   version: string | undefined,
   channelName: string | undefined,
   ignoreCertficateErrors: string | undefined,
+  allPermissions = false,
   local = false,
   freshInstall = false,
 ): Promise<void> {
@@ -155,15 +157,23 @@ export async function upgrade(
   }
 
   // Install
-  const installCmd = [
-    "install",
-    "-qAfr",
-    "-n",
-    "pup",
-    ignoreCertificateErrorsString,
-    unstableInstall ? "--unstable" : "",
-    canaryInstall ? versions.canary_url : (requestedVersion as Version).url,
-  ].filter(Boolean)
+  const installCmd = []
+
+  installCmd.push("install")
+  installCmd.push("-qfr") // Quite, Reload
+  if (allPermissions || !requestedVersion?.default_permissions) {
+    installCmd.push("-A")
+  } else {
+    installCmd.push(...requestedVersion.default_permissions)
+  }
+  if (ignoreCertificateErrorsString && ignoreCertificateErrorsString !== "") {
+    installCmd.push(ignoreCertificateErrorsString)
+  }
+  if (unstableInstall) {
+    installCmd.push("--unstable")
+  }
+  installCmd.push("-n", "pup")
+  installCmd.push(canaryInstall ? versions.canary_url : (requestedVersion as Version).url)
 
   console.info(`\nRunning: deno ${installCmd.join(" ")}`)
 

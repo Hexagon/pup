@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this section.
 - refactor(core): Refactor and jsdoc improvements of several modules.
 - fix(process): Add missing call to `setState()` on status change to `STOPPING`.
 - chore(build): Full dependency update
+- fix(core): Fix worker runner
+- feature(upgrader): Use hardened permissions by default, allow override on setup/upgrade by `--all-permissions`
 
 ## [1.0.0-beta.36] - 2023-06-28
 

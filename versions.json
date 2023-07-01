@@ -6,37 +6,85 @@
       "version": "1.0.0-beta.37",
       "url": "https://deno.land/x/pup@1.0.0-beta.37/pup.ts",
       "deno": null,
-      "deno_unstable": "1.33.0"
+      "deno_unstable": "1.33.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
     },
     {
       "version": "1.0.0-beta.36",
       "url": "https://deno.land/x/pup@1.0.0-beta.36/pup.ts",
       "deno": null,
-      "deno_unstable": "1.33.0"
+      "deno_unstable": "1.33.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
     },
     {
       "version": "1.0.0-beta.35",
       "url": "https://deno.land/x/pup@1.0.0-beta.35/pup.ts",
       "deno": null,
-      "deno_unstable": "1.33.0"
+      "deno_unstable": "1.33.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
     },
     {
       "version": "1.0.0-beta.34",
       "url": "https://deno.land/x/pup@1.0.0-beta.34/pup.ts",
       "deno": null,
-      "deno_unstable": "1.33.0"
+      "deno_unstable": "1.33.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
     },
     {
       "version": "1.0.0-beta.33",
       "url": "https://deno.land/x/pup@1.0.0-beta.33/pup.ts",
       "deno": null,
-      "deno_unstable": "1.33.0"
+      "deno_unstable": "1.33.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
     },
     {
       "version": "1.0.0-beta.32",
       "url": "https://deno.land/x/pup@1.0.0-beta.32/pup.ts",
       "deno": "1.33.0",
-      "deno_unstable": "1.30.0"
+      "deno_unstable": "1.30.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
     }
   ]
 }

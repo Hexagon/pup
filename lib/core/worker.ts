@@ -57,26 +57,30 @@ class WorkerRunner extends BaseRunner {
     const workingDir = this.processConfig.cwd || Deno.cwd()
     const workingDirUrl = new URL(`file://${path.resolve(workingDir)}/`).href
 
-    this.worker = new Worker(
-      new URL(this.processConfig.worker[0], workingDirUrl).href,
-      { type: "module", name: this.processConfig.id },
-    )
+    try {
+      this.worker = new Worker(
+        new URL(this.processConfig.worker[0], workingDirUrl).href,
+        { type: "module", name: this.processConfig.id },
+      )
 
-    runningCallback()
+      runningCallback()
 
-    this.worker.postMessage({
-      run: this.processConfig.worker.slice(1),
-      cmd: this.processConfig.cmd,
-      cwd: this.processConfig.cwd,
-      env: env,
-    })
+      this.worker.postMessage({
+        run: this.processConfig.worker.slice(1),
+        cmd: this.processConfig.cmd,
+        cwd: this.processConfig.cwd,
+        env: env,
+      })
 
-    this.worker.onmessageerror = (error) => {
-      this.pup.logger.error("error", `Worker message error: ${error}`, this.processConfig)
-    }
+      this.worker.onmessageerror = (error) => {
+        this.pup.logger.error("error", `Worker message error: ${error}`, this.processConfig)
+      }
 
-    this.worker.onerror = (error) => {
-      this.pup.logger.error("error", `Worker error: ${error.message}`, this.processConfig)
+      this.worker.onerror = (error) => {
+        this.pup.logger.error("error", `Worker error: ${error.message}`, this.processConfig)
+      }
+    } catch (error) {
+      this.pup.logger.error("error", `Fatal worker error: ${error.message}`, this.processConfig)
     }
 
     return await new Promise((resolve) => {

@@ -44,7 +44,7 @@ async function main(inputArgs: string[]) {
   const setupCondition = args.upgrade || baseArgument === "upgrade" || baseArgument === "update"
   if (upgradeCondition || setupCondition) {
     try {
-      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args.local, setupCondition)
+      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args["all-permissions"], args.local, setupCondition)
     } catch (e) {
       console.error(`Could not ${setupCondition ? "install" : "upgrade"} pup, error: ${e.message}`)
     }
@@ -216,8 +216,8 @@ async function main(inputArgs: string[]) {
     try {
       const rawConfig = await Deno.readTextFile(configFile)
       configuration = validateConfiguration(jsonc.parse(rawConfig))
-    } catch (_e) {
-      console.error(`Could not start, error reading or parsing configuration file '${configFile}'`)
+    } catch (e) {
+      console.error(`Could not start, error reading or parsing configuration file '${configFile}': ${e.message}`)
       Deno.exit(1)
     }
   } else {

@@ -52,7 +52,7 @@ interface PluginClusterConfiguration {
 interface PluginProcessConfiguration {
   id: string
   cmd?: string
-  worker?: string
+  worker?: string[]
   env?: Record<string, string>
   cwd?: string
   cluster?: PluginClusterConfiguration

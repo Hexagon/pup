@@ -14,6 +14,7 @@ interface Version {
   url: string
   deno: string | null
   deno_unstable: string
+  default_permissions: string[]
 }
 
 interface Versions {
@@ -37,6 +38,7 @@ async function main() {
     url: Application.url.replace("$VERSION", Application.version),
     deno: Application.deno,
     deno_unstable: Application.deno_unstable,
+    default_permissions: Application.permissions,
   }
 
   // Parse the version using semver

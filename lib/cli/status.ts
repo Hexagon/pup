@@ -95,8 +95,8 @@ export async function getStatus(configFile?: string, statusFile?: string) {
     if (result) {
       status = result.value as ApplicationState
     }
-  } catch (_e) {
-    throw new Error(`Could not read status for config file '${configFile}' from '${statusFile}', could not read store.`)
+  } catch (e) {
+    throw new Error(`Could not read status for config file '${configFile}' from '${statusFile}', could not read store: ${e.message}.`)
   }
   // A valid status file were found, figure out if it is stale or not
   if (status && status.updated) {

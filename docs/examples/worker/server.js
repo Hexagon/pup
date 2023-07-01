@@ -1,5 +1,3 @@
-// http_worker.ts
-
 import { serve } from "https://deno.land/std/http/server.ts"
 
 /**

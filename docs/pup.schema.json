@@ -112,7 +112,10 @@
                 "type": "string"
               },
               "worker": {
-                "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "cwd": {
                 "type": "string"

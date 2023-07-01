@@ -28,6 +28,14 @@ const Application = {
   deno_unstable: "1.33.0", /* Minimum version of Deno required to run Pup (with --unstable flag) */
   repository: "https://github.com/hexagon/pup",
   changelog: "https://hexagon.github.io/pup/changelog.html",
+  permissions: [
+    "--allow-env",
+    "--allow-read",
+    "--allow-write",
+    "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+    "--allow-net",
+    "--allow-run",
+  ],
 }
 
 export { Application }
