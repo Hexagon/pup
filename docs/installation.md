@@ -32,7 +32,7 @@ This command downloads the latest version of Pup and installs it on your system.
 If you already have Pup installed and want to upgrade to the latest version, you can use:
 
 ```bash
-pup upgrade
+pup upgrade --channel prerelease
 ```
 
 Both the `setup` and `upgrade` commands support the following parameters:
