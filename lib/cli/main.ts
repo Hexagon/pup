@@ -87,7 +87,7 @@ async function main(inputArgs: string[]) {
     if (checkedArgs.cmd) {
       cmd = checkedArgs.cmd
     } else if (checkedArgs["--"] && checkedArgs["--"].length > 0) {
-      cmd = checkedArgs["--"]
+      cmd = checkedArgs["--"].join(" ")
     }
   }
 

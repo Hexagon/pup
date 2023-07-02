@@ -117,7 +117,7 @@ export async function upgrade(
         console.warn(
           `\nWarning: Your current Deno version does not meet the stable requirement but it matches the unstable version. Proceeding with ${
             freshInstall ? "install" : "upgrade"
-          } may require the --unstable flag.`,
+          } will require Deno to run using the --unstable flag.\n`,
         )
 
         const answer = confirm("Do you want to proceed?")

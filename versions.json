@@ -3,6 +3,20 @@
   "stable": [],
   "prerelease": [
     {
+      "version": "1.0.0-rc.1",
+      "url": "https://deno.land/x/pup@1.0.0-rc.1/pup.ts",
+      "deno": null,
+      "deno_unstable": "1.33.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
+    },
+    {
       "version": "1.0.0-rc.0",
       "url": "https://deno.land/x/pup@1.0.0-rc.0/pup.ts",
       "deno": null,

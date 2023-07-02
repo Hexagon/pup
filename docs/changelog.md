@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.1] - Unreleased
+
+- fix(cli): Read command from `--` correctly
+
 ## [1.0.0-rc.0] - 2023-07-02
 
 Pup has now achieved enough stability to enter the Release Candidate phase. Here is a brief summary of the significant changes and enhancements implemented during the Beta phase:
