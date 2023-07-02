@@ -9,6 +9,38 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.0] - 2023-07-02
+
+Pup has now achieved enough stability to enter the Release Candidate phase. Here is a brief summary of the significant changes and enhancements implemented during the Beta phase:
+
+- Major refactoring of the core modules was conducted to improve efficiency and stability.
+
+- Several bug fixes were made in different parts of the software, especially in the process module, the worker runner, and the web interface plugin.
+
+- The upgrader module underwent a significant revamp, introducing upgrade channels, support for initial installs and better error handling. We've also implemented more granular permission checks to
+  align with the principle of least privilege. Pup now requests only the specific permissions necessary for each operation, enhancing overall security. Note that these security improvements only cover
+  Pup, permissions of child processes must be taken care of explicitly as usual.
+
+- New features added to web interface plugin, such as telemetry status, process status, and details of the selected process in the side bar.
+
+- The logger module was improved by moving internal logs from temporary to persistent storage. Allowing for the new command `pup logs` which allow filtering using `--start/end <iso-time>`,
+  `--severity <error|warn|...>` etc.
+
+- A new maintenance loop was added to purge internal logs and status after a set number of hours.
+
+- Breaking changes were introduced with the move to Deno KV for storing internal states and logs. This transition required a fresh install of Pup and the use of the --unstable flag in Deno. If you're
+  upgrading from an early version, run `pup upgrade --channel prerelease` twice to make sure you're all good.
+
+- The load balancer module was enhanced with features for backend health tracking, error handling, and redirection.
+
+- Significant enhancements were made to the CLI to improve functionality and user experience.
+
+Moving forward, our focus will shift to bug hunting and overall stability improvements. We greatly appreciate any feedback from users during this final testing phase. Please be aware that while this
+release candidate is close to the final version, it might still contain some bugs.
+
+It's important to note that Pup can currently only operate with the --unstable flag. However, this is automatically managed by the installer/upgrader. As soon as Deno stabilizes KV, the --unstable
+flag will be automatically removed during the upgrade process.
+
 ## [1.0.0-beta.37] - 2023-07-01
 
 - refactor(core): Refactor and jsdoc improvements of several modules.

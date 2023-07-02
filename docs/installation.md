@@ -39,6 +39,9 @@ Both the `setup` and `upgrade` commands support the following parameters:
 
 - `--version`: Install, upgrade, or downgrade to a specific version.
 - `--channel <channel>`: Defaults to stable, but you can also install the `prerelease` or `canary` channel.
+- `--all-permissions`: This flag grants Pup full permissions, diverging from the principle of least privilege, which is the default behavior. Use this cautiously due to potential security
+  implications. It's important to note that this setting is exclusive to Pup; every child process initiated retains its own distinct permissions as configured, respecting their individual least
+  privilege settings.
 - `--unsafely-ignore-certificate-errors[=list,of,hosts]`: **Should almost never be used, and certainly not in production.** This parameter is passed along to Deno as-is, and makes Pup and all Deno
   subprocess ignore certificate errors. Has to be speficied on both setup and upgrade. It is better to pass this parameter to selected processes using the command in `pup.json` if you really need it.
 
