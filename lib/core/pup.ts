@@ -179,7 +179,7 @@ class Pup {
     }
 
     this.watchdog()
-    this.maintenance()
+    this.maintenance(true)
   }
 
   public allProcesses(): Process[] {
@@ -290,18 +290,20 @@ class Pup {
    *
    * @private
    */
-  private maintenance = async () => {
-    this.logger.log("maintenance", "Performing periodic maintenance")
+  private maintenance = async (skip = false) => {
+    if (!skip) {
+      this.logger.log("maintenance", "Performing periodic maintenance")
 
-    const keepHours = this.configuration.logger?.internalLogHours === undefined ? DEFAULT_INTERNAL_LOG_HOURS : this.configuration.logger?.internalLogHours
+      const keepHours = this.configuration.logger?.internalLogHours === undefined ? DEFAULT_INTERNAL_LOG_HOURS : this.configuration.logger?.internalLogHours
 
-    // Purge logs
-    const logsPurged = await this.logger.purge(keepHours)
-    this.logger.log("maintenance", `Purged log entries: ${logsPurged}`)
+      // Purge logs
+      const logsPurged = await this.logger.purge(keepHours)
+      this.logger.log("maintenance", `Purged log entries: ${logsPurged}`)
 
-    // Purge state
-    const statusPurged = await this.status.purge(keepHours)
-    this.logger.log("maintenance", `Purged status entries: ${statusPurged}`)
+      // Purge state
+      const statusPurged = await this.status.purge(keepHours)
+      this.logger.log("maintenance", `Purged status entries: ${statusPurged}`)
+    }
 
     // Schedule next maintenance
     // - also make maintenance timer non-blocking using Deno.unrefTimer

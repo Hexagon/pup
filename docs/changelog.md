@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this section.
 ## [1.0.0-rc.1] - Unreleased
 
 - fix(cli): Read command from `--` correctly
+- fix(core): Skip instant maintenance run to avoid problems on first run
 
 ## [1.0.0-rc.0] - 2023-07-02
 
