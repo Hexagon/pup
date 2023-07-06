@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.2] - 2023-07-06
+
+- chore(deps): Update dependencies
+
 ## [1.0.0-rc.1] - 2023-07-04
 
 - fix(cli): Read command from `--` correctly
