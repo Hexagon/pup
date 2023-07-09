@@ -18,6 +18,8 @@ interface Configuration {
   watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
   plugins?: PluginConfiguration[]
+  terminateTimeout?: number
+  terminateGracePeriod?: number
 }
 
 interface PluginConfiguration {
@@ -82,6 +84,8 @@ interface ProcessConfiguration {
 
 const ConfigurationSchema = z.object({
   $schema: z.optional(z.string()),
+  terminateTimeout: z.number().min(0).default(30),
+  terminateGracePeriod: z.number().min(0).default(0),
   logger: z.optional(
     z.object({
       console: z.optional(z.boolean()),
