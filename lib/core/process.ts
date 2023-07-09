@@ -6,12 +6,13 @@
  */
 
 import { Pup } from "./pup.ts"
-import { Cron } from "../../deps.ts"
+import { Cron, delay } from "../../deps.ts"
 import { Runner } from "./runner.ts"
 import { WorkerRunner } from "./worker.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
 import { TelemetryData } from "../../telemetry.ts"
+import { resolve } from "https://deno.land/std@0.183.0/path/win32.ts"
 
 /**
  * Represents the state of a process in Pup.
@@ -264,8 +265,39 @@ class Process {
    * @param {string} reason - The reason for stopping the process.
    * @returns {boolean} - Returns true if the process was stopped successfully, false otherwise.
    */
-  public stop = (reason: string): boolean => {
-    return this.killRunner(reason)
+  public stop = async (reason: string): Promise<boolean> => {
+    if (!this.runner) {
+      return false;
+    }
+
+    this.setStatus(ProcessState.STOPPING)
+    const abortTimers = new AbortController();
+
+    // Stop process after `terminateGracePeriod`
+    delay((this.config.terminateGracePeriod ?? 0) * 1000, {signal: abortTimers.signal}).then(() => {
+      this.pup.logger.log("stopping", `Stopping process, reason: ${reason}`, this.config)
+      // ToDo, send SIGTERM or SIGINT instead of SIGKILL as soon as Dax supports it
+      return this.killRunner(reason)
+    }).catch(() => false),
+
+    // Kill process after `terminateTimeout`
+    delay((this.config.terminateTimeout ?? 30) * 1000, {signal: abortTimers.signal}).then(() => {
+      this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
+      return this.killRunner(reason)
+    }).catch(() => false)
+
+    const finished = new Promise<boolean>((resolve) => {
+      const onFinish = (ev) => {
+        if (ev.status.pid == this.getStatus().pid && [ProcessState.FINISHED, ProcessState.EXHAUSTED].includes(this.status)) {
+          abortTimers.abort()
+          this.pup.events.off('process_status_changed', onFinish)
+          resolve(true)
+        }
+      }
+      this.pup.events.on('process_status_changed', onFinish)
+    })
+
+    return await finished
   }
 
   /**
