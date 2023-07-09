@@ -286,11 +286,13 @@ class Process {
     }).catch(() => false)
 
     const finished = new Promise<boolean>((resolve) => {
-      const onFinish = (ev) => {
-        if (ev.status.pid == this.getStatus().pid && [ProcessState.FINISHED, ProcessState.EXHAUSTED].includes(this.status)) {
+      // Using `any` because event payload is not typed yet
+      // deno-lint-ignore no-explicit-any
+      const onFinish = (ev: any) => {
+        if (ev.status?.pid == this.getStatus().pid && [ProcessState.FINISHED, ProcessState.EXHAUSTED].includes(this.status)) {
           abortTimers.abort()
           this.pup.events.off("process_status_changed", onFinish)
-          // ToDo, should resolve to whatever `killRunner()` returns, which is currently unavailable inside the `process_status_changed` event, so it's fixed to `true` by now
+          // ToDo, resolve to whatever `killRunner()` returns, which is currently unavailable inside the `process_status_changed` event, so it's fixed to `true` by now
           resolve(true)
         }
       }
