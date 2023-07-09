@@ -12,7 +12,6 @@ import { WorkerRunner } from "./worker.ts"
 import { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
 import { TelemetryData } from "../../telemetry.ts"
-import { resolve } from "https://deno.land/std@0.183.0/path/win32.ts"
 
 /**
  * Represents the state of a process in Pup.
