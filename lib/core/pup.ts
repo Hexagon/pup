@@ -542,32 +542,34 @@ class Pup {
 
     this.events.emit("terminating", forceQuitMs)
 
-    const stoppingProcesses: Promise<boolean>[] = [];
+    const stoppingProcesses: Promise<boolean>[] = []
 
     // Block and stop all processes
     for (const process of this.processes) {
       process.block("terminating")
-      stoppingProcesses.push(process.stop("terminating").then((result) => {
-        process.cleanup()
-        return result
-      }))
+      stoppingProcesses.push(
+        process.stop("terminating").then((result) => {
+          process.cleanup()
+          return result
+        }),
+      )
     }
-    
+
     // Close IPC
     if (this.ipc) {
       await this.ipc.close()
     }
-    
+
     // Terminate all plugins
     for (const plugin of this.plugins) {
       await plugin.terminate()
     }
-    
+
     // Cleanup
     await this.cleanup()
-    
-    await Promise.allSettled(stoppingProcesses);
-    
+
+    await Promise.allSettled(stoppingProcesses)
+
     Deno.exit(0)
   }
 

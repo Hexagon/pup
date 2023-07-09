@@ -266,21 +266,21 @@ class Process {
    */
   public stop = async (reason: string): Promise<boolean> => {
     if (!this.runner) {
-      return false;
+      return false
     }
 
     this.setStatus(ProcessState.STOPPING)
-    const abortTimers = new AbortController();
+    const abortTimers = new AbortController()
 
     // Stop process after `terminateGracePeriod`
-    delay((this.config.terminateGracePeriod ?? this.pup.configuration.terminateGracePeriod ?? 0) * 1000, {signal: abortTimers.signal}).then(() => {
+    delay((this.config.terminateGracePeriod ?? this.pup.configuration.terminateGracePeriod ?? 0) * 1000, { signal: abortTimers.signal }).then(() => {
       this.pup.logger.log("stopping", `Stopping process, reason: ${reason}`, this.config)
       // ToDo, send SIGTERM or SIGINT instead of SIGKILL as soon as Dax supports it
       return this.killRunner(reason)
-    }).catch(() => false),
+    }).catch(() => false)
 
     // Kill process after `terminateTimeout`
-    delay((this.config.terminateTimeout ?? this.pup.configuration.terminateTimeout ?? 30) * 1000, {signal: abortTimers.signal}).then(() => {
+    delay((this.config.terminateTimeout ?? this.pup.configuration.terminateTimeout ?? 30) * 1000, { signal: abortTimers.signal }).then(() => {
       this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
       return this.killRunner(reason)
     }).catch(() => false)
@@ -289,12 +289,12 @@ class Process {
       const onFinish = (ev) => {
         if (ev.status.pid == this.getStatus().pid && [ProcessState.FINISHED, ProcessState.EXHAUSTED].includes(this.status)) {
           abortTimers.abort()
-          this.pup.events.off('process_status_changed', onFinish)
+          this.pup.events.off("process_status_changed", onFinish)
           // ToDo, should resolve to whatever `killRunner()` returns, which is currently unavailable inside the `process_status_changed` event, so it's fixed to `true` by now
           resolve(true)
         }
       }
-      this.pup.events.on('process_status_changed', onFinish)
+      this.pup.events.on("process_status_changed", onFinish)
     })
 
     return await finished

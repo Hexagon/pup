@@ -65,8 +65,7 @@ You need to specify one of these for each process, else the process will never s
 ### Stop/restart policy
 
 - `terminate` (optional): A cron expression specifying when the process should terminate. Combined with `restart: "always"` this effectively restarts the process on a cron schedule.
-- `terminateGracePeriod` (optional): A number specifying how many seconds to wait for a process to finish by itself before actually
-  asking it to terminate.
+- `terminateGracePeriod` (optional): A number specifying how many seconds to wait for a process to finish by itself before actually asking it to terminate.
 - `terminateTimeout` (optional): A number specifying how many seconds to wait for a process to terminate before killing it.
 
 ### Clustering
