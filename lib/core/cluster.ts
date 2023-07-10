@@ -111,9 +111,9 @@ class Cluster extends Process {
     }
   }
 
-  public override stop = (reason: string): boolean => {
+  public override stop = (reason: string): Promise<boolean> => {
     const results = this.processes.map((process) => process.stop(reason))
-    return results.every((result) => result)
+    return Promise.allSettled(results).then((results) => results.every((result) => result))
   }
 
   public override restart = (reason: string) => {

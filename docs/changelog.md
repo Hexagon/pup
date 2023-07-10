@@ -9,6 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.3] - Unreleased
+
+- feature(configuration): Add options `terminateTimeout` (default 30) and `terminateGracePeriod` (default 0) to both process and global scopes
+
 ## [1.0.0-rc.2] - 2023-07-06
 
 - chore(deps): Update dependencies

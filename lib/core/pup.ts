@@ -542,11 +542,17 @@ class Pup {
 
     this.events.emit("terminating", forceQuitMs)
 
+    const stoppingProcesses: Promise<boolean>[] = []
+
     // Block and stop all processes
     for (const process of this.processes) {
       process.block("terminating")
-      process.stop("terminating")
-      process.cleanup()
+      stoppingProcesses.push(
+        process.stop("terminating").then((result) => {
+          process.cleanup()
+          return result
+        }),
+      )
     }
 
     // Close IPC
@@ -562,13 +568,9 @@ class Pup {
     // Cleanup
     await this.cleanup()
 
-    // Now the process should exit gracefully after som time - if not,
-    // Force quit after 30 seconds
-    const timer = setTimeout(async () => {
-      await this.logger.warn("terminate", "Terminating by force")
-      Deno.exit(0)
-    }, forceQuitMs)
-    Deno.unrefTimer(timer) // Unref force quit timer to allow the process to exit earlier
+    await Promise.allSettled(stoppingProcesses)
+
+    Deno.exit(0)
   }
 
   private registerGlobalErrorHandler() {

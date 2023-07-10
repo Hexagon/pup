@@ -7,6 +7,16 @@
         "$schema": {
           "type": "string"
         },
+        "terminateTimeout": {
+          "type": "number",
+          "minimum": 0,
+          "default": 30
+        },
+        "terminateGracePeriod": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0
+        },
         "logger": {
           "type": "object",
           "properties": {
@@ -180,6 +190,16 @@
                 "type": "string",
                 "minLength": 9,
                 "maxLength": 256
+              },
+              "terminateTimeout": {
+                "type": "number",
+                "minimum": 0,
+                "default": 30
+              },
+              "terminateGracePeriod": {
+                "type": "number",
+                "minimum": 0,
+                "default": 0
               },
               "restart": {
                 "type": "string",

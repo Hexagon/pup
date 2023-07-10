@@ -18,6 +18,8 @@ interface Configuration {
   watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
   plugins?: PluginConfiguration[]
+  terminateTimeout?: number
+  terminateGracePeriod?: number
 }
 
 interface PluginConfiguration {
@@ -70,6 +72,8 @@ interface ProcessConfiguration {
   autostart?: boolean
   cron?: string
   terminate?: string
+  terminateTimeout?: number
+  terminateGracePeriod?: number
   timeout?: number
   overrun?: boolean
   logger?: ProcessLoggerConfiguration
@@ -80,6 +84,8 @@ interface ProcessConfiguration {
 
 const ConfigurationSchema = z.object({
   $schema: z.optional(z.string()),
+  terminateTimeout: z.number().min(0).default(30),
+  terminateGracePeriod: z.number().min(0).default(0),
   logger: z.optional(
     z.object({
       console: z.optional(z.boolean()),
@@ -126,6 +132,8 @@ const ConfigurationSchema = z.object({
       watch: z.optional(z.array(z.string())),
       cron: z.optional(z.string().min(9).max(256)),
       terminate: z.optional(z.string().min(9).max(256)),
+      terminateTimeout: z.number().min(0).default(30),
+      terminateGracePeriod: z.number().min(0).default(0),
       restart: z.optional(z.enum(["always", "error"])),
       restartDelayMs: z.number().min(0).max(24 * 60 * 60 * 1000 * 1).default(10000), // Max one day
       overrun: z.optional(z.boolean()),

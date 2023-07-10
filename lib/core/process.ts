@@ -6,7 +6,7 @@
  */
 
 import { Pup } from "./pup.ts"
-import { Cron } from "../../deps.ts"
+import { Cron, delay } from "../../deps.ts"
 import { Runner } from "./runner.ts"
 import { WorkerRunner } from "./worker.ts"
 import { ProcessConfiguration } from "./configuration.ts"
@@ -264,8 +264,42 @@ class Process {
    * @param {string} reason - The reason for stopping the process.
    * @returns {boolean} - Returns true if the process was stopped successfully, false otherwise.
    */
-  public stop = (reason: string): boolean => {
-    return this.killRunner(reason)
+  public stop = async (reason: string): Promise<boolean> => {
+    if (!this.runner) {
+      return false
+    }
+
+    this.setStatus(ProcessState.STOPPING)
+    const abortTimers = new AbortController()
+
+    // Stop process after `terminateGracePeriod`
+    delay((this.config.terminateGracePeriod ?? this.pup.configuration.terminateGracePeriod ?? 0) * 1000, { signal: abortTimers.signal }).then(() => {
+      this.pup.logger.log("stopping", `Stopping process, reason: ${reason}`, this.config)
+      // ToDo, send SIGTERM or SIGINT instead of SIGKILL as soon as Dax supports it
+      return this.killRunner(reason)
+    }).catch(() => false)
+
+    // Kill process after `terminateTimeout`
+    delay((this.config.terminateTimeout ?? this.pup.configuration.terminateTimeout ?? 30) * 1000, { signal: abortTimers.signal }).then(() => {
+      this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
+      return this.killRunner(reason)
+    }).catch(() => false)
+
+    const finished = new Promise<boolean>((resolve) => {
+      // Using `any` because event payload is not typed yet
+      // deno-lint-ignore no-explicit-any
+      const onFinish = (ev: any) => {
+        if (ev.status?.pid == this.getStatus().pid && [ProcessState.FINISHED, ProcessState.EXHAUSTED].includes(this.status)) {
+          abortTimers.abort()
+          this.pup.events.off("process_status_changed", onFinish)
+          // ToDo, resolve to whatever `killRunner()` returns, which is currently unavailable inside the `process_status_changed` event, so it's fixed to `true` by now
+          resolve(true)
+        }
+      }
+      this.pup.events.on("process_status_changed", onFinish)
+    })
+
+    return await finished
   }
 
   /**
