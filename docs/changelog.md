@@ -9,9 +9,10 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.3] - Unreleased
+## [1.0.0-rc.3] - 2023-07-10
 
 - feature(configuration): Add options `terminateTimeout` (default 30) and `terminateGracePeriod` (default 0) to both process and global scopes
+- fix(service): Fix an issue where user mode ystemd services installed by pup did not start on boot by upgrading dependency `service`
 
 ## [1.0.0-rc.2] - 2023-07-06
 
