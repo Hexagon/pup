@@ -10,6 +10,7 @@
 import { Application } from "../../application.meta.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
 import { PluginConfiguration, ProcessLoggerConfiguration } from "./configuration.ts"
+import { LogEventData } from "./logger.ts"
 import { ProcessState } from "./process.ts"
 import { Pup } from "./pup.ts"
 
@@ -143,6 +144,9 @@ export class PluginApi {
   }
   public log(severity: "log" | "error" | "info" | "warn", plugin: string, message: string) {
     this._pup.logger[severity](`plugin-${plugin}`, message)
+  }
+  public async getLogs(processId?: string, startTimeStamp?: number, endTimeStamp?: number, nRows?: number): Promise<LogEventData[]> {
+    return await this._pup.logger.getLogContents(processId, startTimeStamp, endTimeStamp, nRows)
   }
 }
 

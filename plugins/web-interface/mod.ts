@@ -14,12 +14,12 @@ interface Configuration {
   port: number
 }
 
-interface LogInventoryEntry {
-  ts: Date
-  id?: string
+export interface LogEventData {
   severity: string
   category: string
   text: string
+  processId: string
+  timeStamp: number
 }
 
 export class PupPlugin extends PluginImplementation {
@@ -35,8 +35,6 @@ export class PupPlugin extends PluginImplementation {
   private app: Application
   private router: Router
   private controller: AbortController
-  private logs: Map<string, Array<LogInventoryEntry>>
-  private staticFiles?: Record<string, string>
 
   constructor(pup: PluginApi, config: PluginConfiguration) {
     super(pup, config)
@@ -54,28 +52,6 @@ export class PupPlugin extends PluginImplementation {
 
     this.setupRoutes()
     this.startServer()
-
-    this.logs = new Map<string, Array<LogInventoryEntry>>()
-
-    this.pup.events.on("log", (d?: LogEvent) => {
-      if (d) {
-        const logRow: LogInventoryEntry = {
-          ts: new Date(),
-          id: d.process?.id,
-          category: d.category,
-          severity: d.severity,
-          text: d.text,
-        }
-        const process = d.process?.id || "__core"
-        if (!this.logs.has(process)) {
-          this.logs.set(process, [logRow])
-        } else {
-          const arr = this.logs.get(process) || []
-          arr?.push(logRow)
-          this.logs.set(process, arr)
-        }
-      }
-    })
   }
 
   private setupRoutes() {
@@ -151,15 +127,45 @@ export class PupPlugin extends PluginImplementation {
       }
     })
 
-    // Set up endpoint to serve process data
-    this.router.get("/logs/:id", (context: any) => {
-      const id = context.params.id
-      context.response.body = JSON.stringify(this.logs.get(id))
-    })
-
     // Set up endpoint to redirect / to /web-interface.html
     this.router.get("/", (context: any) => {
       context.response.redirect("/web-interface.html")
+    })
+
+    this.router.get("/logs", async (context: any) => {
+      try {
+        const params = context.request.url.searchParams
+
+        const processId = params.get("processId")
+        const startTimeStamp = params.get("startTimeStamp")
+        const endTimeStamp = params.get("endTimeStamp")
+        const severity = params.get("severity")
+        let nRows = params.get("nRows")
+
+        // Convert nRows to integer and validate
+        if (nRows) {
+          nRows = parseInt(nRows, 10)
+          if (isNaN(nRows)) {
+            context.response.status = 400
+            context.response.body = { error: "nRows should be a number" }
+            return
+          }
+        }
+
+        const nRowsCapped = (!nRows || nRows > 100) ? 100 : nRows
+
+        let logContents = await this.pup.getLogs(processId, startTimeStamp, endTimeStamp, nRowsCapped)
+
+        if (severity) {
+          const severityLower = severity.toLowerCase()
+          logContents = logContents.filter((log) => log.severity.toLowerCase() === severityLower)
+        }
+
+        context.response.body = logContents
+      } catch (error) {
+        context.response.status = 500
+        context.response.body = { error: "Internal Server Error", message: error.message }
+      }
     })
 
     // Set up route to serve static files using Bundlee
@@ -171,7 +177,7 @@ export class PupPlugin extends PluginImplementation {
         context.response.headers.set("Content-Type", fileData.contentType)
         context.response.body = fileData.content
       } else {
-        next()
+        await next()
       }
     })
 
@@ -191,9 +197,9 @@ export class PupPlugin extends PluginImplementation {
   private handleWebSocketConnection(ws: WebSocket) {
     const logStreamer = (d?: LogEvent) => {
       if (d) {
-        const logRow: LogInventoryEntry = {
-          ts: new Date(),
-          id: d.process?.id,
+        const logRow: LogEventData = {
+          timeStamp: new Date(),
+          processId: d.process?.id || "core",
           category: d.category,
           severity: d.severity,
           text: d.text,
@@ -204,11 +210,13 @@ export class PupPlugin extends PluginImplementation {
             data: logRow,
           }))
         } catch (_e) {
-          this.pup.log(
+          // Do not log, this will cause an infinite loop
+          /*this.pup.log(
             "error",
             "web-interface",
             `ProcessStateStreamer: Error sending log update`,
-          )
+          )*/
+          console.error("ProcessStateStreamer: Error sending log update (not logged)")
         }
       }
     }

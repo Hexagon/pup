@@ -510,7 +510,7 @@ class Pup {
           response = { success, action: "telemetry" }
         } else if (parsedMessage.terminate) {
           // Defer actual termination to allow response to be sent
-          setTimeout(() => this.terminate(30000), 500)
+          Deno.unrefTimer(setTimeout(() => this.terminate(30000), 500))
           response = { success: true, action: "terminate" }
         } else {
           response = { success: false, action: "unknown" }

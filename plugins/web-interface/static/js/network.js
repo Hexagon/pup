@@ -123,6 +123,70 @@ async function fetchInstance() {
 }
 
 /**
+ * Fetches the logs for a specific process from the server, optionally filtering by a time range, severity level, and row limit.
+ * @async
+ * @param {string} processId - The ID of the process to fetch logs for.
+ * @param {string} [startTimeStamp] - An optional timestamp indicating the start of the time range for which to fetch logs.
+ * @param {string} [endTimeStamp] - An optional timestamp indicating the end of the time range for which to fetch logs.
+ * @param {string} [severity] - An optional severity level by which to filter the logs.
+ * @param {string} [nRows] - An optional limit on the number of log rows to fetch.
+ * @returns {Promise<object[]>} A promise that resolves to the list of logs.
+ * @throws {Error} When unable to fetch the logs.
+ */
+export async function getLogs(processId, startTimeStamp, endTimeStamp, severity, nRows) {
+  // Initialize the endpoint with the process ID
+  let endpoint = `./logs`
+
+  // Prepare an object for the query parameters
+  let params = {}
+
+  // Add 'processId' to the params if it's defined
+  if (processId) {
+    params.processId = processId
+  }
+
+  // Add 'startTimeStamp' to the params if it's defined
+  if (startTimeStamp) {
+    params.startTimeStamp = startTimeStamp
+  }
+
+  // Add 'endTimeStamp' to the params if it's defined
+  if (endTimeStamp) {
+    params.endTimeStamp = endTimeStamp
+  }
+
+  // Add 'severity' to the params if it's defined
+  if (severity) {
+    params.severity = severity
+  }
+
+  // Add 'nRows' to the params if it's defined
+  if (nRows) {
+    params.nRows = nRows
+  }
+
+  // Convert the params object to a URLSearchParam object
+  let queryParams = new URLSearchParams(params)
+
+  // Append the query parameters to the endpoint
+  endpoint += `?${queryParams.toString()}`
+
+  let response
+  try {
+    response = await fetch(endpoint)
+  } catch (error) {
+    console.error(`Error fetching logs for process ${processId}:`, error)
+    throw error
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+/**
  * Fetches the list of processes from the server
  * @async
  * @returns {Promise<object[]>} A promise that resolves to the list of processes.

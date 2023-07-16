@@ -5,8 +5,9 @@
  * @file static/js/ui.js
  */
 
-import { ansiToHtml, formatBytes, formatTime, getStatusColor, ProcessStateToString, showSpecificClassElements, timeAgo } from "./helpers.js"
+import { ansiToHtml, formatBytes, formatTime, getStatusColor, ProcessStateToString, timeAgo } from "./helpers.js"
 import { processConfigInventory, processSelector, processStatusInventory } from "./state.js"
+import { getLogs } from "./network.js"
 
 async function updateInstance(instanceData, processData) {
   const systemMemoryUsagePercent = ((instanceData.systemMemory.total - instanceData.systemMemory.free) / instanceData.systemMemory.total * 100).toFixed(2)
@@ -34,7 +35,6 @@ async function updateInstance(instanceData, processData) {
   processData.forEach((currentProcess) => {
     updateProcessCard(currentProcess)
   })
-  changeLogScope(processSelector.get())
 }
 
 /**
@@ -43,7 +43,7 @@ async function updateInstance(instanceData, processData) {
  *
  * @param {string} processId - The id of the process.
  */
-export function changeLogScope(processId) {
+export async function changeLogScope(processId) {
   processSelector.set(processId)
 
   let sanitizedId
@@ -78,23 +78,37 @@ export function changeLogScope(processId) {
     updateSidebar()
   }
 
-  // Show logs for the selected process only
-  showSpecificClassElements("logs", sanitizedId)
+  // Clear logs for the selected process only
+  clearLogs()
+
+  // Load logs for the selected process, and add them one by one at the top of the history window
+  // in reverse order. This is to make sure any logs added during this process is added after the history.
+  let logs = await getLogs(processId)
+  logs.slice().reverse().forEach((log) => addLog(log, true))
+}
+
+/**
+ * Clear all log entries from the logs section.
+ */
+function clearLogs() {
+  const logsDiv = document.getElementById("logs")
+  logsDiv.innerHTML = ""
 }
 
 /**
  * Add a log entry to the logs section.
  *
  * @param {Object} log - Log entry.
- * @param {string} processId - The id of the selected process.
+ * @param {boolean} [initial] - Add entries first.
  */
-function addLog(log, processId) {
+function addLog(log, initial) {
   const logsDiv = document.getElementById("logs")
-  logsDiv.classList.remove("hidden")
-
-  const hiddenClass = processId === log.id ? "" : "hidden"
-  let logsHtml = `<pre class="${log.id} ${hiddenClass}">${log.ts} | ${log.category} | ${log.severity} > ${ansiToHtml(log.text)}\n</pre>`
-  logsDiv.innerHTML = logsHtml + logsDiv.innerHTML
+  let logsHtml = `<pre class="${log.processId}">${new Date(log.timeStamp).toLocaleString()} | ${log.category} | ${log.severity} > ${ansiToHtml(log.text)}\n</pre>`
+  if (initial) {
+    logsDiv.innerHTML = logsHtml + logsDiv.innerHTML
+  } else {
+    logsDiv.innerHTML = logsDiv.innerHTML + logsHtml
+  }
 }
 
 /**

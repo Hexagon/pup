@@ -275,8 +275,8 @@ class Process {
     // Stop process after `terminateGracePeriod`
     // - delay is blocking
     const graceDelayOptions = {
-      signal: abortTimers.signal, 
-      persistent: true
+      signal: abortTimers.signal,
+      persistent: true,
     }
     delay((this.config.terminateGracePeriod ?? this.pup.configuration.terminateGracePeriod ?? 0) * 1000, graceDelayOptions).then(() => {
       this.pup.logger.log("stopping", `Stopping process, reason: ${reason}`, this.config)
@@ -286,9 +286,9 @@ class Process {
 
     // Kill process after `terminateTimeout`
     // - delay is non-blocking
-    const terminateDelayOptions = { 
-      signal: abortTimers.signal, 
-      persistent: false 
+    const terminateDelayOptions = {
+      signal: abortTimers.signal,
+      persistent: false,
     }
     delay((this.config.terminateTimeout ?? this.pup.configuration.terminateTimeout ?? 30) * 1000, terminateDelayOptions).then(() => {
       this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)

@@ -47,25 +47,6 @@ export function ansiToHtml(ansiText) {
 }
 
 /**
- * Shows elements of a specific class within a container.
- * First, hides all elements within the container.
- * Then, shows only elements of the specific class.
- *
- * @param {string} containerId - ID of the container element.
- * @param {string} targetClass - Class of the elements to show.
- */
-export function showSpecificClassElements(containerId, targetClass) {
-  const container = document.getElementById(containerId)
-  const allChildren = container.children
-  if (targetClass) {
-    Array.from(allChildren).forEach((child) => child.classList.add("hidden"))
-    const targetElements = container.getElementsByClassName(targetClass)
-    Array.from(targetElements).forEach((el) => el.classList.remove("hidden"))
-  } else {
-    Array.from(allChildren).forEach((child) => child.classList.remove("hidden"))
-  }
-}
-/**
  * Converts the given seconds into a string with a time unit.
  * The units used are years, days, hours, minutes, and seconds.
  *
