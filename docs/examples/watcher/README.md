@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Example: File watcher"
+title: "File watcher"
+parent: Examples
+nav_order: 7
 ---
 
-# Example: Restart on file changes
+# Restart on file changes
 
 ---
 

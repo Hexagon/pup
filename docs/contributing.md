@@ -1,9 +1,10 @@
 ---
 layout: page
-title: "10. Contributing"
+title: "Contributing"
+nav_order: 10
 ---
 
-# 10. Contributing
+# Contributing
 
 ---
 

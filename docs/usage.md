@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 3. Usage"
+title: "Usage"
+nav_order: 3
 ---
 
-# 3. Usage
+# Usage
 
 ---
 

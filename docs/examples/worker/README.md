@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Example: Kept-alive Worker Server"
+title: "Kept-alive Worker Server"
+parent: Examples
+nav_order: 8
 ---
 
-# Example: Kept-alive Worker Server
+# Kept-alive Worker Server
 
 ---
 

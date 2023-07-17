@@ -1,9 +1,10 @@
 ---
 layout: page
-title: "11. Changelog"
+title: "Changelog"
+nav_order: 11
 ---
 
-# 11. Changelog
+# Changelog
 
 ---
 

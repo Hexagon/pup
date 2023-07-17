@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Appendix: Telemetry"
+nav_order: 14
 ---
 
 # Appendix: Telemetry

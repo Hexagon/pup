@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 1. Overview"
+title: "Overview"
+nav_order: 1
 ---
 
-# 1. Overview
+# Overview
 
 ---
 

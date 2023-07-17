@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 7. Library usage"
+title: "Library usage"
+nav_order: 7
 ---
 
-# 7. Library usage
+# Library usage
 
 ---
 

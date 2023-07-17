@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 9. Troubleshooting"
+title: "Troubleshooting"
+nav_order: 9
 ---
 
-# 9. Troubleshooting
+# Troubleshooting
 
 ---
 

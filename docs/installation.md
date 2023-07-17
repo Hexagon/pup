@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 2. Installation"
+title: "Installation"
+nav_order: 2
 ---
 
-# 2. Installation
+# Installation
 
 ---
 

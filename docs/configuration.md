@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 4. Configuration"
+title: "Configuration"
+nav_order: 4
 ---
 
-# 4. Configuration
+# Configuration
 
 ---
 

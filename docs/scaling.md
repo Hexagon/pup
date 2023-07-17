@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 6. Clusters and Load Balancer"
+title: "Clusters and Load Balancer"
+nav_order: 6
 ---
 
-# 6. Clusters and Load Balancer
+# Clusters and Load Balancer
 
 ---
 

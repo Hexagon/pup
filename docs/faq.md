@@ -1,6 +1,7 @@
 ---
 layout: page
-title: " 8. FAQ"
+title: "FAQ"
+nav_order: 8
 ---
 
 # 8. FAQ

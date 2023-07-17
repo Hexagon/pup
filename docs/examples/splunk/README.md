@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Example: Server w/ Splunk Logging"
+title: "Server w/ Splunk Logging"
+parent: Examples
+nav_order: 6
 ---
 
-# Example: Server with Splunk Logging
+# Server with Splunk Logging
 
 ---
 

@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Example: Server w/ cron task"
+title: "Server w/ cron task"
+parent: Examples
+nav_order: 2
 ---
 
-# Example: Server with periodical (cron) task
+# Server with periodical (cron) task
 
 ---
 

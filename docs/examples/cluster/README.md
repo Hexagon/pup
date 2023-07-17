@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Example: Cluster w/ Load balancer"
+title: "Cluster w/ Load balancer"
+parent: Examples
+nav_order: 4
 ---
 
-# Example: Pup Cluster w/ Load balancer
+# Pup Cluster w/ Load balancer
 
 ---
 

@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Example: Docker (Deno)"
+title: "Docker (Deno)"
+parent: Examples
+nav_order: 5
 ---
 
-# Example: Using pup with Docker
+# Using pup with Docker
 
 ---
 

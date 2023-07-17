@@ -1,9 +1,10 @@
 ---
 layout: page
-title: " 5. Run at boot"
+title: "Run at boot"
+nav_order: 5
 ---
 
-# 5. Run pup at boot
+# Run pup at boot
 
 ---
 

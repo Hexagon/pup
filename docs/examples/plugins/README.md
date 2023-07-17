@@ -1,9 +1,10 @@
 ---
 layout: page
 title: "Appendix: Plugin development"
+nav_order: 13
 ---
 
-# Appendix: Plugin development
+# Plugin development
 
 ---
 

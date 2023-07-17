@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Example: Enabling the web interface"
+title: "Enabling the web interface"
+parent: Examples
+nav_order: 3
 ---
 
-# Example: Web interface
+# Enabling the Web interface
 
 ---
 
