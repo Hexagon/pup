@@ -43,3 +43,7 @@ status.json
 # Ignore files named core, but not folders named core
 core
 !core/
+
+# Test coverage
+cov_profile
+*.lcov

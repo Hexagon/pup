@@ -9,10 +9,11 @@ title: "11. Changelog"
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.4] - Unreleased
+## [1.0.0-rc.4] - 2023-07-18
 
 - fix(process): Unref forced termination timer by passing `persistant: false` to delay, to prevent it for keeping the main process alive for the full duration of the timeout
 - feature(web-interface): Add history to web interface log view
+- chore(build): Add coverage task to `deno.json`
 
 ## [1.0.0-rc.3] - 2023-07-10
 
