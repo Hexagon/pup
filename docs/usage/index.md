@@ -2,11 +2,14 @@
 layout: page
 title: "Usage"
 nav_order: 3
+has_children: true
 ---
 
 # Usage
 
 ---
+
+{:toc}
 
 Pup offers various command line parameters to help you control its behavior. These parameters are grouped into general flags, init, append, and no-config options. In this section, we'll describe each
 group and provide examples of usage.

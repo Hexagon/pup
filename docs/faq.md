@@ -4,7 +4,7 @@ title: "FAQ"
 nav_order: 8
 ---
 
-# 8. FAQ
+# FAQ
 
 ---
 

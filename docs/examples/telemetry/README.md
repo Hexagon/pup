@@ -1,10 +1,11 @@
 ---
 layout: page
-title: "Appendix: Telemetry"
-nav_order: 14
+title: "Telemetry"
+parent: Usage
+nav_order: 6
 ---
 
-# Appendix: Telemetry
+# Telemetry
 
 ---
 

@@ -1,7 +1,8 @@
 ---
 layout: page
 title: "Clusters and Load Balancer"
-nav_order: 6
+parent: Usage
+nav_order: 4
 ---
 
 # Clusters and Load Balancer

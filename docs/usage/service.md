@@ -1,7 +1,8 @@
 ---
 layout: page
 title: "Run at boot"
-nav_order: 5
+parent: Usage
+nav_order: 3
 ---
 
 # Run pup at boot

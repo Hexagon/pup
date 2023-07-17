@@ -1,7 +1,8 @@
 ---
 layout: page
-title: "Appendix: Plugin development"
-nav_order: 13
+title: "Plugin development"
+parent: Contributing
+nav_order: 2
 ---
 
 # Plugin development

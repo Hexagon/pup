@@ -1,7 +1,8 @@
 ---
 layout: page
 title: "Configuration"
-nav_order: 4
+parent: Usage
+nav_order: 2
 ---
 
 # Configuration

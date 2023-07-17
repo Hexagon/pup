@@ -1,7 +1,8 @@
 ---
 layout: page
 title: "Library usage"
-nav_order: 7
+parent: Usage
+nav_order: 5
 ---
 
 # Library usage
