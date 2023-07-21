@@ -349,20 +349,24 @@ class Pup {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
-      foundProcess.start(requestor)
-      return true
+      if (foundProcess.getStatus().blocked) {
+        return false
+      } else {
+        // Start will not return until the child process is done, so we can not await this call
+        foundProcess.start(requestor)
+        return true
+      }
     } else {
       console.error("Rpc: Got signal to stop process which does not exist.")
       return false
     }
   }
 
-  public stop(id: string, requestor: string): boolean {
+  public async stop(id: string, requestor: string): Promise<boolean> {
     const cleanedId = id.trim().toLocaleLowerCase()
     const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
     if (foundProcess) {
-      foundProcess.stop(requestor)
-      return true
+      return await foundProcess.stop(requestor)
     } else {
       console.error("Rpc: Got signal to stop process which does not exist.")
       return false
@@ -434,7 +438,7 @@ class Pup {
     }
   }
 
-  private handleInstruction(message: IpcValidatedMessage) {
+  private async handleInstruction(message: IpcValidatedMessage) {
     let response: InstructionResponse = { success: false, action: "", error: "No message data" }
     if (message.data !== null) {
       try {
@@ -458,7 +462,7 @@ class Pup {
             }
             // ToDo, also check valid characters
           } else if (parsedMessage.stop.length >= 1 && parsedMessage.stop.length <= 64) {
-            success = this.stop(parsedMessage.stop, "ipc")
+            success = await this.stop(parsedMessage.stop, "ipc")
           }
           response = { success, action: "stop" }
         } else if (parsedMessage.restart) {
@@ -538,7 +542,7 @@ class Pup {
     clearTimeout(this.watchdogTimer)
     clearTimeout(this.maintenanceTimer)
 
-    this.logger.log("terminate", "Termination requested")
+    await this.logger.log("terminate", "Termination requested")
 
     this.events.emit("terminating", forceQuitMs)
 
@@ -570,7 +574,7 @@ class Pup {
 
     await Promise.allSettled(stoppingProcesses)
 
-    Deno.exit(0)
+    // Deno should exit gracefully now
   }
 
   private registerGlobalErrorHandler() {

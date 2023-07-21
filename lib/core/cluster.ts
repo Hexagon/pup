@@ -3,7 +3,7 @@
  *
  * `Cluster` is basically a collection of processes, also extending `Process` to support the exact same methods
  *
- * @file      lib/core/process.ts
+ * @file      lib/core/cluster.ts
  * @license   MIT
  */
 
@@ -40,18 +40,24 @@ class Cluster extends Process {
     // ToDo: If there already are processes, reuse, stop or add
     this.processes = []
 
-    for (let i = 0; i < nInstances; i++) {
+    // Check start port if load balancer is activated
+    if (this.config.cluster?.commonPort) {
       if (!this.config.cluster?.startPort) {
         throw new Error("startPort not defined in cluster configuration.")
       }
+    }
 
+    for (let i = 0; i < nInstances; i++) {
       // Create a modified configuration for the subprocess
       const modConfig = structuredClone(this.config)
       modConfig.id = `${this.config.id}-${i + 1}`
-      modConfig.autostart = true
       modConfig.env = structuredClone(this.config.env || {})
       modConfig.env.PUP_CLUSTER_INSTANCE = i.toString()
-      modConfig.env.PUP_CLUSTER_PORT = (this.config.cluster.startPort + i).toString()
+
+      // Add PUP_CLUSTER_PORT only if load balancer is activated
+      if (this.config.cluster?.commonPort && this.config.cluster.startPort) {
+        modConfig.env.PUP_CLUSTER_PORT = (this.config.cluster.startPort + i).toString()
+      }
 
       // Create the subprocess
       const process = new Process(this.pup, modConfig)
@@ -61,10 +67,12 @@ class Cluster extends Process {
       this.pup.logger.log("cluster", `Sub-Process '${process.getConfig().id}' loaded`)
 
       // Add backend for load balancer
-      backends.push({
-        host: "127.0.0.1",
-        port: (this.config.cluster.startPort + i),
-      })
+      if (this.config.cluster?.commonPort && this.config.cluster.startPort) {
+        backends.push({
+          host: "127.0.0.1",
+          port: (this.config.cluster.startPort + i),
+        })
+      }
     }
 
     if (this.config.cluster?.commonPort) {
@@ -136,21 +144,33 @@ class Cluster extends Process {
     const clusterStatus: ProcessInformation = {
       id: this.getConfig().id,
       status: ProcessState.CREATED,
+      blocked: false,
       updated: new Date(),
       type: "cluster",
     }
 
+    // Extract the status values from each instance
     const statuses = this.getStatuses()
-    const allRunning = statuses.every((status) => status.status === ProcessState.RUNNING)
-    const anyRunning = statuses.some((status) => status.status === ProcessState.RUNNING)
 
-    if (allRunning) {
-      clusterStatus.status = ProcessState.RUNNING
-    } else if (anyRunning) {
-      clusterStatus.status = ProcessState.STARTING
+    // Adjust cluster status to match all children
+    const statusValues = statuses.map((status) => status.status)
+    const uniqueStatuses = new Set(statusValues)
+    if (uniqueStatuses.size === 1) {
+      // All instances have the same status
+      clusterStatus.status = Array.from(uniqueStatuses)[0]
+    } else {
+      // Instances have varying statuses
+      clusterStatus.status = ProcessState.MIXED
+    }
+
+    // Set blocked flag if all children are blocked
+    const allBlocked = statuses.every((status) => status.blocked)
+    if (allBlocked) {
+      clusterStatus.blocked = true
     }
 
     clusterStatus.updated = new Date()
+
     return clusterStatus
   }
 

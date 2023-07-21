@@ -27,6 +27,7 @@ enum ProcessState {
   FINISHED = 300,
   ERRORED = 400,
   EXHAUSTED = 450,
+  MIXED = 500, // Used for clusters with instances of varying modes
 }
 
 interface ProcessStateChangedEvent {

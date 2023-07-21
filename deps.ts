@@ -13,30 +13,30 @@
  * - Always use the same version of all imports from deno.land/std
  */
 // cli
-export { parse } from "https://deno.land/std@0.193.0/flags/mod.ts"
-export type { Args } from "https://deno.land/std@0.193.0/flags/mod.ts"
-export * as path from "https://deno.land/std@0.193.0/path/mod.ts"
-export * as uuid from "https://deno.land/std@0.193.0/uuid/mod.ts"
+export { parse } from "https://deno.land/std@0.195.0/flags/mod.ts"
+export type { Args } from "https://deno.land/std@0.195.0/flags/mod.ts"
+export * as path from "https://deno.land/std@0.195.0/path/mod.ts"
+export * as uuid from "https://deno.land/std@0.195.0/uuid/mod.ts"
 // logger
-export { stripColor } from "https://deno.land/std@0.193.0/fmt/colors.ts"
+export { stripColor } from "https://deno.land/std@0.195.0/fmt/colors.ts"
 // config
-export * as jsonc from "https://deno.land/std@0.193.0/jsonc/mod.ts"
+export * as jsonc from "https://deno.land/std@0.195.0/jsonc/mod.ts"
 // watcher
-export { deferred, delay } from "https://deno.land/std@0.193.0/async/mod.ts"
-export { globToRegExp, relative } from "https://deno.land/std@0.193.0/path/mod.ts"
+export { deferred, delay } from "https://deno.land/std@0.195.0/async/mod.ts"
+export { globToRegExp, relative } from "https://deno.land/std@0.195.0/path/mod.ts"
 // load balancer
-export { copy } from "https://deno.land/std@0.193.0/streams/mod.ts"
+export { copy } from "https://deno.land/std@0.195.0/streams/mod.ts"
 // core - process
-export { StringReader } from "https://deno.land/std@0.193.0/io/string_reader.ts"
-export { readLines } from "https://deno.land/std@0.193.0/io/mod.ts"
+export { StringReader } from "https://deno.land/std@0.195.0/io/string_reader.ts"
+export { readLines } from "https://deno.land/std@0.195.0/io/mod.ts"
 // service installer, release tool
-export { existsSync } from "https://deno.land/std@0.193.0/fs/mod.ts"
+export { existsSync } from "https://deno.land/std@0.195.0/fs/mod.ts"
 // ipc
-export { debounce } from "https://deno.land/std@0.193.0/async/mod.ts"
-export { basename, dirname, join, resolve } from "https://deno.land/std@0.193.0/path/mod.ts"
+export { debounce } from "https://deno.land/std@0.195.0/async/mod.ts"
+export { basename, dirname, join, resolve } from "https://deno.land/std@0.195.0/path/mod.ts"
 // upgrader
-export { gt, lt, parse as parseVersion } from "https://deno.land/std@0.193.0/semver/mod.ts"
-export type { SemVer } from "https://deno.land/std@0.193.0/semver/mod.ts"
+export { gt, lt, parse as parseVersion } from "https://deno.land/std@0.195.0/semver/mod.ts"
+export type { SemVer } from "https://deno.land/std@0.195.0/semver/mod.ts"
 
 /**
  * Third party dependencies

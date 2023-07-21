@@ -10,6 +10,17 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.5] - Unreleased
+
+- feat(process): Make process/cluster .stop async
+- fix(process): Make .start() return false if process/cluster is blocked
+- fix(cluster): Do not autostart cluster instances by default
+- fix(cluster): Make cluster status better reflect instance status, add status MIXED
+- fix(cluster): Set cluster status to blocked if all instances are blocked
+- chore: Improve test coverage
+- chore(build): Add coverage html report, serve automatically using std/http/file_server on task `check-coverage`
+- chore(deps): Update Deno std from `0.193.0` to `0.195.0`
+
 ## [1.0.0-rc.4] - 2023-07-18
 
 - fix(process): Unref forced termination timer by passing `persistant: false` to delay, to prevent it for keeping the main process alive for the full duration of the timeout

@@ -82,3 +82,39 @@ Deno.test({
     assertEquals(fileExistsResult, false)
   },
 })
+
+Deno.test({
+  name: "FileIPC - close leaves IPC file when leaveFile option is true",
+  async fn() {
+    const fileIPC = new FileIPC(TEST_FILE_PATH)
+    await fileIPC.sendData("test data")
+    await fileIPC.close(true)
+    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    assertEquals(fileExistsResult, true)
+    await Deno.remove(TEST_FILE_PATH)
+  },
+})
+
+Deno.test({
+  name: "FileIPC - close leaves IPC file when leaveFile option is true",
+  async fn() {
+    const fileIPC = new FileIPC(TEST_FILE_PATH)
+    await fileIPC.sendData("test data")
+    await fileIPC.close(true)
+    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    assertEquals(fileExistsResult, true)
+    await Deno.remove(TEST_FILE_PATH)
+  },
+})
+
+Deno.test({
+  name: "FileIPC - close leaves IPC file when leaveFile option is true",
+  async fn() {
+    const fileIPC = new FileIPC(TEST_FILE_PATH)
+    await fileIPC.sendData("test data")
+    await fileIPC.close(true)
+    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    assertEquals(fileExistsResult, true)
+    await Deno.remove(TEST_FILE_PATH)
+  },
+})
