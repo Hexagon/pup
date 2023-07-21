@@ -10,7 +10,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.5] - Unreleased
+## [1.0.0-rc.5] - 2023-07-22
 
 - feat(process): Make process/cluster .stop async
 - fix(process): Make .start() return false if process/cluster is blocked
