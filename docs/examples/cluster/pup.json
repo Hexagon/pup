@@ -3,6 +3,7 @@
     {
       "id": "cluster-example",
       "cmd": "deno run -A app.ts",
+      "autostart": true,
       "cluster": {
         "instances": 3,
         "commonPort": 3456,

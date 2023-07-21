@@ -22,6 +22,7 @@ Example available in the GitHub Repository at [/docs/examples/cluster](https://g
     {
       "id": "my-scalable-app",
       "cmd": "deno run --allow-net server.ts",
+      "autostart": true,
       "cluster": {
         "instances": 4,
         "commonPort": 3000,
@@ -37,6 +38,7 @@ In this example, Pup will start 4 instances of the process with the ID `my-scala
 
 - `id`: A unique identifier for the process.
 - `cmd`: The command to run
+- `autostart`: Autostart the cluster
 - `cluster`: An object containing the settings for the cluster of processes
   - `instances`: The number of instances to be started for the process.
   - `startPort`: The starting port number for the individual process instances.
