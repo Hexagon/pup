@@ -2,6 +2,8 @@
  * Exports helper functions to print standardised messages
  * Belongs to Pup cli entrypoint
  *
+ * Logic is separated from side effects (in this case `console.log` for testability)
+ *
  * @file      lib/cli/output.ts
  * @license   MIT
  */
@@ -9,16 +11,15 @@
 import { Application } from "../../application.meta.ts"
 import { Column, Columns, TableRow } from "./columns.ts"
 
-export function printHeader() {
-  console.log(Application.name + " " + Application.version)
-  console.log(Application.repository)
+export function createHeaderMessage() {
+  return Application.name + " " + Application.version + "\n" + Application.repository
 }
 
-export function printUsage() {
-  console.log(`Usage: ${Application.name} [OPTIONS...]`)
+export function createUsageMessage() {
+  return `Usage: ${Application.name} [OPTIONS...]`
 }
 
-export function printFlags(externalInstaller: boolean) {
+export function createFlagsMessage(externalInstaller: boolean): string {
   const rows: TableRow[] = []
   rows.push(
     { short: "-h", long: "help", description: "Display this help and exit" },
@@ -111,5 +112,18 @@ export function printFlags(externalInstaller: boolean) {
     { key: "description" },
   ]
 
-  console.log(Columns(rows, columns))
+  // All your previous code for building rows and columns, finally:
+  return Columns(rows, columns)
+}
+
+export function printHeader() {
+  console.log(createHeaderMessage())
+}
+
+export function printUsage() {
+  console.log(createUsageMessage())
+}
+
+export function printFlags(externalInstaller: boolean) {
+  console.log(createFlagsMessage(externalInstaller))
 }

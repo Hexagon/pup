@@ -235,11 +235,7 @@ Deno.test("printHeader should output the name, version, and repository of the ap
   printHeader()
   assertEquals(
     consoleSpy.calls[0].args[0],
-    `${expectedName} ${Application.version}`,
-  )
-  assertEquals(
-    consoleSpy.calls[1].args[0],
-    expectedRepository,
+    `${expectedName} ${Application.version}\n${expectedRepository}`,
   )
   consoleSpy.restore()
 })
