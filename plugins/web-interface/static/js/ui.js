@@ -48,7 +48,7 @@ export async function changeLogScope(processId) {
 
   let sanitizedId
 
-  if (processId) {
+  if (processId && processId !== "core") {
     sanitizedId = sanitizeId(processId)
 
     // Show actions
@@ -102,6 +102,9 @@ function clearLogs() {
  * @param {boolean} [initial] - Add entries first.
  */
 function addLog(log, initial) {
+  // Check if the log's process ID matches the currently selected process ID
+  if (processSelector.get() && log.processId !== processSelector.get()) return
+
   const logsDiv = document.getElementById("logs")
   let logsHtml = `<pre class="${log.processId}">${new Date(log.timeStamp).toLocaleString()} | ${log.category} | ${log.severity} > ${ansiToHtml(log.text)}\n</pre>`
   if (initial) {

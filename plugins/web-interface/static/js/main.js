@@ -34,6 +34,11 @@ async function main() {
       changeLogScope()
     })
 
+    document.getElementById("toolbar-core-process").addEventListener("click", async () => {
+      // Change to the global scope by passing nothing
+      changeLogScope("core")
+    })
+
     // Update instance information every 10th second, and immediately
     setInterval(async () => {
       updateInstance(await fetchInstance(), await fetchProcesses())

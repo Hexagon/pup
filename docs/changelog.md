@@ -10,6 +10,13 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.6] - Unreleased
+
+- fix(web-interface): Only display logs from selected process
+- feature(web-interface): Add button to show logs for core process
+- chore(deps): Update Deno std from `0.195.0` to `0.196.0`
+- chore(deps): Update [croner](https://github.com/hexagon/croner) from `6.0.6` to `6.0.7`
+
 ## [1.0.0-rc.5] - 2023-07-22
 
 - feat(process): Make process/cluster .stop async

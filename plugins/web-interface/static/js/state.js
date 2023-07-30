@@ -6,7 +6,7 @@
 
 class ProcessSelector {
   constructor() {
-    this.selectedProcessId = null
+    this.selectedProcessId = undefined
   }
   set(id) {
     this.selectedProcessId = id
