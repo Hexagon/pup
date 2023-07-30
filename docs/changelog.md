@@ -10,7 +10,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.6] - Unreleased
+## [1.0.0-rc.6] - 2023-07-30
 
 - fix(web-interface): Only display logs from selected process
 - feature(web-interface): Add button to show logs for core process
