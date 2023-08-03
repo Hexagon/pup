@@ -10,6 +10,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.7] - Unreleasted
+
+- fix(configuration): Allow any value under configuration path `plugins.options`, update json schema.
+
 ## [1.0.0-rc.6] - 2023-07-30
 
 - fix(web-interface): Only display logs from selected process

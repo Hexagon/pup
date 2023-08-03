@@ -109,7 +109,7 @@ const ConfigurationSchema = z.object({
     z.array(
       z.object({
         url: z.string(),
-        options: z.optional(z.object({})),
+        options: z.optional(z.any()),
       }),
     ),
   ),

@@ -95,11 +95,7 @@
               "url": {
                 "type": "string"
               },
-              "options": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
-              }
+              "options": {}
             },
             "required": [
               "url"
