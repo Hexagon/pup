@@ -419,7 +419,7 @@ class Pup {
     if (message.data) {
       try {
         const parsedMessage = JSON.parse(message.data)
-        const response = this.handleInstruction(message)
+        const response = await this.handleInstruction(message)
 
         // If senderUuid is set, send response back to sender
         if (parsedMessage.senderUuid && uuid.v4.validate(parsedMessage.senderUuid)) {
