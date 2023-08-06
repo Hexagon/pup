@@ -280,9 +280,13 @@ class Process {
       persistent: true,
     }
     delay((this.config.terminateGracePeriod ?? this.pup.configuration.terminateGracePeriod ?? 0) * 1000, graceDelayOptions).then(() => {
-      this.pup.logger.log("stopping", `Stopping process, reason: ${reason}`, this.config)
-      // ToDo, send SIGTERM or SIGINT instead of SIGKILL as soon as Dax supports it
-      return this.killRunner(reason)
+      if (Deno.build.os == "windows") {
+        // On Windows, SIGTERM kills the process because Windows can't handle signals without cumbersome workarounds: https://stackoverflow.com/questions/35772001/how-to-handle-a-signal-sigint-on-a-windows-os-machine#35792192
+        this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
+      } else {
+        this.pup.logger.log("stopping", `Stopping process, reason: ${reason}`, this.config)
+      }
+      this.killRunner(reason, "SIGTERM")
     }).catch(() => false)
 
     // Kill process after `terminateTimeout`
@@ -293,7 +297,7 @@ class Process {
     }
     delay((this.config.terminateTimeout ?? this.pup.configuration.terminateTimeout ?? 30) * 1000, terminateDelayOptions).then(() => {
       this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
-      return this.killRunner(reason)
+      return this.killRunner(reason, "SIGKILL")
     }).catch(() => false)
 
     const finished = new Promise<boolean>((resolve) => {
@@ -316,11 +320,12 @@ class Process {
   /**
    * Kills the current runner and performs cleanup.
    * @param {string} reason - The reason for killing the runner.
+   * @param {Deno.Signal} signal - Signal to be sent to the process.
    * @returns {boolean} - Returns true if the runner was killed successfully, false otherwise.
    */
-  private killRunner = (reason: string): boolean => {
+  private killRunner = (reason: string, signal: Deno.Signal = "SIGTERM"): boolean => {
     if (this.runner) {
-      this.runner.kill()
+      this.runner.kill(signal)
       this.pup.logger.log("stop", `Process stopped, reason: ${reason}`, this.config)
       this.setStatus(ProcessState.STOPPING)
       this.restarts = 0
