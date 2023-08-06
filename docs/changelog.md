@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this section.
 ## [1.0.0-rc.7] - Unreleasted
 
 - fix(configuration): Allow any value under configuration path `plugins.options`, update json schema.
+- fix(process): Many CLI commands such as `start`, `stop` and `terminate` were returning "Action failed" even though they worked.
 
 ## [1.0.0-rc.6] - 2023-07-30
 
