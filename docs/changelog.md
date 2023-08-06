@@ -10,7 +10,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.7] - Unreleasted
+## [1.0.0-rc.7] - 2023-08-06
 
 - fix(configuration): Allow any value under configuration path `plugins.options`, update json schema.
 - fix(process): Many CLI commands such as `start`, `stop` and `terminate` were returning "Action failed" even though they worked.
