@@ -60,9 +60,9 @@ class Runner extends BaseRunner {
    *
    * @param signal The signal to use when killing the process.
    */
-  public kill(_signal?: Deno.Signal) {
+  public kill(signal: Deno.Signal = "SIGTERM") {
     try {
-      this.process?.abort() // Note: the abort method does not accept a signal parameter.
+      this.process?.kill(signal)
     } catch (_e) {
       // Ignore
     }
