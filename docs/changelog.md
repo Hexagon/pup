@@ -11,6 +11,7 @@ nav_order: 13
 All notable changes to this project will be documented in this section.
 
 ## [1.0.0-rc.8] - Unreleased
+
 - feature(process): Now that [Dax 0.34.0](https://github.com/dsherret/dax/releases/tag/0.34.0) supports it, send `SIGTERM` instead of `SIGKILL` to terminate processes.
 
 ## [1.0.0-rc.7] - 2023-08-06
