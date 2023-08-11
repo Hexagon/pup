@@ -4,7 +4,7 @@
 
 Pup is a powerful universal process manager developed with Deno, designed to keep your applications and services alive.
 
-_For detailed documentation, visit [hexagon.github.io/pup](https://hexagon.github.io/pup)._
+_For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 
 ## Key Features
 
@@ -32,7 +32,7 @@ deno run -Ar https://deno.land/x/pup/pup.ts setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
-channels [here](https://hexagon.github.io/pup/installation.html#release-channels).
+channels [here](https://pup.56k.guru/installation.html#release-channels).
 
 ### Configuration
 
@@ -53,7 +53,7 @@ channels [here](https://hexagon.github.io/pup/installation.html#release-channels
 
    `pup install --name my-service`
 
-For the full manual, see <https://hexagon.github.io/pup>
+For the full manual, see <https://pup.56k.guru>
 
 #### Single command example
 
@@ -83,14 +83,14 @@ Each channel serves different purposes, so choose the one that best fits your ne
 
 ## Contributions and Development
 
-Contributions to Pup are very welcome! Please read [the contributing section](https://hexagon.github.io/pup/contributing.html) of the manual, fork the repository, make your changes, and submit a pull
+Contributions to Pup are very welcome! Please read [the contributing section](https://pup.56k.guru/contributing.html) of the manual, fork the repository, make your changes, and submit a pull
 request.
 
 We appreciate all feedback and contributions that help make Pup better!
 
 ### Examples of areas that need extra attention right now
 
-- **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://hexagon.github.io/pup/examples/plugins/README.html> to
+- **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://pup.56k.guru/examples/plugins/README.html> to
   get started on plugin development in general. See <https://github.com/Hexagon/pup/blob/main/plugins/web-interface/README.md> for instructions on how to rebuild the web-interface.
 - **Testing**: Pup needs to be thoroughly tested; help out by using and testing it in various scenarios. Report any issues you encounter.
 - **Reading**: Review the documentation and report any issues or areas for improvement.
