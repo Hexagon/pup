@@ -83,15 +83,14 @@ Each channel serves different purposes, so choose the one that best fits your ne
 
 ## Contributions and Development
 
-Contributions to Pup are very welcome! Please read [the contributing section](https://pup.56k.guru/contributing.html) of the manual, fork the repository, make your changes, and submit a pull
-request.
+Contributions to Pup are very welcome! Please read [the contributing section](https://pup.56k.guru/contributing.html) of the manual, fork the repository, make your changes, and submit a pull request.
 
 We appreciate all feedback and contributions that help make Pup better!
 
 ### Examples of areas that need extra attention right now
 
-- **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://pup.56k.guru/examples/plugins/README.html> to
-  get started on plugin development in general. See <https://github.com/Hexagon/pup/blob/main/plugins/web-interface/README.md> for instructions on how to rebuild the web-interface.
+- **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://pup.56k.guru/examples/plugins/README.html> to get
+  started on plugin development in general. See <https://github.com/Hexagon/pup/blob/main/plugins/web-interface/README.md> for instructions on how to rebuild the web-interface.
 - **Testing**: Pup needs to be thoroughly tested; help out by using and testing it in various scenarios. Report any issues you encounter.
 - **Reading**: Review the documentation and report any issues or areas for improvement.
 - **Bugfixes**: Find bugs, report them, and optionally create a PR to fix the issue.
