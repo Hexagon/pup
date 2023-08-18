@@ -187,7 +187,7 @@ export class Plugin {
     }
   }
   async terminate() {
-    await this.impl?.cleanup()
+    if (this.impl?.cleanup) await this.impl?.cleanup()
   }
 }
 

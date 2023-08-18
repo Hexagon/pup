@@ -11,7 +11,7 @@
 
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-net=deno.land,cdn.deno.land https://deno.land/x/udd/main.ts --dry-run deno.json deps.ts test/deps.ts plugins/web-interface/deps.ts",
-    "check": "deno fmt --check && deno lint && deno check pup.ts --unstable && deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --unstable --coverage=cov_profile && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",
+    "check": "deno fmt --check && deno lint && deno check pup.ts --unstable && deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --unstable --coverage=cov_profile && echo \"Generating coverage\" && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",
     "check-coverage": "deno task check && genhtml cov_profile.lcov --output-directory cov_profile/html && lcov --list cov_profile.lcov && deno run --allow-net --allow-read https://deno.land/std/http/file_server.ts cov_profile/html",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env --unstable tools/release.ts && deno fmt",
