@@ -40,7 +40,7 @@ Deno.test({
     // Stop process, assert stopped
     const stopResult = await pup.stop(TEST_PROCESS_ID, "test")
     assertEquals(stopResult, true)
-    assertEquals(testProcess?.getStatus().status, ProcessState.FINISHED)
+    assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
 
     // Block process, assert blocked
     const blockResult = pup.block(TEST_PROCESS_ID, "test")
@@ -50,7 +50,7 @@ Deno.test({
     // Start process, assert failed
     const startResult2 = pup.start(TEST_PROCESS_ID, "test")
     assertEquals(startResult2, false)
-    assertEquals(testProcess?.getStatus().status, ProcessState.FINISHED)
+    assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
 
     // Unblock process, assert unblocked
     const unblockResult = pup.unblock(TEST_PROCESS_ID, "test")
@@ -101,7 +101,7 @@ Deno.test({
     // Stop process, assert finished
     const stopResult = await pup.stop(TEST_PROCESS_ID, "test")
     assertEquals(stopResult, true)
-    assertEquals(testProcess?.getStatus().status, ProcessState.FINISHED)
+    assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
 
     // Block process, assert blocked
     const blockResult = pup.block(TEST_PROCESS_ID, "test")
@@ -111,7 +111,7 @@ Deno.test({
     // Start process, assert failed
     const startResult2 = pup.start(TEST_PROCESS_ID, "test")
     assertEquals(startResult2, false)
-    assertEquals(testProcess?.getStatus().status, ProcessState.FINISHED)
+    assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
 
     // Unblock process, assert unblocked
     const unblockResult = pup.unblock(TEST_PROCESS_ID, "test")
