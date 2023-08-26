@@ -108,6 +108,9 @@ export class PupTelemetry {
 
       // Read incoming messages
       for await (const messages of this.ipc.receiveData()) {
+        // Break out of the loop if aborted
+        if (this.aborted) break
+
         if (messages.length > 0) {
           // Process messages and emit events
           for (const message of messages) {

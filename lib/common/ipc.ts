@@ -49,6 +49,9 @@ export class FileIPC {
    * from the extractMessages call are then added to the messageQueue to be consumed by the receiveData generator.
    */
   private async startWatching() {
+    // Stop if aborted
+    if (this.aborted) return
+
     // Create directory if it doesn't exist
     await Deno.mkdir(this.dirPath, { recursive: true })
 
@@ -61,6 +64,9 @@ export class FileIPC {
     // Watch the directory, not the file
     this.watcher = Deno.watchFs(this.dirPath)
     for await (const event of this.watcher) {
+      // Stop if aborted
+      if (this.aborted) break
+
       // Check that the event pertains to the correct file
       if (event.kind === "modify" && event.paths.includes(join(this.dirPath, this.fileName))) {
         debounce(async () => {

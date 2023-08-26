@@ -10,6 +10,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.9] - 2023-08-23
+
+- fix(telemetry): Fixes issue where telemetry kept child process running even after calling `.close()` on the telemetry instance.
+
 ## [1.0.0-rc.8] - 2023-08-23
 
 - feature(process): Now that [Dax 0.34.0](https://github.com/dsherret/dax/releases/tag/0.34.0) supports it, send `SIGTERM` instead of `SIGKILL` to terminate processes.
