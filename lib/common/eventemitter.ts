@@ -52,6 +52,10 @@ class EventEmitter {
       }
     }
   }
+
+  close() {
+    this.listeners.clear()
+  }
 }
 
 export { EventEmitter }

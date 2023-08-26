@@ -167,10 +167,13 @@ export class PupTelemetry {
       const message = { event, eventData }
 
       // Send the message to the target process
-      await ipc.sendData(JSON.stringify(message))
-
-      // Close the temporary IPC
-      ipc.close(true)
+      try {
+        await ipc.sendData(JSON.stringify(message))
+      } finally {
+        // Close the temporary IPC
+        ipc.close(true)
+      }
+      
     } else {
       // Ignore, process not run by Pup?
     }
@@ -186,5 +189,7 @@ export class PupTelemetry {
     if (this.ipc) {
       this.ipc.close()
     }
+
+    this.events.close()
   }
 }
