@@ -173,7 +173,6 @@ export class PupTelemetry {
         // Close the temporary IPC
         ipc.close(true)
       }
-      
     } else {
       // Ignore, process not run by Pup?
     }
