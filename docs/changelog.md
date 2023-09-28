@@ -10,6 +10,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.10] - 2023-09-28
+
+- chore(deps): Full dependency update
+
 ## [1.0.0-rc.9] - 2023-08-23
 
 - fix(telemetry): Fixes issue where telemetry kept child process running even after calling `.close()` on the telemetry instance.

@@ -138,7 +138,9 @@ export async function upgrade(
   }
 
   // Determine version to install
-  const upgradeOrDowngradingAction = freshInstall ? "Installing" : (canaryInstall ? "Upgrading" : gt(Application.version, (requestedVersion as Version).version) ? "Downgrading" : "Upgrading")
+  const upgradeOrDowngradingAction = freshInstall
+    ? "Installing"
+    : (canaryInstall ? "Upgrading" : gt(parseVersion(Application.version), parseVersion((requestedVersion as Version).version)) ? "Downgrading" : "Upgrading")
 
   // If upgrading to a version that requires --unstable, alert the user
   if (unstableInstall) {
