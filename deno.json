@@ -2,11 +2,11 @@
   "fmt": {
     "lineWidth": 200,
     "semiColons": false,
-    "exclude": ["cov_profile"]
+    "exclude": ["cov_profile", "docs/_site"]
   },
 
   "lint": {
-    "exclude": ["plugins/web-interface/static/js", "cov_profile"]
+    "exclude": ["plugins/web-interface/static/js", "cov_profile", "docs/_site"]
   },
 
   "tasks": {

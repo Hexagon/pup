@@ -47,3 +47,5 @@ core
 # Test coverage
 cov_profile
 *.lcov
+# Lumocs generated site
+_site

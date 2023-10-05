@@ -1,0 +1,38 @@
+{
+  "metas": {
+    "title": "=title",
+    "site": "Pup - The Manual",
+    "lang": "en",
+    "description": "Universal Process Manager"
+  },
+  "substitute": {
+    "$PUP_VERSION": "1.0.0-rc.10"
+  },
+  "top_links": [
+    {
+      "icon": "fab fa-github",
+      "title": "GitHub Repsitory",
+      "url": "https://github.com/hexagon/croner"
+    },
+    {
+      "icon": "fas fa-cube",
+      "title": "Deno.land/x",
+      "url": "https://deno.land/x/pup"
+    },
+    {
+      "icon": "fab fa-npm",
+      "title": "NPM Library",
+      "url": "https://npmjs.com/package/pup"
+    }
+  ],
+  "nav_links": [
+    {
+      "title": "GitHub Repsitory",
+      "url": "https://github.com/hexagon/pup"
+    },
+    {
+      "title": "Deno.land/x",
+      "url": "https://deno.land/x/pup"
+    }
+  ]
+}
