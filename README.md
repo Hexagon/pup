@@ -1,6 +1,6 @@
 # Pup - Universal Process Manager
 
-![PUP](https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/resources/pup_dark.png)
+![PUP](https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/src/resources/pup_dark.png)
 
 Pup is a powerful universal process manager developed with Deno, designed to keep your applications and services alive.
 
@@ -13,9 +13,9 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 - **Multiple start/restart policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
 - **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.
 - **Clustering and load balancing:** Seamlessly scale your applications with built-in clustering and load balancing capabilities.
-- **Plugins:** Extend Pup's functionality with custom plugins, such as the [Splunk HEC plugin](/docs/examples/splunk/README.md) for seamless integration with Splunk and the
-  [Web Interface plugin](/docs/examples/basic-webinterface/README.md) for an intuitive graphical user interface. Create your own plugins to add additional features and integrations tailored to your
-  needs.
+- **Plugins:** Extend Pup's functionality with custom plugins, such as the [Splunk HEC plugin](/docs/src/examples/splunk/README.md) for seamless integration with Splunk and the
+  [Web Interface plugin](/docs/src/examples/basic-webinterface/README.md) for an intuitive graphical user interface. Create your own plugins to add additional features and integrations tailored to
+  your needs.
 - **Process Telemetry and IPC:** Gain deeper insights into managed processes by gathering telemetry data, such as memory usage and current working directory, from Deno client processes. Supports
   inter-process communication for connected processes to interact with each other.
 
@@ -65,7 +65,7 @@ To achieve this, use `pup run` with `--cmd` and a start policy, for example `--a
 
 ## Example setups
 
-Full examples available at [/docs/examples](/docs/examples)
+Full examples available at [/docs/src/examples](/docs/src/examples)
 
 ## Release channels
 

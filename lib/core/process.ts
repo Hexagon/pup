@@ -89,6 +89,7 @@ class Process {
   private updated: Date = new Date()
   private pendingRestartReason?: string
   private telemetry?: TelemetryData
+  private watcher?: Watcher
 
   constructor(pup: Pup, config: ProcessConfiguration) {
     this.config = config
@@ -144,8 +145,6 @@ class Process {
     if (this.config.cron) this.setupCron()
     // Terminate using cron pattern
     if (this.config.terminate) this.setupCronTerminate()
-    // Restart on file/directory watcher
-    if (this.config.watch) this.setupWatch(this.config.watch)
     // Send initial process status
     this.pup.events.emit("process_status_changed", {
       old: null,
@@ -197,6 +196,9 @@ class Process {
     this.exited = undefined
     this.started = undefined
     this.telemetry = undefined
+
+    // Start watching
+    if (this.config.watch) this.setupWatch(this.config.watch)
 
     // Start process (await for it to exit)
     if (this.config.worker) {
@@ -266,6 +268,11 @@ class Process {
    * @returns {boolean} - Returns true if the process was stopped successfully, false otherwise.
    */
   public stop = async (reason: string): Promise<boolean> => {
+    // Stop the watcher
+    if (this.watcher) {
+      this.watcher.stop()
+    }
+
     if (!this.runner) {
       return false
     }
@@ -335,8 +342,8 @@ class Process {
   }
 
   /**
-   * Restarts the process.
-   * @param {string} reason - The reason for restarting the process.
+   * Stops the process.
+   * @param {string} reason - The reason for stopping the process.
    */
   public restart = (reason: string) => {
     this.stop(reason)
@@ -418,8 +425,8 @@ class Process {
 
   private setupWatch = async (paths: string[]) => {
     const config = this.pup.configuration.watcher
-    const watcher = new Watcher({ ...config, paths })
-    for await (const watchEvent of watcher) {
+    this.watcher = new Watcher({ ...config, paths })
+    for await (const watchEvent of this.watcher) {
       if (watchEvent.some((_) => _.type.includes("modify"))) {
         this.pup.logger.log("watcher", "File change detected", this.config)
         this.pup.events.emit("process_watch", {

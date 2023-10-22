@@ -8,15 +8,15 @@ nav_order: 3
 
 ---
 
-The example at [/docs/examples/basic-webinterface](https://github.com/Hexagon/pup/tree/main/docs/examples/basic-webinterface) borrows the server.ts and task.ts from the basic example. Both processes
-have logging configurations, with the second process having custom logger settings which enable the periodic process to write its logs to separate files.
+The example at [/docs/src/examples/basic-webinterface](https://github.com/Hexagon/pup/tree/main/docs/src/examples/basic-webinterface) borrows the server.ts and task.ts from the basic example. Both
+processes have logging configurations, with the second process having custom logger settings which enable the periodic process to write its logs to separate files.
 
 The web interface plugin is enabled by `pup.jsonc` and available at <http://localhost:5000/>
 
 ## Example Files
 
-- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/examples/basic/pup.jsonc) - Pup configuration, sets up `task.ts` to run at cron schedule `0/20 * * * * *` (every fifth second), and enables
-  web interface.
+- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/src/examples/basic/pup.jsonc) - Pup configuration, sets up `task.ts` to run at cron schedule `0/20 * * * * *` (every fifth second), and
+  enables web interface.
 
 ## Configuring
 
@@ -41,7 +41,7 @@ intallation, you **can not** use the `$VERSION` variable, and should give an abs
 
 ## Running the example
 
-`cd` to `/docs/examples/basic-webinterface` directory.
+`cd` to `/docs/src/examples/basic-webinterface` directory.
 
 Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 

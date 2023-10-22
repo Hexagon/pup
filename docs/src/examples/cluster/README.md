@@ -8,19 +8,19 @@ nav_order: 4
 
 ---
 
-The example at [/docs/examples/cluster](https://github.com/Hexagon/pup/tree/main/docs/examples/cluster) shows how to scale up an application using the clustering feature of Pup.
+The example at [/docs/src/examples/cluster](https://github.com/Hexagon/pup/tree/main/docs/src/examples/cluster) shows how to scale up an application using the clustering feature of Pup.
 
 Detailed documentation available at [5. Scaling applications](https://hexagon.github.io/pup/scaling).
 
 ## Files
 
-- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/examples/cluster/pup.jsonc) - Pup configuration, sets up a process with the cluster setting, and a load balancer using round-robin at port
-  `3456`
-- [app.ts](https://github.com/Hexagon/pup/tree/main/docs/examples/cluster/app.ts) - Demo http server, will be launched in three instances on ports `4000`,`4001`, and `4002`
+- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/src/examples/cluster/pup.jsonc) - Pup configuration, sets up a process with the cluster setting, and a load balancer using round-robin at
+  port `3456`
+- [app.ts](https://github.com/Hexagon/pup/tree/main/docs/src/examples/cluster/app.ts) - Demo http server, will be launched in three instances on ports `4000`,`4001`, and `4002`
 
 ## Running
 
-`cd` to `/docs/examples/cluster` directory.
+`cd` to `/docs/src/examples/cluster` directory.
 
 Run using command `pup run`
 

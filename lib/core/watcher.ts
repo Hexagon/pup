@@ -32,6 +32,7 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
   private match?: RegExp[] = []
   private skip?: RegExp[] = []
   private config: WatcherConfig
+  private stopWatching = false
 
   constructor(config: WatcherConfig = {}) {
     this.config = config
@@ -80,7 +81,7 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
 
   async *iterate(): AsyncIterator<FileEvent[]> {
     this.watch()
-    while (true) {
+    while (!this.stopWatching) {
       await this.signal
       yield Array.from(this.changes.entries()).map(([path, type]) => ({
         path,
@@ -95,6 +96,8 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
   }
 
   private async watch(): Promise<void> {
+    this.stopWatching = false
+
     let timer = 0
     const debounce = () => {
       clearTimeout(timer)
@@ -103,6 +106,10 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
 
     const run = async () => {
       for await (const event of Deno.watchFs(this.paths)) {
+        if (this.stopWatching) {
+          break // Exit the loop if stopWatching is true
+        }
+
         const { kind, paths } = event
         for (const path of paths) {
           if (this.isWatched(path)) {
@@ -113,10 +120,16 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
         }
       }
     }
+
     run()
-    while (true) {
+
+    while (!this.stopWatching) {
       debounce()
       await delay(this.interval)
     }
+  }
+
+  public stop() {
+    this.stopWatching = true
   }
 }

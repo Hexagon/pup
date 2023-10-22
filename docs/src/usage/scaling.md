@@ -11,7 +11,7 @@ nav_order: 4
 Pup supports scaling of processes using the `cluster` key in the process configuration. This manual will cover the configuration pattern, how application scaling works, the supported load balancing
 strategies, and how and when to use built in load balancing.
 
-Example available in the GitHub Repository at [/docs/examples/cluster](https://github.com/Hexagon/pup/tree/main/docs/examples/cluster)
+Example available in the GitHub Repository at [/docs/src/examples/cluster](https://github.com/Hexagon/pup/tree/main/docs/src/examples/cluster)
 
 ## Clustering
 

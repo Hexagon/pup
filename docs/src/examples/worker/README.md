@@ -8,18 +8,18 @@ nav_order: 8
 
 ---
 
-The example at [/docs/examples/kept-alive-worker-server](https://github.com/Hexagon/pup/tree/main/docs/examples/worker) runs a Deno server script as a continuously monitored and restarted process
-using a worker. The process has logging configurations to write logs to separate files.
+The example at [/docs/src/examples/kept-alive-worker-server](https://github.com/Hexagon/pup/tree/main/docs/src/examples/worker) runs a Deno server script as a continuously monitored and restarted
+process using a worker. The process has logging configurations to write logs to separate files.
 
 ## Files
 
-- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/examples/worker/pup.jsonc) - Pup configuration, sets up `server.js` to be kept alive forever and restarts with a 10 seconds delay.
-- [server.js](https://github.com/Hexagon/pup/tree/main/docs/examples/worker/server.js) - Worker server script that runs an HTTP server. It sends log messages and exit signals through the logger
+- [pup.jsonc](https://github.com/Hexagon/pup/tree/main/docs/src/examples/worker/pup.jsonc) - Pup configuration, sets up `server.js` to be kept alive forever and restarts with a 10 seconds delay.
+- [server.js](https://github.com/Hexagon/pup/tree/main/docs/src/examples/worker/server.js) - Worker server script that runs an HTTP server. It sends log messages and exit signals through the logger
   facility.
 
 ## Running
 
-`cd` to `/docs/examples/worker` directory.
+`cd` to `/docs/src/examples/worker` directory.
 
 Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 

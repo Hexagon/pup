@@ -165,7 +165,7 @@ To change default behavior of the global watcher, use the following properties w
 ### Plugins
 
 > **Note**: If you are interested in developing a custom plugin, there is a [guide](/pup/examples/plugins/README.html) and
-> [example](https://github.com/Hexagon/pup/blob/main/docs/examples/plugins/log-interceptor.ts) available. { .note }
+> [example](https://github.com/Hexagon/pup/blob/main/docs/src/examples/plugins/log-interceptor.ts) available. { .note }
 
 To activate plugins, add your plugins to the configuration using this pattern:
 
