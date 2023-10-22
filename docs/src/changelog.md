@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.11] - 2023-10-22
+
+- chore(deps): Full dependency update
+- fix(core): Fix issue #45 where watcher refused to stop
+- fix(docs): Fix broken links
+
 ## [1.0.0-rc.10] - 2023-09-28
 
 - chore(deps): Full dependency update
