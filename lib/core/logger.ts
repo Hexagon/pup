@@ -7,7 +7,7 @@
  */
 
 import { stripColor } from "../../deps.ts"
-import { GlobalLoggerConfiguration, ProcessConfiguration } from "./configuration.ts"
+import { GlobalLoggerConfiguration, KV_SIZE_LIMIT_BYTES, ProcessConfiguration } from "./configuration.ts"
 
 export interface LogEvent {
   severity: string
@@ -92,23 +92,31 @@ class Logger {
     // Write to persistent log store (if a name is supplied and internal logging is enabled)
     const logHours = this.config.internalLogHours === undefined ? 72 : this.config.internalLogHours
     if (this.storeName && logHours > 0) {
-      // Ignore errors when writing to log store
-      try {
-        const logObj: LogEventData = {
-          severity,
-          category,
-          text,
-          processId: initiator,
-          timeStamp,
+      const textBytes = new TextEncoder().encode(text)
+      const store = await Deno.openKv(this.storeName)
+      let i = 0, offset = 0
+      while (offset < textBytes.length) {
+        // Give 6000 bytes margin to make it less likely that the full serialized object exceeds the KV limit
+        const slice = textBytes.subarray(offset, offset + KV_SIZE_LIMIT_BYTES - 6000)
+        // Ignore errors when writing to log store
+        try {
+          const logObj: LogEventData = {
+            severity,
+            category,
+            text: new TextDecoder().decode(slice),
+            processId: initiator,
+            timeStamp: timeStamp + i,
+          }
+          await store.set(["logs_by_time", timeStamp + i], logObj)
+          await store.set(["logs_by_process", initiator, timeStamp + i], logObj)
+          await store.set(["logs_by_process_lookup", timeStamp + i], ["logs_by_process", initiator, timeStamp + i])
+          i++
+        } catch (error) {
+          console.error(`Failed to write log to store '${this.storeName}' due to '${error.message}'. The following message was not logged: ${text}.`)
         }
-        const store = await Deno.openKv(this.storeName)
-        await store.set(["logs_by_time", timeStamp], logObj)
-        await store.set(["logs_by_process", initiator, timeStamp], logObj)
-        await store.set(["logs_by_process_lookup", timeStamp], ["logs_by_process", initiator, timeStamp])
-        store.close()
-      } catch (error) {
-        console.error(`Failed to write log to store '${this.storeName}' due to '${error.message}'. The following message was not logged: ${text}.`)
+        offset += KV_SIZE_LIMIT_BYTES - 6000
       }
+      store.close()
     }
 
     // Delegate to attached logger if there is one

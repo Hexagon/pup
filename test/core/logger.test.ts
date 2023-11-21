@@ -1,4 +1,4 @@
-import { assertEquals } from "../deps.ts"
+import { assertEquals, assertGreater } from "../deps.ts"
 import { AttachedLogger, LogEventData, Logger } from "../../lib/core/logger.ts"
 import { ProcessConfiguration } from "../../mod.ts"
 
@@ -48,6 +48,37 @@ Deno.test("Logger - Logging with Different Methods", () => {
   logger.error("test", "Testing error method")
 
   assertEquals(true, true) // This is just to assert that the test passed if no errors are thrown
+})
+
+Deno.test("Logger - Logging Line Larger than KV Limit", async () => {
+  const tempStore = Deno.makeTempFileSync()
+  const logger = new Logger({ console: false }, tempStore)
+
+  let chars = 60000
+  let data = ""
+  while (chars--) {
+    data += "國"
+  }
+  await logger.log("test", data)
+  assertGreater(Deno.statSync(tempStore).size, 200_000)
+
+  chars = 70000
+  data = ""
+  while (chars--) {
+    data += "a"
+  }
+  await logger.log("test", data)
+  assertGreater(Deno.statSync(tempStore).size, 400_000)
+
+  chars = 50000
+  data = ""
+  while (chars--) {
+    data += "👨‍👩‍👧‍👦"
+  }
+  await logger.log("test", data)
+  assertGreater(Deno.statSync(tempStore).size, 2_000_000)
+
+  await Deno.remove(tempStore)
 })
 
 Deno.test("Logger - File Writing with writeFile Method", async () => {

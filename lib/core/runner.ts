@@ -82,9 +82,9 @@ class Runner extends BaseRunner {
         const r = new StringReader(new TextDecoder().decode(chunk))
         for await (const line of readLines(r)) {
           if (category === "stderr") {
-            logger.error(category, line, this.processConfig)
+            await logger.error(category, line, this.processConfig)
           } else {
-            logger.log(category, line, this.processConfig)
+            await logger.log(category, line, this.processConfig)
           }
         }
       }

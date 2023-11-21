@@ -9,6 +9,11 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.12] - Unreleased
+
+- fix(logger): Store (sliced) log lines larger than Deno's KV limit of 64KiB
+- fix(logger): Guarantee that log messages are stored in chronological order per process
+
 ## [1.0.0-rc.11] - 2023-10-22
 
 - chore(deps): Full dependency update

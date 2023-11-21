@@ -12,6 +12,7 @@ export const MAINTENANCE_INTERVAL_MS = 900_000
 export const WATCHDOG_INTERVAL_MS = 1_000
 export const APPLICATION_STATE_WRITE_LIMIT_MS = 20_000
 export const LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S = 60
+export const KV_SIZE_LIMIT_BYTES = 65_536
 
 interface Configuration {
   logger?: GlobalLoggerConfiguration
