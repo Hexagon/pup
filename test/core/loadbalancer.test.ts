@@ -38,6 +38,9 @@ class MockConn implements Deno.Conn {
   upgrade(): Promise<Deno.FsFile> {
     return Promise.resolve(new Deno.FsFile(this.rid))
   }
+  [Symbol.dispose](): void {
+    this.close()
+  }
 }
 
 Deno.test("LoadBalancer - Initialization", () => {
