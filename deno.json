@@ -17,5 +17,6 @@
     "build-versions": "deno run --allow-read --allow-write --allow-env --unstable tools/release.ts && deno fmt",
     "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts --bundle static static/bundle.json && deno fmt",
     "build": "deno task check && deno task build-schema && deno task build-webinterface && deno task build-versions"
-  }
+  },
+  "imports": { "@cross/utils": "jsr:@cross/utils@^0.8.0" }
 }

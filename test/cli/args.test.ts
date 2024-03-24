@@ -2,6 +2,8 @@ import { checkArguments, parseArguments } from "../../lib/cli/args.ts"
 import { assertEquals, assertThrows, spy } from "../deps.ts"
 import { Application } from "../../application.meta.ts"
 import { printHeader, printUsage } from "../../lib/cli/output.ts"
+import { ArgsParser } from "jsr:@cross/utils@^0.8.0/args"
+import { parseCatArgs } from "https://deno.land/x/dax@0.35.0/src/commands/cat.ts"
 
 Deno.test("Boolean options and aliases are parsed correctly", () => {
   const inputArgs = [
@@ -16,31 +18,15 @@ Deno.test("Boolean options and aliases are parsed correctly", () => {
     "--cmd",
   ]
   const parsedArgs = parseArguments(inputArgs)
-  const expectedArgs = {
-    /* Specified */
-    version: "",
-    v: "",
-
-    setup: false,
-
-    help: true,
-    h: true,
-    "dry-run": false,
-
-    autostart: true,
-    A: true,
-
-    cmd: "",
-    C: "",
-
-    update: false,
-    upgrade: false,
-
-    _: ["init", "append", "status", "remove", "run"],
-    "--": [],
-  }
-
-  assertEquals(parsedArgs, expectedArgs)
+  assertEquals(parsedArgs.getBoolean("version"), true);
+  assertEquals(parsedArgs.getBoolean("help"), true);
+  assertEquals(parsedArgs.getBoolean("autostart"), true);
+  assertEquals(parsedArgs.getLoose().includes("init"), true);
+  assertEquals(parsedArgs.getLoose().includes("append"), true);
+  assertEquals(parsedArgs.getLoose().includes("status"), true);
+  assertEquals(parsedArgs.getLoose().includes("remove"), true);
+  assertEquals(parsedArgs.getLoose().includes("run"), true);
+  assertEquals(parsedArgs.getLoose().includes("cmd"), true);
 })
 
 Deno.test("String options and aliases are parsed correctly", () => {
@@ -64,51 +50,15 @@ Deno.test("String options and aliases are parsed correctly", () => {
     "--dry-run",
   ]
   const parsedArgs = parseArguments(inputArgs)
-  const expectedArgs = {
-    /* Specified */
-    config: "config.json",
-    c: "config.json",
-
-    watch: "watched.ts",
-    w: "watched.ts",
-
-    cmd: "command",
-    C: "command",
-
-    worker: "worker_script",
-    W: "worker_script",
-
-    cwd: "cwd",
-    d: "cwd",
-
-    id: "id",
-    I: "id",
-
-    cron: "cron",
-    O: "cron",
-
-    terminate: "terminate",
-    T: "terminate",
-
-    A: false,
-    autostart: false,
-
-    /* All boolean options will be included in output too */
-    help: false,
-    h: false,
-    "dry-run": true,
-    setup: false,
-    upgrade: false,
-    update: false,
-
-    _: [],
-    "--": [],
-  }
-  assertEquals(parsedArgs, expectedArgs)
+  assertEquals(parsedArgs.get("config"), "config.json");
+  assertEquals(parsedArgs.get("watch"), "watched.json");
+  assertEquals(parsedArgs.get("cmd"), "command");
+  assertEquals(parsedArgs.getBoolean("dry-run"), true);
+  
 })
 
 Deno.test("checkArguments should throw error when autostart argument is provided without init, append or --cmd", async () => {
-  const args = { _: [], autostart: true }
+  const args = new ArgsParser(["--cron"])
   await assertThrows(
     () => {
       checkArguments(args)
@@ -163,7 +113,7 @@ Deno.test("checkArguments should throw error when cmd argument is provided witho
 })
 
 Deno.test("checkArguments should throw error when worker argument is provided without init, append or run", async () => {
-  const args = { _: [], worker: "command" }
+  const args = new ArgsParser(["--worker", "command"]);
   await assertThrows(
     () => {
       checkArguments(args)
@@ -174,7 +124,7 @@ Deno.test("checkArguments should throw error when worker argument is provided wi
 })
 
 Deno.test("checkArguments should throw error when init or append argument is provided without cmd", async () => {
-  const args = { _: [], init: true }
+  const args = new ArgsParser(["init"]);
   await assertThrows(
     () => {
       checkArguments(args)

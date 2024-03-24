@@ -13,8 +13,6 @@
  * - Always use the same version of all imports from deno.land/std
  */
 // cli
-export { parse } from "https://deno.land/std@0.207.0/flags/mod.ts"
-export type { Args } from "https://deno.land/std@0.207.0/flags/mod.ts"
 export * as path from "https://deno.land/std@0.207.0/path/mod.ts"
 export * as uuid from "https://deno.land/std@0.207.0/uuid/mod.ts"
 // logger

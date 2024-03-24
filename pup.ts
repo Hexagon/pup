@@ -7,4 +7,4 @@
 
 import { main } from "./lib/cli/main.ts"
 
-main(Deno.args)
+main()

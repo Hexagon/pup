@@ -24,27 +24,36 @@ import { fileExists, toPersistentPath, toTempPath } from "../common/utils.ts"
 import { installService, jsonc, path, uninstallService } from "../../deps.ts"
 import { Logger } from "../core/logger.ts"
 
+import { args } from "@cross/utils/args"
+
 /**
  * Define the main entry point of the CLI application
  *
  * @private
  * @async
  */
-async function main(inputArgs: string[]) {
-  const args = parseArguments(inputArgs)
+async function main() {
+  const parsedArgs = parseArguments(args())
 
   // Extract base argument
-  const baseArgument = args._.length > 0 ? args._[0] : undefined
-  const secondaryBaseArgument = args._.length > 1 ? args._[1] : undefined
+  const baseArgument = parsedArgs.countLoose() ? parsedArgs.getLoose()[0] : undefined
+  const secondaryBaseArgument = parsedArgs.countLoose() > 1 ? parsedArgs.getLoose()[1] : undefined
 
   /**
    * setup, upgrade
    */
-  const upgradeCondition = args.setup || baseArgument === "setup"
-  const setupCondition = args.upgrade || baseArgument === "upgrade" || baseArgument === "update"
+  const upgradeCondition = parsedArgs.get("setup") || baseArgument === "setup"
+  const setupCondition = parsedArgs.get("upgrade") || baseArgument === "upgrade" || baseArgument === "update"
   if (upgradeCondition || setupCondition) {
     try {
-      await upgrade(args.version, args.channel, args["unsafely-ignore-certificate-errors"], args["all-permissions"], args.local, setupCondition)
+      await upgrade(
+        parsedArgs.get("version"),
+        parsedArgs.get("channel"),
+        parsedArgs.get("unsafely-ignore-certificate-errors"),
+        parsedArgs.getBoolean("all-permissions"),
+        parsedArgs.getBoolean("local"),
+        setupCondition,
+      )
     } catch (e) {
       console.error(`Could not ${setupCondition ? "install" : "upgrade"} pup, error: ${e.message}`)
     }
@@ -55,7 +64,7 @@ async function main(inputArgs: string[]) {
   /**
    * version
    */
-  if (args.version !== undefined || baseArgument === "version") {
+  if (parsedArgs.get("version") !== undefined || baseArgument === "version") {
     printHeader()
     Deno.exit(0)
   }
@@ -63,10 +72,10 @@ async function main(inputArgs: string[]) {
   /**
    * help
    */
-  if (args.help || !baseArgument || baseArgument === "help") {
+  if (parsedArgs.get("help") || !baseArgument || baseArgument === "help") {
     printUsage()
     console.log("")
-    printFlags(args["external-installer"])
+    printFlags(parsedArgs.getBoolean("external-installer"))
     Deno.exit(0)
   }
 
@@ -75,7 +84,7 @@ async function main(inputArgs: string[]) {
    */
   let checkedArgs
   try {
-    checkedArgs = checkArguments(args)
+    checkedArgs = checkArguments(parsedArgs)
   } catch (e) {
     console.error(`Invalid combination of arguments: ${e.message}`)
     Deno.exit(1)
@@ -84,15 +93,15 @@ async function main(inputArgs: string[]) {
   // Extract command from arguments
   let cmd
   if (checkedArgs) {
-    if (checkedArgs.cmd) {
-      cmd = checkedArgs.cmd
-    } else if (checkedArgs["--"] && checkedArgs["--"].length > 0) {
-      cmd = checkedArgs["--"].join(" ")
+    if (checkedArgs.get("cmd")) {
+      cmd = checkedArgs.get("cmd")
+    } else if (checkedArgs.hasRest()) {
+      cmd = checkedArgs.getRest()
     }
   }
 
   // Extract worker from arguments
-  const worker = checkedArgs.worker
+  const worker = checkedArgs.get("worker")
 
   /**
    * Now either
@@ -104,7 +113,7 @@ async function main(inputArgs: string[]) {
   const useConfigFile = !runWithoutConfig
   let configFile
   if (useConfigFile) {
-    configFile = await findConfigFile(useConfigFile, checkedArgs.config, checkedArgs.cwd)
+    configFile = await findConfigFile(useConfigFile, checkedArgs.get("config"), checkedArgs.get("cwd"))
   }
 
   /**
@@ -116,26 +125,26 @@ async function main(inputArgs: string[]) {
       Deno.exit(1)
     }
 
-    const system = args.system
-    const name = args.name || "pup"
-    const config = args.config
-    const cwd = args.cwd
+    const system = parsedArgs.getBoolean("system")
+    const name = parsedArgs.get("name") || "pup"
+    const config = parsedArgs.get("config")
+    const cwd = parsedArgs.get("cwd")
     const cmd = `pup run ${config ? `--config ${config}` : ""}`
-    const user = args.user
-    const home = args.home
-    const env = args.env || []
+    const user = parsedArgs.get("user")
+    const home = parsedArgs.get("home")
+    const env = parsedArgs.getArray("env") || []
 
     try {
-      await installService({ system, name, cmd, cwd, user, home, env }, args["dry-run"])
+      await installService({ system, name, cmd, cwd, user, home, env }, parsedArgs.getBoolean("dry-run"))
       Deno.exit(0)
     } catch (e) {
       console.error(`Could not install service, error: ${e.message}`)
       Deno.exit(1)
     }
   } else if (baseArgument === "uninstall") {
-    const system = args.system
-    const name = args.name || "pup"
-    const home = args.home
+    const system = parsedArgs.getBoolean("system")
+    const name = parsedArgs.get("name") || "pup"
+    const home = parsedArgs.get("home")
 
     try {
       await uninstallService({ system, name, home })
@@ -157,7 +166,7 @@ async function main(inputArgs: string[]) {
       console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
       Deno.exit(1)
     } else {
-      await createConfigurationFile(fallbackedConfigFile, checkedArgs, cmd)
+      await createConfigurationFile(fallbackedConfigFile, checkedArgs, cmd!)
       console.log(`Configuration file '${fallbackedConfigFile}' created`)
       Deno.exit(0)
     }
@@ -170,8 +179,8 @@ async function main(inputArgs: string[]) {
    */
   if (baseArgument === "append") {
     if (configFile) {
-      await appendConfigurationFile(configFile, checkedArgs, cmd)
-      console.log(`Process '${args.id}' appended to configuration file '${configFile}'.`)
+      await appendConfigurationFile(configFile, checkedArgs, cmd!)
+      console.log(`Process '${parsedArgs.get("id")}' appended to configuration file '${configFile}'.`)
       Deno.exit(0)
     } else {
       console.log(`Configuration file '${configFile}' not found, use init if you want to create a new one. Exiting.`)
@@ -182,7 +191,7 @@ async function main(inputArgs: string[]) {
   if (baseArgument === "remove") {
     if (configFile) {
       await removeFromConfigurationFile(configFile, checkedArgs)
-      console.log(`Process '${args.id}' removed from configuration file '${configFile}'.`)
+      console.log(`Process '${parsedArgs.get("id")}' removed from configuration file '${configFile}'.`)
       Deno.exit(0)
     } else {
       console.log("Configuration file '${fallbackedConfigFile}' not found, use init if you want to create a new one. Exiting.")
@@ -221,16 +230,24 @@ async function main(inputArgs: string[]) {
       Deno.exit(1)
     }
   } else {
-    configuration = generateConfiguration(args.id || "task", cmd, args.cwd, args.cron, args.terminate, args.autostart, args.watch)
+    configuration = generateConfiguration(
+      parsedArgs.get("id") || "task",
+      cmd!,
+      parsedArgs.get("cwd"),
+      parsedArgs.get("cron"),
+      parsedArgs.get("terminate"),
+      parsedArgs.getBoolean("autostart"),
+      parsedArgs.get("watch"),
+    )
 
     // Change working directory to configuration file directory
-    if (args.cwd) {
+    if (parsedArgs.get("cwd")) {
       // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
       try {
-        const resolvedPath = path.parse(path.resolve(args.cwd))
+        const resolvedPath = path.parse(path.resolve(parsedArgs.get("cwd")!))
         Deno.chdir(resolvedPath.dir)
       } catch (e) {
-        console.error(`Could not change working directory to path specified by --cwd ${args.cwd}, exiting. Message: `, e.message)
+        console.error(`Could not change working directory to path specified by --cwd ${parsedArgs.get("cwd")}, exiting. Message: `, e.message)
         Deno.exit(1)
       }
     }
@@ -241,14 +258,14 @@ async function main(inputArgs: string[]) {
   if (baseArgument === "logs") {
     const logStore = `${await toPersistentPath(configFile as string)}/.main.log`
     const logger = new Logger(configuration.logger || {}, logStore)
-    const startTimestamp = args.start ? new Date(Date.parse(args.start)).getTime() : undefined
-    const endTimestamp = args.end ? new Date(Date.parse(args.end)).getTime() : undefined
-    const numberOfRows = args.n ? parseInt(args.n, 10) : undefined
-    let logs = await logger.getLogContents(args.id, startTimestamp, endTimestamp)
+    const startTimestamp = parsedArgs.get("start") ? new Date(Date.parse(parsedArgs.get("start")!)).getTime() : undefined
+    const endTimestamp = parsedArgs.get("end") ? new Date(Date.parse(parsedArgs.get("end")!)).getTime() : undefined
+    const numberOfRows = parsedArgs.get("n") ? parseInt(parsedArgs.get("n")!, 10) : undefined
+    let logs = await logger.getLogContents(parsedArgs.get("id"), startTimestamp, endTimestamp)
     logs = logs.filter((log) => {
       const { processId, severity } = log
-      const severityFilter = !args.severity || args.severity === "" || args.severity.toLowerCase() === severity.toLowerCase()
-      const processFilter = !args.id || args.id === "" || args.id.toLowerCase() === processId.toLowerCase()
+      const severityFilter = !parsedArgs.get("severity") || parsedArgs.get("severity") === "" || parsedArgs.get("severity")!.toLowerCase() === severity.toLowerCase()
+      const processFilter = !parsedArgs.get("id") || parsedArgs.get("id") === "" || parsedArgs.get("id")!.toLowerCase() === processId.toLowerCase()
       return severityFilter && processFilter
     })
     if (numberOfRows) {
