@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.14] - 2024-04-07
+
+- fix(loadbalancer): Fixes an issue with the loadbalancer introduced in `1.0.0-rc.13`
+
+### Fixes
+
 ## [1.0.0-rc.13] - 2024-04-06
 
 ### Important Changes

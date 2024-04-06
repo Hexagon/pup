@@ -119,19 +119,25 @@ export class LoadBalancer {
       const targetWritable = targetConn.writable
 
       // Pipe data from client to backend
-      await clientReadable.pipeTo(targetWritable)
+      const clientPipe = clientReadable.pipeTo(targetWritable)
 
       // Pipe data from backend to client (assuming bidirectional communication)
       const backendReadable = targetConn.readable
       const clientWritable = client.writable
-      await backendReadable.pipeTo(clientWritable)
+      const backendPipe = backendReadable.pipeTo(clientWritable)
+
+      await Promise.all([clientPipe, backendPipe])
     } catch (_err) {
       // Handle transport error if needed
       // logger("warn", "loadbalancer", "Proxy error:", err)
     } finally {
       this.updateBackendConnectionStatus(backend, false)
-      client.close()
-      targetConn.close()
+      try {
+        client.close()
+      } catch (_clientCloseErr) { /* Ignore */ }
+      try {
+        targetConn.close()
+      } catch (_targetCloseErr) { /* Ignore */ }
     }
   }
 
