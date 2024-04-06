@@ -6,7 +6,7 @@
  * @license MIT
  */
 
-import { deferred, delay, globToRegExp, relative } from "../../deps.ts"
+import { delay, globToRegExp, relative } from "../../deps.ts"
 
 type FileAction = "any" | "access" | "create" | "modify" | "remove" | "other"
 
@@ -24,7 +24,8 @@ export interface WatcherConfig {
 }
 
 export class Watcher implements AsyncIterable<FileEvent[]> {
-  private signal = deferred()
+  private signal: Promise<void> // Change deferred to Promise<void>
+  private signalResolver!: (value?: void | PromiseLike<void>) => void // Add a resolver
   private changes = new Map<string, FileAction[]>()
   private paths: string[] = []
   private interval = 350
@@ -37,6 +38,10 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
   constructor(config: WatcherConfig = {}) {
     this.config = config
     this.reload()
+    // Initialize signal
+    this.signal = new Promise((resolve) => {
+      this.signalResolver = resolve
+    })
   }
 
   reload(): void {
@@ -66,7 +71,10 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
 
   private reset(): void {
     this.changes.clear()
-    this.signal = deferred()
+    // Reset signal
+    this.signal = new Promise((resolve) => {
+      this.signalResolver = resolve
+    })
   }
 
   private verifyPath(path: string): string {
@@ -101,7 +109,9 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
     let timer = 0
     const debounce = () => {
       clearTimeout(timer)
-      timer = setTimeout(this.signal.resolve, this.interval)
+      timer = setTimeout(() => {
+        this.signalResolver()
+      }, this.interval)
     }
 
     const run = async () => {

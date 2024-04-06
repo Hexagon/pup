@@ -5,7 +5,6 @@
  * @license   MIT
  */
 
-import { copy } from "../../deps.ts"
 import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S } from "./configuration.ts"
 
 export enum BalancingStrategy {
@@ -116,13 +115,19 @@ export class LoadBalancer {
 
   private async handleProxyCommunication(client: Deno.Conn, targetConn: Deno.Conn, backend: InternalBackend): Promise<void> {
     try {
-      await Promise.all([
-        copy(client, targetConn),
-        copy(targetConn, client),
-      ])
+      const clientReadable = client.readable
+      const targetWritable = targetConn.writable
+
+      // Pipe data from client to backend
+      await clientReadable.pipeTo(targetWritable)
+
+      // Pipe data from backend to client (assuming bidirectional communication)
+      const backendReadable = targetConn.readable
+      const clientWritable = client.writable
+      await backendReadable.pipeTo(clientWritable)
     } catch (_err) {
       // Handle transport error if needed
-      // logger("warn","loadbalancer", "Proxy error:", err)
+      // logger("warn", "loadbalancer", "Proxy error:", err)
     } finally {
       this.updateBackendConnectionStatus(backend, false)
       client.close()

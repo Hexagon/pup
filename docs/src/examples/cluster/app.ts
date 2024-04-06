@@ -1,15 +1,12 @@
 const PORT = parseInt(Deno.env.get("PUP_CLUSTER_PORT") || "8000", 10)
 
-async function serveHttp(conn: Deno.Conn) {
-  const httpConn = Deno.serveHttp(conn)
-  for await (const requestEvent of httpConn) {
+function serveHttp(conn: Deno.Conn) {
+  Deno.serve(conn, () => {
     const body = `Response from HTTP webserver running on pup instance ${Deno.env.get("PUP_CLUSTER_INSTANCE")}.`
-    requestEvent.respondWith(
-      new Response(body, {
-        status: 200,
-      }),
-    )
-  }
+    return new Response(body, {
+      status: 200,
+    })
+  })
 }
 
 if (!isNaN(PORT)) {
