@@ -9,6 +9,25 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.14] - 2024-04-07
+
+- fix(loadbalancer): Fixes an issue with the loadbalancer introduced in `1.0.0-rc.13`
+
+### Fixes
+
+## [1.0.0-rc.13] - 2024-04-06
+
+### Important Changes
+
+- **Minimum Deno Version:** Pup now require Deno version `1.38.0` or later. If you're using an older version, you'll need to upgrade Deno before upgrading Pup.
+
+### Fixes
+
+- fix(core): The code has been updated to use `--unstable-kv` to maintain compatibility as `--unstable` is being phased out in Deno 2.0.
+- fix(cluster): The internal cluster server now uses `Deno.serve` instead of the deprecated `Deno.serveHttp` for alignment with current Deno practices.
+- chore(ci): Remove `--unstable` in CI and
+- chore(deps): Full dependency update. Replace `lt` with `lessThan`, `gt` with `greaterThan`, and `deferred` with native Promises.
+
 ## [1.0.0-rc.12] - 2023-11-22
 
 - fix(logger): Store (sliced) log lines larger than Deno's KV limit of 64KiB
@@ -96,8 +115,8 @@ Pup has now achieved enough stability to enter the Release Candidate phase. Here
 
 - A new maintenance loop was added to purge internal logs and status after a set number of hours.
 
-- Breaking changes were introduced with the move to Deno KV for storing internal states and logs. This transition required a fresh install of Pup and the use of the --unstable flag in Deno. If you're
-  upgrading from an early version, run `pup upgrade --channel prerelease` twice to make sure you're all good.
+- Breaking changes were introduced with the move to Deno KV for storing internal states and logs. This transition required a fresh install of Pup and the use of the --unstable-kv flag in Deno. If
+  you're upgrading from an early version, run `pup upgrade --channel prerelease` twice to make sure you're all good.
 
 - The load balancer module was enhanced with features for backend health tracking, error handling, and redirection.
 
@@ -106,8 +125,8 @@ Pup has now achieved enough stability to enter the Release Candidate phase. Here
 Moving forward, our focus will shift to bug hunting and overall stability improvements. We greatly appreciate any feedback from users during this final testing phase. Please be aware that while this
 release candidate is close to the final version, it might still contain some bugs.
 
-It's important to note that Pup can currently only operate with the --unstable flag. However, this is automatically managed by the installer/upgrader. As soon as Deno stabilizes KV, the --unstable
-flag will be automatically removed during the upgrade process.
+It's important to note that Pup can currently only operate with the --unstable-kv flag. However, this is automatically managed by the installer/upgrader. As soon as Deno stabilizes KV, the
+--unstable-kv flag will be automatically removed during the upgrade process.
 
 ## [1.0.0-beta.37] - 2023-07-01
 
@@ -144,12 +163,12 @@ flag will be automatically removed during the upgrade process.
 **A note on breaking changes**
 
 This release contains breaking changes. Starting from this version, Deno KV is used for storing internal states and logs. Deno KV is an experimental feature that requires Deno to run with the
-`--unstable` flag.
+`--unstable-kv` flag.
 
-You cannot update from a previous version using the built-in installer, as it would install Pup without the `--unstable` flag. Instead, please follow the instructions for a fresh install in the
+You cannot update from a previous version using the built-in installer, as it would install Pup without the `--unstable-kv` flag. Instead, please follow the instructions for a fresh install in the
 manual, and the old version of Pup will be overwritten.
 
-From now on, the upgrader will check your installed Deno version and the need for using `--unstable`, and it will act/suggest actions accordingly.
+From now on, the upgrader will check your installed Deno version and the need for using `--unstable-kv`, and it will act/suggest actions accordingly.
 
 Also not that the `stable` installation channel will be empty until the first stable release. From now on, you will have to pass `--channel prerelease` when using the `setup` or `upgrade` commands.
 

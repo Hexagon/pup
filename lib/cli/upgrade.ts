@@ -9,7 +9,7 @@
  */
 
 import { Application } from "../../application.meta.ts"
-import { gt, lt, parseVersion } from "../../deps.ts"
+import { greaterThan, lessThan, parseVersion } from "../../deps.ts"
 
 const VERSION_INVENTORY_URL = "https://deno.land/x/pup/versions.json"
 const LOCAL_VERSION_INVENTORY_FILE = "./versions.json"
@@ -46,7 +46,7 @@ function denoVersionCheck(requiredVersion: string | null): boolean {
   if (requiredVersion === null) return false
   const denoVersion = parseVersion(Deno.version.deno)
   const required = parseVersion(requiredVersion)
-  if (denoVersion !== null && required !== null && !lt(denoVersion, required)) {
+  if (denoVersion !== null && required !== null && !lessThan(denoVersion, required)) {
     return true
   } else {
     return false
@@ -66,7 +66,7 @@ export async function upgrade(
   // Determine the channel from the version if it's not specified
   if (version && !channelName) {
     const semver = parseVersion(version)
-    channelName = semver && semver.prerelease.length > 0 ? "prerelease" : "stable"
+    channelName = semver && semver.prerelease && semver.prerelease.length > 0 ? "prerelease" : "stable"
   }
 
   // Default channel to stable
@@ -140,7 +140,7 @@ export async function upgrade(
   // Determine version to install
   const upgradeOrDowngradingAction = freshInstall
     ? "Installing"
-    : (canaryInstall ? "Upgrading" : gt(parseVersion(Application.version), parseVersion((requestedVersion as Version).version)) ? "Downgrading" : "Upgrading")
+    : (canaryInstall ? "Upgrading" : greaterThan(parseVersion(Application.version), parseVersion((requestedVersion as Version).version)) ? "Downgrading" : "Upgrading")
 
   // If upgrading to a version that requires --unstable, alert the user
   if (unstableInstall) {
@@ -172,7 +172,7 @@ export async function upgrade(
     installCmd.push(ignoreCertificateErrorsString)
   }
   if (unstableInstall) {
-    installCmd.push("--unstable")
+    installCmd.push("--unstable-kv")
   }
   installCmd.push("-n", "pup")
   installCmd.push(canaryInstall ? versions.canary_url : (requestedVersion as Version).url)

@@ -25,7 +25,7 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 
 ### Installation
 
-To install Pup, open your terminal and execute the following command:
+To install Pup, make sure you have a fairly recent version of Deno installed (>=1.38.0), then open your terminal and execute the following command:
 
 ```bash
 deno run -Ar https://deno.land/x/pup/pup.ts setup --channel prerelease
