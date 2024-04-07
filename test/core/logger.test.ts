@@ -1,4 +1,4 @@
-import { assertEquals, assertGreater } from "../deps.ts"
+import { assertEquals, assertGreater } from "@std/assert"
 import { AttachedLogger, LogEventData, Logger } from "../../lib/core/logger.ts"
 import { ProcessConfiguration } from "../../mod.ts"
 

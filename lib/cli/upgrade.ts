@@ -9,7 +9,7 @@
  */
 
 import { Application } from "../../application.meta.ts"
-import { greaterThan, lessThan, parseVersion } from "../../deps.ts"
+import { greaterThan, lessThan, parse } from "@std/semver"
 
 const VERSION_INVENTORY_URL = "https://deno.land/x/pup/versions.json"
 const LOCAL_VERSION_INVENTORY_FILE = "./versions.json"
@@ -44,8 +44,8 @@ async function getVersions(local = false): Promise<Versions> {
 // Determine if the current Deno version meets the required version
 function denoVersionCheck(requiredVersion: string | null): boolean {
   if (requiredVersion === null) return false
-  const denoVersion = parseVersion(Deno.version.deno)
-  const required = parseVersion(requiredVersion)
+  const denoVersion = parse(Deno.version.deno)
+  const required = parse(requiredVersion)
   if (denoVersion !== null && required !== null && !lessThan(denoVersion, required)) {
     return true
   } else {
@@ -65,7 +65,7 @@ export async function upgrade(
 
   // Determine the channel from the version if it's not specified
   if (version && !channelName) {
-    const semver = parseVersion(version)
+    const semver = parse(version)
     channelName = semver && semver.prerelease && semver.prerelease.length > 0 ? "prerelease" : "stable"
   }
 
@@ -140,7 +140,7 @@ export async function upgrade(
   // Determine version to install
   const upgradeOrDowngradingAction = freshInstall
     ? "Installing"
-    : (canaryInstall ? "Upgrading" : greaterThan(parseVersion(Application.version), parseVersion((requestedVersion as Version).version)) ? "Downgrading" : "Upgrading")
+    : (canaryInstall ? "Upgrading" : greaterThan(parse(Application.version), parse((requestedVersion as Version).version)) ? "Downgrading" : "Upgrading")
 
   // If upgrading to a version that requires --unstable, alert the user
   if (unstableInstall) {

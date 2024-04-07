@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-import { path } from "../../deps.ts"
+import { parse, resolve } from "@std/path"
 
 /**
  * Check if a file exists.
@@ -64,8 +64,8 @@ export async function dirExists(dirPath: string): Promise<boolean> {
  * @returns {string} The temporary path associated with the configuration file.
  */
 export async function toTempPath(configFile: string) {
-  const resolvedPath = path.parse(path.resolve(configFile))
-  const tempPath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-tmp`)
+  const resolvedPath = parse(resolve(configFile))
+  const tempPath = resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-tmp`)
   await Deno.mkdir(tempPath, { recursive: true })
   return tempPath
 }
@@ -77,8 +77,8 @@ export async function toTempPath(configFile: string) {
  * @returns {string} The persistent storage path associated with the configuration file.
  */
 export async function toPersistentPath(configFile: string) {
-  const resolvedPath = path.parse(path.resolve(configFile))
-  const persistentStoragePath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-data`)
+  const resolvedPath = parse(resolve(configFile))
+  const persistentStoragePath = resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-data`)
   await Deno.mkdir(persistentStoragePath, { recursive: true })
   return persistentStoragePath
 }

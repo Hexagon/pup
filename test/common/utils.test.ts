@@ -1,5 +1,5 @@
 import { dirExists, fileExists } from "../../lib/common/utils.ts"
-import { assertEquals } from "../deps.ts"
+import { assertEquals } from "@std/assert"
 
 Deno.test("dirExists - Directory exists", async () => {
   const tempDir = await Deno.makeTempDir()

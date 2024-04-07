@@ -1,5 +1,5 @@
 import { EventEmitter } from "../../lib/common/eventemitter.ts"
-import { assert, assertEquals } from "../deps.ts"
+import { assert, assertEquals } from "@std/assert"
 
 Deno.test("EventEmitter - Add and trigger event listener", () => {
   const eventEmitter = new EventEmitter()

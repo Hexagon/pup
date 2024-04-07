@@ -1,4 +1,4 @@
-import { assertEquals } from "../deps.ts"
+import { assertEquals } from "@std/assert"
 import { FileIPC } from "../../lib/common/ipc.ts"
 import { fileExists } from "../../lib/common/utils.ts"
 

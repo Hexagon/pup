@@ -1,6 +1,6 @@
 /*
 import { main } from "../lib/main.ts"
-import { assertSpyCall, spy } from "./deps.ts"
+import { assertSpyCall, spy } from "@std/testing/mock"
 
 Deno.test("main: exit with --version flag", async () => {
   const exitSpy = spy(Deno, "exit")

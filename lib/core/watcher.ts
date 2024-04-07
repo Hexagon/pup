@@ -6,7 +6,8 @@
  * @license MIT
  */
 
-import { delay, globToRegExp, relative } from "../../deps.ts"
+import { globToRegExp, relative } from "@std/path"
+import { delay } from "@std/async"
 
 type FileAction = "any" | "access" | "create" | "modify" | "remove" | "other"
 

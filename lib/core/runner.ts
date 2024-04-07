@@ -6,9 +6,9 @@
  */
 
 import { ProcessConfiguration, Pup } from "./pup.ts"
-import { $, CommandChild, readLines, StringReader } from "../../deps.ts"
+import { readLines, StringReader } from "@std/io"
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
-
+import { $, CommandChild } from "@david/dax"
 /**
  * Represents a task runner that executes tasks as regular processes.
  * Extends the BaseRunner class.
@@ -130,7 +130,7 @@ class Runner extends BaseRunner {
    * @returns The command to be executed.
    */
   private prepareCommand(env: Record<string, string>) {
-    let child = $.raw`${this.processConfig.cmd}`.stdout("piped").stderr("piped")
+    let child = $.raw`${this.processConfig.cmd!}`.stdout("piped").stderr("piped")
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
     if (env) child = child.env(env)
 

@@ -4,7 +4,8 @@
  * @file      tools/release.ts
  * @license   MIT
  */
-import { existsSync, parseVersion } from "../deps.ts"
+import { parse } from "@std/semver"
+import { exists } from "@cross/fs"
 import { Application } from "../application.meta.ts"
 
 const VERSIONS_JSON_PATH = "./versions.json"
@@ -26,7 +27,7 @@ interface Versions {
 async function main() {
   let versions: Versions = { canary_url: "", stable: [], prerelease: [] }
 
-  if (existsSync(VERSIONS_JSON_PATH)) {
+  if (await exists(VERSIONS_JSON_PATH)) {
     const data = await Deno.readTextFile(VERSIONS_JSON_PATH)
     versions = JSON.parse(data)
   }
@@ -42,10 +43,10 @@ async function main() {
   }
 
   // Parse the version using semver
-  const semver = parseVersion(Application.version)
+  const semver = parse(Application.version)
 
   // If semver.prerelease is not empty, it's a prerelease version
-  if (semver && semver.prerelease.length > 0) {
+  if (semver?.prerelease && semver.prerelease.length > 0) {
     versions.prerelease = versions.prerelease.filter((ver) => ver.version !== Application.version)
     versions.prerelease.unshift(newVersion)
   } else {

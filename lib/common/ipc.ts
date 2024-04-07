@@ -10,7 +10,8 @@
  */
 
 import { fileExists } from "../common/utils.ts"
-import { basename, debounce, dirname, join, resolve } from "../../deps.ts"
+import { basename, dirname, join, resolve } from "@std/path"
+import { debounce } from "@std/async"
 
 export interface IpcValidatedMessage {
   pid: number | null

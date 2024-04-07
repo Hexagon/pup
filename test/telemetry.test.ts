@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
-import { assertEquals } from "./deps.ts"
-import { PupTelemetry, TelemetryData } from "../telemetry.ts"
+import { assertEquals } from "@std/assert"
+import { PupTelemetry } from "../telemetry.ts"
 
 Deno.test("PupTelemetry - Singleton pattern", () => {
   const telemetry1 = new PupTelemetry()

@@ -1,4 +1,4 @@
-import { assertEquals } from "../deps.ts"
+import { assertEquals } from "@std/assert"
 import { Column, Columns, SeparatorRow, TableRow } from "../../lib/cli/columns.ts"
 
 Deno.test("Formats and pads Rows and Columns correctly", () => {

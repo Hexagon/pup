@@ -6,7 +6,7 @@
  * @license   MIT
  */
 
-import { stripColor } from "../../deps.ts"
+import { stripAnsi } from "@cross/utils"
 import { GlobalLoggerConfiguration, KV_SIZE_LIMIT_BYTES, ProcessConfiguration } from "./configuration.ts"
 
 export interface LogEvent {
@@ -197,7 +197,7 @@ class Logger {
 
   private async writeFile(fileName: string, text: string, quiet = false) {
     // Strip colors
-    text = stripColor(text)
+    text = stripAnsi(text)
     try {
       await Deno.writeTextFile(fileName, `${text}\n`, { append: true })
     } catch (_e) {

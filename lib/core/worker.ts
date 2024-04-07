@@ -6,7 +6,8 @@
  */
 
 import { ProcessConfiguration, Pup } from "./pup.ts"
-import { path, readLines, StringReader } from "../../deps.ts"
+import { readLines, StringReader } from "@std/io"
+import { resolve } from "@std/path"
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
 
 class WorkerRunner extends BaseRunner {
@@ -55,7 +56,7 @@ class WorkerRunner extends BaseRunner {
     if (this.pup.persistentStoragePath) env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
 
     const workingDir = this.processConfig.cwd || Deno.cwd()
-    const workingDirUrl = new URL(`file://${path.resolve(workingDir)}/`).href
+    const workingDirUrl = new URL(`file://${resolve(workingDir)}/`).href
 
     try {
       this.worker = new Worker(

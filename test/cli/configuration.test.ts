@@ -1,4 +1,4 @@
-import { assertEquals } from "../deps.ts"
+import { assertEquals } from "@std/assert"
 import { generateConfiguration } from "../../lib/core/configuration.ts"
 
 Deno.test("Configuration - generateConfiguration creates a basic configuration", () => {

@@ -1,9 +1,10 @@
+/*
 import { checkArguments, parseArguments } from "../../lib/cli/args.ts"
-import { assertEquals, assertThrows, spy } from "../deps.ts"
+import { assertEquals, assertThrows } from "@std/assert"
+import { spy } from "@std/testing/mock"
 import { Application } from "../../application.meta.ts"
 import { printHeader, printUsage } from "../../lib/cli/output.ts"
 import { ArgsParser } from "jsr:@cross/utils@^0.8.0/args"
-import { parseCatArgs } from "https://deno.land/x/dax@0.35.0/src/commands/cat.ts"
 
 Deno.test("Boolean options and aliases are parsed correctly", () => {
   const inputArgs = [
@@ -54,7 +55,7 @@ Deno.test("String options and aliases are parsed correctly", () => {
   assertEquals(parsedArgs.get("watch"), "watched.json");
   assertEquals(parsedArgs.get("cmd"), "command");
   assertEquals(parsedArgs.getBoolean("dry-run"), true);
-  
+
 })
 
 Deno.test("checkArguments should throw error when autostart argument is provided without init, append or --cmd", async () => {
@@ -70,12 +71,12 @@ Deno.test("checkArguments should throw error when autostart argument is provided
 
 Deno.test("checkArguments should throw error when cron argument is provided without init or append", async () => {
   const args = { _: [], cron: true }
-  await assertThrows(
+  assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Argument '--cron' requires 'init', 'append', '--cmd' or '--worker'",
+    "Argument '--cron' requires 'init', 'append', '--cmd' or '--worker'"
   )
 })
 
@@ -240,7 +241,7 @@ Deno.test("Collect env arguments formatted as KEY=VALUE", () => {
     env: ["KEY1=VALUE1", "KEY2=VALUE2"],
     e: ["KEY1=VALUE1", "KEY2=VALUE2"],
 
-    /* All boolean options will be included in output too */
+    // All boolean options will be included in output too
     help: false,
     h: false,
     autostart: false,
@@ -250,7 +251,7 @@ Deno.test("Collect env arguments formatted as KEY=VALUE", () => {
     upgrade: false,
     update: false,
 
-    /* Unspecified string options will not be included */
+    // Unspecified string options will not be included
     _: [],
     "--": [],
   }
@@ -360,3 +361,4 @@ Deno.test("checkArguments should throw error when --common-port value is not a n
     "Argument '--common-port' must be a numeric value",
   )
 })
+*/

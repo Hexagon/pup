@@ -21,10 +21,13 @@ import { upgrade } from "./upgrade.ts"
 import { fileExists, toPersistentPath, toTempPath } from "../common/utils.ts"
 
 // Import external dependencies
-import { installService, jsonc, path, uninstallService } from "../../deps.ts"
+import * as jsonc from "@std/jsonc"
+import * as path from "@std/path"
 import { Logger } from "../core/logger.ts"
 
 import { args } from "@cross/utils/args"
+
+import { installService, uninstallService } from "@cross/service"
 
 /**
  * Define the main entry point of the CLI application
@@ -52,7 +55,7 @@ async function main() {
         parsedArgs.get("unsafely-ignore-certificate-errors"),
         parsedArgs.getBoolean("all-permissions"),
         parsedArgs.getBoolean("local"),
-        setupCondition,
+        setupCondition as boolean,
       )
     } catch (e) {
       console.error(`Could not ${setupCondition ? "install" : "upgrade"} pup, error: ${e.message}`)

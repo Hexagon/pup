@@ -7,7 +7,7 @@
 import { Configuration } from "../../lib/core/configuration.ts"
 import { ProcessState } from "../../lib/core/process.ts"
 import { Pup } from "../../lib/core/pup.ts"
-import { assertEquals, assertNotEquals } from "../deps.ts"
+import { assertEquals, assertNotEquals } from "@std/assert"
 
 Deno.test({
   name: "Create test process. Test start, block, stop, start, unblock, start in sequence.",

@@ -1,5 +1,5 @@
 import { Status } from "../../lib/core/status.ts"
-import { assertEquals } from "../deps.ts"
+import { assertEquals } from "@std/assert"
 
 const TEST_FILE_PATH = "./test_data_Status.jsontest"
 

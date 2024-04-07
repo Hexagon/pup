@@ -2,7 +2,7 @@
 
 import { createFlagsMessage, createHeaderMessage, createUsageMessage } from "../../lib/cli/output.ts"
 import { Application } from "../../application.meta.ts"
-import { assertEquals } from "../deps.ts"
+import { assertEquals } from "@std/assert"
 
 Deno.test("Should correctly create the header message", () => {
   const expected = Application.name + " " + Application.version + "\n" + Application.repository

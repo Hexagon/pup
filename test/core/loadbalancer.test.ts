@@ -1,5 +1,5 @@
 // load_balancer_test.ts
-import { assertEquals, assertThrows } from "../deps.ts"
+import { assertEquals, assertThrows } from "@std/assert"
 import { Backend, BalancingStrategy, hashCode, LoadBalancer } from "../../lib/core/loadbalancer.ts"
 
 // Define logger callback function

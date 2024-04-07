@@ -7,8 +7,10 @@
  */
 
 import { Configuration, generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
-import { Args, join, jsonc, resolve } from "../../deps.ts"
+import * as jsonc from "@std/jsonc"
+import { join, resolve } from "@std/path"
 import { fileExists } from "../common/utils.ts"
+import { ArgsParser } from "@cross/utils"
 
 /**
  * Helper which creates a configuration file from command line arguments
@@ -16,22 +18,22 @@ import { fileExists } from "../common/utils.ts"
  * @private
  * @async
  */
-export async function createConfigurationFile(configFile: string, checkedArgs: Args, cmd: string) {
+export async function createConfigurationFile(configFile: string, checkedArgs: ArgsParser, cmd: string) {
   try {
     const config = generateConfiguration(
-      checkedArgs.id,
+      checkedArgs.get("id")!,
       cmd,
-      checkedArgs.cwd,
-      checkedArgs.cron,
-      checkedArgs.terminate,
-      checkedArgs.autostart,
-      checkedArgs.watch,
-      checkedArgs.instances,
-      checkedArgs["start-port"],
-      checkedArgs["common-port"],
-      checkedArgs.strategy,
-      checkedArgs.stdout,
-      checkedArgs.stderr,
+      checkedArgs.get("cwd"),
+      checkedArgs.get("cron"),
+      checkedArgs.get("terminate"),
+      checkedArgs.getBoolean("autostart"),
+      checkedArgs.get("watch"),
+      checkedArgs.get("instances"),
+      checkedArgs.get("start-port"),
+      checkedArgs.get("common-port"),
+      checkedArgs.get("strategy"),
+      checkedArgs.get("stdout"),
+      checkedArgs.get("stderr"),
     )
     await Deno.writeTextFile(configFile, JSON.stringify(config, null, 2))
   } catch (e) {
@@ -46,7 +48,7 @@ export async function createConfigurationFile(configFile: string, checkedArgs: A
  * @private
  * @async
  */
-export async function appendConfigurationFile(configFile: string, checkedArgs: Args, cmd: string) {
+export async function appendConfigurationFile(configFile: string, checkedArgs: ArgsParser, cmd: string) {
   try {
     // Read existing configuration
     let existingConfigurationObject
@@ -64,19 +66,19 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
 
     // Generate new configuration
     const newConfiguration = generateConfiguration(
-      checkedArgs.id,
+      checkedArgs.get("id")!,
       cmd,
-      checkedArgs.cwd,
-      checkedArgs.cron,
-      checkedArgs.terminate,
-      checkedArgs.autostart,
-      checkedArgs.watch,
-      checkedArgs.instances,
-      checkedArgs["start-port"],
-      checkedArgs["common-port"],
-      checkedArgs.strategy,
-      checkedArgs.stdout,
-      checkedArgs.stderr,
+      checkedArgs.get("cwd"),
+      checkedArgs.get("cron"),
+      checkedArgs.get("terminate"),
+      checkedArgs.getBoolean("autostart"),
+      checkedArgs.get("watch"),
+      checkedArgs.get("instances"),
+      checkedArgs.get("start-port"),
+      checkedArgs.get("common-port"),
+      checkedArgs.get("strategy"),
+      checkedArgs.get("stdout"),
+      checkedArgs.get("stderr"),
     )
     const newProcess = newConfiguration.processes[0]
 
@@ -100,7 +102,7 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
  *
  * @async
  */
-export async function removeFromConfigurationFile(configFile: string, checkedArgs: Args) {
+export async function removeFromConfigurationFile(configFile: string, checkedArgs: ArgsParser) {
   try {
     // Read existing configuration
     let existingConfigurationObject
@@ -116,13 +118,13 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
     }
 
     // Remove from configuration
-    const alreadyExists = existingConfigurationObject.processes?.find((p: ProcessConfiguration) => p?.id === checkedArgs?.id)
+    const alreadyExists = existingConfigurationObject.processes?.find((p: ProcessConfiguration) => p?.id === checkedArgs.get("id"))
     if (!alreadyExists) {
-      throw new Error(`Process id '${checkedArgs?.id}' not found, exiting.`)
+      throw new Error(`Process id '${checkedArgs.get("id")}' not found, exiting.`)
     }
 
     // Filter out
-    existingConfigurationObject.processes = existingConfigurationObject.processes.filter((p: ProcessConfiguration) => p?.id !== checkedArgs?.id)
+    existingConfigurationObject.processes = existingConfigurationObject.processes.filter((p: ProcessConfiguration) => p?.id !== checkedArgs.get("id"))
 
     // Append new process, and write configuration file
     await Deno.writeTextFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))

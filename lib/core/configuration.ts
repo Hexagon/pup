@@ -5,7 +5,7 @@
  * @license   MIT
  */
 
-import { z } from "../../deps.ts"
+import { z } from "zod"
 
 export const DEFAULT_INTERNAL_LOG_HOURS = 48
 export const MAINTENANCE_INTERVAL_MS = 900_000
