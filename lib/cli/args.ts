@@ -29,8 +29,8 @@ function parseArguments(args: string[]): ArgsParser {
     "upgrade": "update",
     "e": "env",
   }
-
-  return new ArgsParser(args, { aliases })
+  const boolean = ["setup", "upgrade", "help", "version", "autostart", "dry-run"]
+  return new ArgsParser(args, { aliases, boolean })
 }
 
 /**
@@ -87,7 +87,7 @@ function checkArguments(args: ArgsParser): ArgsParser {
   ]
 
   // Check that the base argument is either undefined or valid
-  const baseArgument = args.getRest()
+  const baseArgument = args.countLoose() > 0 ? args.getLoose()[0] : undefined;
   if (baseArgument !== undefined && (typeof baseArgument !== "string" || !validBaseArguments.includes(baseArgument))) {
     throw new Error(`Invalid base argument: ${baseArgument}`)
   }

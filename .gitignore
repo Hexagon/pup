@@ -47,5 +47,11 @@ core
 # Test coverage
 cov_profile
 *.lcov
+
 # Lumocs generated site
 _site
+
+# Node files
+.npmrc
+package-lock.json
+package.json
