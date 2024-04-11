@@ -12,9 +12,8 @@ import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
 import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
-import * as path from "@std/path"
 import { EventEmitter } from "../common/eventemitter.ts"
-import { toPersistentPath, toTempPath } from "../common/utils.ts"
+import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
 import * as uuid from "@std/uuid"
 
 interface InstructionResponse {
@@ -57,7 +56,7 @@ class Pup {
     let ipcFile
     let logStore
     if (configFilePath && temporaryStoragePath && persistentStoragePath) {
-      this.configFilePath = path.resolve(configFilePath)
+      this.configFilePath = toResolvedAbsolutePath(configFilePath)
 
       this.temporaryStoragePath = temporaryStoragePath
       this.cleanupQueue.push(this.temporaryStoragePath)

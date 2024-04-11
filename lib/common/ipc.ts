@@ -9,9 +9,10 @@
  * @license MIT
  */
 
-import { fileExists } from "../common/utils.ts"
-import { basename, dirname, join, resolve } from "@std/path"
+import { exists } from "@cross/fs"
+import { basename, dirname, join } from "@std/path"
 import { debounce } from "@std/async"
+import { toResolvedAbsolutePath } from "./utils.ts"
 
 export interface IpcValidatedMessage {
   pid: number | null
@@ -32,8 +33,8 @@ export class FileIPC {
   private watcher?: Deno.FsWatcher
 
   constructor(filePath: string, staleMessageLimitMs?: number, debounceTimeMs?: number) {
-    this.filePath = resolve(filePath)
-    this.dirPath = resolve(dirname(filePath)) // Get directory of the file
+    this.filePath = toResolvedAbsolutePath(filePath)
+    this.dirPath = toResolvedAbsolutePath(dirname(filePath)) // Get directory of the file
     this.fileName = basename(filePath) // Get name of the file
     this.staleMessageLimitMs = staleMessageLimitMs ?? 30000
     this.debounceTimeMs = debounceTimeMs ?? 100
@@ -92,7 +93,7 @@ export class FileIPC {
    * Note: This function should only be used internally by the FileIPC class and is not meant to be exposed to external consumers.
    */
   private async extractMessages(): Promise<IpcValidatedMessage[]> {
-    if (await fileExists(this.filePath)) {
+    if (await exists(this.filePath)) {
       let fileContent
       try {
         fileContent = await Deno.readTextFile(this.filePath)

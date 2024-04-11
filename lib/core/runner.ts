@@ -8,7 +8,7 @@
 import { ProcessConfiguration, Pup } from "./pup.ts"
 import { readLines, StringReader } from "@std/io"
 import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
-import { $, CommandChild } from "@david/dax"
+import { $, CommandChild } from "dax-sh"
 /**
  * Represents a task runner that executes tasks as regular processes.
  * Extends the BaseRunner class.

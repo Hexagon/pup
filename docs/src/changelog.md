@@ -9,6 +9,37 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.15] - 2024-04-11
+
+WIP, This is a roadmap.
+
+### Breaking Changes
+
+- [ ] change(cli): Rename cli command `run` to `foreground`
+- [ ] change(cli): Rename cli command `install` to `service-enable`
+- [ ] change(cli): Rename cli command `uninstall` to `service-disable`
+- [ ] change(cli): Autostart by default if no other start policy is defined.
+- [ ] change(core): Use a common process as system service and ecosystem manager.
+- [ ] change(plugins): Remove built in plugins.
+- [ ] change(api): Add HTTP API for building plugins, add-ons and utilities.
+
+### Non-breaking
+
+- [ ] fix(core): Foreground command did not keep an autostarted process running.
+- [ ] change(docs): Rename instances to ecosystems everywhere.
+
+## Maintenance
+
+- [x] chore(deps): Replace `deno.land/x/udd` with `@check/deps`
+- [x] chore(deps): Use `@cross/deps` for cross-runtime filesystem operations
+- [x] chore(deps): Replace `deno.land/x/hexagon/service` with `@cross/service` for cross-runtime service installation
+- [x] chore(deps): Replace `deno.land/x/std/` with `@std/` from jsr
+- [x] chore(deps): Replace `deno.land/x/dax` with `dax-sh` for a cross runtime shell
+- [x] chore(deps): Replace `deno.land/x/zod` with `npm:zod`
+- [x] chore(deps): Utilize `@cross/utils` instead of Deno built-ins for cross runtime ansi console output, argument parsing, process management and more.
+- [x] chore(deps): Use `@cross/env` to handle enviroment variables across runtimes.
+- [ ] chore(testing): Use `@cross/test` insted of Deno test runner, to utilize the native test runners of Node, Deno and Bun.
+
 ## [1.0.0-rc.14] - 2024-04-07
 
 - fix(loadbalancer): Fixes an issue with the loadbalancer introduced in `1.0.0-rc.13`

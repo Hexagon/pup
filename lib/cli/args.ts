@@ -51,9 +51,9 @@ function checkArguments(args: ArgsParser): ArgsParser {
     "restart",
     "block",
     "unblock",
-    "run",
-    "install",
-    "uninstall",
+    "foreground",
+    "enable-service",
+    "disable-service",
     "logs",
     "upgrade",
     "update",
@@ -87,14 +87,14 @@ function checkArguments(args: ArgsParser): ArgsParser {
   ]
 
   // Check that the base argument is either undefined or valid
-  const baseArgument = args.countLoose() > 0 ? args.getLoose()[0] : undefined;
+  const baseArgument = args.countLoose() > 0 ? args.getLoose()[0] : undefined
   if (baseArgument !== undefined && (typeof baseArgument !== "string" || !validBaseArguments.includes(baseArgument))) {
     throw new Error(`Invalid base argument: ${baseArgument}`)
   }
 
   const hasDoubleDashCmd = args.hasRest()
   const hasCmd = hasDoubleDashCmd || args.get("cmd") || args.get("worker")
-  const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "run" && hasCmd)
+  const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "foreground" && hasCmd)
   const expectInstallerOptions = baseArgument === "setup" || baseArgument === "upgrade" || baseArgument === "update"
 
   // Only one type of command can be present at the same time
@@ -139,7 +139,7 @@ function checkArguments(args: ArgsParser): ArgsParser {
   }
 
   // --env flag can only be used with 'service install' base argument
-  if (args.get("env") && (baseArgument !== "install")) {
+  if (args.get("env") && (baseArgument !== "enable-service")) {
     throw new Error("Argument '--env' can only be used with 'service install' base argument")
   }
 

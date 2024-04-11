@@ -8,9 +8,10 @@
 
 import { Configuration, generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
 import * as jsonc from "@std/jsonc"
-import { join, resolve } from "@std/path"
-import { fileExists } from "../common/utils.ts"
+import { join } from "@std/path"
+import { exists } from "@cross/fs"
 import { ArgsParser } from "@cross/utils"
+import { toResolvedAbsolutePath } from "../common/utils.ts"
 
 /**
  * Helper which creates a configuration file from command line arguments
@@ -140,14 +141,14 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
  *
  * @async
  */
-export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFile?: string, cwd?: string): Promise<string | undefined> {
+export async function findConfigFile(cwd: string, useConfigFile?: boolean, argumentsConfigFile?: string): Promise<string | undefined> {
   // If not using config file, return undefined
   if (!useConfigFile) return undefined
 
   // If config file was specified in arguments, return it or throw if it does not exist
   if (argumentsConfigFile) {
-    const resolvedPath = resolve(argumentsConfigFile)
-    if (await fileExists(resolvedPath)) {
+    const resolvedPath = toResolvedAbsolutePath(argumentsConfigFile)
+    if (await exists(resolvedPath)) {
       return resolvedPath
     } else {
       throw new Error("Specified configuration file does not exist.")
@@ -158,10 +159,10 @@ export async function findConfigFile(useConfigFile?: boolean, argumentsConfigFil
   let jsonPath = "./pup.json"
   let jsoncPath = "./pup.jsonc"
   if (cwd) {
-    jsonPath = join(resolve(cwd), jsonPath)
-    jsoncPath = join(resolve(cwd), jsoncPath)
+    jsonPath = join(toResolvedAbsolutePath(cwd), jsonPath)
+    jsoncPath = join(toResolvedAbsolutePath(cwd), jsoncPath)
   }
-  if (await fileExists(jsoncPath)) {
+  if (await exists(jsoncPath)) {
     return jsoncPath
   } else {
     return jsonPath

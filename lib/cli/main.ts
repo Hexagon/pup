@@ -18,7 +18,8 @@ import { getStatus, printStatus } from "./status.ts"
 import { upgrade } from "./upgrade.ts"
 
 // Import common utilities
-import { fileExists, toPersistentPath, toTempPath } from "../common/utils.ts"
+import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
+import { exists, readFile } from "@cross/fs"
 
 // Import external dependencies
 import * as jsonc from "@std/jsonc"
@@ -28,6 +29,8 @@ import { Logger } from "../core/logger.ts"
 import { args } from "@cross/utils/args"
 
 import { installService, uninstallService } from "@cross/service"
+import { exit } from "@cross/utils"
+import { chdir, cwd } from "@cross/fs"
 
 /**
  * Define the main entry point of the CLI application
@@ -44,6 +47,8 @@ async function main() {
 
   /**
    * setup, upgrade
+   *
+   * setup is a special command used as the pup installer, to install pup as a system cli command
    */
   const upgradeCondition = parsedArgs.get("setup") || baseArgument === "setup"
   const setupCondition = parsedArgs.get("upgrade") || baseArgument === "upgrade" || baseArgument === "update"
@@ -58,10 +63,10 @@ async function main() {
         setupCondition as boolean,
       )
     } catch (e) {
-      console.error(`Could not ${setupCondition ? "install" : "upgrade"} pup, error: ${e.message}`)
+      console.error(`Could not ${setupCondition ? "enable-service" : "upgrade"} pup, error: ${e.message}`)
     }
     // upgrader(...) will normally handle exiting with signal 0, so we exit with code 1 if getting here
-    Deno.exit(1)
+    exit(1)
   }
 
   /**
@@ -69,7 +74,7 @@ async function main() {
    */
   if (parsedArgs.get("version") !== undefined || baseArgument === "version") {
     printHeader()
-    Deno.exit(0)
+    exit(0)
   }
 
   /**
@@ -79,7 +84,7 @@ async function main() {
     printUsage()
     console.log("")
     printFlags(parsedArgs.getBoolean("external-installer"))
-    Deno.exit(0)
+    exit(0)
   }
 
   /**
@@ -90,7 +95,7 @@ async function main() {
     checkedArgs = checkArguments(parsedArgs)
   } catch (e) {
     console.error(`Invalid combination of arguments: ${e.message}`)
-    Deno.exit(1)
+    exit(1)
   }
 
   // Extract command from arguments
@@ -104,7 +109,7 @@ async function main() {
   }
 
   // Extract worker from arguments
-  const worker = checkedArgs.get("worker")
+  const worker = checkedArgs?.get("worker")
 
   /**
    * Now either
@@ -112,20 +117,21 @@ async function main() {
    * - Find configuration using (--config)
    * - Or generate configuration using (init)
    */
-  const runWithoutConfig = baseArgument == "run" && (cmd !== undefined || worker !== undefined)
+  const runWithoutConfig = baseArgument == "foreground" && (cmd !== undefined || worker !== undefined)
   const useConfigFile = !runWithoutConfig
   let configFile
   if (useConfigFile) {
-    configFile = await findConfigFile(useConfigFile, checkedArgs.get("config"), checkedArgs.get("cwd"))
+    const configFileCwd = toResolvedAbsolutePath(checkedArgs?.get("cwd") || cwd())
+    configFile = await findConfigFile(configFileCwd, useConfigFile, checkedArgs?.get("config"))
   }
-
+  ""
   /**
    * Handle the install argument
    */
-  if (baseArgument === "install") {
+  if (baseArgument === "enable-service") {
     if (!configFile) {
       console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
-      Deno.exit(1)
+      exit(1)
     }
 
     const system = parsedArgs.getBoolean("system")
@@ -139,12 +145,12 @@ async function main() {
 
     try {
       await installService({ system, name, cmd, cwd, user, home, env }, parsedArgs.getBoolean("dry-run"))
-      Deno.exit(0)
+      exit(0)
     } catch (e) {
       console.error(`Could not install service, error: ${e.message}`)
-      Deno.exit(1)
+      exit(1)
     }
-  } else if (baseArgument === "uninstall") {
+  } else if (baseArgument === "disable-service") {
     const system = parsedArgs.getBoolean("system")
     const name = parsedArgs.get("name") || "pup"
     const home = parsedArgs.get("home")
@@ -152,10 +158,10 @@ async function main() {
     try {
       await uninstallService({ system, name, home })
       console.log(`Service '${name}' uninstalled.`)
-      Deno.exit(0)
+      exit(0)
     } catch (e) {
       console.error(`Could not uninstall service, error: ${e.message}`)
-      Deno.exit(1)
+      exit(1)
     }
   }
 
@@ -165,13 +171,13 @@ async function main() {
   if (baseArgument === "init") {
     // Default new configuration file to pup.jsonc
     const fallbackedConfigFile = configFile ?? "pup.jsonc"
-    if (await fileExists(fallbackedConfigFile)) {
+    if (await exists(fallbackedConfigFile)) {
       console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
-      Deno.exit(1)
+      exit(1)
     } else {
-      await createConfigurationFile(fallbackedConfigFile, checkedArgs, cmd!)
+      await createConfigurationFile(fallbackedConfigFile, checkedArgs!, cmd!)
       console.log(`Configuration file '${fallbackedConfigFile}' created`)
-      Deno.exit(0)
+      exit(0)
     }
   }
 
@@ -182,30 +188,30 @@ async function main() {
    */
   if (baseArgument === "append") {
     if (configFile) {
-      await appendConfigurationFile(configFile, checkedArgs, cmd!)
+      await appendConfigurationFile(configFile, checkedArgs!, cmd!)
       console.log(`Process '${parsedArgs.get("id")}' appended to configuration file '${configFile}'.`)
-      Deno.exit(0)
+      exit(0)
     } else {
       console.log(`Configuration file '${configFile}' not found, use init if you want to create a new one. Exiting.`)
-      Deno.exit(1)
+      exit(1)
     }
   }
 
   if (baseArgument === "remove") {
     if (configFile) {
-      await removeFromConfigurationFile(configFile, checkedArgs)
+      await removeFromConfigurationFile(configFile, checkedArgs!)
       console.log(`Process '${parsedArgs.get("id")}' removed from configuration file '${configFile}'.`)
-      Deno.exit(0)
+      exit(0)
     } else {
       console.log("Configuration file '${fallbackedConfigFile}' not found, use init if you want to create a new one. Exiting.")
-      Deno.exit(1)
+      exit(1)
     }
   }
 
   // Exit if no configuration file was found, or specified configuration file were not found
   if (useConfigFile && !configFile) {
     console.error("Configuration file not found.")
-    Deno.exit(1)
+    exit(1)
   }
 
   /**
@@ -214,11 +220,11 @@ async function main() {
   if (useConfigFile && configFile) {
     try {
       const resolvedPath = path.parse(path.resolve(configFile))
-      Deno.chdir(resolvedPath.dir)
+      chdir(resolvedPath.dir)
       configFile = `${resolvedPath.name}${resolvedPath.ext}`
     } catch (e) {
       console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
-      Deno.exit(1)
+      exit(1)
     }
   }
 
@@ -226,11 +232,12 @@ async function main() {
   let configuration: Configuration
   if (configFile) {
     try {
-      const rawConfig = await Deno.readTextFile(configFile)
-      configuration = validateConfiguration(jsonc.parse(rawConfig))
+      const rawConfig = await readFile(configFile)
+      const rawConfigText = new TextDecoder().decode(rawConfig)
+      configuration = validateConfiguration(jsonc.parse(rawConfigText))
     } catch (e) {
       console.error(`Could not start, error reading or parsing configuration file '${configFile}': ${e.message}`)
-      Deno.exit(1)
+      exit(1)
     }
   } else {
     configuration = generateConfiguration(
@@ -251,7 +258,7 @@ async function main() {
         Deno.chdir(resolvedPath.dir)
       } catch (e) {
         console.error(`Could not change working directory to path specified by --cwd ${parsedArgs.get("cwd")}, exiting. Message: `, e.message)
-        Deno.exit(1)
+        exit(1)
       }
     }
   }
@@ -301,7 +308,7 @@ async function main() {
     } else {
       console.error("No logs found.")
     }
-    Deno.exit(0)
+    exit(0)
   }
 
   // Prepare for IPC
@@ -319,19 +326,19 @@ async function main() {
   if (baseArgument === "status") {
     if (!statusFile || !configFile) {
       console.error("Can not print status, no configuration file found")
-      Deno.exit(1)
+      exit(1)
     }
     console.log("")
     printHeader()
     await printStatus(configFile, statusFile)
-    Deno.exit(0)
+    exit(0)
   }
 
   // Handle --restart, --stop etc using IPC
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
     if (baseArgument === op && !secondaryBaseArgument && baseArgument !== "terminate") {
       console.error(`Control functions require an id, specify with '${baseArgument} all|<task-id>'`)
-      Deno.exit(1)
+      exit(1)
     }
     if (baseArgument === op) {
       // If status file doesn't exist, don't even try to communicate
@@ -347,7 +354,7 @@ async function main() {
 
           const responseTimeout = setTimeout(() => {
             console.error("Response timeout after 10 seconds")
-            Deno.exit(1)
+            exit(1)
           }, 10000) // wait at most 10 seconds
 
           for await (const message of ipcResponse.receiveData()) {
@@ -358,24 +365,24 @@ async function main() {
                 console.log("Action completed successfully")
               } else {
                 console.error("Action failed.")
-                Deno.exit(1)
+                exit(1)
               }
             } else {
               console.error("Action failed: Invalid response received.")
-              Deno.exit(1)
+              exit(1)
             }
 
             break // break out of the loop after receiving the response
           }
 
-          Deno.exit(0)
+          exit(0)
         } else {
           console.error(`No running instance found, cannot send command '${op}' over IPC.`)
-          Deno.exit(1)
+          exit(1)
         }
       } catch (e) {
         console.error(e.message)
-        Deno.exit(1)
+        exit(1)
       }
     }
   }
@@ -383,18 +390,18 @@ async function main() {
   /**
    * handle the case where there is an existing status file
    */
-  if (statusFile && await fileExists(statusFile)) {
+  if (statusFile && await exists(statusFile)) {
     try {
       // A valid status file were found
       if (!await getStatus(configFile, statusFile)) {
         /* ignore */
       } else {
         console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
-        Deno.exit(1)
+        exit(1)
       }
     } catch (e) {
       console.error(e.message)
-      Deno.exit(1)
+      exit(1)
     }
   }
 
@@ -403,15 +410,15 @@ async function main() {
    */
   if (!configuration || configuration?.processes?.length < 1) {
     console.error("No processes defined, exiting.")
-    Deno.exit(1)
+    exit(1)
   }
 
   /**
    * Ready to start pup!
    */
-  if (baseArgument !== "run") {
+  if (baseArgument !== "foreground") {
     console.error("Trying to start pup without 'run' argument, this should not happen. Exiting.")
-    Deno.exit(1)
+    exit(1)
   }
 
   try {
@@ -437,10 +444,10 @@ async function main() {
       await pup.terminate(30000)
     })
 
-    // Let program end gracefully, no Deno.exit here
+    // Let program end gracefully, no exit here
   } catch (e) {
     console.error("Could not start pup, invalid configuration:", e.message)
-    Deno.exit(1)
+    exit(1)
   }
 }
 

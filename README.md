@@ -25,33 +25,42 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 
 ### Installation
 
-To install Pup, make sure you have a fairly recent version of Deno installed (>=1.38.0), then open your terminal and execute the following command:
+To install Pup, open your terminal and execute the following command:
 
 ```bash
 deno run -Ar https://deno.land/x/pup/pup.ts setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
-channels [here](https://pup.56k.guru/installation.html#release-channels).
+channels [here](https://hexagon.github.io/pup/installation.html#release-channels).
+
+To enable pup at system boot, install it as a system service using `pup enable-service`.
+
+```bash
+pup enable-service
+```
+
+You can pass `-n my-custom-name` to give the service a name different from `pup`
 
 ### Configuration
 
-1. Start by generating a new configuration file called pup.json at your project root. This can be achieved using Pup's built-in helper with the following command:
+Pup revolves around ecosystem configuration files, each process belongs to an ecosystem defined by a `pup.json`. This file can either be created manually, or by the command line helpers. To create a
+simple ecosystem running a single process:
 
-   `pup init --id "my-server" --cmd "deno run -A server.ts" --autostart`
+`pup init --id "my-server" --cmd "deno run -A server.ts"`
 
 2. (Optional) In case you have an additional task to execute, such as a cleanup script, you can make use of `pup append`. The following example shows how to add an extra task that use the cron start
    policy:
 
    `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
-3. Now, start your ecosystem:
+3. (Optional) Test run your instance (ecosystem):
 
-   `pup run`
+   `pup test`
 
-4. (Optional) To make your ecosystem function as a system service, install it using `pup install`. This works with systemd, sysvinit, upstart, launchd, and Windows service manager:
+4. To make your instance run at boot, enable it using `pup start`.
 
-   `pup install --name my-service`
+   `pup start`
 
 For the full manual, see <https://pup.56k.guru>
 
@@ -59,9 +68,9 @@ For the full manual, see <https://pup.56k.guru>
 
 It is also possible to use pup to keep a process alive temporary, without a `pup.json` or system service.
 
-To achieve this, use `pup run` with `--cmd` and a start policy, for example `--autostart`.
+To achieve this, use `pup foreground` with `--cmd` and a start policy, the default restart policy is `--autostart`.
 
-`pup run --cmd "deno run server.ts" --autostart`
+`pup foreground --cmd "deno run server.ts"`
 
 ## Example setups
 

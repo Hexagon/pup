@@ -21,10 +21,10 @@ A: Yes, Pup is a language-agnostic process manager. You can use it to manage pro
 A: You can pass environment variables to your processes using the `env` property in the `ProcessConfiguration` object. This property accepts an object where keys represent the environment variable
 names and values represent their corresponding values.
 
-**Q: Can I run multiple instances of Pup simultaneously?**
+**Q: Can I run multiple ecosystems simultaneously?**
 
-A: Yes, you can run multiple instances of Pup simultaneously. However, it is essential to ensure that each instance has a separate configuration file and that they do not conflict with each other in
-terms of process IDs or shared resources.
+A: Yes, you can run multiple ecosystems simultaneously. However, it is essential to ensure that each instance has a separate configuration file and that they do not conflict with each other in terms
+of process IDs or shared resources.
 
 **Q: Is there a limit to the number of processes Pup can manage?**
 
