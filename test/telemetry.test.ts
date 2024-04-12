@@ -2,7 +2,7 @@
 import { assertEquals } from "@std/assert"
 import { PupTelemetry } from "../telemetry.ts"
 
-Deno.test("PupTelemetry - Singleton pattern", () => {
+test("PupTelemetry - Singleton pattern", () => {
   const telemetry1 = new PupTelemetry()
   const telemetry2 = new PupTelemetry()
   const telemetry3 = new PupTelemetry()
@@ -16,7 +16,7 @@ Deno.test("PupTelemetry - Singleton pattern", () => {
 })
 
 // deno-lint-ignore require-await
-Deno.test("PupTelemetry - Emitting messages", async () => {
+test("PupTelemetry - Emitting messages", async () => {
   const telemetry = new PupTelemetry()
   const eventData = { test: "data" }
 

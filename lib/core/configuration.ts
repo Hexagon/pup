@@ -120,7 +120,7 @@ const ConfigurationSchema = z.object({
       cmd: z.optional(z.string()),
       worker: z.optional(z.array(z.string())),
       cwd: z.optional(z.string()),
-      env: z.optional(z.object({})),
+      env: z.optional(z.record(z.string())),
       cluster: z.optional(z.object({
         instances: z.number().min(0).max(65535).default(1),
         commonPort: z.number().min(1).max(65535).optional(),

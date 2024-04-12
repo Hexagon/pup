@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this section.
 - [x] change(cli): Rename cli command `uninstall` to `disable-service`
 - [ ] change(logging): Make logs streaming by default.
 - [x] change(config): Support JSON5.
+- [x] change(core): Move .pup.jsonc-tmp, .pup.jsonc-data into .pup
 
 ### Non-breaking
 
@@ -25,6 +26,7 @@ All notable changes to this project will be documented in this section.
 - [x] fix(cli): Controlled output of manual rests after installing/uninstalling as service.
 - [x] fix(docs): Docs incorrectly stated that `**/_._` is default for watcher config. `**/*.*` is correct.
 - [ ] chore(docs): Add a PM2 migration guide.
+- [x] fix(schema): Expect Record<string, string> for process.env in json schema.
 
 ## Maintenance
 
@@ -36,7 +38,7 @@ All notable changes to this project will be documented in this section.
 - [x] chore(deps): Replace `deno.land/x/zod` with `npm:zod`
 - [x] chore(deps): Utilize `@cross/utils` instead of Deno built-ins for cross runtime ansi console output, argument parsing, process management and more.
 - [x] chore(deps): Use `@cross/env` to handle enviroment variables across runtimes.
-- [ ] chore(testing): Use `@cross/test` insted of Deno test runner, to utilize the native test runners of Node, Deno and Bun.
+- [x] chore(testing): Use `@cross/test` insted of Deno test runner, to utilize the native test runners of Node, Deno and Bun.
 
 ## [1.0.0-rc.14] - 2024-04-07
 

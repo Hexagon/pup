@@ -7,7 +7,7 @@ const minimalPupConfiguration = {
   processes: [],
 }
 
-Deno.test("Plugin - Load and verify missing meta.name", async () => {
+test("Plugin - Load and verify missing meta.name", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginConfiguration: PluginConfiguration = {
     url: "../../test/core/test-data/test_plugin_name.ts",
@@ -18,7 +18,7 @@ Deno.test("Plugin - Load and verify missing meta.name", async () => {
   assertThrows(() => plugin.verify(), Error, "Plugin missing meta.name")
 })
 
-Deno.test("Plugin - Load and verify missing meta.repository", async () => {
+test("Plugin - Load and verify missing meta.repository", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginConfiguration: PluginConfiguration = {
     url: "../../test/core/test-data/test_plugin_repository.ts",
@@ -29,7 +29,7 @@ Deno.test("Plugin - Load and verify missing meta.repository", async () => {
   assertThrows(() => plugin.verify(), Error, "Plugin missing meta.repository")
 })
 
-Deno.test("Plugin - Load and verify missing meta.version", async () => {
+test("Plugin - Load and verify missing meta.version", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginConfiguration: PluginConfiguration = {
     url: "../../test/core/test-data/test_plugin_version.ts",
@@ -40,7 +40,7 @@ Deno.test("Plugin - Load and verify missing meta.version", async () => {
   assertThrows(() => plugin.verify(), Error, "Plugin missing meta.version")
 })
 
-Deno.test("Plugin - Load and verify missing meta.api", async () => {
+test("Plugin - Load and verify missing meta.api", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginConfiguration: PluginConfiguration = {
     url: "../../test/core/test-data/test_plugin_api.ts",
@@ -51,7 +51,7 @@ Deno.test("Plugin - Load and verify missing meta.api", async () => {
   assertThrows(() => plugin.verify(), Error, "Plugin missing meta.api")
 })
 
-Deno.test("Plugin - Load and verify unsupported API version", async () => {
+test("Plugin - Load and verify unsupported API version", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginConfiguration: PluginConfiguration = {
     url: "../../test/core/test-data/test_plugin_unsupported_api.ts",
@@ -62,7 +62,7 @@ Deno.test("Plugin - Load and verify unsupported API version", async () => {
   assertThrows(() => plugin.verify(), Error, "Plugin version not supported")
 })
 
-Deno.test("Plugin - Test default hook implementation", async () => {
+test("Plugin - Test default hook implementation", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginConfiguration: PluginConfiguration = {
     url: "../../test/core/test-data/test_plugin_valid.ts",
@@ -75,7 +75,7 @@ Deno.test("Plugin - Test default hook implementation", async () => {
   assertEquals(result, false, "Default hook implementation should return false")
 })
 
-Deno.test("PluginApi - Check temporaryStorage path - undefined", async () => {
+test("PluginApi - Check temporaryStorage path - undefined", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginApi = new PluginApi(pup)
 
@@ -92,7 +92,7 @@ Deno.test("PluginApi - Check temporaryStorage path - undefined", async () => {
   )
 })
 
-Deno.test("PluginApi - Check persistentStorage path - undefined", async () => {
+test("PluginApi - Check persistentStorage path - undefined", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginApi = new PluginApi(pup)
 
@@ -109,7 +109,7 @@ Deno.test("PluginApi - Check persistentStorage path - undefined", async () => {
   )
 })
 
-Deno.test("PluginApi - Check configFilePath - undefined", async () => {
+test("PluginApi - Check configFilePath - undefined", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginApi = new PluginApi(pup)
 
@@ -126,7 +126,7 @@ Deno.test("PluginApi - Check configFilePath - undefined", async () => {
   )
 })
 
-Deno.test("PluginApi - Check configFilePath - set", async () => {
+test("PluginApi - Check configFilePath - set", async () => {
   const pup = await Pup.init(minimalPupConfiguration, "./test/core/test-data/test.json")
   const pluginApi = new PluginApi(pup)
 
@@ -143,7 +143,7 @@ Deno.test("PluginApi - Check configFilePath - set", async () => {
   )
 })
 
-Deno.test("PluginApi - Check temporaryStorage path - set", async () => {
+test("PluginApi - Check temporaryStorage path - set", async () => {
   const pup = await Pup.init(minimalPupConfiguration, "./test/core/test-data/test.json")
   const pluginApi = new PluginApi(pup)
 
@@ -158,7 +158,7 @@ Deno.test("PluginApi - Check temporaryStorage path - set", async () => {
   )
 })
 
-Deno.test("PluginApi - Check persistentStorage path - set", async () => {
+test("PluginApi - Check persistentStorage path - set", async () => {
   const pup = await Pup.init(minimalPupConfiguration, "./test/core/test-data/test.json")
   const pluginApi = new PluginApi(pup)
 
@@ -174,7 +174,7 @@ Deno.test("PluginApi - Check persistentStorage path - set", async () => {
   )
 })
 
-Deno.test("Plugin - Test signal listener", async () => {
+test("Plugin - Test signal listener", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
   const pluginConfiguration: PluginConfiguration = {
     url: "../../test/core/test-data/test_signal_listener.ts",

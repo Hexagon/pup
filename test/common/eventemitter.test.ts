@@ -1,7 +1,7 @@
 import { EventEmitter } from "../../lib/common/eventemitter.ts"
 import { assert, assertEquals } from "@std/assert"
 
-Deno.test("EventEmitter - Add and trigger event listener", () => {
+test("EventEmitter - Add and trigger event listener", () => {
   const eventEmitter = new EventEmitter()
   let called = false
 
@@ -13,7 +13,7 @@ Deno.test("EventEmitter - Add and trigger event listener", () => {
   assert(called, "Event listener should be called")
 })
 
-Deno.test("EventEmitter - Trigger event listener with data", () => {
+test("EventEmitter - Trigger event listener with data", () => {
   const eventEmitter = new EventEmitter()
   let receivedData: string | undefined
 
@@ -25,7 +25,7 @@ Deno.test("EventEmitter - Trigger event listener with data", () => {
   assertEquals(receivedData, "Hello, World!", "Event listener should receive data")
 })
 
-Deno.test("EventEmitter - Remove event listener", () => {
+test("EventEmitter - Remove event listener", () => {
   const eventEmitter = new EventEmitter()
   let called = false
 
@@ -40,7 +40,7 @@ Deno.test("EventEmitter - Remove event listener", () => {
   assert(!called, "Event listener should not be called after being removed")
 })
 
-Deno.test("EventEmitter - Multiple listeners for same event", () => {
+test("EventEmitter - Multiple listeners for same event", () => {
   const eventEmitter = new EventEmitter()
   let listener1Called = false
   let listener2Called = false
@@ -60,7 +60,7 @@ Deno.test("EventEmitter - Multiple listeners for same event", () => {
   assert(listener2Called, "Listener 2 should be called")
 })
 
-Deno.test("EventEmitter - Multiple events with different listeners", () => {
+test("EventEmitter - Multiple events with different listeners", () => {
   const eventEmitter = new EventEmitter()
   let testEventCalled = false
   let anotherEventCalled = false

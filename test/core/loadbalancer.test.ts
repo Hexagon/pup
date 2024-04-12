@@ -43,7 +43,7 @@ class MockConn implements Deno.Conn {
   }
 }
 
-Deno.test("LoadBalancer - Initialization", () => {
+test("LoadBalancer - Initialization", () => {
   const backends: Backend[] = [
     { host: "backend1.example.com", port: 80 },
     { host: "backend2.example.com", port: 80 },
@@ -54,14 +54,14 @@ Deno.test("LoadBalancer - Initialization", () => {
   loadBalancer.close()
 })
 
-Deno.test("LoadBalancer - Throws Error When No Backends are Provided", () => {
+test("LoadBalancer - Throws Error When No Backends are Provided", () => {
   const backends: Backend[] = []
   assertThrows(() => {
     new LoadBalancer(backends, BalancingStrategy.ROUND_ROBIN, 120, loggerCallback)
   })
 })
 
-Deno.test("LoadBalancer - Initializes with Backends Correctly", () => {
+test("LoadBalancer - Initializes with Backends Correctly", () => {
   const backends: Backend[] = [
     { host: "192.168.1.1", port: 8080 },
     { host: "192.168.1.2", port: 8080 },
@@ -81,7 +81,7 @@ Deno.test("LoadBalancer - Initializes with Backends Correctly", () => {
   loadBalancer.close()
 })
 
-Deno.test("LoadBalancer - Selects Backend with ROUND_ROBIN Strategy", () => {
+test("LoadBalancer - Selects Backend with ROUND_ROBIN Strategy", () => {
   const backends: Backend[] = [
     { host: "192.168.1.1", port: 8080 },
     { host: "192.168.1.2", port: 8080 },
@@ -99,7 +99,7 @@ Deno.test("LoadBalancer - Selects Backend with ROUND_ROBIN Strategy", () => {
   loadBalancer.close()
 })
 
-Deno.test("LoadBalancer - Selects Backend with IP_HASH Strategy", () => {
+test("LoadBalancer - Selects Backend with IP_HASH Strategy", () => {
   const backends: Backend[] = [
     { host: "192.168.1.1", port: 8080 },
     { host: "192.168.1.2", port: 8080 },
@@ -116,7 +116,7 @@ Deno.test("LoadBalancer - Selects Backend with IP_HASH Strategy", () => {
   loadBalancer.close()
 })
 
-Deno.test("LoadBalancer - Selects Backend with LEAST_CONNECTIONS Strategy", () => {
+test("LoadBalancer - Selects Backend with LEAST_CONNECTIONS Strategy", () => {
   const backends: Backend[] = [
     { host: "192.168.1.1", port: 8080 },
     { host: "192.168.1.2", port: 8080 },
