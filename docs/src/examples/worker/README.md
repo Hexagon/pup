@@ -21,7 +21,7 @@ process using a worker. The process has logging configurations to write logs to 
 
 `cd` to `/docs/src/examples/worker` directory.
 
-Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
+Start example by running `pup foreground` if pup is installed, or something like `deno run -A ../../../pup.ts foreground` if not.
 
 Success!
 

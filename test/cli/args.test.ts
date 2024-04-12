@@ -56,7 +56,7 @@ Deno.test("String options and aliases are parsed correctly", () => {
   assertEquals(parsedArgs.get("cmd"), "command")
   assertEquals(parsedArgs.getBoolean("dry-run"), true)
 })
-/*
+
 Deno.test("checkArguments should throw error when autostart argument is provided without init, append or --cmd", async () => {
   const args = new ArgsParser(["--cron"])
   assertThrows(
@@ -68,6 +68,7 @@ Deno.test("checkArguments should throw error when autostart argument is provided
   )
 })
 
+/*
 Deno.test("checkArguments should throw error when cron argument is provided without init or append", async () => {
   const args = new ArgsParser(["cron"])
   assertThrows(

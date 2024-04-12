@@ -22,7 +22,7 @@ Detailed documentation available at [5. Scaling applications](https://hexagon.gi
 
 `cd` to `/docs/src/examples/cluster` directory.
 
-Run using command `pup run`
+Run using command `pup foreground`
 
 Browse to `http://localhost:3456`
 

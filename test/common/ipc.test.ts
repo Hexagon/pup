@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert"
 import { FileIPC } from "../../lib/common/ipc.ts"
-import { fileExists } from "../../lib/common/utils.ts"
+import { exists } from "@cross/fs"
 
 const TEST_FILE_PATH = "./test_data_FileIPC.ipctest"
 const TEST_STALE_LIMIT = 2000
@@ -10,7 +10,7 @@ Deno.test({
   async fn() {
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
-    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    const fileExistsResult = await exists(TEST_FILE_PATH)
     assertEquals(fileExistsResult, true)
     await fileIPC.close()
   },
@@ -78,7 +78,7 @@ Deno.test({
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
     await fileIPC.close()
-    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    const fileExistsResult = await exists(TEST_FILE_PATH)
     assertEquals(fileExistsResult, false)
   },
 })
@@ -89,7 +89,7 @@ Deno.test({
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
     await fileIPC.close(true)
-    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    const fileExistsResult = await exists(TEST_FILE_PATH)
     assertEquals(fileExistsResult, true)
     await Deno.remove(TEST_FILE_PATH)
   },
@@ -101,7 +101,7 @@ Deno.test({
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
     await fileIPC.close(true)
-    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    const fileExistsResult = await exists(TEST_FILE_PATH)
     assertEquals(fileExistsResult, true)
     await Deno.remove(TEST_FILE_PATH)
   },
@@ -113,7 +113,7 @@ Deno.test({
     const fileIPC = new FileIPC(TEST_FILE_PATH)
     await fileIPC.sendData("test data")
     await fileIPC.close(true)
-    const fileExistsResult = await fileExists(TEST_FILE_PATH)
+    const fileExistsResult = await exists(TEST_FILE_PATH)
     assertEquals(fileExistsResult, true)
     await Deno.remove(TEST_FILE_PATH)
   },

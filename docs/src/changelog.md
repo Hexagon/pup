@@ -17,13 +17,14 @@ All notable changes to this project will be documented in this section.
 - [x] change(cli): Rename cli command `install` to `enable-service`
 - [x] change(cli): Rename cli command `uninstall` to `disable-service`
 - [ ] change(logging): Make logs streaming by default.
-- [ ] change(config): Support JSON5.
-- [ ] change(packaging): Use jsr.io instead of deno.land/x for distribution.
-- [ ] change(packaging]: Specify installation command for next version in version metadata instead of code, allowing for new installation commands for new versions.
+- [x] change(config): Support JSON5.
 
 ### Non-breaking
 
 - [ ] fix(core): Foreground command does not keep an autostarted process running.
+- [x] fix(cli): Controlled output of manual rests after installing/uninstalling as service.
+- [x] fix(docs): Docs incorrectly stated that `**/_._` is default for watcher config. `**/*.*` is correct.
+- [ ] chore(docs): Add a PM2 migration guide.
 
 ## Maintenance
 

@@ -22,14 +22,14 @@ import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/
 import { exists, readFile } from "@cross/fs"
 
 // Import external dependencies
-import * as jsonc from "@std/jsonc"
+import JSON5 from "json5"
 import * as path from "@std/path"
 import { Logger } from "../core/logger.ts"
 
 import { args } from "@cross/utils/args"
 
 import { installService, uninstallService } from "@cross/service"
-import { exit } from "@cross/utils"
+import { Colors, exit } from "@cross/utils"
 import { chdir, cwd } from "@cross/fs"
 
 /**
@@ -144,7 +144,18 @@ async function main() {
     const env = parsedArgs.getArray("env") || []
 
     try {
-      await installService({ system, name, cmd, cwd, user, home, env }, parsedArgs.getBoolean("dry-run"))
+      const result = await installService({ system, name, cmd, cwd, user, home, env }, parsedArgs.getBoolean("dry-run"))
+      if (result.manualSteps && result.manualSteps.length) {
+        console.log(Colors.bold("To complete the installation, carry out these manual steps:"))
+        result.manualSteps.forEach((step, index) => {
+          console.log(Colors.cyan(`${index + 1}. ${step.text}`))
+          if (step.command) {
+            console.log("   " + Colors.yellow("Command: ") + step.command)
+          }
+        })
+      } else {
+        console.log(`Service ´${name}' successfully installed at '${result.servicePath}'.`)
+      }
       exit(0)
     } catch (e) {
       console.error(`Could not install service, error: ${e.message}`)
@@ -154,10 +165,19 @@ async function main() {
     const system = parsedArgs.getBoolean("system")
     const name = parsedArgs.get("name") || "pup"
     const home = parsedArgs.get("home")
-
     try {
-      await uninstallService({ system, name, home })
-      console.log(`Service '${name}' uninstalled.`)
+      const result = await uninstallService({ system, name, home })
+      if (result.manualSteps && result.manualSteps.length) {
+        console.log(Colors.bold("To complete the uninstallation, carry out these manual steps:"))
+        result.manualSteps.forEach((step, index) => {
+          console.log(Colors.cyan(`${index + 1}. ${step.text}`))
+          if (step.command) {
+            console.log("   " + Colors.yellow("Command: ") + step.command)
+          }
+        })
+      } else {
+        console.log(`Service '${name}' at '${result.servicePath}' is now uninstalled.`)
+      }
       exit(0)
     } catch (e) {
       console.error(`Could not uninstall service, error: ${e.message}`)
@@ -169,8 +189,8 @@ async function main() {
    * Now, handle the argument to generate a new configuration file and exit
    */
   if (baseArgument === "init") {
-    // Default new configuration file to pup.jsonc
-    const fallbackedConfigFile = configFile ?? "pup.jsonc"
+    // Default new configuration file to pup.json
+    const fallbackedConfigFile = configFile ?? "pup.json"
     if (await exists(fallbackedConfigFile)) {
       console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
       exit(1)
@@ -234,7 +254,7 @@ async function main() {
     try {
       const rawConfig = await readFile(configFile)
       const rawConfigText = new TextDecoder().decode(rawConfig)
-      configuration = validateConfiguration(jsonc.parse(rawConfigText))
+      configuration = validateConfiguration(JSON5.parse(rawConfigText))
     } catch (e) {
       console.error(`Could not start, error reading or parsing configuration file '${configFile}': ${e.message}`)
       exit(1)

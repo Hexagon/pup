@@ -7,7 +7,7 @@
  */
 
 import { Configuration, generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
-import * as jsonc from "@std/jsonc"
+import JSON5 from "npm:json5"
 import { join } from "@std/path"
 import { exists } from "@cross/fs"
 import { ArgsParser } from "@cross/utils"
@@ -55,7 +55,7 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
     let existingConfigurationObject
     try {
       const existingConfiguration = await Deno.readTextFile(configFile)
-      existingConfigurationObject = jsonc.parse(existingConfiguration) as unknown as Configuration
+      existingConfigurationObject = JSON5.parse(existingConfiguration) as unknown as Configuration
     } catch (e) {
       throw new Error("Could not read configuration file: " + e.message)
     }
@@ -109,7 +109,7 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
     let existingConfigurationObject
     try {
       const existingConfiguration = await Deno.readTextFile(configFile)
-      existingConfigurationObject = jsonc.parse(existingConfiguration) as unknown as Configuration
+      existingConfigurationObject = JSON5.parse(existingConfiguration) as unknown as Configuration
     } catch (e) {
       throw new Error("Could not read configuration file.", e.message)
     }
@@ -155,15 +155,15 @@ export async function findConfigFile(cwd: string, useConfigFile?: boolean, argum
     }
   }
 
-  // Try to find configuration file, jsonc first. Take cwd into account.
+  // Try to find configuration file, JSON5 first. Take cwd into account.
   let jsonPath = "./pup.json"
-  let jsoncPath = "./pup.jsonc"
+  let JSON5Path = "./pup.JSON5"
   if (cwd) {
     jsonPath = join(toResolvedAbsolutePath(cwd), jsonPath)
-    jsoncPath = join(toResolvedAbsolutePath(cwd), jsoncPath)
+    JSON5Path = join(toResolvedAbsolutePath(cwd), JSON5Path)
   }
-  if (await exists(jsoncPath)) {
-    return jsoncPath
+  if (await exists(JSON5Path)) {
+    return JSON5Path
   } else {
     return jsonPath
   }

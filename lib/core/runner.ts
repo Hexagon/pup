@@ -38,8 +38,8 @@ class Runner extends BaseRunner {
 
     runningCallback()
 
-    this.pipeToLogger("stdout", this.process.stdout())
-    this.pipeToLogger("stderr", this.process.stderr())
+    this.pipeToLogger("stdout", this.process.stdout() as ReadableStream<Uint8Array>)
+    this.pipeToLogger("stderr", this.process.stderr() as ReadableStream<Uint8Array>)
 
     const result = await this.waitForProcessEnd()
 

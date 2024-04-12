@@ -17,7 +17,7 @@ Follow the guide below to install Pup as a system service and launch at boot. Th
 
 ### Prerequisites
 
-Ensure that you have a working environment set up so that you can run `pup run` with a `pup.json` in the current directory, or that you can start Pup using `pup run --config path/to/pup.json`.
+Ensure that you have a working environment set up so that you can run `pup foreground` with a `pup.json` in the current directory, or that you can start Pup using `pup run --config path/to/pup.json`.
 
 Now there is two options, User Mode Installation, or System Installation. User Mode Installation is recommended as it rhymes best with Deno, which is installed for the current user. User mode is only
 supported with launchd or systemd.
@@ -34,11 +34,11 @@ Replace `username` with your actual username.
 
 2. Install Pup as a user mode service, named `pup`:
 
-`pup install`
+`pup enable-service`
 
 To install multiple services, provide a unique name for each instance:
 
-`pup install --name my-service`
+`pup enable-service --name my-service`
 
 ### System Mode Installation
 
@@ -46,11 +46,11 @@ To install multiple services, provide a unique name for each instance:
 
 1. Install Pup as a system service, by default named `pup`:
 
-`pup install --system`
+`pup enable-service --system`
 
 To install multiple services, provide a unique name for each instance:
 
-`pup install --system --name my-service`
+`pup enable-service --system --name my-service`
 
 2. Follow the on-screen instructions to copy the generated configuration file to the correct location, and enable the service.
 
@@ -59,8 +59,8 @@ To install multiple services, provide a unique name for each instance:
 Use the `pup <method> [...flags]` command with the following methods and flags:
 
 - Methods:
-  - `install`: Installs the configured Pup instance as a system service, then verifies the installation by enabling and starting the service. Rolls back any changes on error.
-  - `uninstall`: Uninstall service
+  - `enable-service`: Installs the configured Pup instance as a system service, then verifies the installation by enabling and starting the service. Rolls back any changes on error.
+  - `disable-service`: Uninstall service
 
 - Flags:
   - `--config`: Specifies the configuration file for the instance to be installed, defaulting to `pup.json` or `pup.jsonc` in the current directory.
@@ -144,7 +144,7 @@ Description=Pup
 After=network.target
 
 [Service]
-ExecStart=/home/user/.deno/bin/deno run -A https://deno.land/x/pup/pup.ts run --config /path/to/your/pup.json
+ExecStart=/home/user/.deno/bin/deno run -A https://deno.land/x/pup/`pup.ts foreground` --config /path/to/your/pup.json
 Restart=always
 
 [Install]

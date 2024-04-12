@@ -20,8 +20,8 @@ Pup is a powerful process manager for Deno, designed to simplify the management 
 
 > **Note** Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes. { .note }
 
-Pup is centered on a single configuration file, ideally named `pup.json` or `pup.jsonc`, which manages all aspects of the processes to be executed, including their execution methods and logging
-handling.
+Pup is centered on a single configuration file, `pup.json`, which manages all aspects of the processes to be executed, including their execution methods and logging handling.
+[JSON5](https://github.com/json5/json5) syntax is supported.
 
 ## Quick Start
 

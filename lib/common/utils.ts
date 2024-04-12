@@ -25,7 +25,7 @@ export function toResolvedAbsolutePath(path: string, cwdInput?: string) {
  */
 export async function toTempPath(configFile: string) {
   const resolvedPath = parse(toResolvedAbsolutePath(configFile))
-  const tempPath = toResolvedAbsolutePath(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-tmp`)
+  const tempPath = toResolvedAbsolutePath(`${resolvedPath.dir}/.pup/${resolvedPath.name}${resolvedPath.ext}-tmp`)
   await mkdir(tempPath, { recursive: true })
   return tempPath
 }
@@ -38,7 +38,7 @@ export async function toTempPath(configFile: string) {
  */
 export async function toPersistentPath(configFile: string) {
   const resolvedPath = parse(toResolvedAbsolutePath(configFile))
-  const persistentStoragePath = resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-data`)
+  const persistentStoragePath = resolve(`${resolvedPath.dir}/.pup/${resolvedPath.name}${resolvedPath.ext}-data`)
   await mkdir(persistentStoragePath, { recursive: true })
   return persistentStoragePath
 }
