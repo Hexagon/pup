@@ -36,20 +36,12 @@ deno run -Ar https://deno.land/x/pup/pup.ts setup --channel prerelease
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
 channels [here](https://hexagon.github.io/pup/installation.html#release-channels).
 
-To enable pup at system boot, install it as a system service using `pup enable-service`.
-
-```bash
-pup enable-service
-```
-
-You can pass `-n my-custom-name` to give the service a name different from `pup`
-
 ### Configuration
 
-Pup revolves around ecosystem configuration files, each process belongs to an ecosystem defined by a `pup.json`. This file can either be created manually, or by the command line helpers. To create a
-simple ecosystem running a single process:
+Pup revolves around instances configuration files, each process belongs to an instances defined by a `pup.json`. This file can either be created manually, or by the command line helpers. To create a
+simple instances running a single process:
 
-`pup init --id "my-server" --cmd "deno run -A server.ts"`
+`pup init --id "my-server" --autostart --cmd "deno run -A server.ts"`
 
 2. (Optional) In case you have an additional task to execute, such as a cleanup script, you can make use of `pup append`. The following example shows how to add an extra task that use the cron start
    policy:
@@ -58,8 +50,10 @@ simple ecosystem running a single process:
 
 3. (Optional) Test run your instance (ecosystem):
 
-   `pup test`
+   `pup foreground`
 
-4. To make your instance run at boot, enable it using `pup start`.
+4. To make your instance run at boot, enable it using `pup enable-service`.
 
-   `pup start`
+   `pup enable-service`
+
+   You can pass `-n my-custom-name` to give the service a name different from `pup`
