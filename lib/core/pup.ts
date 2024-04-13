@@ -5,8 +5,16 @@
  * @license   MIT
  */
 
-import { Configuration, DEFAULT_INTERNAL_LOG_HOURS, GlobalLoggerConfiguration, MAINTENANCE_INTERVAL_MS, ProcessConfiguration, validateConfiguration, WATCHDOG_INTERVAL_MS } from "./configuration.ts"
-import { FileIPC, IpcValidatedMessage } from "../common/ipc.ts"
+import {
+  type Configuration,
+  DEFAULT_INTERNAL_LOG_HOURS,
+  type GlobalLoggerConfiguration,
+  MAINTENANCE_INTERVAL_MS,
+  type ProcessConfiguration,
+  validateConfiguration,
+  WATCHDOG_INTERVAL_MS,
+} from "./configuration.ts"
+import { FileIPC, type IpcValidatedMessage } from "../common/ipc.ts"
 import { Logger } from "./logger.ts"
 import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
@@ -44,7 +52,7 @@ class Pup {
 
   public cleanupQueue: string[] = []
 
-  static async init(unvalidatedConfiguration: unknown, configFilePath?: string) {
+  static async init(unvalidatedConfiguration: unknown, configFilePath?: string): Promise<Pup> {
     const temporaryStoragePath: string | undefined = configFilePath ? await toTempPath(configFilePath) : undefined
     const persistentStoragePath: string | undefined = configFilePath ? await toPersistentPath(configFilePath) : undefined
     return new Pup(unvalidatedConfiguration, configFilePath, temporaryStoragePath, persistentStoragePath)

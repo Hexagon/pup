@@ -1,7 +1,7 @@
 import { assertEquals, assertThrows } from "@std/assert"
 import { Pup } from "../../lib/core/pup.ts"
 import { Plugin, PluginApi } from "../../lib/core/plugin.ts"
-import { PluginConfiguration } from "../../lib/core/configuration.ts"
+import type { PluginConfiguration } from "../../lib/core/configuration.ts"
 import { test } from "@cross/test"
 
 const minimalPupConfiguration = {

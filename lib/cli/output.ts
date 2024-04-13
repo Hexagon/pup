@@ -9,7 +9,7 @@
  */
 
 import { Application } from "../../application.meta.ts"
-import { Column, Columns, TableRow } from "./columns.ts"
+import { type Column, Columns, type TableRow } from "./columns.ts"
 
 export function createHeaderMessage() {
   return Application.name + " " + Application.version + "\n" + Application.repository

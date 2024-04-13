@@ -6,12 +6,13 @@
  * @license   MIT
  */
 
-import { Configuration, generateConfiguration, ProcessConfiguration } from "../core/configuration.ts"
-import JSON5 from "npm:json5"
+import { type Configuration, generateConfiguration, type ProcessConfiguration } from "../core/configuration.ts"
+import JSON5 from "json5"
 import { join } from "@std/path"
 import { exists } from "@cross/fs"
-import { ArgsParser } from "@cross/utils"
+import type { ArgsParser } from "@cross/utils"
 import { toResolvedAbsolutePath } from "../common/utils.ts"
+import { exit } from "node:process"
 
 /**
  * Helper which creates a configuration file from command line arguments
@@ -39,7 +40,7 @@ export async function createConfigurationFile(configFile: string, checkedArgs: A
     await Deno.writeTextFile(configFile, JSON.stringify(config, null, 2))
   } catch (e) {
     console.error("Could not create/write configuration file: ", e)
-    Deno.exit(1)
+    exit(1)
   }
 }
 
@@ -94,7 +95,7 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
     await Deno.writeTextFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
   } catch (e) {
     console.error(`Could not modify configuration file '${configFile}': `, e.message)
-    Deno.exit(1)
+    exit(1)
   }
 }
 
@@ -131,7 +132,7 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
     await Deno.writeTextFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
   } catch (e) {
     console.error(`Could not modify configuration file ${configFile}: `, e.message)
-    Deno.exit(1)
+    exit(1)
   }
 }
 
@@ -157,13 +158,13 @@ export async function findConfigFile(cwd: string, useConfigFile?: boolean, argum
 
   // Try to find configuration file, JSON5 first. Take cwd into account.
   let jsonPath = "./pup.json"
-  let JSON5Path = "./pup.JSON5"
+  let jsoncPath = "./pup.jsonc"
   if (cwd) {
     jsonPath = join(toResolvedAbsolutePath(cwd), jsonPath)
-    JSON5Path = join(toResolvedAbsolutePath(cwd), JSON5Path)
+    jsoncPath = join(toResolvedAbsolutePath(cwd), jsoncPath)
   }
-  if (await exists(JSON5Path)) {
-    return JSON5Path
+  if (await exists(jsoncPath)) {
+    return jsoncPath
   } else {
     return jsonPath
   }

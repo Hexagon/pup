@@ -5,10 +5,10 @@
  * @license   MIT
  */
 
-import { ProcessConfiguration, Pup } from "./pup.ts"
+import type { ProcessConfiguration, Pup } from "./pup.ts"
 import { readLines, StringReader } from "@std/io"
 import { resolve } from "@std/path"
-import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
+import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
 
 class WorkerRunner extends BaseRunner {
   private worker?: Worker

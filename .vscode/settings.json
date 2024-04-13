@@ -7,7 +7,7 @@
         "/pup.json",
         "/pup.jsonc"
       ],
-      "url": "https://deno.land/x/pup/docs/pup.schema.json"
+      "url": "https://jsr.io/@pup/pup/docs/pup.schema.json"
     }
   ]
 }

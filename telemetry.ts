@@ -6,7 +6,7 @@
  *
  *     //  Early in your application entrypoint - pin to a specific version similar
  *     //  to what your main process use, like pup@1.0.0-alpha-28
- *     import { PupTelemetry } from "https://deno.land/x/pup/telemetry.ts"
+ *     import { PupTelemetry } from "jsr:@pup/pup/telemetry.ts"
  *     const telemetry = PupTelemetry()
  *
  *     // The rest of your application
@@ -29,7 +29,7 @@
  * @license   MIT
  */
 
-import { EventEmitter, EventHandler } from "./lib/common/eventemitter.ts"
+import { EventEmitter, type EventHandler } from "./lib/common/eventemitter.ts"
 import { FileIPC } from "./lib/common/ipc.ts"
 import { exists, isDir } from "@cross/fs"
 

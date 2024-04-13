@@ -5,12 +5,12 @@
  * @license   MIT
  */
 
-import { Pup } from "./pup.ts"
+import type { Pup } from "./pup.ts"
 import { Runner } from "./runner.ts"
 import { WorkerRunner } from "./worker.ts"
-import { ProcessConfiguration } from "./configuration.ts"
+import type { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
-import { TelemetryData } from "../../telemetry.ts"
+import type { TelemetryData } from "../../telemetry.ts"
 
 import { Cron } from "@hexagon/croner"
 import { delay } from "@std/async"
@@ -131,11 +131,11 @@ class Process {
     }
   }
 
-  public isCluster() {
+  public isCluster(): boolean {
     return false
   }
 
-  public getConfig() {
+  public getConfig(): ProcessConfiguration {
     return this.config
   }
 

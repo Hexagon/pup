@@ -5,8 +5,8 @@
  * @license   MIT
  */
 
-import { ProcessConfiguration } from "../core/configuration.ts"
-import { Pup } from "../core/pup.ts"
+import type { ProcessConfiguration } from "../core/configuration.ts"
+import type { Pup } from "../core/pup.ts"
 
 export type RunnerCallback = (pid?: number) => void
 

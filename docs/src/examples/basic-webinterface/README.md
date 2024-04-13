@@ -27,7 +27,7 @@ To activate the web interface plugin, set up the `plugins:`-section of your `pup
   "processes": [/* ... */],
   "plugins": [
     {
-      "url": "https://deno.land/x/pup@$VERSION/plugins/web-interface/mod.ts",
+      "url": "jsr:@pup/pup@$VERSION/plugins/web-interface/mod.ts",
       "options": {
         "port": 5000
       }

@@ -8,11 +8,11 @@
  */
 
 import { Application } from "../../application.meta.ts"
-import { EventEmitter } from "../common/eventemitter.ts"
-import { PluginConfiguration, ProcessLoggerConfiguration } from "./configuration.ts"
-import { LogEventData } from "./logger.ts"
-import { ProcessState } from "./process.ts"
-import { Pup } from "./pup.ts"
+import type { EventEmitter } from "../common/eventemitter.ts"
+import type { PluginConfiguration, ProcessLoggerConfiguration } from "./configuration.ts"
+import type { LogEventData } from "./logger.ts"
+import type { ProcessState } from "./process.ts"
+import type { Pup } from "./pup.ts"
 
 const SUPPORTED_API_VERSIONS = ["1"]
 
@@ -223,7 +223,7 @@ export class PluginImplementation {
     return false
   }
   // Default implemetation of the cleanup function
-  public async cleanup() {
+  public async cleanup(): Promise<boolean> {
     return await false
   }
 }

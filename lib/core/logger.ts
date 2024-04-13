@@ -7,7 +7,7 @@
  */
 
 import { stripAnsi } from "@cross/utils"
-import { GlobalLoggerConfiguration, KV_SIZE_LIMIT_BYTES, ProcessConfiguration } from "./configuration.ts"
+import { type GlobalLoggerConfiguration, KV_SIZE_LIMIT_BYTES, type ProcessConfiguration } from "./configuration.ts"
 
 export interface LogEvent {
   severity: string

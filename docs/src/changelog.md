@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this section.
 - [ ] change(logging): Make `pup logs` streaming by default.
 - [x] change(config): Support JSON5.
 - [x] change(core): Move .pup.jsonc-tmp, .pup.jsonc-data into .pup
+- [x] change(packaging): Move default installation docs/references from `deno.land/x` to JSR.io
 
 ### Non-breaking
 
@@ -29,6 +30,7 @@ All notable changes to this project will be documented in this section.
 - [x] fix(docs): Docs incorrectly stated that `**/_._` is default for watcher config. `**/*.*` is correct.
 - [ ] chore(docs): Add a PM2 migration guide.
 - [x] fix(schema): Expect Record<string, string> for process.env in json schema.
+- [x] change(core): Make most code cross runtime, preparing for Node and Bun support.
 
 ## Maintenance
 

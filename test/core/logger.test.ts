@@ -1,6 +1,6 @@
 import { assertEquals, assertGreater } from "@std/assert"
-import { AttachedLogger, LogEventData, Logger } from "../../lib/core/logger.ts"
-import { ProcessConfiguration } from "../../mod.ts"
+import { type AttachedLogger, type LogEventData, Logger } from "../../lib/core/logger.ts"
+import type { ProcessConfiguration } from "../../mod.ts"
 import { test } from "@cross/test"
 
 test("Logger - Creation with Global Configuration", () => {

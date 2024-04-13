@@ -6,8 +6,8 @@
 
 // deno-lint-ignore-file no-explicit-any
 
-import { ProcessStateChangedEvent } from "../../lib/core/process.ts"
-import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
+import type { ProcessStateChangedEvent } from "../../lib/core/process.ts"
+import { type LogEvent, type PluginApi, type PluginConfiguration, PluginImplementation } from "../../mod.ts"
 import { Application, Bundlee, dirname, Router } from "./deps.ts"
 
 interface Configuration {

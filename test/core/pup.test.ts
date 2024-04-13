@@ -4,7 +4,7 @@
  * @file test/core/pup.test.ts
  */
 
-import { Configuration } from "../../lib/core/configuration.ts"
+import type { Configuration } from "../../lib/core/configuration.ts"
 import { ProcessState } from "../../lib/core/process.ts"
 import { Pup } from "../../lib/core/pup.ts"
 import { assertEquals, assertNotEquals } from "@std/assert"

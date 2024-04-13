@@ -5,10 +5,10 @@
  * @license   MIT
  */
 
-import { ProcessConfiguration, Pup } from "./pup.ts"
+import type { ProcessConfiguration, Pup } from "./pup.ts"
 import { readLines, StringReader } from "@std/io"
-import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
-import { $, CommandChild } from "dax-sh"
+import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
+import { $, type CommandChild } from "dax-sh"
 /**
  * Represents a task runner that executes tasks as regular processes.
  * Extends the BaseRunner class.

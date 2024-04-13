@@ -6,8 +6,8 @@
  */
 
 // Import core dependencies
-import { InstructionResponse, Pup } from "../core/pup.ts"
-import { Configuration, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
+import { type InstructionResponse, Pup } from "../core/pup.ts"
+import { type Configuration, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
 import { FileIPC } from "../common/ipc.ts"
 
 // Import CLI utilities
@@ -275,7 +275,7 @@ async function main() {
       // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
       try {
         const resolvedPath = path.parse(path.resolve(parsedArgs.get("cwd")!))
-        Deno.chdir(resolvedPath.dir)
+        chdir(resolvedPath.dir)
       } catch (e) {
         console.error(`Could not change working directory to path specified by --cwd ${parsedArgs.get("cwd")}, exiting. Message: `, e.message)
         exit(1)

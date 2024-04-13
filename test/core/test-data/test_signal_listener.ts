@@ -1,4 +1,4 @@
-import { PluginApi, PluginImplementation } from "../../../lib/core/plugin.ts"
+import { type PluginApi, PluginImplementation } from "../../../lib/core/plugin.ts"
 
 export class PupPlugin extends PluginImplementation {
   public meta = {

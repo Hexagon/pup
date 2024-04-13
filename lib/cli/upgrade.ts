@@ -10,8 +10,9 @@
 
 import { Application } from "../../application.meta.ts"
 import { greaterThan, lessThan, parse } from "@std/semver"
+import { exit } from "@cross/utils"
 
-const VERSION_INVENTORY_URL = "https://deno.land/x/pup/versions.json"
+const VERSION_INVENTORY_URL = "https://jsr.io/@pup/pup/versions.json"
 const LOCAL_VERSION_INVENTORY_FILE = "./versions.json"
 
 type Versions = {
@@ -124,7 +125,7 @@ export async function upgrade(
 
         if (!answer) {
           console.log(`\n${freshInstall ? "Installation" : "Upgrade"} cancelled by the user.\n`)
-          Deno.exit(1)
+          exit(1)
         }
 
         unstableInstall = true
@@ -132,7 +133,7 @@ export async function upgrade(
         console.log(
           `\nError: Current Deno version does not meet the requirements of the requested version (${(requestedVersion as Version).version}).\n`,
         )
-        Deno.exit(1)
+        exit(1)
       }
     }
   }
@@ -166,7 +167,7 @@ export async function upgrade(
   if (allPermissions || !requestedVersion?.default_permissions) {
     installCmd.push("-A")
   } else {
-    installCmd.push(...requestedVersion.default_permissions)
+    installCmd.push(...requestedVersion!.default_permissions)
   }
   if (ignoreCertificateErrorsString && ignoreCertificateErrorsString !== "") {
     installCmd.push(ignoreCertificateErrorsString)
@@ -197,9 +198,9 @@ export async function upgrade(
         `\nFor any potential changes that might affect your setup in this new version, please review the changelog at ${Application.changelog}\n`,
       )
     }
-    Deno.exit(0)
+    exit(0)
   } else {
     console.log(`\n${upgradeOrDowngradingAction} failed.\n`)
-    Deno.exit(1)
+    exit(1)
   }
 }

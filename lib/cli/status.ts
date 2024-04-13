@@ -6,9 +6,10 @@
  * @license   MIT
  */
 
-import { ProcessInformation, ProcessState } from "../core/process.ts"
-import { ApplicationState } from "../core/status.ts"
-import { Column, Columns, Row } from "./columns.ts"
+import { type ProcessInformation, ProcessState } from "../core/process.ts"
+import type { ApplicationState } from "../core/status.ts"
+import { type Column, Columns, type Row } from "./columns.ts"
+import { exit } from "@cross/utils"
 
 /**
  * Helper which print the status of all running processes,
@@ -25,11 +26,11 @@ export async function printStatus(configFile: string, statusFile: string) {
     status = await getStatus(configFile, statusFile)
     if (!status) {
       console.error("\nNo running instance found.\n")
-      Deno.exit(1)
+      exit(1)
     }
   } catch (e) {
     console.error(e.message)
-    Deno.exit(1)
+    exit(1)
   }
   const taskTable: Row[] = []
 
@@ -38,19 +39,19 @@ export async function printStatus(configFile: string, statusFile: string) {
   // Add main process
   taskTable.push({
     Id: "Main",
-    Type: status.type.slice(0, 4) || "N/A",
-    Status: status.status || "N/A",
+    Type: status!.type.slice(0, 4) || "N/A",
+    Status: status!.status || "N/A",
     Blocked: "N/A",
-    Started: status.started ? new Date(Date.parse(status.started)).toLocaleString() : "N/A",
+    Started: status!.started ? new Date(Date.parse(status!.started)).toLocaleString() : "N/A",
     Exited: "N/A",
-    RSS: (Math.round(status.memory?.rss / 1024)).toString(10) || "N/A",
+    RSS: (Math.round(status!.memory?.rss / 1024)).toString(10) || "N/A",
     Signal: "N/A",
   })
 
   taskTable.push({ separator: "dashed" })
 
   // Add all processes
-  for (const taskInfo of Object.values(status.processes)) {
+  for (const taskInfo of Object.values(status!.processes)) {
     const currentTask = taskInfo as ProcessInformation
     taskTable.push({
       Id: currentTask.id,

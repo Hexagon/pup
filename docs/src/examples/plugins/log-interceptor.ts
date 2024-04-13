@@ -1,4 +1,4 @@
-import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "../../../mod.ts"
+import { type LogEvent, type PluginApi, type PluginConfiguration, PluginImplementation } from "../../../mod.ts"
 
 export class PupPlugin extends PluginImplementation {
   constructor(pup: PluginApi, config: PluginConfiguration) {
