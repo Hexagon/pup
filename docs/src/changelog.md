@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.16] - 2024-04-14
+
+- fix(packaging): Fix regression bug in upgrader after moving to jsr.io
+
 ## [1.0.0-rc.15] - 2024-04-11
 
 - **Minimum Deno Version:** Pup now require Deno version `1.42.0` or later. If you're using an older version, you'll need to upgrade Deno before upgrading Pup.
