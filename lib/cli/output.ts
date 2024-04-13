@@ -97,7 +97,7 @@ export function createFlagsMessage(externalInstaller: boolean): string {
       { content: "Upgrade pup", spanStart: 1 },
       { separator: "empty" },
       { long: "upgrade", description: "Upgrade pup and exit." },
-      /* { long: "setup", description: "Install pup and exit." }, Keep setup undocoumented to avoid confusion */
+      /* { long: "setup", description: "Install pup and exit." }, Keep setup undocumented to avoid confusion */
       { separator: "empty" },
       { long: "--channel <name>", description: "Select channel. stable (default), prerelease or canary." },
       { long: "--version <version>", description: "Install or upgrade to a specific version." },

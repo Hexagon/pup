@@ -1,5 +1,6 @@
 import { EventEmitter } from "../../lib/common/eventemitter.ts"
 import { assert, assertEquals } from "@std/assert"
+import { test } from "@cross/test"
 
 test("EventEmitter - Add and trigger event listener", () => {
   const eventEmitter = new EventEmitter()

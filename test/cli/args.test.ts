@@ -1,8 +1,9 @@
 import { checkArguments, parseArguments } from "../../lib/cli/args.ts"
 import { assertEquals, assertThrows } from "@std/assert"
-import { spy } from "@std/testing/mock"
+/*import { spy } from "@std/testing/mock"
 import { Application } from "../../application.meta.ts"
-import { printHeader, printUsage } from "../../lib/cli/output.ts"
+import { printHeader, printUsage } from "../../lib/cli/output.ts"*/
+
 import { ArgsParser } from "@cross/utils"
 import { test } from "@cross/test"
 
@@ -22,7 +23,6 @@ test("Boolean options and aliases are parsed correctly", () => {
   assertEquals(parsedArgs.getBoolean("version"), true)
   assertEquals(parsedArgs.getBoolean("help"), true)
   assertEquals(parsedArgs.getBoolean("autostart"), true)
-  console.log(parsedArgs.getLoose())
   assertEquals(parsedArgs.getLoose().includes("init"), true)
   assertEquals(parsedArgs.getLoose().includes("append"), true)
   assertEquals(parsedArgs.getLoose().includes("status"), true)
@@ -58,8 +58,8 @@ test("String options and aliases are parsed correctly", () => {
   assertEquals(parsedArgs.getBoolean("dry-run"), true)
 })
 
-test("checkArguments should throw error when autostart argument is provided without init, append or --cmd", async () => {
-  const args = new ArgsParser(["--cron"])
+test("checkArguments should throw error when autostart argument is provided without init, append or --cmd", () => {
+  const args = new ArgsParser(["--autostart"], { boolean: ["autostart"] })
   assertThrows(
     () => {
       checkArguments(args)
@@ -69,21 +69,20 @@ test("checkArguments should throw error when autostart argument is provided with
   )
 })
 
-/*
-test("checkArguments should throw error when cron argument is provided without init or append", async () => {
-  const args = new ArgsParser(["cron"])
+test("checkArguments should throw error when cron argument is provided without init or append", () => {
+  const args = new ArgsParser(["--cron", "* * * * *"])
   assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Argument '--cron' requires 'init', 'append', '--cmd' or '--worker'"
+    "Argument '--cron' requires 'init', 'append', '--cmd' or '--worker'",
   )
 })
 
-test("checkArguments should throw error when terminate argument is provided without init or append", async () => {
-  const args = { _: [], terminate: true }
-  await assertThrows(
+test("checkArguments should throw error when terminate argument is provided without init or append", () => {
+  const args = new ArgsParser(["--terminate", "* * * * *"])
+  assertThrows(
     () => {
       checkArguments(args)
     },
@@ -92,9 +91,9 @@ test("checkArguments should throw error when terminate argument is provided with
   )
 })
 
-test("checkArguments should throw error when watch argument is provided without init or append", async () => {
-  const args = { _: [], watch: "path" }
-  await assertThrows(
+test("checkArguments should throw error when watch argument is provided without init or append", () => {
+  const args = new ArgsParser(["--watch", "path"])
+  assertThrows(
     () => {
       checkArguments(args)
     },
@@ -103,9 +102,9 @@ test("checkArguments should throw error when watch argument is provided without 
   )
 })
 
-test("checkArguments should throw error when cmd argument is provided without init, append or run", async () => {
-  const args = { _: [], cmd: "command" }
-  await assertThrows(
+test("checkArguments should throw error when cmd argument is provided without init, append or run", () => {
+  const args = new ArgsParser(["--cmd", "command"])
+  assertThrows(
     () => {
       checkArguments(args)
     },
@@ -114,9 +113,9 @@ test("checkArguments should throw error when cmd argument is provided without in
   )
 })
 
-test("checkArguments should throw error when worker argument is provided without init, append or run", async () => {
-  const args = new ArgsParser(["--worker", "command"]);
-  await assertThrows(
+test("checkArguments should throw error when worker argument is provided without init, append or run", () => {
+  const args = new ArgsParser(["--worker", "command"])
+  assertThrows(
     () => {
       checkArguments(args)
     },
@@ -125,20 +124,20 @@ test("checkArguments should throw error when worker argument is provided without
   )
 })
 
-test("checkArguments should throw error when init or append argument is provided without cmd", async () => {
-  const args = new ArgsParser(["init"]);
-  await assertThrows(
+test("checkArguments should throw error when init or append argument is provided without cmd", () => {
+  const args = new ArgsParser(["init"])
+  assertThrows(
     () => {
       checkArguments(args)
     },
     Error,
-    "Arguments 'init' and 'append' requires '--cmd' or '--worker'",
+    "Arguments 'init', 'append', and 'remove' require '--id'",
   )
 })
 
-test("checkArguments should throw error when both --cmd and -- is specified", async () => {
-  const args = { _: [], ["--"]: "hello", cmd: "hello world", init: true, id: "test" }
-  await assertThrows(
+test("checkArguments should throw error when both --cmd and -- is specified", () => {
+  const args = new ArgsParser(["--cmd", "command", "--", "command"])
+  assertThrows(
     () => {
       checkArguments(args)
     },
@@ -147,6 +146,7 @@ test("checkArguments should throw error when both --cmd and -- is specified", as
   )
 })
 
+/*
 test("checkArguments should throw error when id argument is missing with init or append argument", async () => {
   const args = { _: ["init"], cmd: "command" }
   await assertThrows(

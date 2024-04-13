@@ -1,5 +1,6 @@
 import { assertEquals } from "@std/assert"
 import { Column, Columns, SeparatorRow, TableRow } from "../../lib/cli/columns.ts"
+import { test } from "@cross/test"
 
 test("Formats and pads Rows and Columns correctly", () => {
   const columns: Column[] = [

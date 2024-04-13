@@ -206,7 +206,6 @@ class Pup {
    */
   private watchdog = () => {
     this.events.emit("watchdog")
-
     // Wrap watchdog operation in a catch to prevent it from ever stopping
     try {
       // Loop through all processes, checking if some actions are needed
@@ -279,7 +278,6 @@ class Pup {
         // Exit watchdog if terminating
         this.watchdog()
       }, WATCHDOG_INTERVAL_MS)
-      Deno.unrefTimer(this.watchdogTimer)
     }
   }
 

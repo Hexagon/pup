@@ -138,7 +138,7 @@ async function main() {
     const name = parsedArgs.get("name") || "pup"
     const config = parsedArgs.get("config")
     const cwd = parsedArgs.get("cwd")
-    const cmd = `pup run ${config ? `--config ${config}` : ""}`
+    const cmd = `pup foreground ${config ? `--config ${config}` : ""}`
     const user = parsedArgs.get("user")
     const home = parsedArgs.get("home")
     const env = parsedArgs.getArray("env") || []
@@ -287,7 +287,7 @@ async function main() {
   // Add a new condition for "logs" base command
   if (baseArgument === "logs") {
     const logStore = `${await toPersistentPath(configFile as string)}/.main.log`
-    const logger = new Logger(configuration.logger || {}, logStore)
+    const logger = new Logger(configuration!.logger || {}, logStore)
     const startTimestamp = parsedArgs.get("start") ? new Date(Date.parse(parsedArgs.get("start")!)).getTime() : undefined
     const endTimestamp = parsedArgs.get("end") ? new Date(Date.parse(parsedArgs.get("end")!)).getTime() : undefined
     const numberOfRows = parsedArgs.get("n") ? parseInt(parsedArgs.get("n")!, 10) : undefined
@@ -302,7 +302,7 @@ async function main() {
       logs = logs.slice(-numberOfRows)
     }
     if (logs && logs.length > 0) {
-      const logWithColors = configuration.logger?.colors ?? true
+      const logWithColors = configuration!.logger?.colors ?? true
       for (const log of logs) {
         const { processId, severity, category, timeStamp, text } = log
         const isStdErr = severity === "error" || category === "stderr"
@@ -350,7 +350,7 @@ async function main() {
     }
     console.log("")
     printHeader()
-    await printStatus(configFile, statusFile)
+    await printStatus(configFile!, statusFile!)
     exit(0)
   }
 
@@ -428,7 +428,7 @@ async function main() {
   /**
    * One last check before starting, is there any processes?
    */
-  if (!configuration || configuration?.processes?.length < 1) {
+  if (!configuration! || configuration?.processes?.length < 1) {
     console.error("No processes defined, exiting.")
     exit(1)
   }
@@ -437,12 +437,12 @@ async function main() {
    * Ready to start pup!
    */
   if (baseArgument !== "foreground") {
-    console.error("Trying to start pup without 'run' argument, this should not happen. Exiting.")
+    console.error("Trying to start pup without 'foreground' argument, this should not happen. Exiting.")
     exit(1)
   }
 
   try {
-    const pup = await Pup.init(configuration, configFile ?? undefined)
+    const pup = await Pup.init(configuration!, configFile ?? undefined)
 
     // Start the watchdog
     pup.init()

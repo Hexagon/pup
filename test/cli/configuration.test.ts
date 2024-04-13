@@ -1,5 +1,6 @@
 import { assertEquals } from "@std/assert"
 import { generateConfiguration } from "../../lib/core/configuration.ts"
+import { test } from "@cross/test"
 
 test("Configuration - generateConfiguration creates a basic configuration", () => {
   const id = "task"
