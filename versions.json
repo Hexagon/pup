@@ -3,8 +3,22 @@
   "stable": [],
   "prerelease": [
     {
+      "version": "1.0.0-rc.18",
+      "url": "jsr:@pup/pup@1.0.0-rc.18",
+      "deno": null,
+      "deno_unstable": "1.42.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+        "--allow-net",
+        "--allow-run"
+      ]
+    },
+    {
       "version": "1.0.0-rc.17",
-      "url": "jsr:@pup/pup/1.0.0-rc.17/pup.ts",
+      "url": "jsr:@pup/pup@1.0.0-rc.17",
       "deno": null,
       "deno_unstable": "1.42.0",
       "default_permissions": [
@@ -18,7 +32,7 @@
     },
     {
       "version": "1.0.0-rc.16",
-      "url": "jsr:@pup/pup/1.0.0-rc.16/pup.ts",
+      "url": "jsr:@pup/pup@1.0.0-rc.16",
       "deno": null,
       "deno_unstable": "1.42.0",
       "default_permissions": [
@@ -32,7 +46,7 @@
     },
     {
       "version": "1.0.0-rc.15",
-      "url": "jsr:@pup/pup/1.0.0-rc.15/pup.ts",
+      "url": "jsr:@pup/pup@1.0.0-rc.15",
       "deno": null,
       "deno_unstable": "1.42.0",
       "default_permissions": [

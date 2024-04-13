@@ -1,6 +1,6 @@
 {
   // Completely optional: Include $schema to get auto completion in VS Code etc...
-  "$schema": "https://jsr.io/@pup/pup/1.0.0-rc.17/docs/pup.schema.json",
+  "$schema": "https://jsr.io/@pup/pup/1.0.0-rc.18/docs/pup.schema.json",
 
   // Global logger configuration, all options can be ovverridden per process
   "logger": {

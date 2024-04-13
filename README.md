@@ -28,7 +28,7 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 To install Pup, open your terminal and execute the following command:
 
 ```bash
-deno run -Ar jsr:@pup/pup@1.0.0-rc.17 setup --channel prerelease
+deno run -Ar jsr:@pup/pup@1.0.0-rc.18 setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
