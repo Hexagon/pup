@@ -9,7 +9,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.16] - 2024-04-14
+## [1.0.0-rc.17] - 2024-04-14
 
 - fix(packaging): Fix regression bug in upgrader after moving to jsr.io
 

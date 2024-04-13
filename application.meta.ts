@@ -21,8 +21,8 @@
 
 const Application = {
   name: "pup",
-  version: "1.0.0-rc.16",
-  url: "https://jsr.io/@pup/pup/$VERSION/pup.ts",
+  version: "1.0.0-rc.17",
+  url: "jsr:@pup/pup/$VERSION/pup.ts",
   canary_url: "https://raw.githubusercontent.com/Hexagon/pup/main/pup.ts",
   deno: null, /* Minimum stable version of Deno required to run Pup (without --unstable-* flags)  */
   deno_unstable: "1.42.0", /* Minimum version of Deno required to run Pup (with --unstable-* flags) */
