@@ -12,7 +12,7 @@ import { Application } from "../../application.meta.ts"
 import { greaterThan, lessThan, parse } from "@std/semver"
 import { exit } from "@cross/utils"
 
-const VERSION_INVENTORY_URL = "https://jsr.io/@pup/pup/versions.json"
+const VERSION_INVENTORY_URL = "https://deno.land/x/pup/versions.json"
 const LOCAL_VERSION_INVENTORY_FILE = "./versions.json"
 
 type Versions = {
