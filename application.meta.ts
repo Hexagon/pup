@@ -25,7 +25,7 @@ const Application = {
   url: "https://deno.land/x/pup@$VERSION/pup.ts",
   canary_url: "https://raw.githubusercontent.com/Hexagon/pup/main/pup.ts",
   deno: null, /* Minimum stable version of Deno required to run Pup (without --unstable-* flags)  */
-  deno_unstable: "1.38.0", /* Minimum version of Deno required to run Pup (with --unstable-* flags) */
+  deno_unstable: "1.42.0", /* Minimum version of Deno required to run Pup (with --unstable-* flags) */
   repository: "https://github.com/hexagon/pup",
   changelog: "https://hexagon.github.io/pup/changelog.html",
   permissions: [
