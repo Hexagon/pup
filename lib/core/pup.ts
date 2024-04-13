@@ -5,16 +5,24 @@
  * @license   MIT
  */
 
-import { Configuration, DEFAULT_INTERNAL_LOG_HOURS, GlobalLoggerConfiguration, MAINTENANCE_INTERVAL_MS, ProcessConfiguration, validateConfiguration, WATCHDOG_INTERVAL_MS } from "./configuration.ts"
-import { FileIPC, IpcValidatedMessage } from "../common/ipc.ts"
+import {
+  type Configuration,
+  DEFAULT_INTERNAL_LOG_HOURS,
+  type GlobalLoggerConfiguration,
+  MAINTENANCE_INTERVAL_MS,
+  type ProcessConfiguration,
+  validateConfiguration,
+  WATCHDOG_INTERVAL_MS,
+} from "./configuration.ts"
+import { FileIPC, type IpcValidatedMessage } from "../common/ipc.ts"
 import { Logger } from "./logger.ts"
 import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
 import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
-import { path, uuid } from "../../deps.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
-import { toPersistentPath, toTempPath } from "../common/utils.ts"
+import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
+import * as uuid from "@std/uuid"
 
 interface InstructionResponse {
   success: boolean
@@ -44,7 +52,7 @@ class Pup {
 
   public cleanupQueue: string[] = []
 
-  static async init(unvalidatedConfiguration: unknown, configFilePath?: string) {
+  static async init(unvalidatedConfiguration: unknown, configFilePath?: string): Promise<Pup> {
     const temporaryStoragePath: string | undefined = configFilePath ? await toTempPath(configFilePath) : undefined
     const persistentStoragePath: string | undefined = configFilePath ? await toPersistentPath(configFilePath) : undefined
     return new Pup(unvalidatedConfiguration, configFilePath, temporaryStoragePath, persistentStoragePath)
@@ -56,7 +64,7 @@ class Pup {
     let ipcFile
     let logStore
     if (configFilePath && temporaryStoragePath && persistentStoragePath) {
-      this.configFilePath = path.resolve(configFilePath)
+      this.configFilePath = toResolvedAbsolutePath(configFilePath)
 
       this.temporaryStoragePath = temporaryStoragePath
       this.cleanupQueue.push(this.temporaryStoragePath)
@@ -206,7 +214,6 @@ class Pup {
    */
   private watchdog = () => {
     this.events.emit("watchdog")
-
     // Wrap watchdog operation in a catch to prevent it from ever stopping
     try {
       // Loop through all processes, checking if some actions are needed
@@ -279,7 +286,6 @@ class Pup {
         // Exit watchdog if terminating
         this.watchdog()
       }, WATCHDOG_INTERVAL_MS)
-      Deno.unrefTimer(this.watchdogTimer)
     }
   }
 

@@ -7,10 +7,10 @@
  * @license   MIT
  */
 
-import { Process, ProcessInformation, ProcessState } from "./process.ts"
-import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S, ProcessConfiguration } from "./configuration.ts"
-import { Pup } from "./pup.ts"
-import { BalancingStrategy, LoadBalancerStartOperation } from "./loadbalancer.ts"
+import { Process, type ProcessInformation, ProcessState } from "./process.ts"
+import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S, type ProcessConfiguration } from "./configuration.ts"
+import type { Pup } from "./pup.ts"
+import { BalancingStrategy, type LoadBalancerStartOperation } from "./loadbalancer.ts"
 
 class Cluster extends Process {
   public processes: Process[] = []

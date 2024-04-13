@@ -9,7 +9,7 @@
  */
 
 import { Application } from "../../application.meta.ts"
-import { Column, Columns, TableRow } from "./columns.ts"
+import { type Column, Columns, type TableRow } from "./columns.ts"
 
 export function createHeaderMessage() {
   return Application.name + " " + Application.version + "\n" + Application.repository
@@ -25,34 +25,38 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { short: "-h", long: "help", description: "Display this help and exit" },
     { short: "-v", long: "version", description: "Output version information and exit" },
   )
-  if (!externalInstaller) {
-    rows.push(
-      { separator: "empty" },
-      { content: "Install or upgrade pup", spanStart: 1 },
-      { separator: "empty" },
-      { long: "upgrade", description: "Upgrade pup and exit." },
-      { long: "setup", description: "Install pup and exit." },
-      { separator: "empty" },
-      { long: "--channel <name>", description: "Select channel. stable (default), prerelease or canary." },
-      { long: "--version <version>", description: "Install or upgrade to a specific version." },
-    )
-  }
   rows.push(
     { separator: "empty" },
-    { content: "Start, control and monitor instances", spanStart: 1 },
+    { content: "Control and monitor instances", spanStart: 1 },
     { separator: "empty" },
-    { long: "run", description: "Run a pup instance" },
+    { long: "foreground", description: "Run a pup instance in foreground" },
     { long: "terminate", description: "Terminate pup instance using IPC" },
-    { long: "status", description: "Display status for a running instance" },
-    { separator: "empty" },
-    { long: "restart <all|proc-id>", description: "Restart process using IPC" },
-    { long: "start <all|proc-id>", description: "Start process using IPC" },
-    { long: "stop <all|proc-id>", description: "Stop process using IPC" },
-    { long: "block <all|proc-id>", description: "Block process using IPC" },
-    { long: "unblock <all|proc-id>", description: "Unblock process using IPC" },
+    { long: "status", description: "Show status for a pup instance" },
     { separator: "empty" },
     { short: "-c", long: "--config <path>", description: "Optional. Use specific configuration file." },
     { separator: "empty" },
+    { long: "start <all|proc-id>", description: "Start process using IPC" },
+    { long: "stop <all|proc-id>", description: "Stop process using IPC" },
+    { long: "restart <all|proc-id>", description: "Restart process using IPC" },
+    { long: "block <all|proc-id>", description: "Block process using IPC" },
+    { long: "unblock <all|proc-id>", description: "Unblock process using IPC" },
+    { separator: "empty" },
+    { content: "Service installation", spanStart: 1 },
+    { separator: "empty" },
+    { long: "enable-service", description: "Start pup instance at boot" },
+    { long: "disable-service", description: "Uninstall pup service" },
+    { separator: "empty" },
+    { short: "-c", long: "--config <path>", description: "Optional. Use specific configuration file." },
+    { description: "Default: ./pup.json" },
+    { long: "--dry-run", description: "Generate and output service configuration, do not actually install the service" },
+    { long: "--system", description: "Optional. Install the service system-wide (requires root)." },
+    { long: "--cwd", description: "Optional. Set working directory for service" },
+    { long: "--name", description: "Optional. Set service name" },
+    { long: "--user", description: "Optional. Set service run-as user" },
+    { long: "--home", description: "Optional. Set service home directory" },
+    { long: "--env", short: "-e", description: "Optional. Set environment variables for service, in the format KEY=VALUE." },
+    { description: "Multiple variables can be passed by using the flag multiple times," },
+    { description: "e.g., --env KEY1=VALUE1 --env KEY2=VALUE2." },
     { content: "Inspecting logs", spanStart: 1 },
     { separator: "empty" },
     { long: "logs", description: "View the logs for a running instance" },
@@ -63,17 +67,17 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { long: "--severity <severity>", description: "Optional. Filter logs based on the severity level." },
     { long: "--start <iso860-timestamp>", description: "Display logs after a specified timestamp." },
     { long: "--end <iso860-timestamp>", description: "Display logs before a specific timestamp." },
-    { description: "Default: ./pup.jsonc or ./pup.json" },
+    { description: "Default: ./pup.json" },
     { separator: "empty" },
     { content: "Configuration helpers", spanStart: 1 },
     { separator: "empty" },
     { long: "init", description: "Initialize a new configuration file using the flags below." },
     { long: "append", description: "Append a new process to the configuration file, " },
-    { description: "configure using the flags below." },
     { long: "remove", description: "Remove a process from a configuration file" },
+    { description: "configure using the flags below." },
     { separator: "empty" },
     { short: "-c", long: "--config <path>", description: "Optional. Use specific configuration file." },
-    { description: "Default: ./pup.jsonc or ./pup.json" },
+    { description: "Default: ./pup.json" },
     { short: "-I", long: "--id", description: "Id of the process to add/append/remove from configuration." },
     { short: "-C", long: "--cmd", description: "Command to run, for complex commands use '--' then the command." },
     { short: "-W", long: "--worker", description: "Worker script to run, any trailing arguments are passed to the worker" },
@@ -86,25 +90,19 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { long: "--start-port", description: "Cluster: Start port for instances." },
     { long: "--common-port", description: "Cluster: Common port for instances." },
     { long: "--strategy", description: "Cluster: Load balancing strategy (defaults to round-robin)." },
-    { separator: "empty" },
-    { content: "Service installation", spanStart: 1 },
-    { separator: "empty" },
-    { long: "install", description: "Install pup instance as a service" },
-    { long: "uninstall", description: "Uninstall service" },
-    { separator: "empty" },
-    { short: "-c", long: "--config <path>", description: "Optional. Use specific configuration file." },
-    { description: "Default: ./pup.jsonc or ./pup.json" },
-    { long: "--dry-run", description: "Generate and output service configuration, do not actually install the service" },
-    { long: "--system", description: "Optional. Install the service system-wide (requires root)." },
-    { long: "--cwd", description: "Optional. Set working directory for service" },
-    { long: "--name", description: "Optional. Set service name" },
-    { long: "--user", description: "Optional. Set service run-as user" },
-    { long: "--home", description: "Optional. Set service home directory" },
-    { long: "--env", short: "-e", description: "Optional. Set environment variables for service, in the format KEY=VALUE." },
-    { description: "Multiple variables can be passed by using the flag multiple times," },
-    { description: "e.g., --env KEY1=VALUE1 --env KEY2=VALUE2." },
-    { separator: "empty" },
   )
+  if (!externalInstaller) {
+    rows.push(
+      { separator: "empty" },
+      { content: "Upgrade pup", spanStart: 1 },
+      { separator: "empty" },
+      { long: "upgrade", description: "Upgrade pup and exit." },
+      /* { long: "setup", description: "Install pup and exit." }, Keep setup undocumented to avoid confusion */
+      { separator: "empty" },
+      { long: "--channel <name>", description: "Select channel. stable (default), prerelease or canary." },
+      { long: "--version <version>", description: "Install or upgrade to a specific version." },
+    )
+  }
 
   const columns: Column[] = [
     { key: "short", align: "right", minWidth: 8 },

@@ -6,7 +6,7 @@
  *
  *     //  Early in your application entrypoint - pin to a specific version similar
  *     //  to what your main process use, like pup@1.0.0-alpha-28
- *     import { PupTelemetry } from "https://deno.land/x/pup/telemetry.ts"
+ *     import { PupTelemetry } from "jsr:@pup/pup/telemetry.ts"
  *     const telemetry = PupTelemetry()
  *
  *     // The rest of your application
@@ -29,9 +29,9 @@
  * @license   MIT
  */
 
-import { EventEmitter, EventHandler } from "./lib/common/eventemitter.ts"
+import { EventEmitter, type EventHandler } from "./lib/common/eventemitter.ts"
 import { FileIPC } from "./lib/common/ipc.ts"
-import { dirExists } from "./lib/common/utils.ts"
+import { exists, isDir } from "@cross/fs"
 
 export interface TelemetryData {
   sender: string
@@ -85,7 +85,7 @@ export class PupTelemetry {
     const pupTempPath = Deno.env.get("PUP_TEMP_STORAGE")
     const pupProcessId = Deno.env.get("PUP_PROCESS_ID")
 
-    if (pupTempPath && (await dirExists(pupTempPath)) && pupProcessId) {
+    if (pupTempPath && (await exists(pupTempPath)) && pupProcessId) {
       const data: TelemetryData = {
         sender: pupProcessId,
         memory: Deno.memoryUsage(),
@@ -102,7 +102,7 @@ export class PupTelemetry {
     const pupTempPath = Deno.env.get("PUP_TEMP_STORAGE")
     const pupProcessId = Deno.env.get("PUP_PROCESS_ID")
 
-    if (pupTempPath && (await dirExists(pupTempPath)) && pupProcessId) {
+    if (pupTempPath && (await isDir(pupTempPath)) && pupProcessId) {
       const ipcPath = `${pupTempPath}/.${pupProcessId}.ipc` // Process-specific IPC path
       this.ipc = new FileIPC(ipcPath)
 
@@ -157,7 +157,7 @@ export class PupTelemetry {
   async emit<T>(targetProcessId: string, event: string, eventData?: T) {
     const pupTempPath = Deno.env.get("PUP_TEMP_STORAGE")
 
-    if (pupTempPath && (await dirExists(pupTempPath)) && targetProcessId) {
+    if (pupTempPath && (await isDir(pupTempPath)) && targetProcessId) {
       const ipcPath = `${pupTempPath}/.${targetProcessId}.ipc` // Target process IPC path
 
       // Create a temporary IPC to send the message

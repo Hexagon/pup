@@ -128,8 +128,9 @@
               },
               "env": {
                 "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "additionalProperties": {
+                  "type": "string"
+                }
               },
               "cluster": {
                 "type": "object",

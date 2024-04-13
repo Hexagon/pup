@@ -5,10 +5,10 @@
  * @license   MIT
  */
 
-import { ProcessConfiguration, Pup } from "./pup.ts"
-import { $, CommandChild, readLines, StringReader } from "../../deps.ts"
-import { BaseRunner, RunnerCallback, RunnerResult } from "../types/runner.ts"
-
+import type { ProcessConfiguration, Pup } from "./pup.ts"
+import { readLines, StringReader } from "@std/io"
+import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
+import { $, type CommandChild } from "dax-sh"
 /**
  * Represents a task runner that executes tasks as regular processes.
  * Extends the BaseRunner class.
@@ -38,8 +38,8 @@ class Runner extends BaseRunner {
 
     runningCallback()
 
-    this.pipeToLogger("stdout", this.process.stdout())
-    this.pipeToLogger("stderr", this.process.stderr())
+    this.pipeToLogger("stdout", this.process.stdout() as ReadableStream<Uint8Array>)
+    this.pipeToLogger("stderr", this.process.stderr() as ReadableStream<Uint8Array>)
 
     const result = await this.waitForProcessEnd()
 
@@ -130,7 +130,7 @@ class Runner extends BaseRunner {
    * @returns The command to be executed.
    */
   private prepareCommand(env: Record<string, string>) {
-    let child = $.raw`${this.processConfig.cmd}`.stdout("piped").stderr("piped")
+    let child = $.raw`${this.processConfig.cmd!}`.stdout("piped").stderr("piped")
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
     if (env) child = child.env(env)
 

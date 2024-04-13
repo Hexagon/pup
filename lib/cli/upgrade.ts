@@ -9,9 +9,10 @@
  */
 
 import { Application } from "../../application.meta.ts"
-import { greaterThan, lessThan, parseVersion } from "../../deps.ts"
+import { greaterThan, lessThan, parse } from "@std/semver"
+import { exit } from "@cross/utils"
 
-const VERSION_INVENTORY_URL = "https://deno.land/x/pup/versions.json"
+const VERSION_INVENTORY_URL = "https://jsr.io/@pup/pup/versions.json"
 const LOCAL_VERSION_INVENTORY_FILE = "./versions.json"
 
 type Versions = {
@@ -44,8 +45,8 @@ async function getVersions(local = false): Promise<Versions> {
 // Determine if the current Deno version meets the required version
 function denoVersionCheck(requiredVersion: string | null): boolean {
   if (requiredVersion === null) return false
-  const denoVersion = parseVersion(Deno.version.deno)
-  const required = parseVersion(requiredVersion)
+  const denoVersion = parse(Deno.version.deno)
+  const required = parse(requiredVersion)
   if (denoVersion !== null && required !== null && !lessThan(denoVersion, required)) {
     return true
   } else {
@@ -65,7 +66,7 @@ export async function upgrade(
 
   // Determine the channel from the version if it's not specified
   if (version && !channelName) {
-    const semver = parseVersion(version)
+    const semver = parse(version)
     channelName = semver && semver.prerelease && semver.prerelease.length > 0 ? "prerelease" : "stable"
   }
 
@@ -124,7 +125,7 @@ export async function upgrade(
 
         if (!answer) {
           console.log(`\n${freshInstall ? "Installation" : "Upgrade"} cancelled by the user.\n`)
-          Deno.exit(1)
+          exit(1)
         }
 
         unstableInstall = true
@@ -132,7 +133,7 @@ export async function upgrade(
         console.log(
           `\nError: Current Deno version does not meet the requirements of the requested version (${(requestedVersion as Version).version}).\n`,
         )
-        Deno.exit(1)
+        exit(1)
       }
     }
   }
@@ -140,7 +141,7 @@ export async function upgrade(
   // Determine version to install
   const upgradeOrDowngradingAction = freshInstall
     ? "Installing"
-    : (canaryInstall ? "Upgrading" : greaterThan(parseVersion(Application.version), parseVersion((requestedVersion as Version).version)) ? "Downgrading" : "Upgrading")
+    : (canaryInstall ? "Upgrading" : greaterThan(parse(Application.version), parse((requestedVersion as Version).version)) ? "Downgrading" : "Upgrading")
 
   // If upgrading to a version that requires --unstable, alert the user
   if (unstableInstall) {
@@ -166,7 +167,7 @@ export async function upgrade(
   if (allPermissions || !requestedVersion?.default_permissions) {
     installCmd.push("-A")
   } else {
-    installCmd.push(...requestedVersion.default_permissions)
+    installCmd.push(...requestedVersion!.default_permissions)
   }
   if (ignoreCertificateErrorsString && ignoreCertificateErrorsString !== "") {
     installCmd.push(ignoreCertificateErrorsString)
@@ -197,9 +198,9 @@ export async function upgrade(
         `\nFor any potential changes that might affect your setup in this new version, please review the changelog at ${Application.changelog}\n`,
       )
     }
-    Deno.exit(0)
+    exit(0)
   } else {
     console.log(`\n${upgradeOrDowngradingAction} failed.\n`)
-    Deno.exit(1)
+    exit(1)
   }
 }

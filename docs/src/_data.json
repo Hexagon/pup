@@ -20,9 +20,9 @@
       "url": "https://deno.land/x/pup"
     },
     {
-      "icon": "fab fa-npm",
-      "title": "NPM Library",
-      "url": "https://npmjs.com/package/pup"
+      "icon": "fas fa-cube",
+      "title": "jsr.io",
+      "url": "https://jsr.io/@pup/pup"
     }
   ],
   "nav_links": [
@@ -33,6 +33,10 @@
     {
       "title": "Deno.land/x",
       "url": "https://deno.land/x/pup"
+    },
+    {
+      "title": "JSR.io",
+      "url": "https://jsr.io/@pup/pup"
     }
   ]
 }

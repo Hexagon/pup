@@ -1,8 +1,9 @@
-import { assertEquals, assertGreater } from "../deps.ts"
-import { AttachedLogger, LogEventData, Logger } from "../../lib/core/logger.ts"
-import { ProcessConfiguration } from "../../mod.ts"
+import { assertEquals, assertGreater } from "@std/assert"
+import { type AttachedLogger, type LogEventData, Logger } from "../../lib/core/logger.ts"
+import type { ProcessConfiguration } from "../../mod.ts"
+import { test } from "@cross/test"
 
-Deno.test("Logger - Creation with Global Configuration", () => {
+test("Logger - Creation with Global Configuration", () => {
   const globalConfig = {
     console: false,
     colors: true,
@@ -16,7 +17,7 @@ Deno.test("Logger - Creation with Global Configuration", () => {
   assertEquals(logger instanceof Logger, true)
 })
 
-Deno.test("Logger - Attachment of External Logger", () => {
+test("Logger - Attachment of External Logger", () => {
   let externalLoggerCalled = false
   let externalLoggerText = ""
   const expectedExteralLoggerText = "Testing attached logger"
@@ -39,7 +40,7 @@ Deno.test("Logger - Attachment of External Logger", () => {
   assertEquals(externalLoggerText, expectedExteralLoggerText)
 })
 
-Deno.test("Logger - Logging with Different Methods", () => {
+test("Logger - Logging with Different Methods", () => {
   const logger = new Logger({ console: false })
 
   logger.log("test", "Testing log method")
@@ -50,7 +51,7 @@ Deno.test("Logger - Logging with Different Methods", () => {
   assertEquals(true, true) // This is just to assert that the test passed if no errors are thrown
 })
 
-Deno.test("Logger - Logging Line Larger than KV Limit", async () => {
+test("Logger - Logging Line Larger than KV Limit", async () => {
   const tempStore = Deno.makeTempFileSync()
   const logger = new Logger({ console: false }, tempStore)
 
@@ -81,7 +82,7 @@ Deno.test("Logger - Logging Line Larger than KV Limit", async () => {
   await Deno.remove(tempStore)
 })
 
-Deno.test("Logger - File Writing with writeFile Method", async () => {
+test("Logger - File Writing with writeFile Method", async () => {
   const logger = new Logger({ console: false })
   const testFileName = "test_writeFile.log"
   const testText = "Testing writeFile"
@@ -93,7 +94,7 @@ Deno.test("Logger - File Writing with writeFile Method", async () => {
   await Deno.remove(testFileName)
 })
 
-Deno.test("Logger - getLogContents: Fetch all logs", async () => {
+test("Logger - getLogContents: Fetch all logs", async () => {
   const tempStore = await Deno.makeTempDir() + "/.store"
   const logger = new Logger({}, tempStore)
 
@@ -112,7 +113,7 @@ Deno.test("Logger - getLogContents: Fetch all logs", async () => {
   assertEquals(logs, expectedLogs)
 })
 
-Deno.test("Logger - getLogContents: Fetch logs by process ID", async () => {
+test("Logger - getLogContents: Fetch logs by process ID", async () => {
   const tempStore = await Deno.makeTempDir() + "/.store"
   const logger = new Logger({}, tempStore)
 
@@ -132,7 +133,7 @@ Deno.test("Logger - getLogContents: Fetch logs by process ID", async () => {
   assertEquals(logs, expectedLogs)
 })
 
-Deno.test("Logger - getLogContents: Fetch logs by time range", async () => {
+test("Logger - getLogContents: Fetch logs by time range", async () => {
   const tempStore = await Deno.makeTempDir() + "/.store"
   const logger = new Logger({}, tempStore)
 
@@ -153,7 +154,7 @@ Deno.test("Logger - getLogContents: Fetch logs by time range", async () => {
   assertEquals(logs, expectedLogs)
 })
 
-Deno.test("Logger - getLogContents: Fetch logs by process ID and time range", async () => {
+test("Logger - getLogContents: Fetch logs by process ID and time range", async () => {
   const tempStore = await Deno.makeTempDir() + "/.store"
   const logger = new Logger({}, tempStore)
 

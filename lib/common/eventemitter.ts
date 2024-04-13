@@ -9,7 +9,7 @@ export type EventHandler<t> = (eventData?: t) => void
 
 class EventEmitter {
   // deno-lint-ignore no-explicit-any
-  listeners = new Map<string, Array<EventHandler<any>>>()
+  listeners: Map<string, Array<EventHandler<any>>> = new Map<string, Array<EventHandler<any>>>()
 
   /**
    * Registers an event listener for the specified event.

@@ -1,7 +1,8 @@
-import { assertEquals } from "../deps.ts"
+import { assertEquals } from "@std/assert"
 import { generateConfiguration } from "../../lib/core/configuration.ts"
+import { test } from "@cross/test"
 
-Deno.test("Configuration - generateConfiguration creates a basic configuration", () => {
+test("Configuration - generateConfiguration creates a basic configuration", () => {
   const id = "task"
   const cmd = "npm start"
   const cwd = "/path/to/project"

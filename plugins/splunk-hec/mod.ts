@@ -4,7 +4,7 @@
  * @file plugins/splunk-hec/mod.ts
  */
 
-import { PluginApi, PluginConfiguration, PluginImplementation } from "../../mod.ts"
+import { type PluginApi, type PluginConfiguration, PluginImplementation } from "../../mod.ts"
 import { HECClient } from "./hec.ts"
 
 export class PupPlugin extends PluginImplementation {

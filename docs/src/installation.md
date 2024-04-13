@@ -13,14 +13,14 @@ This section will guide you through the installation process of Pup.
 
 Before proceeding with the installation, ensure that you have the following installed on your system:
 
-- Deno (version `1.30.x` or higher): You can install Deno by following the official Deno [instructions](https://deno.com/manual/getting_started/installation).
+- Deno (version `1.42.x` or higher): You can install Deno by following the official Deno [instructions](https://deno.com/manual/getting_started/installation).
 
 ## Installing or upgrading Pup
 
 To install Pup, open your terminal and execute the following command:
 
 ```bash
-deno run -Ar https://deno.land/x/pup/pup.ts setup --channel prerelease
+deno run -Ar jsr:@pup/pup setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system.
@@ -35,7 +35,7 @@ If you already have Pup installed and want to upgrade to the latest version, you
 pup upgrade --channel prerelease
 ```
 
-Both the `setup` and `upgrade` commands support the following parameters:
+The `upgrade` command support the following parameters:
 
 - `--version`: Install, upgrade, or downgrade to a specific version.
 - `--channel <channel>`: Defaults to stable, but you can also install the `prerelease` or `canary` channel.

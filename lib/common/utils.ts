@@ -5,55 +5,15 @@
  * @license MIT
  */
 
-import { path } from "../../deps.ts"
+import { isAbsolute, parse, resolve } from "@std/path"
+import { cwd, mkdir } from "@cross/fs"
 
-/**
- * Check if a file exists.
- * @async
- * @function
- * @param {string} filePath - The path to the file to check.
- * @returns {Promise<boolean>} A promise that resolves to true if the file exists, false otherwise.
- * @throws {Error} Throws an error if an error occurs other than the file not being found.
- */
-export async function fileExists(filePath: string): Promise<boolean> {
-  try {
-    const statResult = await Deno.stat(filePath)
-    if (statResult.isFile) {
-      return true
-    } else {
-      return false
-    }
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      return false
-    } else {
-      throw e
-    }
-  }
-}
-
-/**
- * Check if a directory exists.
- * @async
- * @function
- * @param {string} dirPath - The path to the directory to check.
- * @returns {Promise<boolean>} A promise that resolves to true if the directory exists, false otherwise.
- * @throws {Error} Throws an error if an error occurs other than the directory not being found.
- */
-export async function dirExists(dirPath: string): Promise<boolean> {
-  try {
-    const statResult = await Deno.stat(dirPath)
-    if (statResult.isDirectory) {
-      return true
-    } else {
-      return false
-    }
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      return false
-    } else {
-      throw e
-    }
+export function toResolvedAbsolutePath(path: string, cwdInput?: string) {
+  const cwdToUse = cwdInput || cwd()
+  if (!isAbsolute(path)) {
+    return resolve(cwdToUse, path)
+  } else {
+    return resolve(path)
   }
 }
 
@@ -64,9 +24,9 @@ export async function dirExists(dirPath: string): Promise<boolean> {
  * @returns {string} The temporary path associated with the configuration file.
  */
 export async function toTempPath(configFile: string) {
-  const resolvedPath = path.parse(path.resolve(configFile))
-  const tempPath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-tmp`)
-  await Deno.mkdir(tempPath, { recursive: true })
+  const resolvedPath = parse(toResolvedAbsolutePath(configFile))
+  const tempPath = toResolvedAbsolutePath(`${resolvedPath.dir}/.pup/${resolvedPath.name}${resolvedPath.ext}-tmp`)
+  await mkdir(tempPath, { recursive: true })
   return tempPath
 }
 
@@ -77,8 +37,8 @@ export async function toTempPath(configFile: string) {
  * @returns {string} The persistent storage path associated with the configuration file.
  */
 export async function toPersistentPath(configFile: string) {
-  const resolvedPath = path.parse(path.resolve(configFile))
-  const persistentStoragePath = path.resolve(`${resolvedPath.dir}/.${resolvedPath.name}${resolvedPath.ext}-data`)
-  await Deno.mkdir(persistentStoragePath, { recursive: true })
+  const resolvedPath = parse(toResolvedAbsolutePath(configFile))
+  const persistentStoragePath = resolve(`${resolvedPath.dir}/.pup/${resolvedPath.name}${resolvedPath.ext}-data`)
+  await mkdir(persistentStoragePath, { recursive: true })
   return persistentStoragePath
 }

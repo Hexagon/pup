@@ -1,4 +1,8 @@
 {
+  "name": "@pup/pup",
+  "version": "1.0.0-rc.15",
+  "exports": "./pup.ts",
+
   "fmt": {
     "lineWidth": 200,
     "semiColons": false,
@@ -6,16 +10,38 @@
   },
 
   "lint": {
-    "exclude": ["plugins/web-interface/static/js", "cov_profile", "docs/_site"]
+    "exclude": ["plugins/web-interface/static/js", "cov_profile", "docs/_site"],
+    "rules": {
+      "exclude": ["verbatim-module-syntax"]
+    }
   },
 
   "tasks": {
-    "update-deps": "deno run --allow-read=. --allow-net=deno.land,cdn.deno.land https://deno.land/x/udd/main.ts --dry-run deno.json deps.ts test/deps.ts plugins/web-interface/deps.ts",
+    "update-deps": "deno run --allow-read=. --allow-net=jsr.io,registry.npmjs.org jsr:@check/deps",
     "check": "deno fmt --check && deno lint && deno check --unstable-kv pup.ts && deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --unstable-kv --coverage=cov_profile && echo \"Generating coverage\" && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",
     "check-coverage": "deno task check && genhtml cov_profile.lcov --output-directory cov_profile/html && lcov --list cov_profile.lcov && deno run --allow-net --allow-read https://deno.land/std/http/file_server.ts cov_profile/html",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env tools/release.ts && deno fmt",
     "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts --bundle static static/bundle.json && deno fmt",
     "build": "deno task check && deno task build-schema && deno task build-webinterface && deno task build-versions"
+  },
+
+  "imports": {
+    "@cross/fs": "jsr:@cross/fs@^0.0.9",
+    "@cross/service": "jsr:@cross/service@^1.0.0",
+    "@cross/test": "jsr:@cross/test@^0.0.9",
+    "@cross/utils": "jsr:@cross/utils@^0.11.0",
+    "@hexagon/croner": "jsr:@hexagon/croner@^8.0.1",
+    "@std/assert": "jsr:@std/assert@^0.222.1",
+    "@std/async": "jsr:@std/async@^0.222.1",
+    "@std/io": "jsr:@std/io@^0.222.1",
+    "@std/path": "jsr:@std/path@^0.222.1",
+    "@std/semver": "jsr:@std/semver@^0.222.1",
+    "@std/testing": "jsr:@std/testing@^0.222.1",
+    "@std/uuid": "jsr:@std/uuid@^0.222.1",
+    "dax-sh": "npm:dax-sh@^0.40.0",
+    "json5": "npm:json5@^2.2.3",
+    "zod": "npm:zod@^3.22.4",
+    "zod-to-json-schema": "npm:zod-to-json-schema@^3.22.5"
   }
 }

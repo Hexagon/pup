@@ -5,7 +5,7 @@
  * @license   MIT
  */
 
-import { Args, parse } from "../../deps.ts"
+import { ArgsParser } from "@cross/utils/args"
 
 /**
  * Parses command line arguments and returns a parsed object.
@@ -13,63 +13,24 @@ import { Args, parse } from "../../deps.ts"
  * @param args - An array of command line arguments.
  * @returns - A parsed object containing the command line arguments.
  */
-function parseArguments(args: string[]): Args {
-  // All boolean arguments
-  const booleanArgs = [
-    "setup",
-    "upgrade",
-    "help",
-    "autostart",
-
-    "dry-run",
-  ]
-
-  // All string arguments
-  const stringArgs = [
-    "version",
-    "config",
-    "watch",
-    "cmd",
-    "worker",
-    "cwd",
-    "id",
-
-    "cron",
-    "terminate",
-
-    "instances",
-    "start-port",
-    "common-port",
-    "strategy",
-    "stdout",
-    "stderr",
-
-    "unsafely-ignore-certificate-errors",
-  ]
-
-  // All collection arguments
-  const collectArgs = [
-    "env",
-  ]
-
-  // And a list of aliases
-  const alias = {
-    "version": "v",
-    "help": "h",
-    "id": "I",
-    "autostart": "A",
-    "config": "c",
-    "cmd": "C",
-    "worker": "W",
-    "watch": "w",
-    "cron": "O",
-    "terminate": "T",
-    "cwd": "d",
-    "update": "upgrade",
-    "env": "e",
+function parseArguments(args: string[]): ArgsParser {
+  const aliases = {
+    "v": "version",
+    "h": "help",
+    "I": "id",
+    "A": "autostart",
+    "c": "config",
+    "C": "cmd",
+    "W": "worker",
+    "w": "watch",
+    "O": "cron",
+    "T": "terminate",
+    "d": "cwd",
+    "upgrade": "update",
+    "e": "env",
   }
-
-  return parse(args, { alias, boolean: booleanArgs, string: stringArgs, collect: collectArgs, stopEarly: false, "--": true })
+  const boolean = ["setup", "upgrade", "help", "version", "autostart", "dry-run"]
+  return new ArgsParser(args, { aliases, boolean })
 }
 
 /**
@@ -78,7 +39,7 @@ function parseArguments(args: string[]): Args {
  * @returns - The parsed and checked arguments.
  * @throws - An error if any of the arguments are invalid.
  */
-function checkArguments(args: Args): Args {
+function checkArguments(args: ArgsParser): ArgsParser {
   const validBaseArguments = [
     "init",
     "append",
@@ -90,9 +51,9 @@ function checkArguments(args: Args): Args {
     "restart",
     "block",
     "unblock",
-    "run",
-    "install",
-    "uninstall",
+    "foreground",
+    "enable-service",
+    "disable-service",
     "logs",
     "upgrade",
     "update",
@@ -126,28 +87,28 @@ function checkArguments(args: Args): Args {
   ]
 
   // Check that the base argument is either undefined or valid
-  const baseArgument = args._[0]
+  const baseArgument = args.countLoose() > 0 ? args.getLoose()[0] : undefined
   if (baseArgument !== undefined && (typeof baseArgument !== "string" || !validBaseArguments.includes(baseArgument))) {
     throw new Error(`Invalid base argument: ${baseArgument}`)
   }
 
-  const hasDoubleDashCmd = args["--"] && args["--"].length > 0
-  const hasCmd = hasDoubleDashCmd || args.cmd || args.worker
-  const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "run" && hasCmd)
+  const hasDoubleDashCmd = args.hasRest()
+  const hasCmd = hasDoubleDashCmd || args.get("cmd") || args.get("worker")
+  const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "foreground" && hasCmd)
   const expectInstallerOptions = baseArgument === "setup" || baseArgument === "upgrade" || baseArgument === "update"
 
   // Only one type of command can be present at the same time
-  if ((hasDoubleDashCmd && args.cmd) || (args.cmd && args.worker) || (hasDoubleDashCmd && args.worker)) {
+  if ((hasDoubleDashCmd && args.get("cmd")) || (args.get("cmd") && args.get("worker")) || (hasDoubleDashCmd && args.get("worker"))) {
     throw new Error("'--cmd', '--worker' and '--' cannot be used at the same time.")
   }
 
   // Certain base arguments require --id
-  if (!args.id && (baseArgument === "init" || baseArgument === "append" || baseArgument === "remove")) {
+  if (!args.get("id") && (baseArgument === "init" || baseArgument === "append" || baseArgument === "remove")) {
     throw new Error("Arguments 'init', 'append', and 'remove' require '--id'")
   }
 
   // Init and append require a command
-  if ((args.init || args.append) && !hasCmd) {
+  if ((args.get("init") || args.get("append")) && !hasCmd) {
     throw new Error("Arguments 'init' and 'append' requires '--cmd' or '--worker'")
   }
 
@@ -158,27 +119,27 @@ function checkArguments(args: Args): Args {
 
   // All arguments in processOptions require that init, append, cmd och worker is used
   for (const opt of processOptions) {
-    if (args[opt] && !expectConfigOptions) {
+    if (args.get(opt) && !expectConfigOptions) {
       throw new Error(`Argument '--${opt}' requires 'init', 'append', '--cmd' or '--worker'`)
     }
   }
 
   // All arguments in installerOptions require that setup or upgrade (or update) is used
   for (const opt of installerOptions) {
-    if (args[opt] && !expectInstallerOptions) {
+    if (args.get(opt) && !expectInstallerOptions) {
       throw new Error(`Argument '--${opt}' requires 'setup' or 'upgrade'`)
     }
   }
 
   // All arguments in numericArguments must be numeric
   for (const opt of numericArguments) {
-    if (args[opt] && isNaN(Number(args[opt]))) {
+    if (args.get(opt) && isNaN(Number(args.get(opt)))) {
       throw new Error(`Argument '--${opt}' must be a numeric value`)
     }
   }
 
   // --env flag can only be used with 'service install' base argument
-  if (args.env && (baseArgument !== "install")) {
+  if (args.get("env") && (baseArgument !== "enable-service")) {
     throw new Error("Argument '--env' can only be used with 'service install' base argument")
   }
 

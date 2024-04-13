@@ -94,7 +94,7 @@ configuration file:
 
 - `console` (boolean): Set to true to enable logging to the console. Default is false.
 - `stdout` (string): The file path to write standard output logs.
-- `stderr` (string): The file path to write standard error logs.
+- `stderr` (string): The file path to write standard error logs. If omitted, stderr is redirected to stdout.
 - `decorateFiles` (boolean): Set to true to enable decoration in the output files. Default is false.
 - `decorate` (boolean): **Only available in global scope.** Set to true to enable decoration in the logs. Default is false.
 - `colors` (boolean): **Only available in global scope.** Set to true to enable colored output. Default is false.
@@ -139,7 +139,7 @@ To change default behavior of the global watcher, use the following properties w
 
 - `interval` (number): The interval (in milliseconds) at which the watcher checks for file changes. Default is `1000`.
 - `exts` (array of strings): The file extensions to watch. Default is `["ts", "tsx", "js", "jsx", "json"]`.
-- `match` (array of strings): The patterns to match for watched files. Default is `["**/_._"]`.
+- `match` (array of strings): The patterns to match for watched files. Default is `["**/*.*"]`.
 - `skip` (array of strings): The patterns to exclude from watching. Default is `["**/.git/**"]`.
 
 ```json
@@ -148,7 +148,7 @@ To change default behavior of the global watcher, use the following properties w
   "watcher": {
     "interval": 100, // default
     "exts": ["ts", "tsx", "js", "jsx", "json"], // default
-    "match": ["**/_._"], // default
+    "match": ["**/*.*"], // default
     "skip": ["**/.git/**"] // default
   },
 
@@ -194,8 +194,8 @@ To activate plugins, add your plugins to the configuration using this pattern:
 
 ## Validating the Configuration
 
-To ensure your configuration is valid, just run `pup run` (or `pup run --config custom/path/to/config.json`). If using pup as a library, you can use the `validateConfiguration()` function provided by
-the `/lib/core/configuration.ts` file. This function checks if the configuration adheres to the schema and will throw an error if it doesn't.
+To ensure your configuration is valid, just run `pup foreground` (or `pup run --config custom/path/to/config.json`). If using pup as a library, you can use the `validateConfiguration()` function
+provided by the `/lib/core/configuration.ts` file. This function checks if the configuration adheres to the schema and will throw an error if it doesn't.
 
 With a valid configuration in place, you're ready to use Pup to manage your processes.
 

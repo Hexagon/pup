@@ -9,6 +9,39 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.15] - 2024-04-11
+
+- **Minimum Deno Version:** Pup now require Deno version `1.42.0` or later. If you're using an older version, you'll need to upgrade Deno before upgrading Pup.
+
+### Breaking Changes
+
+- [x] change(cli): Rename cli command run to foreground to not be confused with starting as a service
+- [x] change(cli): Rename cli command install to enable-service to separate from actual pup installation
+- [x] change(cli): Rename cli command uninstall to disable-service to separate from actual pup uninstallation
+- [x] change(config): Support JSON5.
+- [x] change(core): Move .pup.jsonc-tmp, .pup.jsonc-data into .pup
+- [x] change(packaging): Move default installation docs/references from `deno.land/x` to JSR.io
+
+### Non-breaking
+
+- [x] fix(core): Foreground command did not keep an autostarted process running, fixed by refing the watchdog timer.
+- [x] fix(cli): Controlled output of manual rests after installing/uninstalling as service.
+- [x] fix(docs): Docs incorrectly stated that `**/_._` is default for watcher config. `**/*.*` is correct.
+- [x] fix(schema): Expect Record<string, string> for process.env in json schema.
+- [x] change(core): Make most code cross runtime, preparing for Node and Bun support.
+
+## Maintenance
+
+- [x] chore(deps): Replace `deno.land/x/udd` with `@check/deps`
+- [x] chore(deps): Use `@cross/deps` for cross-runtime filesystem operations
+- [x] chore(deps): Replace `deno.land/x/hexagon/service` with `@cross/service` for cross-runtime service installation
+- [x] chore(deps): Replace `deno.land/x/std/` with `@std/` from jsr
+- [x] chore(deps): Replace `deno.land/x/dax` with `dax-sh` for a cross runtime shell
+- [x] chore(deps): Replace `deno.land/x/zod` with `npm:zod`
+- [x] chore(deps): Utilize `@cross/utils` instead of Deno built-ins for cross runtime ansi console output, argument parsing, process management and more.
+- [x] chore(deps): Use `@cross/env` to handle enviroment variables across runtimes.
+- [x] chore(testing): Use `@cross/test` insted of Deno test runner, to utilize the native test runners of Node, Deno and Bun.
+
 ## [1.0.0-rc.14] - 2024-04-07
 
 - fix(loadbalancer): Fixes an issue with the loadbalancer introduced in `1.0.0-rc.13`

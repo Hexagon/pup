@@ -1,7 +1,8 @@
-import { assertEquals } from "../deps.ts"
-import { Column, Columns, SeparatorRow, TableRow } from "../../lib/cli/columns.ts"
+import { assertEquals } from "@std/assert"
+import { type Column, Columns, type SeparatorRow, type TableRow } from "../../lib/cli/columns.ts"
+import { test } from "@cross/test"
 
-Deno.test("Formats and pads Rows and Columns correctly", () => {
+test("Formats and pads Rows and Columns correctly", () => {
   const columns: Column[] = [
     { key: "name", header: "Name", align: "left" },
     { key: "age", header: "Age", align: "center" },
@@ -19,7 +20,7 @@ Deno.test("Formats and pads Rows and Columns correctly", () => {
   assertEquals(result, expectedOutput)
 })
 
-Deno.test("Formats and pads SeparatorRow correctly", () => {
+test("Formats and pads SeparatorRow correctly", () => {
   const columns: Column[] = [
     { key: "name", header: "Name", align: "left" },
     { key: "age", header: "Age", align: "center" },

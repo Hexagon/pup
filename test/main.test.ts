@@ -1,8 +1,8 @@
 /*
 import { main } from "../lib/main.ts"
-import { assertSpyCall, spy } from "./deps.ts"
+import { assertSpyCall, spy } from "@std/testing/mock"
 
-Deno.test("main: exit with --version flag", async () => {
+test("main: exit with --version flag", async () => {
   const exitSpy = spy(Deno, "exit")
   const args = ["--version"]
 
@@ -13,7 +13,7 @@ Deno.test("main: exit with --version flag", async () => {
   exitSpy.restore()
 })
 
-Deno.test("main: exit with --help flag", async () => {
+test("main: exit with --help flag", async () => {
   const exitSpy = spy(Deno, "exit")
   const args = ["--help"]
 
@@ -24,7 +24,7 @@ Deno.test("main: exit with --help flag", async () => {
   exitSpy.restore()
 })
 
-Deno.test("main: exit when no configuration file found", async () => {
+test("main: exit when no configuration file found", async () => {
   const exitSpy = spy(Deno, "exit")
   const originalFileExists = Deno.stat
 
