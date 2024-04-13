@@ -18,7 +18,6 @@ All notable changes to this project will be documented in this section.
 - [x] change(cli): Rename cli command run to foreground to not be confused with starting as a service
 - [x] change(cli): Rename cli command install to enable-service to separate from actual pup installation
 - [x] change(cli): Rename cli command uninstall to disable-service to separate from actual pup uninstallation
-- [ ] change(logging): Make `pup logs` streaming by default.
 - [x] change(config): Support JSON5.
 - [x] change(core): Move .pup.jsonc-tmp, .pup.jsonc-data into .pup
 - [x] change(packaging): Move default installation docs/references from `deno.land/x` to JSR.io
@@ -28,7 +27,6 @@ All notable changes to this project will be documented in this section.
 - [x] fix(core): Foreground command did not keep an autostarted process running, fixed by refing the watchdog timer.
 - [x] fix(cli): Controlled output of manual rests after installing/uninstalling as service.
 - [x] fix(docs): Docs incorrectly stated that `**/_._` is default for watcher config. `**/*.*` is correct.
-- [ ] chore(docs): Add a PM2 migration guide.
 - [x] fix(schema): Expect Record<string, string> for process.env in json schema.
 - [x] change(core): Make most code cross runtime, preparing for Node and Bun support.
 
