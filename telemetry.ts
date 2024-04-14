@@ -32,6 +32,7 @@
 import { EventEmitter, type EventHandler } from "./lib/common/eventemitter.ts"
 import { FileIPC } from "./lib/common/ipc.ts"
 import { exists, isDir } from "@cross/fs"
+import { getEnv } from "@cross/env"
 
 export interface TelemetryData {
   sender: string
@@ -82,8 +83,8 @@ export class PupTelemetry {
   }
 
   private async sendMainTelemetry() {
-    const pupTempPath = Deno.env.get("PUP_TEMP_STORAGE")
-    const pupProcessId = Deno.env.get("PUP_PROCESS_ID")
+    const pupTempPath = getEnv("PUP_TEMP_STORAGE")
+    const pupProcessId = getEnv("PUP_PROCESS_ID")
 
     if (pupTempPath && (await exists(pupTempPath)) && pupProcessId) {
       const data: TelemetryData = {
@@ -99,8 +100,8 @@ export class PupTelemetry {
   }
 
   private async checkIpc() {
-    const pupTempPath = Deno.env.get("PUP_TEMP_STORAGE")
-    const pupProcessId = Deno.env.get("PUP_PROCESS_ID")
+    const pupTempPath = getEnv("PUP_TEMP_STORAGE")
+    const pupProcessId = getEnv("PUP_PROCESS_ID")
 
     if (pupTempPath && (await isDir(pupTempPath)) && pupProcessId) {
       const ipcPath = `${pupTempPath}/.${pupProcessId}.ipc` // Process-specific IPC path
@@ -155,7 +156,7 @@ export class PupTelemetry {
   }
 
   async emit<T>(targetProcessId: string, event: string, eventData?: T) {
-    const pupTempPath = Deno.env.get("PUP_TEMP_STORAGE")
+    const pupTempPath = getEnv("PUP_TEMP_STORAGE")
 
     if (pupTempPath && (await isDir(pupTempPath)) && targetProcessId) {
       const ipcPath = `${pupTempPath}/.${targetProcessId}.ipc` // Target process IPC path

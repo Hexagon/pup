@@ -6,6 +6,7 @@
 
 import { type PluginApi, type PluginConfiguration, PluginImplementation } from "../../mod.ts"
 import { HECClient } from "./hec.ts"
+import { getEnv } from "@cross/env"
 
 export class PupPlugin extends PluginImplementation {
   private hecClient: HECClient
@@ -24,8 +25,8 @@ export class PupPlugin extends PluginImplementation {
       hecToken: string
     }
 
-    const url = hecUrl || Deno.env.get("PUP_SPLUNK_HEC_URL") || ""
-    const token = hecToken || Deno.env.get("PUP_SPLUNK_HEC_TOKEN") || ""
+    const url = hecUrl || getEnv("PUP_SPLUNK_HEC_URL") || ""
+    const token = hecToken || getEnv("PUP_SPLUNK_HEC_TOKEN") || ""
 
     this.hecClient = new HECClient(url, token)
 

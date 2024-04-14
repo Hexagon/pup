@@ -9,6 +9,8 @@ import type { ProcessConfiguration, Pup } from "./pup.ts"
 import { readLines, StringReader } from "@std/io"
 import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
 import { $, type CommandChild } from "dax-sh"
+import { getEnv, setEnv } from "@cross/env"
+
 /**
  * Represents a task runner that executes tasks as regular processes.
  * Extends the BaseRunner class.
@@ -32,6 +34,7 @@ class Runner extends BaseRunner {
     }
 
     const env = this.createEnvironmentConfig()
+    console.log(env)
     const child = this.prepareCommand(env)
 
     this.process = child.spawn()
@@ -114,12 +117,19 @@ class Runner extends BaseRunner {
    * Extends the PATH environment variable with the path specified in the process configuration.
    */
   private extendPath() {
+    const targetPaths: string[] = []
+
+    const pathEnv = getEnv("PATH")
+    if (pathEnv !== undefined) {
+      targetPaths.push(pathEnv)
+    }
+
     if (this.processConfig.path) {
-      if (Deno.env.has("PATH")) {
-        Deno.env.set("PATH", `${Deno.env.get("PATH")}:${this.processConfig.path}`)
-      } else {
-        Deno.env.set("PATH", `${this.processConfig.path}`)
-      }
+      targetPaths.push(this.processConfig.path)
+    }
+
+    if (targetPaths.length > 0) {
+      setEnv("PATH", targetPaths.join(":"))
     }
   }
 
