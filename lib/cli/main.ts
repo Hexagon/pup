@@ -117,7 +117,7 @@ async function main() {
    * - Find configuration using (--config)
    * - Or generate configuration using (init)
    */
-  const runWithoutConfig = baseArgument == "foreground" && (cmd !== undefined || worker !== undefined)
+  const runWithoutConfig = baseArgument == "run" && (cmd !== undefined || worker !== undefined)
   const useConfigFile = !runWithoutConfig
   let configFile
   if (useConfigFile) {
@@ -138,7 +138,7 @@ async function main() {
     const name = parsedArgs.get("name") || "pup"
     const config = parsedArgs.get("config")
     const cwd = parsedArgs.get("cwd")
-    const cmd = `pup foreground ${config ? `--config ${config}` : ""}`
+    const cmd = `pup run ${config ? `--config ${config}` : ""}`
     const user = parsedArgs.get("user")
     const home = parsedArgs.get("home")
     const env = parsedArgs.getArray("env") || []
@@ -436,8 +436,8 @@ async function main() {
   /**
    * Ready to start pup!
    */
-  if (baseArgument !== "foreground") {
-    console.error("Trying to start pup without 'foreground' argument, this should not happen. Exiting.")
+  if (baseArgument !== "run") {
+    console.error("Trying to start pup without 'run' argument, this should not happen. Exiting.")
     exit(1)
   }
 

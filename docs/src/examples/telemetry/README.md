@@ -59,7 +59,7 @@ telemetry.emit("another-process-id", "my-event", { data: { to: "send" } })
 
 `cd` to `docs/examples/telemetry` directory.
 
-Start example by running `pup foreground` if pup is installed, or something like `deno run -A ../../../pup.ts foreground` if not.
+Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 
 Now open another terminal and issue `pup status`, a brief overview of current status is shown, including memory usage.
 

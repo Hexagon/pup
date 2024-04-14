@@ -43,7 +43,7 @@ intallation, you **can not** use the `$VERSION` variable, and should give an abs
 
 `cd` to `/docs/src/examples/basic-webinterface` directory.
 
-Start example by running `pup foreground` if pup is installed, or something like `deno run -A ../../../pup.ts foreground` if not.
+Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 
 Browse to <http://localhost:5000/>
 

@@ -48,9 +48,9 @@ simple instances running a single process:
 
    `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
-3. (Optional) Test run your instance (ecosystem):
+3. (Optional) Test run your instance:
 
-   `pup foreground`
+   `pup run`
 
 4. To make your instance run at boot, enable it using `pup enable-service`.
 

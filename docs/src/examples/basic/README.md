@@ -25,6 +25,6 @@ its logs to separate files.
 
 `cd` to `/docs/src/examples/basic` directory.
 
-Start example by running `pup foreground` if pup is installed, or something like `deno run -A ../../../pup.ts foreground` if not.
+Start example by running `pup run` if pup is installed, or something like `deno run -A ../../../pup.ts run` if not.
 
 Success!

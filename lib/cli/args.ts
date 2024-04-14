@@ -51,7 +51,7 @@ function checkArguments(args: ArgsParser): ArgsParser {
     "restart",
     "block",
     "unblock",
-    "foreground",
+    "run",
     "enable-service",
     "disable-service",
     "logs",
@@ -94,7 +94,7 @@ function checkArguments(args: ArgsParser): ArgsParser {
 
   const hasDoubleDashCmd = args.hasRest()
   const hasCmd = hasDoubleDashCmd || args.get("cmd") || args.get("worker")
-  const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "foreground" && hasCmd)
+  const expectConfigOptions = baseArgument === "init" || baseArgument === "append" || (baseArgument === "run" && hasCmd)
   const expectInstallerOptions = baseArgument === "setup" || baseArgument === "upgrade" || baseArgument === "update"
 
   // Only one type of command can be present at the same time

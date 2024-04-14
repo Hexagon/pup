@@ -46,9 +46,9 @@ create a simple instance running a single process:
 
    `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
-3. (Optional) Test run your instance (ecosystem):
+3. (Optional) Test run your instance:
 
-   `pup foreground`
+   `pup run`
 
 4. To make your instance run at boot, enable it using `pup enable-service`.
 
@@ -62,9 +62,9 @@ For the full manual, see <https://pup.56k.guru>
 
 It is also possible to use pup to keep a process alive temporary, without a `pup.json` or system service.
 
-To achieve this, use `pup foreground` with `--cmd` and a start policy, the default restart policy is `--autostart`.
+To achieve this, use `pup run` with `--cmd` and a start policy, the default restart policy is `--autostart`.
 
-`pup foreground --cmd "deno run server.ts"`
+`pup run --cmd "deno run server.ts"`
 
 ## Example setups
 

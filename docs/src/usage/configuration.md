@@ -194,8 +194,8 @@ To activate plugins, add your plugins to the configuration using this pattern:
 
 ## Validating the Configuration
 
-To ensure your configuration is valid, just run `pup foreground` (or `pup run --config custom/path/to/config.json`). If using pup as a library, you can use the `validateConfiguration()` function
-provided by the `/lib/core/configuration.ts` file. This function checks if the configuration adheres to the schema and will throw an error if it doesn't.
+To ensure your configuration is valid, just run `pup run` (or `pup run --config custom/path/to/config.json`). If using pup as a library, you can use the `validateConfiguration()` function provided by
+the `/lib/core/configuration.ts` file. This function checks if the configuration adheres to the schema and will throw an error if it doesn't.
 
 With a valid configuration in place, you're ready to use Pup to manage your processes.
 
