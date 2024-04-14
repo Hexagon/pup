@@ -198,7 +198,7 @@ export class PupPlugin extends PluginImplementation {
     const logStreamer = (d?: LogEvent) => {
       if (d) {
         const logRow: LogEventData = {
-          timeStamp: new Date(),
+          timeStamp: new Date().getTime(),
           processId: d.process?.id || "core",
           category: d.category,
           severity: d.severity,
