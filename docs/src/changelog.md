@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this section.
 - chore(core): Make code related to environment variables cross-runtime.
 - change(cli): Revert cli command `foreground` to `run`
 
-## [1.0.0-rc.18] - 2024-04-14
+## [1.0.0-rc.19] - 2024-04-14
 
 - fix(packaging): Fix regression bug in upgrader after moving to jsr.io
 
