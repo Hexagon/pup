@@ -3,9 +3,7 @@
   "version": "1.0.0-rc.20",
   "exports": {
     ".": "./pup.ts",
-    "./mod.ts": "./mod.ts",
-    "./plugins/web-interface/mod.ts": "./plugins/web-interface/mod.ts",
-    "./plugins/splunk-hec/mod.ts": "./plugins/splunk-hec/mod.ts"
+    "./mod.ts": "./mod.ts"
   },
 
   "fmt": {
