@@ -9,7 +9,7 @@ import type { ProcessConfiguration, Pup } from "./pup.ts"
 import { readLines, StringReader } from "@std/io"
 import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
 import { $, type CommandChild } from "dax-sh"
-import { getEnv, setEnv } from "@cross/env"
+import { getEnv } from "@cross/env"
 
 /**
  * Represents a task runner that executes tasks as regular processes.
@@ -34,7 +34,6 @@ class Runner extends BaseRunner {
     }
 
     const env = this.createEnvironmentConfig()
-    console.log(env)
     const child = this.prepareCommand(env)
 
     this.process = child.spawn()
@@ -108,29 +107,25 @@ class Runner extends BaseRunner {
     if (this.pup.temporaryStoragePath) env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
     if (this.pup.persistentStoragePath) env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
 
-    this.extendPath()
+    // Transfer real path
+    if (getEnv("PATH")) {
+      if (env.PATH) {
+        env.PATH = getEnv("PATH") + ":" + env.PATH
+      } else {
+        env.PATH = getEnv("PATH")!
+      }
+    }
+
+    // Transfer specified path
+    if (this.processConfig.path) {
+      if (env.PATH) {
+        env.PATH = this.processConfig.path + ":" + env.PATH
+      } else {
+        env.PATH = this.processConfig.path
+      }
+    }
 
     return env
-  }
-
-  /**
-   * Extends the PATH environment variable with the path specified in the process configuration.
-   */
-  private extendPath() {
-    const targetPaths: string[] = []
-
-    const pathEnv = getEnv("PATH")
-    if (pathEnv !== undefined) {
-      targetPaths.push(pathEnv)
-    }
-
-    if (this.processConfig.path) {
-      targetPaths.push(this.processConfig.path)
-    }
-
-    if (targetPaths.length > 0) {
-      setEnv("PATH", targetPaths.join(":"))
-    }
   }
 
   /**
