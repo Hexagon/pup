@@ -29,7 +29,7 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { separator: "empty" },
     { content: "Control and monitor instances", spanStart: 1 },
     { separator: "empty" },
-    { long: "run", description: "Run a pup instance in run" },
+    { long: "run", description: "Run a pup instance standalone" },
     { long: "terminate", description: "Terminate pup instance using IPC" },
     { long: "status", description: "Show status for a pup instance" },
     { separator: "empty" },
