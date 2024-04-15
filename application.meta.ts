@@ -21,7 +21,7 @@
 
 const Application = {
   name: "pup",
-  version: "1.0.0-rc.21",
+  version: "1.0.0-rc.22",
   url: "jsr:@pup/pup@$VERSION",
   canary_url: "https://raw.githubusercontent.com/Hexagon/pup/main/pup.ts",
   deno: null, /* Minimum stable version of Deno required to run Pup (without --unstable-* flags)  */
@@ -32,7 +32,7 @@ const Application = {
     "--allow-env",
     "--allow-read",
     "--allow-write",
-    "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease",
+    "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease,uid,gid",
     "--allow-net",
     "--allow-run",
   ],

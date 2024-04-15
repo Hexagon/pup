@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this section.
 
 - fix(core): Pup now require `uid` and `gid` added to `--allow-sys` to be able to spawn subprocesses
 
-## [1.0.0-rc.21] - 2024-04-15
+## [] - 2024-04-15
 
 - fix(runner): Always pass all environment variables from pup environment to sub process, extend them if `env:`-option is supplied
 - fix(runner): Use correct PATH separator (`;`) when spawning child processes in Windows
