@@ -4,7 +4,8 @@
   "exports": {
     ".": "./pup.ts",
     "./mod.ts": "./mod.ts",
-    "./plugins/splunk-hec/mod.ts": "./plugins/splunk-hec/mod.ts"
+    "./telemetry": "./telemetry.ts",
+    "./plugins/splunk-hec": "./plugins/splunk-hec/mod.ts"
   },
 
   "fmt": {

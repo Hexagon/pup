@@ -36,10 +36,11 @@ channels [here](https://hexagon.github.io/pup/installation.html#release-channels
 
 ### Configuration
 
-Pup revolves around instance (ecosystem) configuration files, each process belongs to an instance defined by a `pup.json`. This file can either be created manually, or by the command line helpers. To
-create a simple instance running a single process:
+Pup revolves around instance (ecosystem) configuration files, each process belongs to an instance defined by a `pup.json`. This file can either be created manually, or by the command line helpers.
 
-`pup init --id "my-server" --autostart --cmd "deno run -A server.ts"`
+1. To create a simple instance running a single process:
+
+   `pup init --id "my-server" --autostart --cmd "deno run -A server.ts"`
 
 2. (Optional) In case you have an additional task to execute, such as a cleanup script, you can make use of `pup append`. The following example shows how to add an extra task that use the cron start
    policy:

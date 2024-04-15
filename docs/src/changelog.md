@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this section.
 - fix(cli): Visual improvements for `--help`
 - fix(cli): Compacted and colorised `status`
 - fix(cli): Bold headers by default in table headers
+- fix(docs): Small fixes + update examples for jsr usage
 
 ## [1.0.0-rc.22] - 2024-04-15
 

@@ -14,7 +14,7 @@
   "plugins": [
     /* Enable splunk HEC plugin */
     {
-      /* Use a full url to the plugin, from for example deno.land/x/pup/... */
+      /* Use a full url to the plugin, from for example jsr:@pup/pup/plugins/splunk-hec... */
       "url": "../../plugins/splunk-hec/mod.ts",
       "options": {
         /*
