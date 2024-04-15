@@ -64,7 +64,7 @@ It is also possible to use pup to keep a process alive temporary, without a `pup
 
 To achieve this, use `pup run` with `--cmd` and a start policy, the default restart policy is `--autostart`.
 
-`pup run --cmd "deno run server.ts"`
+`pup run --autostart --cmd "deno run server.ts"`
 
 ## Example setups
 

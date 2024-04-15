@@ -57,3 +57,11 @@ simple instances running a single process:
    `pup enable-service`
 
    You can pass `-n my-custom-name` to give the service a name different from `pup`
+
+#### Single command example
+
+It is possible to use pup to keep a process alive temporary, without a `pup.json` or system service.
+
+To achieve this, use `pup run` with `--cmd` and a start policy, the default restart policy is `--autostart`.
+
+`pup run --autostart --cmd "deno run server.ts"`
