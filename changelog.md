@@ -9,7 +9,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.22] - 2024-04-15
+## [1.0.0-rc.23] - 2024-04-15
 
 - fix(core): Pup now require `uid` and `gid` added to `--allow-sys` to be able to spawn subprocesses
 

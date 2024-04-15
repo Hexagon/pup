@@ -4,11 +4,12 @@ import { createFlagsMessage, createHeaderMessage, createUsageMessage } from "../
 import { Application } from "../../application.meta.ts"
 import { assertEquals } from "@std/assert"
 import { test } from "@cross/test"
+import { stripAnsi } from "@cross/utils"
 
 test("Should correctly create the header message", () => {
   const expected = Application.name + " " + Application.version + "\n" + Application.repository
   const actual = createHeaderMessage()
-  assertEquals(actual, expected)
+  assertEquals(stripAnsi(actual), expected)
 })
 
 test("Should correctly create the usage message", () => {

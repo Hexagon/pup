@@ -1,6 +1,7 @@
 import { assertEquals } from "@std/assert"
 import { type Column, Columns, type SeparatorRow, type TableRow } from "../../lib/cli/columns.ts"
 import { test } from "@cross/test"
+import { stripAnsi } from "@cross/utils"
 
 test("Formats and pads Rows and Columns correctly", () => {
   const columns: Column[] = [
@@ -17,7 +18,7 @@ test("Formats and pads Rows and Columns correctly", () => {
 
   const result = Columns(rows, columns)
 
-  assertEquals(result, expectedOutput)
+  assertEquals(stripAnsi(result), expectedOutput)
 })
 
 test("Formats and pads SeparatorRow correctly", () => {
@@ -36,5 +37,5 @@ test("Formats and pads SeparatorRow correctly", () => {
 
   const result = Columns(rows, columns)
 
-  assertEquals(result, expectedOutput)
+  assertEquals(stripAnsi(result), expectedOutput)
 })

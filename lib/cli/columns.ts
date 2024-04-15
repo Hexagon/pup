@@ -6,12 +6,15 @@
  * @license   MIT
  */
 
+import { Colors } from "@cross/utils"
+
 /**
  * Represents a column of the table.
  * @interface
  */
 export interface Column {
   key: string
+  formatter?: (s: string) => string
   header?: string
   minWidth?: number
   maxWidth?: number
@@ -99,7 +102,8 @@ export function Columns(rows: TableRow[], columns: Column[]): string {
         formattedSpanningRow = halfPadding + content + halfPadding
       }
 
-      formattedRows.push(" ".repeat(spanStart) + formattedSpanningRow)
+      const combined = " ".repeat(spanStart) + formattedSpanningRow
+      formattedRows.push(combined)
     } else {
       const normalRow = row as Row
       formattedRows.push(
@@ -108,14 +112,16 @@ export function Columns(rows: TableRow[], columns: Column[]): string {
             const value = String(normalRow[column.key]?.toString().substring(0, columnSizes[column.key]) ?? "")
             const align = column.align ?? "left"
             const padding = " ".repeat(columnSizes[column.key] - value.length)
+            let combined: string
             if (align === "left") {
-              return `${value}${padding}`
+              combined = `${value}${padding}`
             } else if (align === "right") {
-              return `${padding}${value}`
+              combined = `${padding}${value}`
             } else {
               const halfPadding = " ".repeat(Math.floor(padding.length / 2))
-              return `${halfPadding}${value}${halfPadding}`
+              combined = `${halfPadding}${value}${halfPadding}`
             }
+            return column.formatter ? column.formatter(combined) : combined
           })
           .join(" "),
       )
@@ -128,7 +134,7 @@ export function Columns(rows: TableRow[], columns: Column[]): string {
     headerRow = columns.map((column) => {
       const header = column.header?.substring(0, columnSizes[column.key]) ?? ""
       const padding = " ".repeat(columnSizes[column.key] - header.length)
-      return `${header}${padding}`
+      return `${Colors.bold(header)}${padding}`
     }).join(" ")
   }
 

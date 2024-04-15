@@ -10,9 +10,10 @@
 
 import { Application } from "../../application.meta.ts"
 import { type Column, Columns, type TableRow } from "./columns.ts"
+import { Colors } from "@cross/utils"
 
 export function createHeaderMessage() {
-  return Application.name + " " + Application.version + "\n" + Application.repository
+  return Application.name + " " + Application.version + "\n" + Colors.italic(Application.repository)
 }
 
 export function createUsageMessage() {
@@ -27,22 +28,20 @@ export function createFlagsMessage(externalInstaller: boolean): string {
   )
   rows.push(
     { separator: "empty" },
-    { content: "Control and monitor instances", spanStart: 1 },
+    { content: Colors.bold("Control and monitor instances"), spanStart: 1 },
     { separator: "empty" },
     { long: "run", description: "Run a pup instance standalone" },
     { long: "terminate", description: "Terminate pup instance using IPC" },
     { long: "status", description: "Show status for a pup instance" },
     { separator: "empty" },
     { short: "-c", long: "--config <path>", description: "Optional. Use specific configuration file." },
-    { separator: "empty" },
     { long: "start <all|proc-id>", description: "Start process using IPC" },
     { long: "stop <all|proc-id>", description: "Stop process using IPC" },
     { long: "restart <all|proc-id>", description: "Restart process using IPC" },
     { long: "block <all|proc-id>", description: "Block process using IPC" },
     { long: "unblock <all|proc-id>", description: "Unblock process using IPC" },
     { separator: "empty" },
-    { content: "Service installation", spanStart: 1 },
-    { separator: "empty" },
+    { content: Colors.bold("Service installation"), spanStart: 1 },
     { long: "enable-service", description: "Start pup instance at boot" },
     { long: "disable-service", description: "Uninstall pup service" },
     { separator: "empty" },
@@ -57,7 +56,7 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { long: "--env", short: "-e", description: "Optional. Set environment variables for service, in the format KEY=VALUE." },
     { description: "Multiple variables can be passed by using the flag multiple times," },
     { description: "e.g., --env KEY1=VALUE1 --env KEY2=VALUE2." },
-    { content: "Inspecting logs", spanStart: 1 },
+    { content: Colors.bold("Inspecting logs"), spanStart: 1 },
     { separator: "empty" },
     { long: "logs", description: "View the logs for a running instance" },
     { separator: "empty" },
@@ -69,7 +68,7 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { long: "--end <iso860-timestamp>", description: "Display logs before a specific timestamp." },
     { description: "Default: ./pup.json" },
     { separator: "empty" },
-    { content: "Configuration helpers", spanStart: 1 },
+    { content: Colors.bold("Configuration helpers"), spanStart: 1 },
     { separator: "empty" },
     { long: "init", description: "Initialize a new configuration file using the flags below." },
     { long: "append", description: "Append a new process to the configuration file, " },
@@ -94,18 +93,19 @@ export function createFlagsMessage(externalInstaller: boolean): string {
   if (!externalInstaller) {
     rows.push(
       { separator: "empty" },
-      { content: "Upgrade pup", spanStart: 1 },
+      { content: Colors.bold("Upgrade pup"), spanStart: 1 },
       { separator: "empty" },
       { long: "upgrade", description: "Upgrade pup and exit." },
       /* { long: "setup", description: "Install pup and exit." }, Keep setup undocumented to avoid confusion */
       { separator: "empty" },
       { long: "--channel <name>", description: "Select channel. stable (default), prerelease or canary." },
       { long: "--version <version>", description: "Install or upgrade to a specific version." },
+      { separator: "empty" },
     )
   }
 
   const columns: Column[] = [
-    { key: "short", align: "right", minWidth: 8 },
+    { key: "short", align: "right", minWidth: 4 },
     { key: "long", minWidth: 24 },
     { key: "description" },
   ]

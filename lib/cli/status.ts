@@ -10,6 +10,9 @@ import { type ProcessInformation, ProcessState } from "../core/process.ts"
 import type { ApplicationState } from "../core/status.ts"
 import { type Column, Columns, type Row } from "./columns.ts"
 import { exit } from "@cross/utils"
+import { filesize } from "filesize"
+import { blockedFormatter, codeFormatter, naFormatter, statusFormatter } from "./formatters/strings.ts"
+import { timeagoFormatter } from "./formatters/times.ts"
 
 /**
  * Helper which print the status of all running processes,
@@ -34,46 +37,42 @@ export async function printStatus(configFile: string, statusFile: string) {
   }
   const taskTable: Row[] = []
 
-  taskTable.push({ separator: "equals" })
-
   // Add main process
   taskTable.push({
     Id: "Main",
     Type: status!.type.slice(0, 4) || "N/A",
     Status: status!.status || "N/A",
     Blocked: "N/A",
-    Started: status!.started ? new Date(Date.parse(status!.started)).toLocaleString() : "N/A",
+    Started: timeagoFormatter(status!.started ? status!.started : "N/A"),
     Exited: "N/A",
-    RSS: (Math.round(status!.memory?.rss / 1024)).toString(10) || "N/A",
+    RSS: status!.memory?.rss ? filesize(status!.memory?.rss, { round: 0 }) : "N/A",
     Signal: "N/A",
   })
-
-  taskTable.push({ separator: "dashed" })
 
   // Add all processes
   for (const taskInfo of Object.values(status!.processes)) {
     const currentTask = taskInfo as ProcessInformation
     taskTable.push({
-      Id: currentTask.id,
+      Id: " " + currentTask.id,
       Type: currentTask.type.slice(0, 4) || "N/A",
       Status: ProcessState[currentTask.status] || "N/A",
-      Blocked: currentTask.blocked ? "Y" : "N",
-      Started: currentTask.started ? currentTask.started.toLocaleString() : "N/A",
-      Exited: currentTask.exited ? currentTask.exited.toLocaleString() : "N/A",
-      RSS: (Math.round(currentTask.telemetry?.memory?.rss || 0) / 1024).toString(10) || "N/A",
-      Signal: `${(currentTask.code ?? "-")}${currentTask.signal ? (" " + currentTask.signal) : ""}`,
+      Blocked: currentTask.blocked ? "Yes" : "No",
+      Started: timeagoFormatter(currentTask.started ? currentTask.started : "N/A"),
+      Exited: timeagoFormatter(currentTask.exited ? currentTask.exited : "N/A"),
+      RSS: currentTask.telemetry?.memory?.rss ? filesize(currentTask.telemetry?.memory?.rss, { round: 0 }) : "N/A",
+      Signal: `${(currentTask.code ?? "N/A")}${currentTask.signal ? (" " + currentTask.signal) : ""}`,
     })
   }
 
   const tableColumns: Column[] = [
     { key: "Id", header: "Id", minWidth: 15, maxWidth: 24 },
     { key: "Type", header: "Type", minWidth: 5 },
-    { key: "Status", header: "Status", minWidth: 10 },
-    { key: "Blocked", header: "Blocked", minWidth: 8 },
-    { key: "Started", header: "Started", minWidth: 10 },
-    { key: "Exited", header: "Exited", minWidth: 10 },
-    { key: "RSS", header: "RSS(kB)", minWidth: 6 },
-    { key: "Signal", header: "Code", minWidth: 10 },
+    { key: "Status", header: "Status", minWidth: 10, formatter: statusFormatter },
+    { key: "Blocked", header: "Blocked", minWidth: 8, formatter: blockedFormatter },
+    { key: "Started", header: "Started", minWidth: 10, formatter: naFormatter },
+    { key: "Exited", header: "Exited", minWidth: 10, formatter: naFormatter },
+    { key: "RSS", header: "RSS", minWidth: 6, formatter: naFormatter },
+    { key: "Signal", header: "Code", minWidth: 10, formatter: codeFormatter },
   ]
 
   console.log(`\n${Columns(taskTable, tableColumns)}\n`)

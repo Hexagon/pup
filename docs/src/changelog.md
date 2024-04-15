@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.23] - Unreleased
+
+- fix(cli): Visual improvements for `--help`
+- fix(cli): Compacted and colorised `status`
+- fix(cli): Bold headers by default in table headers
+
 ## [1.0.0-rc.22] - 2024-04-15
 
 - fix(core): Pup now require `uid` and `gid` added to `--allow-sys` to be able to spawn subprocesses
