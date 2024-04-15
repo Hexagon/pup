@@ -12,6 +12,8 @@ import { Application } from "../../application.meta.ts"
 import { greaterThan, lessThan, parse } from "@std/semver"
 import { exit } from "@cross/utils"
 
+// The deno.land/x-url has to be used until first stable release, or until jsr.io fixes issue
+// https://github.com/jsr-io/jsr/issues/382
 const VERSION_INVENTORY_URL = "https://deno.land/x/pup/versions.json"
 const LOCAL_VERSION_INVENTORY_FILE = "./versions.json"
 

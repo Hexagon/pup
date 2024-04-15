@@ -1,9 +1,10 @@
 {
   "name": "@pup/pup",
-  "version": "1.0.0-rc.20",
+  "version": "1.0.0-rc.21",
   "exports": {
     ".": "./pup.ts",
-    "./mod.ts": "./mod.ts"
+    "./mod.ts": "./mod.ts",
+    "./plugins/splunk-hec/mod.ts": "./plugins/splunk-hec/mod.ts"
   },
 
   "fmt": {
@@ -32,6 +33,7 @@
   "imports": {
     "@cross/env": "jsr:@cross/env@^1.0.0",
     "@cross/fs": "jsr:@cross/fs@^0.0.9",
+    "@cross/runtime": "jsr:@cross/runtime@^1.0.0",
     "@cross/service": "jsr:@cross/service@^1.0.0",
     "@cross/test": "jsr:@cross/test@^0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.11.0",

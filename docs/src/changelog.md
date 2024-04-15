@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.21] - 2024-04-15
+
+- fix(runner): Always pass all environment variables from pup environment to sub process, extend them if `env:`-option is supplied
+- fix(runner): Use correct PATH separator (`;`) when spawning child processes in Windows
+- fix(docs): Revert to using deno.land/x as source for schema.json, until first stable release
+
 ## [1.0.0-rc.20] - 2024-04-14
 
 - fix(plugins): Export plugin entrypoints on jsr.io

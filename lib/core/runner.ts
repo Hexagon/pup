@@ -9,7 +9,9 @@ import type { ProcessConfiguration, Pup } from "./pup.ts"
 import { readLines, StringReader } from "@std/io"
 import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
 import { $, type CommandChild } from "dax-sh"
-import { getEnv } from "@cross/env"
+import { getAllEnv } from "@cross/env"
+import { deepMerge } from "jsr:@cross/deepmerge@^1.0.0"
+import { CurrentOS, OperatingSystem } from "@cross/runtime"
 
 /**
  * Represents a task runner that executes tasks as regular processes.
@@ -100,28 +102,36 @@ class Runner extends BaseRunner {
    *
    * @returns The environment configuration.
    */
-  private createEnvironmentConfig() {
-    const env = this.processConfig.env ? structuredClone(this.processConfig.env) : {}
-    env.PUP_PROCESS_ID = this.processConfig.id
+  private createEnvironmentConfig(): Record<string, string | undefined> {
+    // Start with current environment
+    let env = getAllEnv() || {}
 
-    if (this.pup.temporaryStoragePath) env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
-    if (this.pup.persistentStoragePath) env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
-
-    // Transfer real path
-    if (getEnv("PATH")) {
-      if (env.PATH) {
-        env.PATH = getEnv("PATH") + ":" + env.PATH
-      } else {
-        env.PATH = getEnv("PATH")!
-      }
+    // Transfer environment variables from process config .env
+    if (this.processConfig.env) {
+      env = deepMerge(env, this.processConfig.env)
     }
 
-    // Transfer specified path
+    // Append/overwrite
+    // - PUP_PROCESS_ID
+    env.PUP_PROCESS_ID = this.processConfig.id
+    // - PUP_TEMP_STORAGE
+    if (this.pup.temporaryStoragePath) env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
+    // - PUP_DATA_STORAGE
+    if (this.pup.persistentStoragePath) env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
+
+    // Transfer path from process config if specified
     if (this.processConfig.path) {
+      const paths = []
       if (env.PATH) {
-        env.PATH = this.processConfig.path + ":" + env.PATH
-      } else {
-        env.PATH = this.processConfig.path
+        paths.push(env.PATH)
+      }
+      if (this.processConfig.path) {
+        paths.push(this.processConfig.path)
+      }
+      if (paths.length > 0) {
+        // Use ; as path separator in Windows, : in others
+        const pathSeparator = CurrentOS === OperatingSystem.Windows ? ";" : ":"
+        env.PATH = paths.join(pathSeparator)
       }
     }
 
@@ -134,7 +144,7 @@ class Runner extends BaseRunner {
    * @param env The environment configuration for the command.
    * @returns The command to be executed.
    */
-  private prepareCommand(env: Record<string, string>) {
+  private prepareCommand(env?: Record<string, string | undefined>) {
     let child = $.raw`${this.processConfig.cmd!}`.stdout("piped").stderr("piped")
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
     if (env) child = child.env(env)

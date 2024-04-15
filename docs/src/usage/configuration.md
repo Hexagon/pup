@@ -43,8 +43,9 @@ Here's a list of available configuration options for each process:
 - `cmd` (optional): A string containing the full command to run, supporting common shell features such as `&&` for chaining through [dax](https://github.com/dsherret/dax).
 - `worker` (optional): A string containing the worker script as first entry.
 - `cwd` (optional): The working directory for the process.
-- `env` (optional): An object containing environment variables for the process.
-- `path` (optional): Extra paths that will be **appended** to `PATH` for this process.
+- `env` (optional): An object containing extended environment variables for the process. This will **override** environment variables conflicting with existing ones, except `PATH` that will be
+  **appended**.
+- `path` (optional): Extra paths that will be **appended** to `PATH` for this process, this is a shortcut for adding `PATH` to the `env`-option.
 - `pidFile` (optional): The path to the file where the process ID (PID) will be stored.
 - `timeout` (optional): A number specifying the maximum time (in seconds) that the process is allowed to run before it's terminated.
 - `overrun` (optional): A boolean indicating whether a new instance of the process is allowed to start if the previous instance is still running. Default: false.
@@ -94,7 +95,7 @@ configuration file:
 
 - `console` (boolean): Set to true to enable logging to the console. Default is false.
 - `stdout` (string): The file path to write standard output logs.
-- `stderr` (string): The file path to write standard error logs. If omitted, stderr is redirected to stdout.
+- `stderr` (string): The file path to write standard error logs. If omitted, stderr is written to the file specified by `stdout`.
 - `decorateFiles` (boolean): Set to true to enable decoration in the output files. Default is false.
 - `decorate` (boolean): **Only available in global scope.** Set to true to enable decoration in the logs. Default is false.
 - `colors` (boolean): **Only available in global scope.** Set to true to enable colored output. Default is false.
