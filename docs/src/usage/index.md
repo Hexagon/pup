@@ -165,7 +165,7 @@ pup run --cmd "deno run server.ts" --autostart
 The same example, using short aliases for the command line parameters.
 
 ```bash
-pup run -AC "deno run server.ts"
+pup run -A -C "deno run server.ts"
 ```
 
 It is also possible to specify command using '--' instead of '-C'. In this case, the command should be written without quotation marks.

@@ -32,7 +32,7 @@ This defines a single process named example that runs a Deno script (app.ts) wit
 the existing process definition.
 
 > **Note**: If you quickly want to scaffold a new configuration file, you can use the cli helpers `pup init`, `append`, and `remove`. More on this at
-> [Configuring using the cli](usage.html#configuring-using-the-cli). { .note }
+> [Configuring using the cli](../#configuring-using-the-cli). { .note }
 
 ## Process configuration
 

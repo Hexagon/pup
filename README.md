@@ -49,7 +49,7 @@ Pup revolves around instance (ecosystem) configuration files, each process belon
 
    `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
-3. (Optional) Test run your instance:
+3. (Optional) Test your instance (exit by pressing CTRL+C):
 
    `pup run`
 
@@ -65,7 +65,7 @@ For the full manual, see <https://pup.56k.guru>
 
 It is also possible to use pup to keep a process alive temporary, without a `pup.json` or system service.
 
-To achieve this, use `pup run` with `--cmd` and a start policy, the default restart policy is `--autostart`.
+To achieve this, use `pup run` with `--cmd` and a start policy.
 
 `pup run --autostart --cmd "deno run server.ts"`
 
