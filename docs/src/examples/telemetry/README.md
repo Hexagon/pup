@@ -38,7 +38,9 @@ const telemetry = new PupTelemetry()
 
 // Listen for ipc events
 telemetry.on("my-event", (data) => {
-  console.log(`Another process triggered 'my-event' with data ${JSON.stringify(data)}`)
+  console.log(
+    `Another process triggered 'my-event' with data ${JSON.stringify(data)}`,
+  )
 })
 
 // Send ipc events

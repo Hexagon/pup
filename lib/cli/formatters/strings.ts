@@ -1,3 +1,10 @@
+/**
+ * Exports string formatter functions for use in the CLI status table
+ *
+ * @file      lib/cli/formatters/string.ts
+ * @license   MIT
+ */
+
 import { Colors } from "@cross/utils"
 
 export const statusFormatter = (s: string) => {

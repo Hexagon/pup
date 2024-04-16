@@ -103,6 +103,9 @@
             "additionalProperties": false
           }
         },
+        "name": {
+          "type": "string"
+        },
         "processes": {
           "type": "array",
           "items": {

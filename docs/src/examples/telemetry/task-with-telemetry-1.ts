@@ -9,5 +9,9 @@ console.log("Task running")
 // Send data every 5th second
 setInterval(() => {
   i += 1
-  telemetry.emit("task-2", "message", `${Deno.env.get("PUP_PROCESS_ID")} sending "Hello" to 'task-2', iteration ${i}`)
+  telemetry.emit(
+    "task-2",
+    "message",
+    `${Deno.env.get("PUP_PROCESS_ID")} sending "Hello" to 'task-2', iteration ${i}`,
+  )
 }, 2000)

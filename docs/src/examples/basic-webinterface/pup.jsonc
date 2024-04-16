@@ -1,4 +1,7 @@
 {
+  // Instance name
+  "name": "pup-webinterface-example",
+
   // Global logger configuration, all options can be ovverridden per process
   "logger": {
     // Decorate console log entries?

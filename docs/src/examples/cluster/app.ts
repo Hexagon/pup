@@ -7,7 +7,9 @@ if (!isNaN(PORT)) {
       status: 200,
     })
   })
-  console.log(`HTTP webserver running on pup instance ${Deno.env.get("PUP_CLUSTER_INSTANCE")}.\nAccess it at:  http://localhost:${PORT}/`)
+  console.log(
+    `HTTP webserver running on pup instance ${Deno.env.get("PUP_CLUSTER_INSTANCE")}.\nAccess it at:  http://localhost:${PORT}/`,
+  )
 } else {
   console.error("Could not start http server")
 }

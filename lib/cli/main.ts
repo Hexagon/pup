@@ -124,66 +124,6 @@ async function main() {
     const configFileCwd = toResolvedAbsolutePath(checkedArgs?.get("cwd") || cwd())
     configFile = await findConfigFile(configFileCwd, useConfigFile, checkedArgs?.get("config"))
   }
-  ""
-  /**
-   * Handle the install argument
-   */
-  if (baseArgument === "enable-service") {
-    if (!configFile) {
-      console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
-      exit(1)
-    }
-
-    const system = parsedArgs.getBoolean("system")
-    const name = parsedArgs.get("name") || "pup"
-    const config = parsedArgs.get("config")
-    const cwd = parsedArgs.get("cwd")
-    const cmd = `pup run ${config ? `--config ${config}` : ""}`
-    const user = parsedArgs.get("user")
-    const home = parsedArgs.get("home")
-    const env = parsedArgs.getArray("env") || []
-
-    try {
-      const result = await installService({ system, name, cmd, cwd, user, home, env }, parsedArgs.getBoolean("dry-run"))
-      if (result.manualSteps && result.manualSteps.length) {
-        console.log(Colors.bold("To complete the installation, carry out these manual steps:"))
-        result.manualSteps.forEach((step, index) => {
-          console.log(Colors.cyan(`${index + 1}. ${step.text}`))
-          if (step.command) {
-            console.log("   " + Colors.yellow("Command: ") + step.command)
-          }
-        })
-      } else {
-        console.log(`Service ´${name}' successfully installed at '${result.servicePath}'.`)
-      }
-      exit(0)
-    } catch (e) {
-      console.error(`Could not install service, error: ${e.message}`)
-      exit(1)
-    }
-  } else if (baseArgument === "disable-service") {
-    const system = parsedArgs.getBoolean("system")
-    const name = parsedArgs.get("name") || "pup"
-    const home = parsedArgs.get("home")
-    try {
-      const result = await uninstallService({ system, name, home })
-      if (result.manualSteps && result.manualSteps.length) {
-        console.log(Colors.bold("To complete the uninstallation, carry out these manual steps:"))
-        result.manualSteps.forEach((step, index) => {
-          console.log(Colors.cyan(`${index + 1}. ${step.text}`))
-          if (step.command) {
-            console.log("   " + Colors.yellow("Command: ") + step.command)
-          }
-        })
-      } else {
-        console.log(`Service '${name}' at '${result.servicePath}' is now uninstalled.`)
-      }
-      exit(0)
-    } catch (e) {
-      console.error(`Could not uninstall service, error: ${e.message}`)
-      exit(1)
-    }
-  }
 
   /**
    * Now, handle the argument to generate a new configuration file and exit
@@ -248,7 +188,9 @@ async function main() {
     }
   }
 
-  // Read or generate configuration
+  /**
+   * Read or generate configuration
+   */
   let configuration: Configuration
   if (configFile) {
     try {
@@ -268,9 +210,10 @@ async function main() {
       parsedArgs.get("terminate"),
       parsedArgs.getBoolean("autostart"),
       parsedArgs.get("watch"),
+      parsedArgs.get("name"),
     )
 
-    // Change working directory to configuration file directory
+    // Change working directory to configured directory
     if (parsedArgs.get("cwd")) {
       // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
       try {
@@ -280,6 +223,66 @@ async function main() {
         console.error(`Could not change working directory to path specified by --cwd ${parsedArgs.get("cwd")}, exiting. Message: `, e.message)
         exit(1)
       }
+    }
+  }
+
+  /**
+   * Handle the install argument
+   */
+  if (baseArgument === "enable-service") {
+    if (!configFile) {
+      console.error("Service maintenance commands require pup to run with a configuration file, exiting.")
+      exit(1)
+    }
+
+    const system = parsedArgs.getBoolean("system")
+    const name = parsedArgs.get("name") || configuration!.name || "pup"
+    const config = parsedArgs.get("config")
+    const cwd = parsedArgs.get("cwd")
+    const cmd = `pup run ${config ? `--config ${config}` : ""}`
+    const user = parsedArgs.get("user")
+    const home = parsedArgs.get("home")
+    const env = parsedArgs.getArray("env") || []
+
+    try {
+      const result = await installService({ system, name, cmd, cwd, user, home, env }, parsedArgs.getBoolean("dry-run"))
+      if (result.manualSteps && result.manualSteps.length) {
+        console.log(Colors.bold("To complete the installation, carry out these manual steps:"))
+        result.manualSteps.forEach((step, index) => {
+          console.log(Colors.cyan(`${index + 1}. ${step.text}`))
+          if (step.command) {
+            console.log("   " + Colors.yellow("Command: ") + step.command)
+          }
+        })
+      } else {
+        console.log(`Service ´${name}' successfully installed at '${result.servicePath}'.`)
+      }
+      exit(0)
+    } catch (e) {
+      console.error(`Could not install service, error: ${e.message}`)
+      exit(1)
+    }
+  } else if (baseArgument === "disable-service") {
+    const system = parsedArgs.getBoolean("system")
+    const name = parsedArgs.get("name") || configuration!.name || "pup"
+    const home = parsedArgs.get("home")
+    try {
+      const result = await uninstallService({ system, name, home })
+      if (result.manualSteps && result.manualSteps.length) {
+        console.log(Colors.bold("To complete the uninstallation, carry out these manual steps:"))
+        result.manualSteps.forEach((step, index) => {
+          console.log(Colors.cyan(`${index + 1}. ${step.text}`))
+          if (step.command) {
+            console.log("   " + Colors.yellow("Command: ") + step.command)
+          }
+        })
+      } else {
+        console.log(`Service '${name}' at '${result.servicePath}' is now uninstalled.`)
+      }
+      exit(0)
+    } catch (e) {
+      console.error(`Could not uninstall service, error: ${e.message}`)
+      exit(1)
     }
   }
 
@@ -350,7 +353,7 @@ async function main() {
     }
     console.log("")
     printHeader()
-    await printStatus(configFile!, statusFile!)
+    await printStatus(configFile!, statusFile!, configuration!, cwd())
     exit(0)
   }
 

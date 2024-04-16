@@ -9,10 +9,12 @@
 import { type ProcessInformation, ProcessState } from "../core/process.ts"
 import type { ApplicationState } from "../core/status.ts"
 import { type Column, Columns, type Row } from "./columns.ts"
-import { exit } from "@cross/utils"
+import { Colors, exit } from "@cross/utils"
 import { filesize } from "filesize"
 import { blockedFormatter, codeFormatter, naFormatter, statusFormatter } from "./formatters/strings.ts"
 import { timeagoFormatter } from "./formatters/times.ts"
+import { Configuration } from "../core/configuration.ts"
+import { resolve } from "@std/path"
 
 /**
  * Helper which print the status of all running processes,
@@ -23,7 +25,7 @@ import { timeagoFormatter } from "./formatters/times.ts"
  * @private
  * @async
  */
-export async function printStatus(configFile: string, statusFile: string) {
+export async function printStatus(configFile: string, statusFile: string, configuration: Configuration, cwd: string | undefined) {
   let status
   try {
     status = await getStatus(configFile, statusFile)
@@ -35,11 +37,19 @@ export async function printStatus(configFile: string, statusFile: string) {
     console.error(e.message)
     exit(1)
   }
+
+  // Print configuration
+  console.log("")
+  console.log(Colors.bold("Configuration:") + "\t" + resolve(configFile))
+  console.log(Colors.bold("Working dir:") + "\t" + cwd || "Not set (default: pup)")
+  console.log(Colors.bold("Instance name:") + "\t" + (configuration.name || "Not set"))
+  console.log(Colors.bold("Plugins:") + "\t" + (configuration.plugins?.map((p) => p.url).join(", ") || "None"))
+
   const taskTable: Row[] = []
 
   // Add main process
   taskTable.push({
-    Id: "Main",
+    Id: configuration.name || "pup",
     Type: status!.type.slice(0, 4) || "N/A",
     Status: status!.status || "N/A",
     Blocked: "N/A",

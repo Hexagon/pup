@@ -141,7 +141,10 @@ export class PupTelemetry {
     } finally {
       clearTimeout(this.timer)
       if (!this.aborted) {
-        this.timer = setTimeout(() => this.telemetryWatchdog(), this.intervalSeconds * 1000)
+        this.timer = setTimeout(
+          () => this.telemetryWatchdog(),
+          this.intervalSeconds * 1000,
+        )
         Deno.unrefTimer(this.timer)
       }
     }

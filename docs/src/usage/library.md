@@ -35,10 +35,17 @@ Pup supports the integration of a custom logger. This allows for more flexible a
 
 ```ts
 // Create a pup instance
-const pup = await Pup.init() /* The configuration object is optional when instantiating a new Pup */
+const pup = await Pup
+  .init() /* The configuration object is optional when instantiating a new Pup */
 
 // Create a custom logger function
-const logger = (severity: string, category: string, text: string, _config?: GlobalLoggerConfiguration, process?: ProcessConfiguration) => {
+const logger = (
+  severity: string,
+  category: string,
+  text: string,
+  _config?: GlobalLoggerConfiguration,
+  process?: ProcessConfiguration,
+) => {
   // The initiator will be the process ID if a process is specified, otherwise it defaults to "core"
   const initiator = process ? process.id : "core"
 

@@ -15,6 +15,7 @@ export const LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S = 60
 export const KV_SIZE_LIMIT_BYTES = 65_536
 
 interface Configuration {
+  name?: string
   logger?: GlobalLoggerConfiguration
   watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
@@ -114,6 +115,7 @@ const ConfigurationSchema = z.object({
       }),
     ),
   ),
+  name: z.optional(z.string()),
   processes: z.array(
     z.object({
       id: z.string().min(1).max(64).regex(/^[a-z0-9@._\-]+$/i, "Process ID can only contain characters a-Z 0-9 . _ - or @"),
@@ -174,6 +176,7 @@ function generateConfiguration(
   terminate?: string,
   autostart?: boolean,
   watch?: string,
+  name?: string,
   instances?: string,
   startPort?: string,
   commonPort?: string,
@@ -183,6 +186,10 @@ function generateConfiguration(
 ) {
   const configuration: Configuration = {
     processes: [],
+  }
+
+  if (name) {
+    configuration.name = name
   }
 
   // Split command to array

@@ -1,3 +1,10 @@
+/**
+ * Exports time formatter functions for use in the CLI status table
+ *
+ * @file      lib/cli/formatters/string.ts
+ * @license   MIT
+ */
+
 import { format, register } from "timeago.js"
 
 const shortTimeagoLocale = (_number: number | undefined, index: number, _totalSec: number | undefined): [string, string] => {
