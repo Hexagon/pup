@@ -33,6 +33,7 @@
   },
 
   "imports": {
+    "@cross/deepmerge": "jsr:@cross/deepmerge@^1.0.0",
     "@cross/env": "jsr:@cross/env@^1.0.0",
     "@cross/fs": "jsr:@cross/fs@^0.0.9",
     "@cross/runtime": "jsr:@cross/runtime@^1.0.0",

@@ -10,7 +10,7 @@ import { readLines, StringReader } from "@std/io"
 import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
 import { $, type CommandChild } from "dax-sh"
 import { getAllEnv } from "@cross/env"
-import { deepMerge } from "jsr:@cross/deepmerge@^1.0.0"
+import { deepMerge } from "@cross/deepmerge"
 import { CurrentOS, OperatingSystem } from "@cross/runtime"
 
 /**
