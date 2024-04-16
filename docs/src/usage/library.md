@@ -8,10 +8,10 @@ nav_order: 5
 
 ---
 
-Pup can be integrated into your application. Simply import it from your preferred CDN. We recommend [deno.land/x/pup](https://deno.land/x/pup). Here's how you can set up your main script:
+Pup can be integrated into your application. Simply import it from your preferred location. We recommend [jsr.io/@pup/pup](https://jsr.io/@pup/pup). Here's how you can set up your main script:
 
 ```ts
-import { Configuration, Pup } from "https://deno.land/x/pup/mod.ts"
+import { Configuration, Pup } from "jsr:@pup/pup@$VERSION/mod.ts"
 
 const configuration: Configuration = {
   "logger": {

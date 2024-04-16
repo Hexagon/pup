@@ -14,7 +14,7 @@ To create a custom plugin, developers should extend the `PluginImplementation` c
 provides various hooks and events to listen for.
 
 ```typescript
-import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation, PluginMetadata } from "https://deno.land/x/pup/mod.ts"
+import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation, PluginMetadata } from "jsr:@pup/pup@$VERSION/mod.ts"
 
 export class PupPlugin extends PluginImplementation {
   constructor(pup: PluginApi, config: PluginConfiguration) {
@@ -98,7 +98,7 @@ To sum it up, and create a custom plugin that intercepts the logger through hook
 this example, the plugin will print all available log data when the log signal is received.
 
 ```typescript
-import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "https://deno.land/x/pup/mod.ts"
+import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "jsr:@pup/pup@$VERSION/mod.ts"
 
 export class PupPlugin extends PluginImplementation {
   constructor(pup: PluginApi, config: PluginConfiguration) {
@@ -137,7 +137,7 @@ The end user configuration for activating a plugin by `pup.json` is
   "plugins": [
     /* Remote plugin */
     {
-      "url": "https://deno.land/x/pup-example-plugin@0.0.1/mod.ts",
+      "url": "jsr:@scope/pup-example-plugin@0.0.1/mod.ts",
       "options": {
         /* Plugin specific configuration */
       }

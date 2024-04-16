@@ -7,7 +7,7 @@ please follow the steps outlined below.
 
 ## Prerequisites
 
-- Have [Deno](https://deno.land/) installed on your machine.
+- Have [Deno](https://deno.com/) installed on your machine.
 
 - Basic knowledge of how [Bundlee](https://github.com/hexagon/bundlee) works: Bundlee is a minimalistic bundler for JavaScript and TypeScript. It takes multiple JS/TS files, compiles them (if needed),
   and bundles them into a single JS file for use in a browser or Deno.

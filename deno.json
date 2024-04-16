@@ -5,7 +5,8 @@
     ".": "./pup.ts",
     "./mod.ts": "./mod.ts",
     "./telemetry": "./telemetry.ts",
-    "./plugins/splunk-hec": "./plugins/splunk-hec/mod.ts"
+    "./plugins/splunk-hec": "./plugins/splunk-hec/mod.ts",
+    "./plugins/web-interface": "./plugins/web-interface/mod.ts"
   },
 
   "fmt": {
@@ -27,7 +28,7 @@
     "check-coverage": "deno task check && genhtml cov_profile.lcov --output-directory cov_profile/html && lcov --list cov_profile.lcov && deno run --allow-net --allow-read https://deno.land/std/http/file_server.ts cov_profile/html",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env tools/release.ts && deno fmt",
-    "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts --bundle static static/bundle.json && deno fmt",
+    "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write jsr:@hexagon/bundlee --bundle static static/bundle.json && deno fmt",
     "build": "deno task check && deno task build-schema && deno task build-webinterface && deno task build-versions"
   },
 
@@ -38,7 +39,9 @@
     "@cross/service": "jsr:@cross/service@^1.0.0",
     "@cross/test": "jsr:@cross/test@^0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.11.0",
+    "@hexagon/bundlee": "jsr:@hexagon/bundlee@^0.9.5",
     "@hexagon/croner": "jsr:@hexagon/croner@^8.0.1",
+    "@oak/oak": "jsr:@oak/oak@^14.2.0",
     "@std/assert": "jsr:@std/assert@^0.222.1",
     "@std/async": "jsr:@std/async@^0.222.1",
     "@std/io": "jsr:@std/io@^0.222.1",

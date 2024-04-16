@@ -12,11 +12,11 @@ All notable changes to this project will be documented in this section.
 ## [1.0.0-rc.23] - Unreleased
 
 - fix(cli): Visual improvements for `--help`
-- fix(cli): Compacted and colorised `status`
-- fix(cli): Bold headers by default in table headers
-- fix(docs): Small fixes + update examples for jsr usage
+- fix(cli): Compacted and colorised output of `status`
+- fix(cli): Bolded headers by default in all table headers
 - feat(core/configuration): Add configuration entry for instance name (`name`)
-- chore(docs): Update telemetry example
+- chore(docs): Update examples for jsr usage, general update of telemetry example, docs for `name`, convert docs to jsr.io
+- fix(plugins): Convert web-interface plugin to jsr.io
 
 ## [1.0.0-rc.22] - 2024-04-15
 

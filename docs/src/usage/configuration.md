@@ -179,7 +179,7 @@ To activate plugins, add your plugins to the configuration using this pattern:
   "plugins": [
     /* Remote plugin ... */
     {
-      "url": "https://deno.land/x/pup-example-plugin@0.0.1/mod.ts",
+      "url": "jsr:@scope/pup-example-plugin@0.0.1/mod.ts",
       "options": {
         /* Plugin specific configuration */
       }

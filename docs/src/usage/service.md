@@ -94,7 +94,7 @@ RUN mkdir /app
 COPY . /app/
 
 # Install pup - Pin this url to a specific version in production
-RUN ["deno","install","-Afrn","pup", "https://deno.land/x/pup/pup.ts"]
+RUN ["deno","install","-Afrn","pup", "jsr:@pup/pup@1.0.0-rc.23"]
 
 # Go!
 ENTRYPOINT ["sh", "-c", "cd /app && pup run"]
@@ -155,7 +155,7 @@ Make sure to replace `/home/user/.deno/bin/deno` with the actual path of your de
 
 You should also replace `/path/to/your/pup.json` with the actual path.
 
-Finally you should add a version specifier to `https://deno.land/x/pup/pup.ts`, like `https://deno.land/x/pup@$PUP_VERSION/pup.ts`, Find the latest version at <https://deno.land/x/pup>.
+Finally you should add a version specifier to `jsr:@pup/pup@$VERSION/pup.ts`, like `jsr:@pup/pup@$PUP_VERSION/pup.ts`, Find the latest version at <https://jsr.io/@pup/pup>.
 
 Note that systemd always expects full paths. Also note that you will need to use full paths to executables in pup.json when running using systemd, alternatively you can use the `path` configuration
 key in each process to add the paths needed, like:
