@@ -17,9 +17,10 @@ Then, add the following basic configuration to the file:
 
 ```json
 {
+  "name": "my-instance-name",
   "processes": [
     {
-      "id": "example",
+      "id": "my-process-id",
       "cmd": "deno run --allow-net app.ts",
       "autostart": true
     }
@@ -82,8 +83,9 @@ You need to specify one of these for each process, else the process will never s
 
 Global configuration are entirely optional.
 
-You can define global configuration options that apply to all processes. In addition to `processes:` the global configuration clauses are:
+You can define global configuration options that apply to all processes. In addition to `processes:` the global configuration keys are:
 
+- `name`: A string indicating the instance name, 1-64 characters in the range `a-z 0-9 . _ -`.
 - `logger`: An object containing global logger configuration options.
 - `watcher`: An object containing global watcher configuration options.
 - `plugins`: An array containing configurations for all plugins that should be enabled.

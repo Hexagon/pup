@@ -115,7 +115,7 @@ const ConfigurationSchema = z.object({
       }),
     ),
   ),
-  name: z.optional(z.string()),
+  name: z.optional(z.string().min(1).max(64).regex(/^[a-z0-9@._\-]+$/i, "Instance name can only contain characters a-Z 0-9 . _ or -")),
   processes: z.array(
     z.object({
       id: z.string().min(1).max(64).regex(/^[a-z0-9@._\-]+$/i, "Process ID can only contain characters a-Z 0-9 . _ - or @"),

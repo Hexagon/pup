@@ -77,6 +77,7 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { separator: "empty" },
     { short: "-c", long: "--config <path>", description: "Optional. Use specific configuration file." },
     { description: "Default: ./pup.json" },
+    { long: "--name", description: "Optional. Set a name for the instance." },
     { short: "-I", long: "--id", description: "Id of the process to add/append/remove from configuration." },
     { short: "-C", long: "--cmd", description: "Command to run, for complex commands use '--' then the command." },
     { short: "-W", long: "--worker", description: "Worker script to run, any trailing arguments are passed to the worker" },

@@ -44,6 +44,8 @@ Pup revolves around instances configuration files, each process belongs to an in
 
    `pup init --id "my-server" --autostart --cmd "deno run -A server.ts"`
 
+   If you intend to create multiple pup instances on the same server, you can pass an instance name through `--name my-instance-name`
+
 2. (Optional) In case you have an additional task to execute, such as a cleanup script, you can make use of `pup append`. The following example shows how to add an extra task that use the cron start
    policy:
 
@@ -57,7 +59,7 @@ Pup revolves around instances configuration files, each process belongs to an in
 
    `pup enable-service`
 
-   You can pass `-n my-custom-name` to give the service a name different from `pup`
+   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `-n my-custom-name`.
 
 #### Single command example
 

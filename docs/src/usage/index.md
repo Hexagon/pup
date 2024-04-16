@@ -85,7 +85,11 @@ Example to stop task-2 started using `/root/pup.json` in the current directory. 
 
 The `init` command is used to create a new configuration file with a single process entry. The following options are available:
 
-**Basic settings**
+**Intance settings**
+
+- `--name <instance-name>` (optional): Specify a unique identifier for the instance
+
+**Process settings**
 
 - `--id <id>`: Specify the unique identifier for the process.
 - `--cmd <cmd>`: Specify the command to run the process, supports common shell features through [dax](https://github.com/dsherret/dax).
@@ -120,7 +124,7 @@ The `init` command is used to create a new configuration file with a single proc
 Example:
 
 ```bash
-pup init --id myprocess --cmd "node server.js" --cwd /path/to/project --cron "0 0 * * *" --autostart
+pup init --name my-instance --id my-process --cmd "node server.js" --cwd /path/to/project --cron "0 0 * * *" --autostart
 ```
 
 More advanced options, like logging to file, or writing of pid files, are available by editing the configuration file manually.
