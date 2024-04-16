@@ -18,7 +18,8 @@ This example demonstrates the telemetry feature of pup, which ...
 The simplest use case, where you only want to monitor your client metrics is used like this:
 
 ```ts
-import { PupTelemetry } from "https://deno.land/x/pup/telemetry.ts" // Pin this to a specific version of pup
+import { PupTelemetry } from "jsr:@pup/pup@$VERSION/telemetry"
+
 new PupTelemetry()
 
 // The rest of your application
@@ -31,7 +32,7 @@ telemetry (including main process) using `status` on the cli.
 
 ```ts
 // PupTelemetry is a singleton, so it can be imported one or many times in your application
-import { PupTelemetry } from "https://deno.land/x/pup/telemetry.ts" // Pin this to a specific version of pup
+import { PupTelemetry } from "jsr:@pup/pup@$VERSION/telemetry" // Pin this to a specific version of pup
 const telemetry = new PupTelemetry()
 
 // One part of your application ...
