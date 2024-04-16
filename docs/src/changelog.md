@@ -9,7 +9,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.23] - Unreleased
+## [1.0.0-rc.23] - 2023-04-16
 
 - fix(cli): Visual improvements for `--help`
 - fix(cli): Compacted and colorised output of `status`
