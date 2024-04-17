@@ -132,6 +132,16 @@ async function main() {
       console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
       exit(1)
     }
+    // Change working directory to configured directory
+  } else if (checkedArgs.get("cwd")) {
+    // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
+    try {
+      const resolvedPath = path.parse(path.resolve(checkedArgs.get("cwd")!))
+      chdir(resolvedPath.dir)
+    } catch (e) {
+      console.error(`Could not change working directory to path specified by --cwd ${checkedArgs.get("cwd")}, exiting. Message: `, e.message)
+      return exit(1)
+    }
   }
   // Read or generate configuration
   let configuration: Configuration
@@ -155,17 +165,6 @@ async function main() {
       checkedArgs.get("watch"),
       checkedArgs.get("name"),
     )
-  }
-  // Change working directory to configured directory
-  if (checkedArgs.get("cwd")) {
-    // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
-    try {
-      const resolvedPath = path.parse(path.resolve(checkedArgs.get("cwd")!))
-      chdir(resolvedPath.dir)
-    } catch (e) {
-      console.error(`Could not change working directory to path specified by --cwd ${checkedArgs.get("cwd")}, exiting. Message: `, e.message)
-      return exit(1)
-    }
   }
   // Prepare for IPC
   let ipcFile
@@ -411,7 +410,6 @@ async function main() {
   /**
    * Base argument: run
    */
-  console.log(baseArgument)
   if (baseArgument === "run") {
     /**
      * Error handling: Pup already running

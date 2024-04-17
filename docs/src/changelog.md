@@ -9,6 +9,13 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.26] - Unreleased
+
+- fix(core): Remove stray console.log
+- fix(core): Fix working dir different from current dir
+- change(plugins): Separate core api from plugin api
+- feat(rest): Add rest API with JWT Bearer auth
+
 ## [1.0.0-rc.25] - 2023-04-17
 
 - fix(plugins): Workaround for jsr bug affecting the web-interface plugin

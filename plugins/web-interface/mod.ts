@@ -7,7 +7,7 @@
 // deno-lint-ignore-file no-explicit-any
 
 import type { ProcessStateChangedEvent } from "../../lib/core/process.ts"
-import { type LogEvent, type PluginApi, type PluginConfiguration, PluginImplementation } from "../../mod.ts"
+import { type LogEvent, type PluginConfiguration, PluginImplementation, PupApi } from "../../mod.ts"
 import { Application, Bundlee, dirname, Router } from "./deps.ts"
 
 interface Configuration {
@@ -30,13 +30,13 @@ export class PupPlugin extends PluginImplementation {
     repository: "https://github.com/hexagon/",
   }
 
-  private pup: PluginApi
+  private pup: PupApi
   private config: Configuration
   private app: Application
   private router: Router
   private controller: AbortController
 
-  constructor(pup: PluginApi, config: PluginConfiguration) {
+  constructor(pup: PupApi, config: PluginConfiguration) {
     super(pup, config)
 
     this.pup = pup

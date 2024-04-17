@@ -4,14 +4,14 @@
  * @file plugins/splunk-hec/mod.ts
  */
 
-import { type PluginApi, type PluginConfiguration, PluginImplementation } from "../../mod.ts"
+import { type PluginConfiguration, PluginImplementation, type PupApi } from "../../mod.ts"
 import { HECClient } from "./hec.ts"
 import { getEnv } from "@cross/env"
 
 export class PupPlugin extends PluginImplementation {
   private hecClient: HECClient
 
-  constructor(private pup: PluginApi, private config: PluginConfiguration) {
+  constructor(private pup: PupApi, private config: PluginConfiguration) {
     super(pup, config)
     this.meta = {
       name: "SplunkReporterPlugin",

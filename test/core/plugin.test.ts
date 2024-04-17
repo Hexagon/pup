@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from "@std/assert"
 import { Pup } from "../../lib/core/pup.ts"
-import { Plugin, PluginApi } from "../../lib/core/plugin.ts"
+import { PupApi } from "../../lib/core/api.ts"
+import { Plugin } from "../../lib/core/plugin.ts"
 import type { PluginConfiguration } from "../../lib/core/configuration.ts"
 import { test } from "@cross/test"
 
@@ -76,9 +77,9 @@ test("Plugin - Test default hook implementation", async () => {
   assertEquals(result, false, "Default hook implementation should return false")
 })
 
-test("PluginApi - Check temporaryStorage path - undefined", async () => {
+test("PupApi - Check temporaryStorage path - undefined", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
-  const pluginApi = new PluginApi(pup)
+  const pluginApi = new PupApi(pup)
 
   assertEquals(
     pluginApi.paths.temporaryStorage,
@@ -93,9 +94,9 @@ test("PluginApi - Check temporaryStorage path - undefined", async () => {
   )
 })
 
-test("PluginApi - Check persistentStorage path - undefined", async () => {
+test("PupApi - Check persistentStorage path - undefined", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
-  const pluginApi = new PluginApi(pup)
+  const pluginApi = new PupApi(pup)
   assertEquals(
     pluginApi.paths.persistentStorage,
     pup.temporaryStoragePath,
@@ -109,9 +110,9 @@ test("PluginApi - Check persistentStorage path - undefined", async () => {
   )
 })
 
-test("PluginApi - Check configFilePath - undefined", async () => {
+test("PupApi - Check configFilePath - undefined", async () => {
   const pup = await Pup.init(minimalPupConfiguration)
-  const pluginApi = new PluginApi(pup)
+  const pluginApi = new PupApi(pup)
 
   assertEquals(
     pluginApi.paths.configFilePath,
@@ -126,9 +127,9 @@ test("PluginApi - Check configFilePath - undefined", async () => {
   )
 })
 
-test("PluginApi - Check configFilePath - set", async () => {
+test("PupApi - Check configFilePath - set", async () => {
   const pup = await Pup.init(minimalPupConfiguration, "./test/core/test-data/test.json")
-  const pluginApi = new PluginApi(pup)
+  const pluginApi = new PupApi(pup)
 
   assertEquals(
     pluginApi.paths.configFilePath,
@@ -143,9 +144,9 @@ test("PluginApi - Check configFilePath - set", async () => {
   )
 })
 
-test("PluginApi - Check temporaryStorage path - set", async () => {
+test("PupApi - Check temporaryStorage path - set", async () => {
   const pup = await Pup.init(minimalPupConfiguration, "./test/core/test-data/test.json")
-  const pluginApi = new PluginApi(pup)
+  const pluginApi = new PupApi(pup)
 
   assertEquals(
     pluginApi.paths.temporaryStorage,
@@ -158,9 +159,9 @@ test("PluginApi - Check temporaryStorage path - set", async () => {
   )
 })
 
-test("PluginApi - Check persistentStorage path - set", async () => {
+test("PupApi - Check persistentStorage path - set", async () => {
   const pup = await Pup.init(minimalPupConfiguration, "./test/core/test-data/test.json")
-  const pluginApi = new PluginApi(pup)
+  const pluginApi = new PupApi(pup)
 
   assertEquals(
     pluginApi.paths.persistentStorage,

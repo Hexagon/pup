@@ -20,6 +20,7 @@ import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
 import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
+import { RestApi } from "./rest.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
 import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
 import * as uuid from "@std/uuid"
@@ -36,6 +37,7 @@ class Pup {
   public status: Status
   public events: EventEmitter
   public ipc?: FileIPC
+  public restApi?: RestApi
 
   public processes: (Process | Cluster)[] = []
   public plugins: Plugin[] = []
@@ -188,6 +190,7 @@ class Pup {
 
     this.watchdog()
     this.maintenance(true)
+    this.api()
   }
 
   public allProcesses(): Process[] {
@@ -286,6 +289,24 @@ class Pup {
         // Exit watchdog if terminating
         this.watchdog()
       }, WATCHDOG_INTERVAL_MS)
+    }
+  }
+
+  /**
+   * Watchdog function that manages process lifecycle events like
+   * auto-start, restart, and timeouts.
+   *
+   * @private
+   */
+  private api = () => {
+    // Initializing rest a
+    this.logger.info("rest", "Initializing rest api")
+    // Initialize rest api
+    try {
+      this.restApi = new RestApi(this)
+      this.restApi.start(8002)
+    } catch (e) {
+      this.logger.error("rest", `An error occured while inizializing the rest api: ${e.message}`)
     }
   }
 
@@ -574,6 +595,9 @@ class Pup {
     for (const plugin of this.plugins) {
       await plugin.terminate()
     }
+
+    // Terminate api
+    if (this.restApi) this.restApi.terminate()
 
     // Cleanup
     await this.cleanup()
