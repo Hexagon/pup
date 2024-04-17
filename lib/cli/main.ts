@@ -39,27 +39,44 @@ import { chdir, cwd } from "@cross/fs"
  * @async
  */
 async function main() {
-  const parsedArgs = parseArguments(args())
-
-  // Extract base argument
-  const baseArgument = parsedArgs.countLoose() ? parsedArgs.getLoose()[0] : undefined
-  const secondaryBaseArgument = parsedArgs.countLoose() > 1 ? parsedArgs.getLoose()[1] : undefined
+  /**
+   * Read and validate CLI arguments
+   * - Exit on error
+   */
+  let checkedArgs, checkedArgsError
+  try {
+    checkedArgs = checkArguments(parseArguments(args()))
+  } catch (e) {
+    checkedArgsError = e
+  }
+  if (!checkedArgs || checkedArgsError) {
+    console.error(`Invalid combination of arguments: ${checkedArgsError.message}`)
+    return exit(1)
+  }
+  // Handle that cmd can be specified using both `--cmd <command>` and `-- <command>`
+  let cmd = checkedArgs.get("cmd")
+  if (!cmd && checkedArgs.hasRest()) {
+    cmd = checkedArgs.getRest()
+  }
+  // Extract base arguments
+  const baseArgument = checkedArgs.countLoose() ? checkedArgs.getLoose()[0] : undefined
+  const secondaryBaseArgument = checkedArgs.countLoose() > 1 ? checkedArgs.getLoose()[1] : undefined
 
   /**
-   * setup, upgrade
+   * Base arguments: setup, upgrade
    *
    * setup is a special command used as the pup installer, to install pup as a system cli command
    */
-  const upgradeCondition = parsedArgs.get("setup") || baseArgument === "setup"
-  const setupCondition = parsedArgs.get("upgrade") || baseArgument === "upgrade" || baseArgument === "update"
+  const upgradeCondition = checkedArgs.get("setup") || baseArgument === "setup"
+  const setupCondition = checkedArgs.get("upgrade") || baseArgument === "upgrade" || baseArgument === "update"
   if (upgradeCondition || setupCondition) {
     try {
       await upgrade(
-        parsedArgs.get("version"),
-        parsedArgs.get("channel"),
-        parsedArgs.get("unsafely-ignore-certificate-errors"),
-        parsedArgs.getBoolean("all-permissions"),
-        parsedArgs.getBoolean("local"),
+        checkedArgs.get("version"),
+        checkedArgs.get("channel"),
+        checkedArgs.get("unsafely-ignore-certificate-errors"),
+        checkedArgs.getBoolean("all-permissions"),
+        checkedArgs.getBoolean("local"),
         setupCondition as boolean,
       )
     } catch (e) {
@@ -70,46 +87,22 @@ async function main() {
   }
 
   /**
-   * version
+   * Base argument: version
    */
-  if (parsedArgs.get("version") !== undefined || baseArgument === "version") {
+  if (checkedArgs.get("version") !== undefined || baseArgument === "version") {
     printHeader()
     exit(0)
   }
 
   /**
-   * help
+   * Base argument: help
    */
-  if (parsedArgs.get("help") || !baseArgument || baseArgument === "help") {
+  if (checkedArgs.get("help") || !baseArgument || baseArgument === "help") {
     printUsage()
     console.log("")
-    printFlags(parsedArgs.getBoolean("external-installer"))
+    printFlags(checkedArgs.getBoolean("external-installer"))
     exit(0)
   }
-
-  /**
-   * check arguments
-   */
-  let checkedArgs
-  try {
-    checkedArgs = checkArguments(parsedArgs)
-  } catch (e) {
-    console.error(`Invalid combination of arguments: ${e.message}`)
-    exit(1)
-  }
-
-  // Extract command from arguments
-  let cmd
-  if (checkedArgs) {
-    if (checkedArgs.get("cmd")) {
-      cmd = checkedArgs.get("cmd")
-    } else if (checkedArgs.hasRest()) {
-      cmd = checkedArgs.getRest()
-    }
-  }
-
-  // Extract worker from arguments
-  const worker = checkedArgs?.get("worker")
 
   /**
    * Now either
@@ -117,16 +110,74 @@ async function main() {
    * - Find configuration using (--config)
    * - Or generate configuration using (init)
    */
-  const runWithoutConfig = baseArgument == "run" && (cmd !== undefined || worker !== undefined)
+  const runWithoutConfig = baseArgument == "run" && (cmd !== undefined || checkedArgs.get("worker") !== undefined)
   const useConfigFile = !runWithoutConfig
   let configFile
   if (useConfigFile) {
     const configFileCwd = toResolvedAbsolutePath(checkedArgs?.get("cwd") || cwd())
     configFile = await findConfigFile(configFileCwd, useConfigFile, checkedArgs?.get("config"))
   }
+  // Exit if a configuration file is expected, but not found
+  if (useConfigFile && !configFile) {
+    console.error("Configuration file not found.")
+    exit(1)
+  }
+  // Change working directory to where the configuration file is, if there is one.
+  if (useConfigFile && configFile) {
+    try {
+      const resolvedPath = path.parse(path.resolve(configFile))
+      chdir(resolvedPath.dir)
+      configFile = `${resolvedPath.name}${resolvedPath.ext}`
+    } catch (e) {
+      console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
+      exit(1)
+    }
+  }
+  // Read or generate configuration
+  let configuration: Configuration
+  if (configFile) {
+    try {
+      const rawConfig = await readFile(configFile)
+      const rawConfigText = new TextDecoder().decode(rawConfig)
+      configuration = validateConfiguration(JSON5.parse(rawConfigText))
+    } catch (e) {
+      console.error(`Could not start, error reading or parsing configuration file '${configFile}': ${e.message}`)
+      return exit(1)
+    }
+  } else {
+    configuration = generateConfiguration(
+      checkedArgs.get("id") || "task",
+      cmd!,
+      checkedArgs.get("cwd"),
+      checkedArgs.get("cron"),
+      checkedArgs.get("terminate"),
+      checkedArgs.getBoolean("autostart"),
+      checkedArgs.get("watch"),
+      checkedArgs.get("name"),
+    )
+  }
+  // Change working directory to configured directory
+  if (checkedArgs.get("cwd")) {
+    // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
+    try {
+      const resolvedPath = path.parse(path.resolve(checkedArgs.get("cwd")!))
+      chdir(resolvedPath.dir)
+    } catch (e) {
+      console.error(`Could not change working directory to path specified by --cwd ${checkedArgs.get("cwd")}, exiting. Message: `, e.message)
+      return exit(1)
+    }
+  }
+  // Prepare for IPC
+  let ipcFile
+  if (useConfigFile) ipcFile = `${await toTempPath(configFile as string)}/.main.ipc`
+  // Prepare status file
+  let statusFile
+  if (useConfigFile) statusFile = `${await toPersistentPath(configFile as string)}/.main.status`
 
   /**
-   * Now, handle the argument to generate a new configuration file and exit
+   * Base argument: init
+   *
+   * Generate a new configuration file and exit
    */
   if (baseArgument === "init") {
     // Default new configuration file to pup.json
@@ -142,14 +193,14 @@ async function main() {
   }
 
   /**
-   * Now, the arguments to modify existing configuration files and exit
-   * - append - Append configuration to existing configuration file and exit
-   * - remove - Remove process from existing configuration file and exit
+   * Base argument: append
+   *
+   * Append configuration to existing configuration file and exit
    */
   if (baseArgument === "append") {
     if (configFile) {
       await appendConfigurationFile(configFile, checkedArgs!, cmd!)
-      console.log(`Process '${parsedArgs.get("id")}' appended to configuration file '${configFile}'.`)
+      console.log(`Process '${checkedArgs.get("id")}' appended to configuration file '${configFile}'.`)
       exit(0)
     } else {
       console.log(`Configuration file '${configFile}' not found, use init if you want to create a new one. Exiting.`)
@@ -157,10 +208,15 @@ async function main() {
     }
   }
 
+  /**
+   * Base argument: remove
+   *
+   * Remove process from existing configuration file and exit
+   */
   if (baseArgument === "remove") {
     if (configFile) {
       await removeFromConfigurationFile(configFile, checkedArgs!)
-      console.log(`Process '${parsedArgs.get("id")}' removed from configuration file '${configFile}'.`)
+      console.log(`Process '${checkedArgs.get("id")}' removed from configuration file '${configFile}'.`)
       exit(0)
     } else {
       console.log("Configuration file '${fallbackedConfigFile}' not found, use init if you want to create a new one. Exiting.")
@@ -168,66 +224,8 @@ async function main() {
     }
   }
 
-  // Exit if no configuration file was found, or specified configuration file were not found
-  if (useConfigFile && !configFile) {
-    console.error("Configuration file not found.")
-    exit(1)
-  }
-
   /**
-   * Change working directory to where the configuration file is, if there is one.
-   */
-  if (useConfigFile && configFile) {
-    try {
-      const resolvedPath = path.parse(path.resolve(configFile))
-      chdir(resolvedPath.dir)
-      configFile = `${resolvedPath.name}${resolvedPath.ext}`
-    } catch (e) {
-      console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
-      exit(1)
-    }
-  }
-
-  /**
-   * Read or generate configuration
-   */
-  let configuration: Configuration
-  if (configFile) {
-    try {
-      const rawConfig = await readFile(configFile)
-      const rawConfigText = new TextDecoder().decode(rawConfig)
-      configuration = validateConfiguration(JSON5.parse(rawConfigText))
-    } catch (e) {
-      console.error(`Could not start, error reading or parsing configuration file '${configFile}': ${e.message}`)
-      exit(1)
-    }
-  } else {
-    configuration = generateConfiguration(
-      parsedArgs.get("id") || "task",
-      cmd!,
-      parsedArgs.get("cwd"),
-      parsedArgs.get("cron"),
-      parsedArgs.get("terminate"),
-      parsedArgs.getBoolean("autostart"),
-      parsedArgs.get("watch"),
-      parsedArgs.get("name"),
-    )
-
-    // Change working directory to configured directory
-    if (parsedArgs.get("cwd")) {
-      // Change working directory of pup to whereever the configuration file is, change configFile to only contain file name
-      try {
-        const resolvedPath = path.parse(path.resolve(parsedArgs.get("cwd")!))
-        chdir(resolvedPath.dir)
-      } catch (e) {
-        console.error(`Could not change working directory to path specified by --cwd ${parsedArgs.get("cwd")}, exiting. Message: `, e.message)
-        exit(1)
-      }
-    }
-  }
-
-  /**
-   * Handle the install argument
+   * Base argument: enable-service
    */
   if (baseArgument === "enable-service") {
     if (!configFile) {
@@ -235,17 +233,17 @@ async function main() {
       exit(1)
     }
 
-    const system = parsedArgs.getBoolean("system")
-    const name = parsedArgs.get("name") || configuration!.name || "pup"
-    const config = parsedArgs.get("config")
-    const cwd = parsedArgs.get("cwd")
+    const system = checkedArgs.getBoolean("system")
+    const name = checkedArgs.get("name") || configuration!.name || "pup"
+    const config = checkedArgs.get("config")
+    const cwd = checkedArgs.get("cwd")
     const cmd = `pup run ${config ? `--config ${config}` : ""}`
-    const user = parsedArgs.get("user")
-    const home = parsedArgs.get("home")
-    const env = parsedArgs.getArray("env") || []
+    const user = checkedArgs.get("user")
+    const home = checkedArgs.get("home")
+    const env = checkedArgs.getArray("env") || []
 
     try {
-      const result = await installService({ system, name, cmd, cwd, user, home, env }, parsedArgs.getBoolean("dry-run"))
+      const result = await installService({ system, name, cmd, cwd, user, home, env }, checkedArgs.getBoolean("dry-run"))
       if (result.manualSteps && result.manualSteps.length) {
         console.log(Colors.bold("To complete the installation, carry out these manual steps:"))
         result.manualSteps.forEach((step, index) => {
@@ -262,10 +260,14 @@ async function main() {
       console.error(`Could not install service, error: ${e.message}`)
       exit(1)
     }
-  } else if (baseArgument === "disable-service") {
-    const system = parsedArgs.getBoolean("system")
-    const name = parsedArgs.get("name") || configuration!.name || "pup"
-    const home = parsedArgs.get("home")
+  }
+  /**
+   * Base argument: disable-service
+   */
+  if (baseArgument === "disable-service") {
+    const system = checkedArgs.getBoolean("system")
+    const name = checkedArgs.get("name") || configuration!.name || "pup"
+    const home = checkedArgs.get("home")
     try {
       const result = await uninstallService({ system, name, home })
       if (result.manualSteps && result.manualSteps.length) {
@@ -279,26 +281,27 @@ async function main() {
       } else {
         console.log(`Service '${name}' at '${result.servicePath}' is now uninstalled.`)
       }
-      exit(0)
+      return exit(0)
     } catch (e) {
       console.error(`Could not uninstall service, error: ${e.message}`)
-      exit(1)
+      return exit(1)
     }
   }
 
-  // Prepare log file path
-  // Add a new condition for "logs" base command
+  /**
+   * Base argument: logs
+   */
   if (baseArgument === "logs") {
     const logStore = `${await toPersistentPath(configFile as string)}/.main.log`
     const logger = new Logger(configuration!.logger || {}, logStore)
-    const startTimestamp = parsedArgs.get("start") ? new Date(Date.parse(parsedArgs.get("start")!)).getTime() : undefined
-    const endTimestamp = parsedArgs.get("end") ? new Date(Date.parse(parsedArgs.get("end")!)).getTime() : undefined
-    const numberOfRows = parsedArgs.get("n") ? parseInt(parsedArgs.get("n")!, 10) : undefined
-    let logs = await logger.getLogContents(parsedArgs.get("id"), startTimestamp, endTimestamp)
+    const startTimestamp = checkedArgs.get("start") ? new Date(Date.parse(checkedArgs.get("start")!)).getTime() : undefined
+    const endTimestamp = checkedArgs.get("end") ? new Date(Date.parse(checkedArgs.get("end")!)).getTime() : undefined
+    const numberOfRows = checkedArgs.get("n") ? parseInt(checkedArgs.get("n")!, 10) : undefined
+    let logs = await logger.getLogContents(checkedArgs.get("id"), startTimestamp, endTimestamp)
     logs = logs.filter((log) => {
       const { processId, severity } = log
-      const severityFilter = !parsedArgs.get("severity") || parsedArgs.get("severity") === "" || parsedArgs.get("severity")!.toLowerCase() === severity.toLowerCase()
-      const processFilter = !parsedArgs.get("id") || parsedArgs.get("id") === "" || parsedArgs.get("id")!.toLowerCase() === processId.toLowerCase()
+      const severityFilter = !checkedArgs.get("severity") || checkedArgs.get("severity") === "" || checkedArgs.get("severity")!.toLowerCase() === severity.toLowerCase()
+      const processFilter = !checkedArgs.get("id") || checkedArgs.get("id") === "" || checkedArgs.get("id")!.toLowerCase() === processId.toLowerCase()
       return severityFilter && processFilter
     })
     if (numberOfRows) {
@@ -331,20 +334,13 @@ async function main() {
     } else {
       console.error("No logs found.")
     }
-    exit(0)
+    return exit(0)
   }
 
-  // Prepare for IPC
-  let ipcFile
-  if (useConfigFile) ipcFile = `${await toTempPath(configFile as string)}/.main.ipc`
-
-  // Prepare status file
-  let statusFile
-  if (useConfigFile) statusFile = `${await toPersistentPath(configFile as string)}/.main.status`
-
   /**
-   * Now when the configuration file is located
-   * status, print status for current running instance, and exit.
+   * Base argument: status
+   *
+   * Print status for current running instance, and exit.
    */
   if (baseArgument === "status") {
     if (!statusFile || !configFile) {
@@ -357,7 +353,9 @@ async function main() {
     exit(0)
   }
 
-  // Handle --restart, --stop etc using IPC
+  /**
+   * Base arguments: restart, start, stop, block, unblock, terminate
+   */
   for (const op of ["restart", "start", "stop", "block", "unblock", "terminate"]) {
     if (baseArgument === op && !secondaryBaseArgument && baseArgument !== "terminate") {
       console.error(`Control functions require an id, specify with '${baseArgument} all|<task-id>'`)
@@ -411,66 +409,70 @@ async function main() {
   }
 
   /**
-   * handle the case where there is an existing status file
+   * Base argument: run
    */
-  if (statusFile && await exists(statusFile)) {
-    try {
-      // A valid status file were found
-      if (!await getStatus(configFile, statusFile)) {
-        /* ignore */
-      } else {
-        console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
+  console.log(baseArgument)
+  if (baseArgument === "run") {
+    /**
+     * Error handling: Pup already running
+     */
+    if (statusFile && await exists(statusFile)) {
+      try {
+        // A valid status file were found
+        if (!await getStatus(configFile, statusFile)) {
+          /* ignore */
+        } else {
+          console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
+          exit(1)
+        }
+      } catch (e) {
+        console.error(e.message)
         exit(1)
       }
-    } catch (e) {
-      console.error(e.message)
+    }
+
+    /**
+     * Error handling: Require at least one configured process
+     */
+    if (!configuration! || configuration?.processes?.length < 1) {
+      console.error("No processes defined, exiting.")
       exit(1)
     }
-  }
 
-  /**
-   * One last check before starting, is there any processes?
-   */
-  if (!configuration! || configuration?.processes?.length < 1) {
-    console.error("No processes defined, exiting.")
-    exit(1)
-  }
+    try {
+      const pup = await Pup.init(configuration!, configFile ?? undefined)
 
-  /**
-   * Ready to start pup!
-   */
-  if (baseArgument !== "run") {
-    console.error("Trying to start pup without 'run' argument, this should not happen. Exiting.")
-    exit(1)
-  }
+      // Start the watchdog
+      pup.init()
 
-  try {
-    const pup = await Pup.init(configuration!, configFile ?? undefined)
+      // Register for running pup.terminate() if not already run on clean exit
+      let hasRunShutdownCode = false
+      globalThis.addEventListener("beforeunload", (evt) => {
+        if (!hasRunShutdownCode) {
+          evt.preventDefault()
+          hasRunShutdownCode = true
+          ;(async () => await pup.terminate(30000))()
+        }
+      })
 
-    // Start the watchdog
-    pup.init()
+      // This is needed to trigger termination, as CTRL+C
+      // does not run the beforeunload event
+      // See https://github.com/denoland/deno/issues/11752
+      Deno.addSignalListener("SIGINT", async () => {
+        await pup.terminate(30000)
+      })
 
-    // Register for running pup.terminate() if not already run on clean exit
-    let hasRunShutdownCode = false
-    globalThis.addEventListener("beforeunload", (evt) => {
-      if (!hasRunShutdownCode) {
-        evt.preventDefault()
-        hasRunShutdownCode = true
-        ;(async () => await pup.terminate(30000))()
-      }
-    })
-
-    // This is needed to trigger termination, as CTRL+C
-    // does not run the beforeunload event
-    // See https://github.com/denoland/deno/issues/11752
-    Deno.addSignalListener("SIGINT", async () => {
-      await pup.terminate(30000)
-    })
-
-    // Let program end gracefully, no exit here
-  } catch (e) {
-    console.error("Could not start pup, invalid configuration:", e.message)
-    exit(1)
+      // Let program end gracefully, no exit here
+    } catch (e) {
+      console.error("Could not start pup, invalid configuration:", e.message)
+      return exit(1)
+    }
+  } else {
+    /**
+     * Error handling: Unknown/missing base argument, no options left
+     */
+    console.error("Unknown operation.")
+    return exit(1)
   }
 }
 

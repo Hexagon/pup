@@ -9,6 +9,11 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.24] - 2023-04-17
+
+- chore(cli): Refactor of the cli entrypoint code
+- fix(plugins): Fix web-interface plugin by switching bundlee mode from import to fetch mode
+
 ## [1.0.0-rc.23] - 2023-04-16
 
 - fix(cli): Visual improvements for `--help`

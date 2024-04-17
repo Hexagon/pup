@@ -170,7 +170,7 @@ export class PupPlugin extends PluginImplementation {
 
     // Set up route to serve static files using Bundlee
     this.app.use(async (context: any, next: any) => {
-      const staticFiles = await Bundlee.load(dirname(import.meta.url) + "/static/bundle.json", "import")
+      const staticFiles = await Bundlee.load(dirname(import.meta.url) + "/static/bundle.json", "fetch")
       const url = "static" + context.request.url.pathname
       if (staticFiles.has(url)) {
         const fileData = await staticFiles.get(url)
