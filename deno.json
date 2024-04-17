@@ -1,6 +1,6 @@
 {
   "name": "@pup/pup",
-  "version": "1.0.0-rc.24",
+  "version": "1.0.0-rc.25",
   "exports": {
     ".": "./pup.ts",
     "./mod.ts": "./mod.ts",
@@ -40,7 +40,7 @@
     "@cross/service": "jsr:@cross/service@^1.0.0",
     "@cross/test": "jsr:@cross/test@^0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.11.0",
-    "@hexagon/bundlee": "jsr:@hexagon/bundlee@^0.9.6",
+    "@hexagon/bundlee": "jsr:@hexagon/bundlee@^0.9.6/mod.ts",
     "@hexagon/croner": "jsr:@hexagon/croner@^8.0.1",
     "@oak/oak": "jsr:@oak/oak@^14.2.0",
     "@std/assert": "jsr:@std/assert@^0.223.0",
