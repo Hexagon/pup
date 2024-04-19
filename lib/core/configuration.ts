@@ -16,12 +16,18 @@ export const KV_SIZE_LIMIT_BYTES = 65_536
 
 interface Configuration {
   name?: string
+  api?: ApiConfiguration
   logger?: GlobalLoggerConfiguration
   watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
   plugins?: PluginConfiguration[]
   terminateTimeout?: number
   terminateGracePeriod?: number
+}
+
+interface ApiConfiguration {
+  hostname?: string
+  port?: number
 }
 
 interface PluginConfiguration {

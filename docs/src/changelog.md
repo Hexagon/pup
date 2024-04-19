@@ -9,12 +9,13 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.26] - Unreleased
+## [1.0.0-rc.26] - 2023-04-19
 
 - fix(core): Remove stray console.log
 - fix(core): Fix working dir different from current dir
 - change(plugins): Separate core api from plugin api
 - feat(rest): Add rest API with JWT Bearer auth
+- fix(core): Update dependency @cross/env to fix a bug in windows caused by legacy environment variable keys such as `=C:`
 
 ## [1.0.0-rc.25] - 2023-04-17
 

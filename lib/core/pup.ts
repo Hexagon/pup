@@ -24,6 +24,7 @@ import { RestApi } from "./rest.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
 import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
 import * as uuid from "@std/uuid"
+import { Secret } from "./secret.ts"
 
 interface InstructionResponse {
   success: boolean
@@ -53,6 +54,7 @@ class Pup {
   public configFilePath?: string
 
   public cleanupQueue: string[] = []
+  public secret?: Secret
 
   static async init(unvalidatedConfiguration: unknown, configFilePath?: string): Promise<Pup> {
     const temporaryStoragePath: string | undefined = configFilePath ? await toTempPath(configFilePath) : undefined
@@ -65,6 +67,7 @@ class Pup {
     let statusFile
     let ipcFile
     let logStore
+    let secretFile
     if (configFilePath && temporaryStoragePath && persistentStoragePath) {
       this.configFilePath = toResolvedAbsolutePath(configFilePath)
 
@@ -75,7 +78,7 @@ class Pup {
 
       ipcFile = `${this.temporaryStoragePath}/.main.ipc` // Plain text file (serialized js object)
       statusFile = `${this.persistentStoragePath}/.main.status` // Deno KV store
-
+      secretFile = `${this.temporaryStoragePath}/.main.secret` // Plain text file containing the JWT secret for the rest api
       logStore = `${this.persistentStoragePath}/.main.log` // Deno KV store
     }
 
@@ -96,6 +99,9 @@ class Pup {
 
     // Initialize file ipc, if a path were passed
     if (ipcFile) this.ipc = new FileIPC(ipcFile)
+
+    // Initialize API secret
+    if (secretFile) this.secret = new Secret(secretFile)
   }
 
   /**
@@ -188,9 +194,9 @@ class Pup {
       process.init()
     }
 
+    this.api()
     this.watchdog()
     this.maintenance(true)
-    this.api()
   }
 
   public allProcesses(): Process[] {
@@ -293,18 +299,19 @@ class Pup {
   }
 
   /**
-   * Watchdog function that manages process lifecycle events like
-   * auto-start, restart, and timeouts.
-   *
+   * Starts the api
    * @private
    */
-  private api = () => {
+  private api = async () => {
+    const secret = await this.secret?.get()
+    if (!secret) return
+
     // Initializing rest a
     this.logger.info("rest", "Initializing rest api")
     // Initialize rest api
     try {
-      this.restApi = new RestApi(this)
-      this.restApi.start(8002)
+      this.restApi = new RestApi(this, this.configuration.api?.port, this.configuration.api?.hostname, secret)
+      this.restApi.start()
     } catch (e) {
       this.logger.error("rest", `An error occured while inizializing the rest api: ${e.message}`)
     }

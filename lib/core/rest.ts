@@ -3,33 +3,30 @@ import { PupApi } from "./api.ts"
 import { Pup } from "./pup.ts"
 import { generateKey, verifyJWT } from "@cross/jwt"
 
-// Dummy secret for now
-const jwtSecret = "GawoWOOWOOFSAFFASOFOFOASOAOFASFwoopieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-
-const jwtKey = await generateKey(jwtSecret, "HS512")
-
-const authMiddleware = async (ctx: Context, next: () => Promise<unknown>) => {
-  const headers: Headers = ctx.request.headers
-  const authorization = headers.get("Authorization")
-  if (!authorization) {
-    ctx.response.status = Status.Unauthorized
-    ctx.response.body = { message: "Authorization header required" }
-    return
-  }
-  const parts = authorization.split(" ")
-  if (parts.length !== 2 || parts[0] !== "Bearer") {
-    ctx.response.status = Status.Unauthorized
-    ctx.response.body = { message: "Invalid authorization format" }
-    return
-  }
-  const token = parts[1]
-  try {
-    const payload = await verifyJWT(token, jwtKey)
-    ctx.state.user = payload.user // Add user info to context state
-    await next() // Proceed if valid
-  } catch (_err) {
-    ctx.response.status = Status.Unauthorized
-    ctx.response.body = { message: "Invalid token" }
+const generateAuthMiddleware = (key: CryptoKey) => {
+  return async (ctx: Context, next: () => Promise<unknown>) => {
+    const headers: Headers = ctx.request.headers
+    const authorization = headers.get("Authorization")
+    if (!authorization) {
+      ctx.response.status = Status.Unauthorized
+      ctx.response.body = { message: "Authorization header required" }
+      return
+    }
+    const parts = authorization.split(" ")
+    if (parts.length !== 2 || parts[0] !== "Bearer") {
+      ctx.response.status = Status.Unauthorized
+      ctx.response.body = { message: "Invalid authorization format" }
+      return
+    }
+    const token = parts[1]
+    try {
+      const payload = await verifyJWT(token, key)
+      ctx.state.user = payload.user // Add user info to context state
+      await next() // Proceed if valid
+    } catch (_err) {
+      ctx.response.status = Status.Unauthorized
+      ctx.response.body = { message: "Invalid token" }
+    }
   }
 }
 
@@ -39,16 +36,27 @@ export class RestApi {
   private router: Router
   private appAbortController: AbortController
 
-  constructor(pup: Pup) { // Takes a Pup instance
+  private port: number
+  private hostname: string
+  private secret: string
+  private key?: CryptoKey
+
+  constructor(pup: Pup, port: number | undefined, hostname: string | undefined, jwtSecret: string) { // Takes a Pup instance
     this.pupApi = new PupApi(pup)
     this.app = new Application()
     this.router = new Router()
     this.appAbortController = new AbortController()
-
+    this.port = port || 16421
+    this.hostname = hostname || "localhost"
+    this.secret = jwtSecret
     this.setupRoutes() // Setup routes within the constructor
   }
 
-  private setupRoutes() {
+  private async setupKey() {
+    return await generateKey(this.secret, "HS512")
+  }
+
+  private async setupRoutes() {
     // Process related routes
     this.router
       .get("/processes", (ctx) => {
@@ -189,15 +197,16 @@ export class RestApi {
       }
     })
 
-    this.app.use(authMiddleware)
+    this.app.use(generateAuthMiddleware(await this.setupKey()))
     this.app.use(this.router.routes())
     this.app.use(this.router.allowedMethods())
   }
 
-  public async start(port = 8001) {
+  public async start() {
     this.pupApi.log("info", "rest", `Starting the REST API`)
-    await this.app.listen({ port, signal: this.appAbortController.signal })
-    this.pupApi.log("info", "rest", `REST API listening on port ${port}`)
+    //await this.app.listen({ port, signal: this.appAbortController.signal })
+    await this.app.listen({ port: this.port, hostname: this.hostname, signal: this.appAbortController.signal })
+    this.pupApi.log("info", "rest", `REST API listening on port ${this.port}`)
   }
 
   public terminate() {
