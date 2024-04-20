@@ -121,13 +121,15 @@ class Pup {
     // Attach logger to events
     this.logger.attach((severity: string, category: string, text: string, process?: ProcessConfiguration): boolean => {
       this.events.emit("log", {
+        timeStamp: Date.now(),
         severity,
         category,
         text,
-        process,
+        processId: process?.id,
       })
-      return true
+      return false
     })
+
     // Create processes
     if (this.configuration.processes) {
       for (const process of this.configuration.processes) {
@@ -144,7 +146,6 @@ class Pup {
       }
     }
 
-    // Call all plugins
     this.events.emit("init")
 
     // Initiate all processes

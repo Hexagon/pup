@@ -30,7 +30,6 @@ interface Configuration {
   logger?: GlobalLoggerConfiguration
   watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
-  plugins?: PluginConfiguration[]
   terminateTimeout?: number
   terminateGracePeriod?: number
 }
@@ -38,11 +37,6 @@ interface Configuration {
 interface ApiConfiguration {
   hostname?: string
   port?: number
-}
-
-interface PluginConfiguration {
-  url: string
-  options?: unknown
 }
 
 interface _BaseLoggerConfiguration {
@@ -123,14 +117,6 @@ const ConfigurationSchema = z.object({
       skip: z.optional(z.array(z.string()).default(["**/.git/**"])),
     }).strict(),
   ),
-  plugins: z.optional(
-    z.array(
-      z.object({
-        url: z.string(),
-        options: z.optional(z.any()),
-      }),
-    ),
-  ),
   name: z.optional(z.string().min(1).max(64).regex(/^[a-z0-9@._\-]+$/i, "Instance name can only contain characters a-Z 0-9 . _ or -")),
   processes: z.array(
     z.object({
@@ -209,7 +195,6 @@ function generateConfiguration(
   }
 
   // Split command to array
-
   const processConfiguration: ProcessConfiguration = {
     id,
     cmd,
@@ -244,4 +229,4 @@ function generateConfiguration(
 
 export { ConfigurationSchema, generateConfiguration, validateConfiguration }
 
-export type { Configuration, GlobalLoggerConfiguration, PluginConfiguration, ProcessConfiguration, ProcessLoggerConfiguration }
+export type { Configuration, GlobalLoggerConfiguration, ProcessConfiguration, ProcessLoggerConfiguration }

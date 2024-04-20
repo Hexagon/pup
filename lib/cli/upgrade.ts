@@ -122,7 +122,7 @@ export async function upgrade(
         console.warn(
           `\nWarning: Your current Deno version does not meet the stable requirement but it matches the unstable version. Proceeding with ${
             freshInstall ? "install" : "upgrade"
-          } will require Deno to run using the --unstable flag.\n`,
+          } will require Deno to run with unstable features enabled.\n`,
         )
 
         const answer = confirm("Do you want to proceed?")
@@ -150,7 +150,7 @@ export async function upgrade(
   // If upgrading to a version that requires --unstable, alert the user
   if (unstableInstall) {
     console.warn(
-      `\nWarning: Installing using Deno flag --unstable due to version requirements.`,
+      `\nWarning: Installing using Deno unstable features enabled due to version requirements.`,
     )
   }
 
@@ -175,9 +175,6 @@ export async function upgrade(
   }
   if (ignoreCertificateErrorsString && ignoreCertificateErrorsString !== "") {
     installCmd.push(ignoreCertificateErrorsString)
-  }
-  if (unstableInstall) {
-    installCmd.push("--unstable-kv")
   }
   installCmd.push("-n", "pup")
   installCmd.push(canaryInstall ? versions.canary_url : (requestedVersion as Version).url)

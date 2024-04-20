@@ -31,7 +31,6 @@ export function printStatus(configFile: string, configuration: Configuration, cw
   console.log(Colors.bold("Configuration:") + "\t" + resolve(configFile))
   console.log(Colors.bold("Working dir:") + "\t" + cwd || "Not set (default: pup)")
   console.log(Colors.bold("Instance name:") + "\t" + (configuration.name || "Not set"))
-  console.log(Colors.bold("Plugins:") + "\t" + (configuration.plugins?.map((p) => p.url).join(", ") || "None"))
 
   const taskTable: Row[] = []
 

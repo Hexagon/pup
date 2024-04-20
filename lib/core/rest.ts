@@ -43,7 +43,6 @@ export class RestApi {
   private appAbortController: AbortController
 
   private secret: string
-  private key?: CryptoKey
 
   public port: number
   public hostname: string
@@ -240,7 +239,6 @@ export class RestApi {
     this.app.use(this.router.allowedMethods())
 
     this.pupApi.log("info", "rest", `Starting the REST API`)
-    //await this.app.listen({ port, signal: this.appAbortController.signal })
     await this.app.listen({ port: this.port, hostname: this.hostname, signal: this.appAbortController.signal })
     this.pupApi.log("info", "rest", `REST API listening on port ${this.port}`)
   }

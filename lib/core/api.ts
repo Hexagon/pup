@@ -27,8 +27,8 @@ export interface ApiProcessData {
 
 /**
  * These interfaces are basically copies of the ones in pup core,
- * but specific to plugins, to make any incompabilities between the
- * plugin api and core apparent.
+ * but specific to the api, to make any incompabilities between the
+ * api and core apparent.
  */
 interface ApiProcessInformation {
   id: string
@@ -136,8 +136,8 @@ export class PupApi {
   public telemetry(data: TelemetryData): boolean {
     return this._pup.telemetry(data)
   }
-  public log(severity: "log" | "error" | "info" | "warn", plugin: string, message: string) {
-    this._pup.logger[severity](`plugin-${plugin}`, message)
+  public log(severity: "log" | "error" | "info" | "warn", consumer: string, message: string) {
+    this._pup.logger[severity](`api-${consumer}`, message)
   }
   public async getLogs(processId?: string, startTimeStamp?: number, endTimeStamp?: number, nRows?: number): Promise<LogEventData[]> {
     return await this._pup.logger.getLogContents(processId, startTimeStamp, endTimeStamp, nRows)

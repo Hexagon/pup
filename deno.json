@@ -1,11 +1,17 @@
 {
   "name": "@pup/pup",
   "version": "1.0.0-rc.26",
+
   "exports": {
     ".": "./pup.ts",
     "./mod.ts": "./mod.ts",
     "./telemetry": "./telemetry.ts"
   },
+
+  "unstable": [
+    "net",
+    "kv"
+  ],
 
   "fmt": {
     "lineWidth": 200,

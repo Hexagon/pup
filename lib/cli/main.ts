@@ -346,7 +346,6 @@ async function main() {
     const apiHostname = configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME
     const apiPort = configuration.api?.port || DEFAULT_REST_API_PORT
     const wsUrl = `ws://${apiHostname}:${apiPort}/wss`
-
     const wss = new WebSocketStream(wsUrl, {
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -361,26 +360,36 @@ async function main() {
       }
       try {
         const v = JSON.parse(value.toString())
-        const logWithColors = configuration!.logger?.colors ?? true
-        const { processId, severity, category, timeStamp, text } = v.d
-        const isStdErr = severity === "error" || category === "stderr"
-        const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${processId}:${category}] ${text}`
-        let color = null
-        // Apply coloring rules
-        if (logWithColors) {
-          if (processId === "core") color = "gray"
-          if (category === "starting") color = "green"
-          if (category === "finished") color = "yellow"
-          if (isStdErr) color = "red"
-        }
-        let logFn = console.log
-        if (severity === "warn") logFn = console.warn
-        if (severity === "info") logFn = console.info
-        if (severity === "error") logFn = console.error
-        if (color !== null) {
-          logFn(`%c${decoratedLogText}`, `color: ${color}`)
-        } else {
-          logFn(decoratedLogText)
+        if (v.t === "log") {
+          const logWithColors = configuration!.logger?.colors ?? true
+
+          const { processId, severity, category, timeStamp, text } = v.d
+
+          const severityFilter = !checkedArgs.get("severity") || checkedArgs.get("severity") === "" || checkedArgs.get("severity")!.toLowerCase() === severity.toLowerCase()
+          const processFilter = !checkedArgs.get("id") || checkedArgs.get("id") === "" || !processId || checkedArgs.get("id")!.toLowerCase() === processId.toLowerCase()
+
+          if (!severityFilter) continue
+          if (!processFilter) continue
+
+          const isStdErr = severity === "error" || category === "stderr"
+          const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${processId || "core"}:${category}] ${text}`
+          let color = null
+          // Apply coloring rules
+          if (logWithColors) {
+            if (processId === "core") color = "gray"
+            if (category === "starting") color = "green"
+            if (category === "finished") color = "yellow"
+            if (isStdErr) color = "red"
+          }
+          let logFn = console.log
+          if (severity === "warn") logFn = console.warn
+          if (severity === "info") logFn = console.info
+          if (severity === "error") logFn = console.error
+          if (color !== null) {
+            logFn(`%c${decoratedLogText}`, `color: ${color}`)
+          } else {
+            logFn(decoratedLogText)
+          }
         }
       } catch (_e) {
         console.error("Error in log streamer: " + _e)

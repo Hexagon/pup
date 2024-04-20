@@ -19,7 +19,6 @@ export async function GenerateToken(secret: string, data: unknown, expMs: number
     data,
     exp: expMs ? Math.round(expMs / 1000) : undefined,
   }
-  console.log(payload)
   return await createJWT(payload, key, { validateExp: expMs !== undefined })
 }
 
