@@ -20,6 +20,10 @@
     }
   },
 
+  "publish": {
+    "exclude": ["docs", ".github", "tools"]
+  },
+
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-net=jsr.io,registry.npmjs.org jsr:@check/deps",
     "check": "deno fmt --check && deno lint && deno check --unstable-kv pup.ts && deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --unstable-kv --coverage=cov_profile && echo \"Generating coverage\" && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",

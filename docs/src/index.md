@@ -17,6 +17,7 @@ Pup is a powerful process manager for Deno, designed to simplify the management 
 - **Plugins:** Extend Pup's functionality with custom plugins for additional features and integrations.
 - **Process Telemetry and IPC:** Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
   telemetry feature also enables inter-process communication, allowing connected processes to interact with one another.
+- **Secure Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
 
 > **Note** Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes. { .note }
 
@@ -30,7 +31,7 @@ Pup is centered on a single configuration file, `pup.json`, which manages all as
 To install Pup, open your terminal and execute the following command:
 
 ```bash
-deno run -Ar jsr:@pup/pup@1.0.0-rc.25 setup --channel prerelease
+deno run -Ar jsr:@pup/pup@1.0.0-rc.26 setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release

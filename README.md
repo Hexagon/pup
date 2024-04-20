@@ -18,6 +18,7 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
   your needs.
 - **Process Telemetry and IPC:** Gain deeper insights into managed processes by gathering telemetry data, such as memory usage and current working directory, from Deno client processes. Supports
   inter-process communication for connected processes to interact with each other.
+- **Secure Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
 
 > **Note**: Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes.
 
@@ -28,7 +29,7 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 To install Pup, open your terminal and execute the following command:
 
 ```bash
-deno run -Ar jsr:@pup/pup@1.0.0-rc.25 setup --channel prerelease
+deno run -Ar jsr:@pup/pup@1.0.0-rc.26 setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
