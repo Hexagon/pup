@@ -4,9 +4,7 @@
   "exports": {
     ".": "./pup.ts",
     "./mod.ts": "./mod.ts",
-    "./telemetry": "./telemetry.ts",
-    "./plugins/splunk-hec": "./plugins/splunk-hec/mod.ts",
-    "./plugins/web-interface": "./plugins/web-interface/mod.ts"
+    "./telemetry": "./telemetry.ts"
   },
 
   "fmt": {
@@ -16,7 +14,7 @@
   },
 
   "lint": {
-    "exclude": ["plugins/web-interface/static/js", "cov_profile", "docs/_site"],
+    "exclude": ["cov_profile", "docs/_site"],
     "rules": {
       "exclude": ["verbatim-module-syntax"]
     }
@@ -28,8 +26,7 @@
     "check-coverage": "deno task check && genhtml cov_profile.lcov --output-directory cov_profile/html && lcov --list cov_profile.lcov && deno run --allow-net --allow-read https://deno.land/std/http/file_server.ts cov_profile/html",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env tools/release.ts && deno fmt",
-    "build-webinterface": "cd plugins/web-interface && rm static/bundle.json; deno run --allow-read --allow-write jsr:@hexagon/bundlee --bundle static static/bundle.json && deno fmt",
-    "build": "deno task check && deno task build-schema && deno task build-webinterface && deno task build-versions"
+    "build": "deno task check && deno task build-schema && deno task build-versions"
   },
 
   "imports": {

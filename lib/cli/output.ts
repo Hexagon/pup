@@ -43,6 +43,7 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { long: "unblock <all|proc-id>", description: "Unblock process using IPC" },
     { separator: "empty" },
     { content: Colors.bold("Service installation"), spanStart: 1 },
+    { separator: "empty" },
     { long: "enable-service", description: "Start pup instance at boot" },
     { long: "disable-service", description: "Uninstall pup service" },
     { separator: "empty" },
@@ -91,6 +92,13 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { long: "--start-port", description: "Cluster: Start port for instances." },
     { long: "--common-port", description: "Cluster: Common port for instances." },
     { long: "--strategy", description: "Cluster: Load balancing strategy (defaults to round-robin)." },
+    { separator: "empty" },
+    { content: Colors.bold("API Token Management"), spanStart: 1 },
+    { separator: "empty" },
+    { long: "token", description: "Generate a new API token" },
+    { separator: "empty" },
+    { long: "--consumer <consumer-id>", description: "Consumer identifier, used to revoke the token." },
+    { long: "--expire-in <seconds>", description: "Optional. Token life-time" },
   )
   if (!externalInstaller) {
     rows.push(

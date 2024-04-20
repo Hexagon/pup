@@ -173,9 +173,9 @@ async function main() {
   // Prepare secret file
   let client
   let token
+  let secret
   if (useConfigFile) {
     const secretFile = `${await toPersistentPath(configFile as string)}/.main.secret`
-    let secret
     // Get secret
     const secretInstance = new Secret(secretFile)
     try {
@@ -186,12 +186,13 @@ async function main() {
     }
 
     // Generate a short lived (2 minute) cli token
-    token = await GenerateToken(secret, { user: "cli" }, new Date().getTime() + 120_000)
+    token = await GenerateToken(secret, { consumer: "cli" }, new Date().getTime() + 120_000)
 
     // Send api request
     const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${configuration.api?.port || DEFAULT_REST_API_PORT}`
     client = new RestClient(apiBaseUrl, token!)
   }
+
   /**
    * Base argument: init
    *
@@ -207,6 +208,35 @@ async function main() {
       await createConfigurationFile(fallbackedConfigFile, checkedArgs!, cmd!)
       console.log(`Configuration file '${fallbackedConfigFile}' created`)
       exit(0)
+    }
+  }
+
+  /**
+   * Base argument: init
+   *
+   * Generate a new configuration file and exit
+   */
+  if (baseArgument === "token") {
+    if (secret) {
+      const consumer = checkedArgs.get("consumer")
+      let expiresAt
+      const expiresInSeconds = checkedArgs.get("expire-in")
+      if (expiresInSeconds) {
+        expiresAt = Date.now() + (parseInt(expiresInSeconds, 10) * 1000)
+      }
+      const token = await GenerateToken(
+        secret,
+        { consumer }, // Include the consumer if provided
+        expiresAt,
+      )
+      console.log("Token generated:")
+      console.log("")
+      console.log(token)
+      console.log("")
+      return exit(0)
+    } else {
+      console.error("Could not generate token. No secret found.")
+      return exit(1)
     }
   }
 

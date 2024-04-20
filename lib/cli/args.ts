@@ -61,12 +61,14 @@ function checkArguments(args: ArgsParser): ArgsParser {
     "setup",
     "help",
     "version",
+    "token",
   ]
 
   const numericArguments = [
     "instances",
     "start-port",
     "common-port",
+    "expires-in",
   ]
 
   const processOptions = [

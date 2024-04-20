@@ -125,7 +125,7 @@ class Runner extends BaseRunner {
     // - PUP_API_PORT
     env.PUP_API_PORT = (this.pup.configuration.api?.port || DEFAULT_REST_API_PORT).toString()
     // - PUP_API_TOKEN
-    if (this.pup.secret?.load()) env.PUP_API_TOKEN = await GenerateToken(await this.pup.secret?.load(), { user: "telemetry-" + this.processConfig.id }, new Date().getTime() + 365 * 24 * 60 * 60)
+    if (this.pup.secret?.load()) env.PUP_API_TOKEN = await GenerateToken(await this.pup.secret?.load(), { consumer: "telemetry-" + this.processConfig.id }, new Date().getTime() + 365 * 24 * 60 * 60)
 
     // Transfer path from process config if specified
     if (this.processConfig.path) {

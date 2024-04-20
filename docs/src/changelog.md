@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this section.
 - feat(cli): Add cli command `monitor` for streaming logs
 - change(plugins): Remove programmatic api and bundled plugins. Plugins will now be entirely separate from pup, and communicate through the Rest API.
 - chore(core): Internal refactor getting closer to being runtime agnostic
+- feat(cli): Add cli command `
 
 ## [1.0.0-rc.25] - 2023-04-17
 
