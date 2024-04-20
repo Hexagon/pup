@@ -9,7 +9,7 @@
 import { type Configuration, generateConfiguration, type ProcessConfiguration } from "../core/configuration.ts"
 import JSON5 from "json5"
 import { join } from "@std/path"
-import { exists } from "@cross/fs"
+import { exists, readFile, writeFile } from "@cross/fs"
 import type { ArgsParser } from "@cross/utils"
 import { toResolvedAbsolutePath } from "../common/utils.ts"
 import { exit } from "node:process"
@@ -38,7 +38,7 @@ export async function createConfigurationFile(configFile: string, checkedArgs: A
       checkedArgs.get("stdout"),
       checkedArgs.get("stderr"),
     )
-    await Deno.writeTextFile(configFile, JSON.stringify(config, null, 2))
+    await writeFile(configFile, JSON.stringify(config, null, 2))
   } catch (e) {
     console.error("Could not create/write configuration file: ", e)
     exit(1)
@@ -56,8 +56,9 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
     // Read existing configuration
     let existingConfigurationObject
     try {
-      const existingConfiguration = await Deno.readTextFile(configFile)
-      existingConfigurationObject = JSON5.parse(existingConfiguration) as unknown as Configuration
+      const existingConfiguration = await readFile(configFile)
+      const existingConfigurationText = new TextDecoder().decode(existingConfiguration)
+      existingConfigurationObject = JSON5.parse(existingConfigurationText) as unknown as Configuration
     } catch (e) {
       throw new Error("Could not read configuration file: " + e.message)
     }
@@ -94,7 +95,7 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
 
     // Append new process, and write configuration file
     existingConfigurationObject.processes.push(newConfiguration.processes[0])
-    await Deno.writeTextFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
+    await writeFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
   } catch (e) {
     console.error(`Could not modify configuration file '${configFile}': `, e.message)
     exit(1)
@@ -111,8 +112,9 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
     // Read existing configuration
     let existingConfigurationObject
     try {
-      const existingConfiguration = await Deno.readTextFile(configFile)
-      existingConfigurationObject = JSON5.parse(existingConfiguration) as unknown as Configuration
+      const existingConfiguration = await readFile(configFile)
+      const existingConfigurationText = new TextDecoder().decode(existingConfiguration)
+      existingConfigurationObject = JSON5.parse(existingConfigurationText) as unknown as Configuration
     } catch (e) {
       throw new Error("Could not read configuration file.", e.message)
     }
@@ -131,7 +133,7 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
     existingConfigurationObject.processes = existingConfigurationObject.processes.filter((p: ProcessConfiguration) => p?.id !== checkedArgs.get("id"))
 
     // Append new process, and write configuration file
-    await Deno.writeTextFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
+    await writeFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
   } catch (e) {
     console.error(`Could not modify configuration file ${configFile}: `, e.message)
     exit(1)

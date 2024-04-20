@@ -11,6 +11,7 @@
 import { Application } from "../../application.meta.ts"
 import { greaterThan, lessThan, parse } from "@std/semver"
 import { exit } from "@cross/utils"
+import { readFile } from "@cross/fs"
 
 // The deno.land/x-url has to be used until first stable release, or until jsr.io fixes issue
 // https://github.com/jsr-io/jsr/issues/382
@@ -35,8 +36,9 @@ type Version = {
 async function getVersions(local = false): Promise<Versions> {
   let versions: Versions
   if (local) {
-    const data = await Deno.readTextFile(LOCAL_VERSION_INVENTORY_FILE)
-    versions = JSON.parse(data)
+    const data = await readFile(LOCAL_VERSION_INVENTORY_FILE)
+    const dataText = new TextDecoder().decode(data)
+    versions = JSON.parse(dataText)
   } else {
     const response = await fetch(VERSION_INVENTORY_URL)
     versions = await response.json()

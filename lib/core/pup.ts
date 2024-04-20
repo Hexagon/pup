@@ -23,6 +23,7 @@ import { EventEmitter } from "../common/eventemitter.ts"
 import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
 import { Secret } from "./secret.ts"
 import { TelemetryData } from "../../telemetry.ts"
+import { rm } from "@cross/fs"
 
 interface InstructionResponse {
   success: boolean
@@ -102,7 +103,7 @@ class Pup {
   public cleanup = async () => {
     for (const cleanupFilePath of this.cleanupQueue) {
       try {
-        await Deno.remove(cleanupFilePath, { recursive: true })
+        await rm(cleanupFilePath, { recursive: true })
         this.logger.info("cleanup", `${cleanupFilePath} removed.`)
       } catch (_e) {
         // Ignore errors

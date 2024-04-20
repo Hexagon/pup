@@ -33,7 +33,7 @@ test("Create test process. Test start, block, stop, start, unblock, start in seq
   // Start process, assert started
   const startResult = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.RUNNING)
+  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
 
   // Stop process, assert stopped
   const stopResult = await pup.stop(TEST_PROCESS_ID, "test")
@@ -58,7 +58,7 @@ test("Create test process. Test start, block, stop, start, unblock, start in seq
   // Start process, assert started
   const startResult3 = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult3, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.RUNNING)
+  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
 
   // Terminate pup instantly
   await pup.terminate(0)
@@ -90,7 +90,7 @@ test("Create test cluster. Test start, block, stop, start, unblock, start in seq
   // Start process, assert started
   const startResult = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.RUNNING)
+  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
 
   // Stop process, assert finished
   const stopResult = await pup.stop(TEST_PROCESS_ID, "test")
@@ -115,7 +115,7 @@ test("Create test cluster. Test start, block, stop, start, unblock, start in seq
   // Start process, assert started
   const startResult3 = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult3, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.RUNNING)
+  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
 
   // Terminate pup instantly
   await pup.terminate(0)

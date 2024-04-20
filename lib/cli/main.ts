@@ -34,6 +34,7 @@ import { Secret } from "../core/secret.ts"
 import { GenerateToken } from "../common/token.ts"
 import { RestClient } from "../common/restclient.ts"
 import { ApiApplicationState } from "../core/api.ts"
+import { CurrentRuntime, Runtime } from "@cross/runtime"
 
 /**
  * Define the main entry point of the CLI application
@@ -495,12 +496,14 @@ async function main() {
         }
       })
 
-      // This is needed to trigger termination, as CTRL+C
-      // does not run the beforeunload event
-      // See https://github.com/denoland/deno/issues/11752
-      Deno.addSignalListener("SIGINT", async () => {
-        await pup.terminate(30000)
-      })
+      if (CurrentRuntime === Runtime.Deno) {
+        // This is needed to trigger termination in Deno
+        // as CTRL+C does not run the beforeunload event
+        // See https://github.com/denoland/deno/issues/11752
+        Deno.addSignalListener("SIGINT", async () => {
+          await pup.terminate(30000)
+        })
+      }
 
       // Let program end gracefully, no exit here
     } catch (e) {

@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this section.
 - fix(core): Update dependency @cross/env to fix a bug in windows caused by legacy environment variable keys such as `=C:`
 - feat(cli): Add cli command `monitor` for streaming logs
 - change(plugins): Remove programmatic api and bundled plugins. Plugins will now be entirely separate from pup, and communicate through the Rest API.
+- chore(core): Internal refactor getting closer to being runtime agnostic
 
 ## [1.0.0-rc.25] - 2023-04-17
 
