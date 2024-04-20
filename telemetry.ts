@@ -31,11 +31,12 @@
 
 import { EventEmitter, type EventHandler } from "./lib/common/eventemitter.ts"
 import { FileIPC } from "./lib/common/ipc.ts"
-import { exists, isDir } from "@cross/fs"
+import { isDir } from "@cross/fs"
 import { getEnv } from "@cross/env"
+import { RestClient } from "./lib/common/restclient.ts"
 
 export interface TelemetryData {
-  sender: string
+  sender?: string
   memory: Deno.MemoryUsage
   sent: string
   cwd: string
@@ -82,11 +83,12 @@ export class PupTelemetry {
     this.checkIpc()
   }
 
-  private async sendMainTelemetry() {
-    const pupTempPath = getEnv("PUP_TEMP_STORAGE")
+  /**
+   * Main telemetry data is sent back to the main process using the rest API
+   */
+  private sendMainTelemetry() {
     const pupProcessId = getEnv("PUP_PROCESS_ID")
-
-    if (pupTempPath && (await exists(pupTempPath)) && pupProcessId) {
+    if (pupProcessId) {
       const data: TelemetryData = {
         sender: pupProcessId,
         memory: Deno.memoryUsage(),
@@ -159,26 +161,43 @@ export class PupTelemetry {
   }
 
   async emit<T>(targetProcessId: string, event: string, eventData?: T) {
-    const pupTempPath = getEnv("PUP_TEMP_STORAGE")
-
-    if (pupTempPath && (await isDir(pupTempPath)) && targetProcessId) {
-      const ipcPath = `${pupTempPath}/.${targetProcessId}.ipc` // Target process IPC path
-
-      // Create a temporary IPC to send the message
-      const ipc = new FileIPC(ipcPath)
-
-      // Create the message with event and eventData
-      const message = { event, eventData }
-
-      // Send the message to the target process
+    // If target is main (pup host process, use the secure rest api), for child-process to child-process
+    // use the file based bus
+    if (targetProcessId === "main") {
       try {
-        await ipc.sendData(JSON.stringify(message))
-      } finally {
-        // Close the temporary IPC
-        ipc.close(true)
+        const pupApiHostname = getEnv("PUP_API_HOSTNAME")
+        const pupApiPort = getEnv("PUP_API_PORT")
+        const pupApiToken = getEnv("PUP_API_TOKEN")
+        if (pupApiHostname && pupApiPort && pupApiToken) {
+          // Send api request
+          const apiBaseUrl = `http://${pupApiHostname}:${pupApiPort}`
+          const client = new RestClient(apiBaseUrl, pupApiToken)
+          client.post("/telemetry", eventData)
+        }
+      } catch (_e) {
+        console.error(_e)
       }
     } else {
-      // Ignore, process not run by Pup?
+      const pupTempPath = getEnv("PUP_TEMP_STORAGE")
+      if (pupTempPath && (await isDir(pupTempPath)) && targetProcessId) {
+        const ipcPath = `${pupTempPath}/.${targetProcessId}.ipc` // Target process IPC path
+
+        // Create a temporary IPC to send the message
+        const ipc = new FileIPC(ipcPath)
+
+        // Create the message with event and eventData
+        const message = { event, eventData }
+
+        // Send the message to the target process
+        try {
+          await ipc.sendData(JSON.stringify(message))
+        } finally {
+          // Close the temporary IPC
+          ipc.close(true)
+        }
+      } else {
+        // Ignore, process not run by Pup?
+      }
     }
   }
 

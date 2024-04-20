@@ -55,6 +55,7 @@ function checkArguments(args: ArgsParser): ArgsParser {
     "enable-service",
     "disable-service",
     "logs",
+    "monitor",
     "upgrade",
     "update",
     "setup",

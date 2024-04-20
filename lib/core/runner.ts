@@ -12,6 +12,8 @@ import { $, type CommandChild } from "dax-sh"
 import { getAllEnv } from "@cross/env"
 import { deepMerge } from "@cross/deepmerge"
 import { CurrentOS, OperatingSystem } from "@cross/runtime"
+import { GenerateToken } from "../common/token.ts"
+import { DEFAULT_REST_API_HOSTNAME, DEFAULT_REST_API_PORT } from "./configuration.ts"
 
 /**
  * Represents a task runner that executes tasks as regular processes.
@@ -35,7 +37,7 @@ class Runner extends BaseRunner {
       throw new Error("No command specified")
     }
 
-    const env = this.createEnvironmentConfig()
+    const env = await this.createEnvironmentConfig()
     const child = this.prepareCommand(env)
 
     this.process = child.spawn()
@@ -102,7 +104,7 @@ class Runner extends BaseRunner {
    *
    * @returns The environment configuration.
    */
-  private createEnvironmentConfig(): Record<string, string | undefined> {
+  private async createEnvironmentConfig(): Promise<Record<string, string | undefined>> {
     // Start with current environment
     let env = getAllEnv() || {}
 
@@ -118,6 +120,12 @@ class Runner extends BaseRunner {
     if (this.pup.temporaryStoragePath) env.PUP_TEMP_STORAGE = this.pup.temporaryStoragePath
     // - PUP_DATA_STORAGE
     if (this.pup.persistentStoragePath) env.PUP_DATA_STORAGE = this.pup.persistentStoragePath
+    // - PUP_API_HOSTNAME
+    env.PUP_API_HOSTNAME = this.pup.configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME
+    // - PUP_API_PORT
+    env.PUP_API_PORT = (this.pup.configuration.api?.port || DEFAULT_REST_API_PORT).toString()
+    // - PUP_API_TOKEN
+    if (this.pup.secret?.load()) env.PUP_API_TOKEN = await GenerateToken(await this.pup.secret?.load(), { user: "telemetry-" + this.processConfig.id }, new Date().getTime() + 365 * 24 * 60 * 60)
 
     // Transfer path from process config if specified
     if (this.processConfig.path) {

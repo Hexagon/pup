@@ -7,14 +7,14 @@
  */
 
 import { type ProcessInformation, ProcessState } from "../core/process.ts"
-import type { ApplicationState } from "../core/status.ts"
 import { type Column, Columns, type Row } from "./columns.ts"
-import { Colors, exit } from "@cross/utils"
+import { Colors } from "@cross/utils"
 import { filesize } from "filesize"
 import { blockedFormatter, codeFormatter, naFormatter, statusFormatter } from "./formatters/strings.ts"
 import { timeagoFormatter } from "./formatters/times.ts"
 import { Configuration } from "../core/configuration.ts"
 import { resolve } from "@std/path"
+import { ApiApplicationState } from "../core/api.ts"
 
 /**
  * Helper which print the status of all running processes,
@@ -25,19 +25,7 @@ import { resolve } from "@std/path"
  * @private
  * @async
  */
-export async function printStatus(configFile: string, statusFile: string, configuration: Configuration, cwd: string | undefined) {
-  let status
-  try {
-    status = await getStatus(configFile, statusFile)
-    if (!status) {
-      console.error("\nNo running instance found.\n")
-      exit(1)
-    }
-  } catch (e) {
-    console.error(e.message)
-    exit(1)
-  }
-
+export function printStatus(configFile: string, configuration: Configuration, cwd: string | undefined, status: ApiApplicationState) {
   // Print configuration
   console.log("")
   console.log(Colors.bold("Configuration:") + "\t" + resolve(configFile))
@@ -86,38 +74,4 @@ export async function printStatus(configFile: string, statusFile: string, config
   ]
 
   console.log(`\n${Columns(taskTable, tableColumns)}\n`)
-}
-
-export async function getStatus(configFile?: string, statusFile?: string) {
-  if (!configFile) {
-    throw new Error(`Could not read status for config file '${configFile}' from '${statusFile}', no instance running.`)
-  }
-
-  if (!statusFile) {
-    throw new Error(`Could not read config file '${configFile}' from '${statusFile}'. Exiting.`)
-  }
-
-  let status: ApplicationState | undefined = undefined
-  try {
-    const kv = await Deno.openKv(statusFile)
-    const result = await kv.get(["last_application_state"])
-    kv.close()
-    if (result) {
-      status = result.value as ApplicationState
-    }
-  } catch (e) {
-    throw new Error(`Could not read status for config file '${configFile}' from '${statusFile}', could not read store: ${e.message}.`)
-  }
-  // A valid status file were found, figure out if it is stale or not
-  if (status && status.updated) {
-    const parsedDate = Date.parse(status.updated)
-    // Watchdog interval is 2 seconds, allow an extra 3 seconds to pass before allowing a new instance to start after a dirty shutdown
-    if (new Date().getTime() - parsedDate > 5000) {
-      // Everything is ok, this is definitely a stale file, just continue
-      return undefined
-    }
-    return status
-  }
-
-  return undefined
 }

@@ -18,8 +18,6 @@ export type { AttachedLogger } from "./lib/core/logger.ts"
 
 /** Export everything needed for Plugins */
 export { PupApi } from "./lib/core/api.ts"
-export { PluginImplementation } from "./lib/core/plugin.ts"
-export type { PluginMetadata } from "./lib/core/plugin.ts"
 export type { PluginConfiguration } from "./lib/core/configuration.ts"
 
 export { Process } from "./lib/core/process.ts"

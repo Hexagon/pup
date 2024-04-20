@@ -7,12 +7,22 @@
 
 import { z } from "zod"
 
+// Logger constants
 export const DEFAULT_INTERNAL_LOG_HOURS = 48
+export const KV_SIZE_LIMIT_BYTES = 65_536
+
+// Core constants
 export const MAINTENANCE_INTERVAL_MS = 900_000
 export const WATCHDOG_INTERVAL_MS = 1_000
 export const APPLICATION_STATE_WRITE_LIMIT_MS = 20_000
 export const LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S = 60
-export const KV_SIZE_LIMIT_BYTES = 65_536
+
+// API constants
+export const DEFAULT_SECRET_LENGTH_BYTES = 64
+export const DEFAULT_SECRET_FILE_PERMISSIONS = 0o600
+export const DEFAULT_SECRET_KEY_ALGORITHM = "HS512"
+export const DEFAULT_REST_API_HOSTNAME = "127.0.0.1"
+export const DEFAULT_REST_API_PORT = 16441
 
 interface Configuration {
   name?: string

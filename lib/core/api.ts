@@ -12,6 +12,7 @@ import type { LogEventData } from "./logger.ts"
 import type { Pup } from "./pup.ts"
 import type { ProcessLoggerConfiguration } from "./configuration.ts"
 import type { ProcessState } from "./process.ts"
+import { TelemetryData } from "../../telemetry.ts"
 
 export interface ApiPaths {
   temporaryStorage?: string
@@ -131,6 +132,9 @@ export class PupApi {
   }
   public unblock(id: string, reason: string) {
     this._pup.unblock(id, reason)
+  }
+  public telemetry(data: TelemetryData): boolean {
+    return this._pup.telemetry(data)
   }
   public log(severity: "log" | "error" | "info" | "warn", plugin: string, message: string) {
     this._pup.logger[severity](`plugin-${plugin}`, message)

@@ -13,9 +13,13 @@ All notable changes to this project will be documented in this section.
 
 - fix(core): Remove stray console.log
 - fix(core): Fix working dir different from current dir
-- change(plugins): Separate core api from plugin api
 - feat(rest): Add rest API with JWT Bearer auth
+- change(cli): Use rest api instead of file ipc for cli commands
+- change(telemetry): Use rest api for child -> host process communcation
+- change(core): Remove FileIPC entirely from the main process
 - fix(core): Update dependency @cross/env to fix a bug in windows caused by legacy environment variable keys such as `=C:`
+- feat(cli): Add cli command `monitor` for streaming logs
+- change(plugins): Remove programmatic api and bundled plugins. Plugins will now be entirely separate from pup, and communicate through the Rest API.
 
 ## [1.0.0-rc.25] - 2023-04-17
 

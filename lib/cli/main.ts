@@ -6,19 +6,18 @@
  */
 
 // Import core dependencies
-import { type InstructionResponse, Pup } from "../core/pup.ts"
-import { type Configuration, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
-import { FileIPC } from "../common/ipc.ts"
+import { Pup } from "../core/pup.ts"
+import { type Configuration, DEFAULT_REST_API_HOSTNAME, DEFAULT_REST_API_PORT, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
 
 // Import CLI utilities
 import { printFlags, printHeader, printUsage } from "./output.ts"
 import { checkArguments, parseArguments } from "./args.ts"
 import { appendConfigurationFile, createConfigurationFile, findConfigFile, removeFromConfigurationFile } from "./config.ts"
-import { getStatus, printStatus } from "./status.ts"
+import { printStatus } from "./status.ts"
 import { upgrade } from "./upgrade.ts"
 
 // Import common utilities
-import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
+import { toPersistentPath, toResolvedAbsolutePath } from "../common/utils.ts"
 import { exists, readFile } from "@cross/fs"
 
 // Import external dependencies
@@ -31,6 +30,10 @@ import { args } from "@cross/utils/args"
 import { installService, uninstallService } from "@cross/service"
 import { Colors, exit } from "@cross/utils"
 import { chdir, cwd } from "@cross/fs"
+import { Secret } from "../core/secret.ts"
+import { GenerateToken } from "../common/token.ts"
+import { RestClient } from "../common/restclient.ts"
+import { ApiApplicationState } from "../core/api.ts"
 
 /**
  * Define the main entry point of the CLI application
@@ -166,13 +169,28 @@ async function main() {
       checkedArgs.get("name"),
     )
   }
-  // Prepare for IPC
-  let ipcFile
-  if (useConfigFile) ipcFile = `${await toTempPath(configFile as string)}/.main.ipc`
-  // Prepare status file
-  let statusFile
-  if (useConfigFile) statusFile = `${await toPersistentPath(configFile as string)}/.main.status`
+  // Prepare secret file
+  let client
+  let token
+  if (useConfigFile) {
+    const secretFile = `${await toPersistentPath(configFile as string)}/.main.secret`
+    let secret
+    // Get secret
+    const secretInstance = new Secret(secretFile)
+    try {
+      secret = await secretInstance.loadOrGenerate()
+    } catch (_e) {
+      console.error("Could not connect to instance, secret could not be read.")
+      return exit(1)
+    }
 
+    // Generate a short lived (2 minute) cli token
+    token = await GenerateToken(secret, { user: "cli" }, new Date().getTime() + 120_000)
+
+    // Send api request
+    const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${configuration.api?.port || DEFAULT_REST_API_PORT}`
+    client = new RestClient(apiBaseUrl, token!)
+  }
   /**
    * Base argument: init
    *
@@ -288,6 +306,59 @@ async function main() {
   }
 
   /**
+   * Base argument: monitor
+   *
+   * Starts a monitoring function, which connects to the REST API endpoint("/")
+   * using websockets, and prints all received messages
+   */
+  if (baseArgument === "monitor") {
+    const apiHostname = configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME
+    const apiPort = configuration.api?.port || DEFAULT_REST_API_PORT
+    const wsUrl = `ws://${apiHostname}:${apiPort}/wss`
+
+    const wss = new WebSocketStream(wsUrl, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+    const { readable } = await wss.opened
+    const reader = readable.getReader()
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) {
+        break
+      }
+      try {
+        const v = JSON.parse(value.toString())
+        const logWithColors = configuration!.logger?.colors ?? true
+        const { processId, severity, category, timeStamp, text } = v.d
+        const isStdErr = severity === "error" || category === "stderr"
+        const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${processId}:${category}] ${text}`
+        let color = null
+        // Apply coloring rules
+        if (logWithColors) {
+          if (processId === "core") color = "gray"
+          if (category === "starting") color = "green"
+          if (category === "finished") color = "yellow"
+          if (isStdErr) color = "red"
+        }
+        let logFn = console.log
+        if (severity === "warn") logFn = console.warn
+        if (severity === "info") logFn = console.info
+        if (severity === "error") logFn = console.error
+        if (color !== null) {
+          logFn(`%c${decoratedLogText}`, `color: ${color}`)
+        } else {
+          logFn(decoratedLogText)
+        }
+      } catch (_e) {
+        console.error("Error in log streamer: " + _e)
+      }
+    }
+    return
+  }
+
+  /**
    * Base argument: logs
    */
   if (baseArgument === "logs") {
@@ -342,14 +413,23 @@ async function main() {
    * Print status for current running instance, and exit.
    */
   if (baseArgument === "status") {
-    if (!statusFile || !configFile) {
-      console.error("Can not print status, no configuration file found")
+    if (!client) {
+      console.error("Can not print status, could not create api client.")
+      return exit(1)
+    }
+    const responseState = await client.get("/state")
+    if (responseState.ok) {
+      const dataState: ApiApplicationState = await responseState.json()
+      console.log("")
+      printHeader()
+      await printStatus(configFile!, configuration!, cwd(), dataState)
+      exit(0)
+      console.log("Action completed successfully")
+      exit(0)
+    } else {
+      console.error("Action failed: Invalid response received.")
       exit(1)
     }
-    console.log("")
-    printHeader()
-    await printStatus(configFile!, statusFile!, configuration!, cwd())
-    exit(0)
   }
 
   /**
@@ -361,47 +441,16 @@ async function main() {
       exit(1)
     }
     if (baseArgument === op) {
-      // If status file doesn't exist, don't even try to communicate
-      try {
-        if (await getStatus(configFile, statusFile) && ipcFile) {
-          const ipc = new FileIPC(ipcFile)
-          const senderId = crypto.randomUUID()
-
-          const responseFile = `${ipcFile}.${senderId}`
-          const ipcResponse = new FileIPC(responseFile)
-
-          await ipc.sendData(JSON.stringify({ [op]: secondaryBaseArgument || true, senderUuid: senderId }))
-
-          const responseTimeout = setTimeout(() => {
-            console.error("Response timeout after 10 seconds")
-            exit(1)
-          }, 10000) // wait at most 10 seconds
-
-          for await (const message of ipcResponse.receiveData()) {
-            clearTimeout(responseTimeout) // clear the timeout when a response is received
-            if (message.length > 0 && message[0].data) {
-              const parsedMessage: InstructionResponse = JSON.parse(message[0].data)
-              if (parsedMessage.success) {
-                console.log("Action completed successfully")
-              } else {
-                console.error("Action failed.")
-                exit(1)
-              }
-            } else {
-              console.error("Action failed: Invalid response received.")
-              exit(1)
-            }
-
-            break // break out of the loop after receiving the response
-          }
-
-          exit(0)
-        } else {
-          console.error(`No running instance found, cannot send command '${op}' over IPC.`)
-          exit(1)
-        }
-      } catch (e) {
-        console.error(e.message)
+      let url = `/${op.toLowerCase().trim()}`
+      if (secondaryBaseArgument) {
+        url = `/processes/${secondaryBaseArgument.toLocaleLowerCase().trim()}${url}`
+      }
+      const result = await client!.post(url, undefined)
+      if (result.ok) {
+        console.log("Action completed successfully")
+        exit(0)
+      } else {
+        console.error("Action failed: Invalid response received.")
         exit(1)
       }
     }
@@ -414,20 +463,13 @@ async function main() {
     /**
      * Error handling: Pup already running
      */
-    if (statusFile && await exists(statusFile)) {
-      try {
-        // A valid status file were found
-        if (!await getStatus(configFile, statusFile)) {
-          /* ignore */
-        } else {
-          console.warn(`An active status file were found at '${statusFile}', pup already running. Exiting.`)
-          exit(1)
-        }
-      } catch (e) {
-        console.error(e.message)
+    try {
+      const response = await client?.get("/state")
+      if (response?.ok) {
+        console.warn(`Pup already running. Exiting.`)
         exit(1)
       }
-    }
+    } catch (_e) { /* Expected! ^*/ }
 
     /**
      * Error handling: Require at least one configured process

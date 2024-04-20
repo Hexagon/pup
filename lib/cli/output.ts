@@ -33,6 +33,7 @@ export function createFlagsMessage(externalInstaller: boolean): string {
     { long: "run", description: "Run a pup instance standalone" },
     { long: "terminate", description: "Terminate pup instance using IPC" },
     { long: "status", description: "Show status for a pup instance" },
+    { long: "monitor", description: "Stream logs from a running instance" },
     { separator: "empty" },
     { short: "-c", long: "--config <path>", description: "Optional. Use specific configuration file." },
     { long: "start <all|proc-id>", description: "Start process using IPC" },

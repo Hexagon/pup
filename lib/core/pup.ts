@@ -14,17 +14,15 @@ import {
   validateConfiguration,
   WATCHDOG_INTERVAL_MS,
 } from "./configuration.ts"
-import { FileIPC, type IpcValidatedMessage } from "../common/ipc.ts"
 import { Logger } from "./logger.ts"
 import { Process, ProcessState } from "./process.ts"
 import { Status } from "./status.ts"
-import { Plugin } from "./plugin.ts"
 import { Cluster } from "./cluster.ts"
 import { RestApi } from "./rest.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
 import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
-import * as uuid from "@std/uuid"
 import { Secret } from "./secret.ts"
+import { TelemetryData } from "../../telemetry.ts"
 
 interface InstructionResponse {
   success: boolean
@@ -37,11 +35,9 @@ class Pup {
   public logger: Logger
   public status: Status
   public events: EventEmitter
-  public ipc?: FileIPC
   public restApi?: RestApi
 
   public processes: (Process | Cluster)[] = []
-  public plugins: Plugin[] = []
 
   private requestTerminate = false
 
@@ -65,7 +61,6 @@ class Pup {
   constructor(unvalidatedConfiguration: unknown, configFilePath?: string, temporaryStoragePath?: string, persistentStoragePath?: string) {
     // Setup paths
     let statusFile
-    let ipcFile
     let logStore
     let secretFile
     if (configFilePath && temporaryStoragePath && persistentStoragePath) {
@@ -76,9 +71,8 @@ class Pup {
 
       this.persistentStoragePath = persistentStoragePath
 
-      ipcFile = `${this.temporaryStoragePath}/.main.ipc` // Plain text file (serialized js object)
       statusFile = `${this.persistentStoragePath}/.main.status` // Deno KV store
-      secretFile = `${this.temporaryStoragePath}/.main.secret` // Plain text file containing the JWT secret for the rest api
+      secretFile = `${this.persistentStoragePath}/.main.secret` // Plain text file containing the JWT secret for the rest api
       logStore = `${this.persistentStoragePath}/.main.log` // Deno KV store
     }
 
@@ -96,9 +90,6 @@ class Pup {
 
     // Initialise status tracker
     this.status = new Status(statusFile)
-
-    // Initialize file ipc, if a path were passed
-    if (ipcFile) this.ipc = new FileIPC(ipcFile)
 
     // Initialize API secret
     if (secretFile) this.secret = new Secret(secretFile)
@@ -122,39 +113,11 @@ class Pup {
     await this.status.cleanup()
   }
 
-  public init = async () => {
-    // Initilize ipc
-    this.receiveData()
+  public init = () => {
+    // Initialize api
+    this.api()
 
-    // Initialize plugins
-    if (this.configuration.plugins) {
-      for (const plugin of this.configuration.plugins) {
-        const newPlugin = new Plugin(this, plugin)
-        let success = true
-
-        try {
-          this.logger.log("plugins", `Loading plugin from '${plugin.url}'`)
-          await newPlugin.load()
-        } catch (e) {
-          this.logger.error("plugins", `Failed to load plugin '${plugin.url}: ${e.message}'`)
-          success = false
-        }
-        try {
-          this.logger.log("plugins", `Verifying plugin from '${plugin.url}'`)
-          newPlugin.verify()
-        } catch (e) {
-          this.logger.error("plugins", `Failed to verify plugin '${plugin.url}': ${e.message}`)
-          success = false
-        }
-
-        if (success) {
-          this.plugins.push(newPlugin)
-          this.logger.log("plugins", `Plugin '${newPlugin.impl?.meta.name}@${newPlugin.impl?.meta.version}' loaded from '${plugin.url}'`)
-        }
-      }
-    }
-
-    // Attach plugins to logger
+    // Attach logger to events
     this.logger.attach((severity: string, category: string, text: string, process?: ProcessConfiguration): boolean => {
       this.events.emit("log", {
         severity,
@@ -162,14 +125,8 @@ class Pup {
         text,
         process,
       })
-      return this.pluginHook("log", {
-        severity,
-        category,
-        text,
-        process,
-      })
+      return true
     })
-
     // Create processes
     if (this.configuration.processes) {
       for (const process of this.configuration.processes) {
@@ -194,7 +151,6 @@ class Pup {
       process.init()
     }
 
-    this.api()
     this.watchdog()
     this.maintenance(true)
   }
@@ -213,6 +169,25 @@ class Pup {
       allProcesses.push(process)
     }
     return allProcesses
+  }
+
+  /**
+   * Function to set telemetry data of a process
+   *
+   * @private
+   */
+  public telemetry(data: TelemetryData): boolean {
+    let success = false
+    if (data.sender && typeof data.sender === "string") {
+      const cleanedId = data.sender.trim().toLocaleLowerCase()
+      const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
+      if (foundProcess) {
+        this.events.emit("process_telemetry", structuredClone(data))
+        foundProcess?.setTelemetry(data)
+        success = true
+      }
+    }
+    return success
   }
 
   /**
@@ -303,7 +278,7 @@ class Pup {
    * @private
    */
   private api = async () => {
-    const secret = await this.secret?.get()
+    const secret = await this.secret?.loadOrGenerate()
     if (!secret) return
 
     // Initializing rest a
@@ -311,7 +286,7 @@ class Pup {
     // Initialize rest api
     try {
       this.restApi = new RestApi(this, this.configuration.api?.port, this.configuration.api?.hostname, secret)
-      this.restApi.start()
+      await this.restApi.start()
     } catch (e) {
       this.logger.error("rest", `An error occured while inizializing the rest api: ${e.message}`)
     }
@@ -345,26 +320,6 @@ class Pup {
       this.maintenance()
     }, MAINTENANCE_INTERVAL_MS)
     Deno.unrefTimer(this.maintenanceTimer)
-  }
-
-  private async receiveData() {
-    if (this.ipc) {
-      try {
-        for await (const messages of this.ipc.receiveData()) {
-          if (messages.length > 0) {
-            for (const message of messages) {
-              try {
-                this.processIpcMessage(message)
-              } catch (e) {
-                this.logger.error("ipc", `Error while processing IPC message: ${e.message}`)
-              }
-            }
-          }
-        }
-      } catch (e) {
-        this.logger.error("ipc", `Error while starting IPC watcher: ${e.message}`)
-      }
-    }
   }
 
   public restart(id: string, requestor: string): boolean {
@@ -431,137 +386,6 @@ class Pup {
     }
   }
 
-  /* Plugin hooks is a special type of events that can be used by plugins to block normal operation */
-  private pluginHook(signal: string, args: unknown): boolean {
-    let result = false
-    for (const plugin of this.plugins) {
-      if (plugin.impl && plugin.impl.hook) {
-        const pluginResult = plugin.impl.hook(signal, args)
-        if (pluginResult) result = true
-      }
-    }
-    return result
-  }
-
-  private async processIpcMessage(message: IpcValidatedMessage) {
-    if (!this.ipc) {
-      throw new Error("IPC not initialized")
-    }
-
-    this.events.emit("ipc", message)
-
-    if (message.data) {
-      try {
-        const parsedMessage = JSON.parse(message.data)
-        const response = await this.handleInstruction(message)
-
-        // If senderUuid is set, send response back to sender
-        if (parsedMessage.senderUuid && uuid.v4.validate(parsedMessage.senderUuid)) {
-          const fileIpc = new FileIPC(this.ipc.getFilePath() + "." + parsedMessage.senderUuid)
-          await fileIpc.sendData(JSON.stringify(response))
-        }
-
-        // All is ok!
-      } catch (_error) {
-        // Ignore
-        this.logger.warn("ipc", "Received invalid IPC message (2)")
-      }
-    } else {
-      // Ignore
-      this.logger.warn("ipc", "Received invalid IPC message (3)")
-    }
-  }
-
-  private async handleInstruction(message: IpcValidatedMessage) {
-    let response: InstructionResponse = { success: false, action: "", error: "No message data" }
-    if (message.data !== null) {
-      try {
-        const parsedMessage = JSON.parse(message.data)
-        if (parsedMessage.start) {
-          let success = true
-          if (parsedMessage.start.trim().toLocaleLowerCase() === "all") {
-            for (const process of this.allProcesses()) {
-              process.start("ipc")
-            }
-            // ToDo, also check valid characters
-          } else if (parsedMessage.start.length >= 1 && parsedMessage.start.length <= 64) {
-            success = this.start(parsedMessage.start, "ipc")
-          }
-          response = { success, action: "start" }
-        } else if (parsedMessage.stop) {
-          let success = true
-          if (parsedMessage.stop.trim().toLocaleLowerCase() === "all") {
-            for (const process of this.allProcesses()) {
-              process.stop("ipc")
-            }
-            // ToDo, also check valid characters
-          } else if (parsedMessage.stop.length >= 1 && parsedMessage.stop.length <= 64) {
-            success = await this.stop(parsedMessage.stop, "ipc")
-          }
-          response = { success, action: "stop" }
-        } else if (parsedMessage.restart) {
-          let success = true
-          if (parsedMessage.restart.trim().toLocaleLowerCase() === "all") {
-            for (const process of this.allProcesses()) {
-              process.restart("ipc")
-            }
-            // ToDo, also check valid characters
-          } else if (parsedMessage.restart.length >= 1 && parsedMessage.restart.length <= 64) {
-            success = this.restart(parsedMessage.restart, "ipc")
-          }
-          response = { success, action: "restart" }
-        } else if (parsedMessage.block) {
-          let success = true
-          if (parsedMessage.block.trim().toLocaleLowerCase() === "all") {
-            for (const process of this.allProcesses()) {
-              process.block("ipc")
-            }
-            // ToDo, also check valid characters
-          } else if (parsedMessage.block.length >= 1 && parsedMessage.block.length <= 64) {
-            success = this.block(parsedMessage.block, "ipc")
-          }
-          response = { success, action: "block" }
-        } else if (parsedMessage.unblock) {
-          let success = true
-          if (parsedMessage.unblock.trim().toLocaleLowerCase() === "all") {
-            for (const process of this.allProcesses()) {
-              process.unblock("ipc")
-            }
-            // ToDo, also check valid characters
-          } else if (parsedMessage.unblock.length >= 1 && parsedMessage.unblock.length <= 64) {
-            success = this.unblock(parsedMessage.unblock, "ipc")
-          }
-          response = { success, action: "unblock" }
-        } else if (parsedMessage.event && parsedMessage.event === "telemetry") {
-          const telemetry = parsedMessage.eventData
-          let success = false
-          if (telemetry.sender && typeof telemetry.sender === "string") {
-            const cleanedId = telemetry.sender.trim().toLocaleLowerCase()
-            const foundProcess = this.allProcesses().findLast((p) => p.getConfig().id.trim().toLowerCase() === cleanedId)
-            if (foundProcess) {
-              this.events.emit("process_telemetry", structuredClone(telemetry))
-              delete telemetry.sender
-              foundProcess?.setTelemetry(telemetry)
-              success = true
-            }
-          }
-          response = { success, action: "telemetry" }
-        } else if (parsedMessage.terminate) {
-          // Defer actual termination to allow response to be sent
-          Deno.unrefTimer(setTimeout(() => this.terminate(30000), 500))
-          response = { success: true, action: "terminate" }
-        } else {
-          response = { success: false, action: "unknown" }
-        }
-      } catch (e) {
-        response = { success: false, action: "error", error: e.message }
-      }
-      return response
-    } else {
-      return response
-    }
-  }
-
   public async terminate(forceQuitMs: number) {
     // Point of no return
 
@@ -591,16 +415,6 @@ class Pup {
           return result
         }),
       )
-    }
-
-    // Close IPC
-    if (this.ipc) {
-      await this.ipc.close()
-    }
-
-    // Terminate all plugins
-    for (const plugin of this.plugins) {
-      await plugin.terminate()
     }
 
     // Terminate api
