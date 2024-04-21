@@ -27,7 +27,7 @@ import { Prop } from "../common/prop.ts"
 import { TelemetryData } from "../../telemetry.ts"
 import { rm } from "@cross/fs"
 import { findFreePort } from "../common/port.ts"
-import { encodeBase64 } from "jsr:@std/encoding@^0.220.1/base64"
+import { encodeBase64 } from "@std/encoding/base64"
 
 interface InstructionResponse {
   success: boolean

@@ -5,7 +5,8 @@
   "exports": {
     ".": "./pup.ts",
     "./mod.ts": "./mod.ts",
-    "./telemetry": "./telemetry.ts"
+    "./telemetry": "./telemetry.ts",
+    "./telemetry.ts": "./telemetry.ts"
   },
 
   "unstable": [
