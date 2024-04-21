@@ -98,6 +98,12 @@ const ConfigurationSchema = z.object({
   $schema: z.optional(z.string()),
   terminateTimeout: z.number().min(0).default(30),
   terminateGracePeriod: z.number().min(0).default(0),
+  api: z.optional(
+    z.object({
+      hostname: z.optional(z.string()),
+      port: z.optional(z.number().int()),
+    }),
+  ),
   logger: z.optional(
     z.object({
       console: z.optional(z.boolean()),
