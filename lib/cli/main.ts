@@ -284,14 +284,14 @@ async function main() {
     const system = checkedArgs.getBoolean("system")
     const name = checkedArgs.get("name") || configuration!.name || "pup"
     const config = checkedArgs.get("config")
-    const cwd = checkedArgs.get("cwd")
+    const cwdArg = cwd() // Use the actual cwd, as pup has already changed directory
     const cmd = `pup run ${config ? `--config ${config}` : ""}`
     const user = checkedArgs.get("user")
     const home = checkedArgs.get("home")
     const env = checkedArgs.getArray("env") || []
 
     try {
-      const result = await installService({ system, name, cmd, cwd, user, home, env }, checkedArgs.getBoolean("dry-run"))
+      const result = await installService({ system, name, cmd, cwd: cwdArg, user, home, env }, checkedArgs.getBoolean("dry-run"))
       if (result.manualSteps && result.manualSteps.length) {
         console.log(Colors.bold("To complete the installation, carry out these manual steps:"))
         result.manualSteps.forEach((step, index) => {

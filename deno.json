@@ -45,7 +45,7 @@
     "@cross/fs": "jsr:@cross/fs@^0.0.9",
     "@cross/jwt": "jsr:@cross/jwt@^0.4.1",
     "@cross/runtime": "jsr:@cross/runtime@^1.0.0",
-    "@cross/service": "jsr:@cross/service@^1.0.0",
+    "@cross/service": "jsr:@cross/service@^1.0.3",
     "@cross/test": "jsr:@cross/test@^0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.11.0",
     "@hexagon/bundlee": "jsr:@hexagon/bundlee@^0.9.6/mod.ts",
