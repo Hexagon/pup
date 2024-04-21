@@ -13,7 +13,7 @@ import { getAllEnv } from "@cross/env"
 import { deepMerge } from "@cross/deepmerge"
 import { CurrentOS, OperatingSystem } from "@cross/runtime"
 import { GenerateToken } from "../common/token.ts"
-import { DEFAULT_REST_API_HOSTNAME, DEFAULT_REST_API_PORT } from "./configuration.ts"
+import { DEFAULT_REST_API_HOSTNAME } from "./configuration.ts"
 
 /**
  * Represents a task runner that executes tasks as regular processes.
@@ -123,7 +123,7 @@ class Runner extends BaseRunner {
     // - PUP_API_HOSTNAME
     env.PUP_API_HOSTNAME = this.pup.configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME
     // - PUP_API_PORT
-    env.PUP_API_PORT = (this.pup.configuration.api?.port || DEFAULT_REST_API_PORT).toString()
+    if (this.pup.port?.fromCache()) env.PUP_API_PORT = this.pup.port.fromCache()
     // - PUP_API_TOKEN
     if (this.pup.secret?.load()) env.PUP_API_TOKEN = await GenerateToken(await this.pup.secret?.load(), { consumer: "telemetry-" + this.processConfig.id }, new Date().getTime() + 365 * 24 * 60 * 60)
 

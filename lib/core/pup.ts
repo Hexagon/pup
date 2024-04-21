@@ -8,6 +8,8 @@
 import {
   type Configuration,
   DEFAULT_INTERNAL_LOG_HOURS,
+  DEFAULT_SECRET_FILE_PERMISSIONS,
+  DEFAULT_SECRET_LENGTH_BYTES,
   type GlobalLoggerConfiguration,
   MAINTENANCE_INTERVAL_MS,
   type ProcessConfiguration,
@@ -21,9 +23,11 @@ import { Cluster } from "./cluster.ts"
 import { RestApi } from "./rest.ts"
 import { EventEmitter } from "../common/eventemitter.ts"
 import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
-import { Secret } from "./secret.ts"
+import { Prop } from "../common/prop.ts"
 import { TelemetryData } from "../../telemetry.ts"
 import { rm } from "@cross/fs"
+import { findFreePort } from "../common/port.ts"
+import { encodeBase64 } from "jsr:@std/encoding@^0.220.1/base64"
 
 interface InstructionResponse {
   success: boolean
@@ -51,7 +55,8 @@ class Pup {
   public configFilePath?: string
 
   public cleanupQueue: string[] = []
-  public secret?: Secret
+  public secret?: Prop
+  public port?: Prop
 
   static async init(unvalidatedConfiguration: unknown, configFilePath?: string): Promise<Pup> {
     const temporaryStoragePath: string | undefined = configFilePath ? await toTempPath(configFilePath) : undefined
@@ -64,6 +69,7 @@ class Pup {
     let statusFile
     let logStore
     let secretFile
+    let portFile
     if (configFilePath && temporaryStoragePath && persistentStoragePath) {
       this.configFilePath = toResolvedAbsolutePath(configFilePath)
 
@@ -74,6 +80,7 @@ class Pup {
 
       statusFile = `${this.persistentStoragePath}/.main.status` // Deno KV store
       secretFile = `${this.persistentStoragePath}/.main.secret` // Plain text file containing the JWT secret for the rest api
+      portFile = `${this.temporaryStoragePath}/.main.port` // Plain text file containing the port number for the API
       logStore = `${this.persistentStoragePath}/.main.log` // Deno KV store
     }
 
@@ -93,7 +100,10 @@ class Pup {
     this.status = new Status(statusFile)
 
     // Initialize API secret
-    if (secretFile) this.secret = new Secret(secretFile)
+    if (secretFile) this.secret = new Prop(secretFile, DEFAULT_SECRET_FILE_PERMISSIONS)
+
+    // Initialize API port
+    if (portFile) this.port = new Prop(portFile)
   }
 
   /**
@@ -256,7 +266,7 @@ class Pup {
 
     // Update process status
     try {
-      const applicationState = this.status.applicationState(this.processes)
+      const applicationState = this.status.applicationState(this.processes, this.port)
       this.events.emit("application_state", applicationState)
       const logHours = this.configuration.logger?.internalLogHours === undefined ? DEFAULT_INTERNAL_LOG_HOURS : this.configuration.logger?.internalLogHours
       if (logHours > 0) {
@@ -280,14 +290,25 @@ class Pup {
    * @private
    */
   private api = async () => {
-    const secret = await this.secret?.loadOrGenerate()
+    // deno-lint-ignore require-await
+    const secret = await this.secret?.loadOrGenerate(async () => {
+      const secretArray = new Uint8Array(DEFAULT_SECRET_LENGTH_BYTES)
+      crypto.getRandomValues(secretArray)
+      return encodeBase64(secretArray)
+    })
     if (!secret) return
+
+    const port = await this.port?.loadOrGenerate(async () => {
+      const resultingPort = this.configuration.api?.port || await findFreePort()
+      return resultingPort.toString()
+    })
 
     // Initializing rest a
     this.logger.info("rest", "Initializing rest api")
+
     // Initialize rest api
     try {
-      this.restApi = new RestApi(this, this.configuration.api?.port, this.configuration.api?.hostname, secret)
+      this.restApi = new RestApi(this, this.configuration.api?.hostname, parseInt(port!, 10), secret)
       await this.restApi.start()
     } catch (e) {
       this.logger.error("rest", `An error occured while inizializing the rest api: ${e.message}`)

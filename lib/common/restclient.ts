@@ -1,3 +1,10 @@
+/**
+ * A "standard" client for the Pup Rest API
+ *
+ * @file lib/common/restclient.ts
+ * @license MIT
+ */
+
 export class RestClient {
   private baseUrl: string // Declare the types
   private token: string

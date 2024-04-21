@@ -9,6 +9,7 @@ import { Application } from "../../application.meta.ts"
 import type { Cluster } from "./cluster.ts"
 import { APPLICATION_STATE_WRITE_LIMIT_MS } from "./configuration.ts"
 import { type Process, type ProcessInformation, ProcessState } from "./process.ts"
+import { Prop } from "../common/prop.ts"
 
 const started = new Date()
 
@@ -21,6 +22,7 @@ export interface ApplicationState {
   status: string
   updated: string
   started: string
+  port: number
   memory: Deno.MemoryUsage
   systemMemory: Deno.SystemMemoryInfo
   loadAvg: number[]
@@ -126,7 +128,7 @@ class Status {
    * @param processes The list of processes to retrieve the statuses from.
    * @returns The application state object.
    */
-  public applicationState(processes: Process[]): ApplicationState {
+  public applicationState(processes: Process[], port?: Prop): ApplicationState {
     const processStates: ProcessInformation[] = []
     for (const p of processes) {
       processStates.push(p.getStatus())
@@ -143,6 +145,7 @@ class Status {
       updated: new Date().toISOString(),
       started: started.toISOString(),
       memory: Deno.memoryUsage(),
+      port: port ? parseInt(port.fromCache()!, 10) : 0,
       systemMemory: Deno.systemMemoryInfo(),
       loadAvg: Deno.loadavg(),
       osUptime: Deno.osUptime(),

@@ -1,3 +1,10 @@
+/**
+ * Utilities for generating and validating Pup Rest API Tokens
+ *
+ * @file lib/common/token.ts
+ * @license MIT
+ */
+
 import { createJWT, generateKey, JWTPayload, validateJWT } from "@cross/jwt"
 import { DEFAULT_SECRET_KEY_ALGORITHM } from "../core/configuration.ts"
 

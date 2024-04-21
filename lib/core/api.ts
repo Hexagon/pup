@@ -10,7 +10,7 @@
 import type { EventEmitter } from "../common/eventemitter.ts"
 import type { LogEventData } from "./logger.ts"
 import type { Pup } from "./pup.ts"
-import type { ProcessLoggerConfiguration } from "./configuration.ts"
+import type { Configuration, ProcessLoggerConfiguration } from "./configuration.ts"
 import type { ProcessState } from "./process.ts"
 import { TelemetryData } from "../../telemetry.ts"
 
@@ -78,6 +78,7 @@ export interface ApiApplicationState {
   updated: string
   started: string
   memory: Deno.MemoryUsage
+  port: number
   systemMemory: Deno.SystemMemoryInfo
   loadAvg: number[]
   osUptime: number
@@ -103,6 +104,9 @@ export class PupApi {
       configFilePath: pup.configFilePath,
     }
   }
+  public getConfiguration(): Configuration {
+    return this._pup.configuration
+  }
   public allProcessStates(): ApiProcessData[] {
     const statuses: ApiProcessData[] = this._pup.allProcesses().map((p) => {
       return {
@@ -113,7 +117,7 @@ export class PupApi {
     return statuses
   }
   public applicationState(): ApiApplicationState {
-    return this._pup.status.applicationState(this._pup.allProcesses())
+    return this._pup.status.applicationState(this._pup.allProcesses(), this._pup.port)
   }
   public terminate(forceQuitMs: number) {
     this._pup.terminate(forceQuitMs)

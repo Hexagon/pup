@@ -1,11 +1,11 @@
 import { Application, Context, Router, Status } from "@oak/oak"
 import { PupApi } from "./api.ts"
 import { Pup } from "./pup.ts"
-import { generateKey } from "@cross/jwt"
-import { DEFAULT_REST_API_HOSTNAME, DEFAULT_REST_API_PORT, DEFAULT_SECRET_KEY_ALGORITHM } from "./configuration.ts"
+import { generateKey, JWTPayload } from "@cross/jwt"
+import { DEFAULT_REST_API_HOSTNAME, DEFAULT_SECRET_KEY_ALGORITHM } from "./configuration.ts"
 import { ValidateToken } from "../common/token.ts"
 
-const generateAuthMiddleware = (key: CryptoKey) => {
+const generateAuthMiddleware = (key: CryptoKey, revoked?: string[]) => {
   return async (ctx: Context, next: () => Promise<unknown>) => {
     const headers: Headers = ctx.request.headers
     const authorization = headers.get("Authorization")
@@ -22,9 +22,19 @@ const generateAuthMiddleware = (key: CryptoKey) => {
     }
     const token = parts[1]
     try {
-      const payload = await ValidateToken(token, key)
+      const payload: JWTPayload = await ValidateToken(token, key) as JWTPayload
       if (payload) {
-        await next() // Proceed if valid
+        if (payload.data?.consumer) {
+          if (revoked && revoked.find((r) => r.toLowerCase().trim() === payload.data?.consumer.toLowerCase().trim())) {
+            ctx.response.status = Status.Unauthorized
+            ctx.response.body = { message: "Invalid token" }
+          } else {
+            await next()
+          }
+        } else {
+          ctx.response.status = Status.Unauthorized
+          ctx.response.body = { message: "Invalid token" }
+        }
       } else {
         ctx.response.status = Status.Unauthorized
         ctx.response.body = { message: "Invalid/expired token" }
@@ -47,12 +57,12 @@ export class RestApi {
   public port: number
   public hostname: string
 
-  constructor(pup: Pup, port: number | undefined, hostname: string | undefined, jwtSecret: string) { // Takes a Pup instance
+  constructor(pup: Pup, hostname: string | undefined, port: number, jwtSecret: string) { // Takes a Pup instance
     this.pupApi = new PupApi(pup)
     this.app = new Application()
     this.router = new Router()
     this.appAbortController = new AbortController()
-    this.port = port || DEFAULT_REST_API_PORT
+    this.port = port
     this.hostname = hostname || DEFAULT_REST_API_HOSTNAME
     this.secret = jwtSecret
     this.setupRoutes() // Setup routes within the constructor
@@ -233,14 +243,15 @@ export class RestApi {
       })
   }
 
-  public async start() {
-    this.app.use(generateAuthMiddleware(await this.setupKey()))
+  public async start(): Promise<number> {
+    const port = this.port
+    this.app.use(generateAuthMiddleware(await this.setupKey(), this.pupApi.getConfiguration().api?.revoked))
     this.app.use(this.router.routes())
     this.app.use(this.router.allowedMethods())
-
-    this.pupApi.log("info", "rest", `Starting the REST API`)
-    await this.app.listen({ port: this.port, hostname: this.hostname, signal: this.appAbortController.signal })
-    this.pupApi.log("info", "rest", `REST API listening on port ${this.port}`)
+    this.pupApi.log("info", "rest", `Starting the Rest API on ${this.hostname}:${this.port}`)
+    await this.app.listen({ port, hostname: this.hostname, signal: this.appAbortController.signal })
+    this.pupApi.log("info", "rest", `Rest API listening on port ${this.port}`)
+    return port
   }
 
   public terminate() {

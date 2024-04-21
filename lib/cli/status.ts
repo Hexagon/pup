@@ -12,7 +12,7 @@ import { Colors } from "@cross/utils"
 import { filesize } from "filesize"
 import { blockedFormatter, codeFormatter, naFormatter, statusFormatter } from "./formatters/strings.ts"
 import { timeagoFormatter } from "./formatters/times.ts"
-import { Configuration } from "../core/configuration.ts"
+import { Configuration, DEFAULT_REST_API_HOSTNAME } from "../core/configuration.ts"
 import { resolve } from "@std/path"
 import { ApiApplicationState } from "../core/api.ts"
 
@@ -31,6 +31,7 @@ export function printStatus(configFile: string, configuration: Configuration, cw
   console.log(Colors.bold("Configuration:") + "\t" + resolve(configFile))
   console.log(Colors.bold("Working dir:") + "\t" + cwd || "Not set (default: pup)")
   console.log(Colors.bold("Instance name:") + "\t" + (configuration.name || "Not set"))
+  console.log(Colors.bold("Rest API URL:") + "\thttp://" + (configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME) + ":" + status.port)
 
   const taskTable: Row[] = []
 

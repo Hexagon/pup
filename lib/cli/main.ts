@@ -7,7 +7,7 @@
 
 // Import core dependencies
 import { Pup } from "../core/pup.ts"
-import { type Configuration, DEFAULT_REST_API_HOSTNAME, DEFAULT_REST_API_PORT, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
+import { type Configuration, DEFAULT_REST_API_HOSTNAME, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
 
 // Import CLI utilities
 import { printFlags, printHeader, printUsage } from "./output.ts"
@@ -17,7 +17,7 @@ import { printStatus } from "./status.ts"
 import { upgrade } from "./upgrade.ts"
 
 // Import common utilities
-import { toPersistentPath, toResolvedAbsolutePath } from "../common/utils.ts"
+import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
 import { exists, readFile } from "@cross/fs"
 
 // Import external dependencies
@@ -30,11 +30,11 @@ import { args } from "@cross/utils/args"
 import { installService, uninstallService } from "@cross/service"
 import { Colors, exit } from "@cross/utils"
 import { chdir, cwd } from "@cross/fs"
-import { Secret } from "../core/secret.ts"
 import { GenerateToken } from "../common/token.ts"
 import { RestClient } from "../common/restclient.ts"
 import { ApiApplicationState } from "../core/api.ts"
 import { CurrentRuntime, Runtime } from "@cross/runtime"
+import { Prop } from "../common/prop.ts"
 
 /**
  * Define the main entry point of the CLI application
@@ -170,6 +170,17 @@ async function main() {
       checkedArgs.get("name"),
     )
   }
+  // Prepare API port
+  let port = configuration.api?.port
+  const portFile = `${await toTempPath(configFile as string)}/.main.port`
+  const portFileObj = new Prop(portFile)
+  if (!port) {
+    try {
+      const filePort = await portFileObj.load()
+      port = parseInt(filePort)
+    } catch (_e) { /* That's ok, there is no running instance. */ }
+  }
+
   // Prepare secret file
   let client
   let token
@@ -177,9 +188,9 @@ async function main() {
   if (useConfigFile) {
     const secretFile = `${await toPersistentPath(configFile as string)}/.main.secret`
     // Get secret
-    const secretInstance = new Secret(secretFile)
+    const secretInstance = new Prop(secretFile)
     try {
-      secret = await secretInstance.loadOrGenerate()
+      secret = await secretInstance.load()
     } catch (_e) {
       console.error("Could not connect to instance, secret could not be read.")
       return exit(1)
@@ -189,7 +200,7 @@ async function main() {
     token = await GenerateToken(secret, { consumer: "cli" }, new Date().getTime() + 120_000)
 
     // Send api request
-    const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${configuration.api?.port || DEFAULT_REST_API_PORT}`
+    const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${port}`
     client = new RestClient(apiBaseUrl, token!)
   }
 
@@ -344,7 +355,7 @@ async function main() {
    */
   if (baseArgument === "monitor") {
     const apiHostname = configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME
-    const apiPort = configuration.api?.port || DEFAULT_REST_API_PORT
+    const apiPort = port
     const wsUrl = `ws://${apiHostname}:${apiPort}/wss`
     const wss = new WebSocketStream(wsUrl, {
       headers: {

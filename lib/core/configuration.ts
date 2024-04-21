@@ -22,7 +22,9 @@ export const DEFAULT_SECRET_LENGTH_BYTES = 64
 export const DEFAULT_SECRET_FILE_PERMISSIONS = 0o600
 export const DEFAULT_SECRET_KEY_ALGORITHM = "HS512"
 export const DEFAULT_REST_API_HOSTNAME = "127.0.0.1"
-export const DEFAULT_REST_API_PORT = 16441
+
+// Prop file constants
+export const DEFAULT_PROP_FILE_PERMISSIONS = 0o600
 
 interface Configuration {
   name?: string
@@ -37,6 +39,7 @@ interface Configuration {
 interface ApiConfiguration {
   hostname?: string
   port?: number
+  revoked?: string[]
 }
 
 interface _BaseLoggerConfiguration {
@@ -102,6 +105,7 @@ const ConfigurationSchema = z.object({
     z.object({
       hostname: z.optional(z.string()),
       port: z.optional(z.number().int()),
+      revoked: z.optional(z.array(z.string())),
     }),
   ),
   logger: z.optional(

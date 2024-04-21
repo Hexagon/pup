@@ -21,7 +21,10 @@ All notable changes to this project will be documented in this section.
 - feat(cli): Add cli command `monitor` for streaming logs
 - change(plugins): Remove programmatic api and bundled plugins. Plugins will now be entirely separate from pup, and communicate through the Rest API.
 - chore(core): Internal refactor getting closer to being runtime agnostic
-- feat(cli): Add cli command `
+- feat(cli): Add cli command `token`to generate new API tokens
+- change(api): Expose configuration to the API
+- change(core): Expose port in the application status
+- fix(core): Fix `enable-service` in Windows by updating dependency `@cross/service`
 
 ## [1.0.0-rc.25] - 2023-04-17
 
