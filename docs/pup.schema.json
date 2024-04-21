@@ -17,6 +17,24 @@
           "minimum": 0,
           "default": 0
         },
+        "api": {
+          "type": "object",
+          "properties": {
+            "hostname": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "revoked": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
         "logger": {
           "type": "object",
           "properties": {
@@ -86,22 +104,6 @@
             }
           },
           "additionalProperties": false
-        },
-        "plugins": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "url": {
-                "type": "string"
-              },
-              "options": {}
-            },
-            "required": [
-              "url"
-            ],
-            "additionalProperties": false
-          }
         },
         "name": {
           "type": "string",

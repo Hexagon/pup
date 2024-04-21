@@ -9,7 +9,11 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.26] - 2023-04-19
+## [1.0.0-rc.27] - 2023-04-21
+
+- fix(upgrader): Update upgrader. **If coming from a previous version, you'll have to run upgrade twice to make pup work**
+
+## [1.0.0-rc.26] - 2023-04-21
 
 - fix(core): Remove stray console.log
 - fix(core): Fix working dir different from current dir
