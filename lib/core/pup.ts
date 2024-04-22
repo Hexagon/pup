@@ -122,9 +122,9 @@ class Pup {
     await this.status.cleanup()
   }
 
-  public init = () => {
+  public init = async () => {
     // Initialize api
-    this.api()
+    await this.api()
 
     // Attach logger to events
     this.logger.attach((severity: string, category: string, text: string, process?: ProcessConfiguration): boolean => {
@@ -302,7 +302,7 @@ class Pup {
     // Initialize rest api
     try {
       this.restApi = new RestApi(this, this.configuration.api?.hostname, parseInt(port!, 10), secret)
-      await this.restApi.start()
+      this.restApi.start()
     } catch (e) {
       this.logger.error("rest", `An error occured while inizializing the rest api: ${e.message}`)
     }
