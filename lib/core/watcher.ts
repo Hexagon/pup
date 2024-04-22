@@ -35,6 +35,7 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
   private skip?: RegExp[] = []
   private config: WatcherConfig
   private stopWatching = false
+  private watcher?: Deno.FsWatcher
 
   constructor(config: WatcherConfig = {}) {
     this.config = config
@@ -116,7 +117,8 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
     }
 
     const run = async () => {
-      for await (const event of Deno.watchFs(this.paths)) {
+      this.watcher = Deno.watchFs(this.paths)
+      for await (const event of this.watcher) {
         if (this.stopWatching) {
           break // Exit the loop if stopWatching is true
         }
@@ -142,5 +144,6 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
 
   public stop() {
     this.stopWatching = true
+    this.watcher?.close()
   }
 }

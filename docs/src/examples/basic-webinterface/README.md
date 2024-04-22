@@ -27,7 +27,7 @@ To activate the web interface plugin, set up the `plugins:`-section of your `pup
   "processes": [/* ... */],
   "plugins": [
     {
-      "url": "jsr:@pup/pup@$VERSION/plugins/web-interface",
+      "url": "jsr:@pup/pup@$PUP_VERSION/plugins/web-interface",
       "options": {
         "port": 5000
       }
@@ -35,9 +35,6 @@ To activate the web interface plugin, set up the `plugins:`-section of your `pup
   ]
 }
 ```
-
-If running pup using the normal release channels `stable` or `prerelease`, `$VERSION` will be replaced by the version of the currently running pup instance. If running a `canary` version, or custom
-intallation, you **can not** use the `$VERSION` variable, and should give an absolute url.
 
 ## Running the example
 

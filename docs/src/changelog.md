@@ -9,6 +9,13 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.29] - Unreleased
+
+- fix(docs): Update docs to include the latest features.
+- fix(core): Fix regression which caused an error when running without configuration.
+- fix(watcher): Fix an issue where the watcher prevented the main process to exit on termination.
+- fix(cli): Fix pup init
+
 ## [1.0.0-rc.28] - 2023-04-22
 
 - fix(core): Generate secret before starting main process.

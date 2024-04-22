@@ -12,7 +12,7 @@ The example at [/docs/src/examples/splunk](https://github.com/Hexagon/pup/tree/m
 output to Splunk using the splunk-hec plugin.
 
 > **Note:** If you're connecting to a Splunk HEC server with a bad certificate, such as during testing, you'll need to start pup manually with the `--unsafely-ignore-certificate-errors` flag. The full
-> command for this would be `deno run -Ar --unsafely-ignore-certificate-errors jsr:@pup/pup@$VERSION run` { .note }
+> command for this would be `deno run -Ar --unsafely-ignore-certificate-errors jsr:@pup/pup@$PUP_VERSION run` { .note }
 
 ## Files
 

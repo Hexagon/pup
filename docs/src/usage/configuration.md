@@ -195,6 +195,33 @@ To activate plugins, add your plugins to the configuration using this pattern:
 }
 ```
 
+### API
+
+The API configuration object is optional, and is used to customize the Rest API used to interact with Pup. Here's a breakdown of the available properties:
+
+| Option     | Type   | Description                                            | Default     |
+| ---------- | ------ | ------------------------------------------------------ | ----------- |
+| `hostname` | string | (Optional) The hostname the API server should bind to. | "127.0.0.1" |
+| `port`     | number | (Optional) The port the API server should listen on.   | Random port |
+| `revoked`  | array  | (Optional) A list of revoked API consumers.            | []          |
+
+By default, the API is only exposed to localhost, and will listen on a random port.
+
+If you want to use the API remotely, you can supply a specific port (one per instance) and set hostname to `0.0.0.0`. It is highly recommended to use a proxy such as nginx to expose the API to the
+internet.
+
+**Example, listening on port 9000 of all interfaces:**
+
+```json
+{
+  "api": {
+    "hostname": "0.0.0.0",
+    "port": 9000,
+    "revoked": ["my-consumer", "my-other-consumer"]
+  }
+}
+```
+
 ## Validating the Configuration
 
 To ensure your configuration is valid, just run `pup run` (or `pup run --config custom/path/to/config.json`). If using pup as a library, you can use the `validateConfiguration()` function provided by

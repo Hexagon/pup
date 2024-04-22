@@ -31,41 +31,50 @@ Pup is centered on a single configuration file, `pup.json`, which manages all as
 To install Pup, open your terminal and execute the following command:
 
 ```bash
-deno run -Ar jsr:@pup/pup@1.0.0-rc.28 setup --channel prerelease
+deno run -Ar jsr:@pup/pup@$PUP_VERSION setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
 channels [here](https://hexagon.github.io/pup/installation.html#release-channels).
 
-### Configuration
+### Configuration and Usage
 
-Pup revolves around instances configuration files, each process belongs to an instances defined by a `pup.json`. This file can either be created manually, or by the command line helpers.
+Pup revolves around instance configuration files, where each managed process belongs to an instance defined by a `pup.json`. This file can either be created manually, or by the command line helpers
+used below:
 
 1. To create a simple instances running a single process:
 
    `pup init --id "my-server" --autostart --cmd "deno run -A server.ts"`
 
-   If you intend to create multiple pup instances on the same server, you can pass an instance name through `--name my-instance-name`
+   If you intend to create multiple pup instances on the same server, you can pass an instance name through `--name my-instance-name`. This name will also be used as the system service name.
 
-2. (Optional) In case you have an additional task to execute, such as a cleanup script, you can make use of `pup append`. The following example shows how to add an extra task that use the cron start
+2. _(Optional)_ In case you have an additional task to execute, such as a cleanup script, you can make use of `pup append`. The following example shows how to add an extra task that use the cron start
    policy:
 
    `pup append --id "my-task" --cmd "deno run -A task.ts" --cron "0 0 * * * *"`
 
-3. (Optional) Test your instance (exit by pressing CTRL+C):
-
-   `pup run`
+3. _(Optional)_ Test your instance by running it foreground using `pup run` (exit by pressing CTRL+C):
 
 4. To make your instance run at boot, enable it using `pup enable-service`.
 
-   `pup enable-service`
+   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `-n my-custom-name`.
+
+5. To stream the logs from a running instance, use the command `pup monitor`. To show historic logs, use `pup logs`.
 
    Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `-n my-custom-name`.
 
 #### Single command example
 
-It is possible to use pup to keep a process alive temporary, without a `pup.json` or system service.
+It is possible to use pup without a `pup.json` or system service.
 
-To achieve this, use `pup run` with `--cmd` and a start policy
+**Keeping a process alive**
+
+To keep a process alive temporary, use `pup run` with `--cmd` and a start policy
 
 `pup run --autostart --cmd "deno run server.ts"`
+
+**Restarting a process on filesystem changes**
+
+To restart if any file changes withing the current directory, add `--watch <watched-path>`:
+
+`pup run --autostart --cmd "deno run server.ts" --watch .`

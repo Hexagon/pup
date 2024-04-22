@@ -14,7 +14,7 @@
   "plugins": [
     /* Enable splunk HEC plugin */
     {
-      /* Use a full url to the plugin, example: jsr:@pup/pup@$VERSION/plugins/splunk-hec */
+      /* Use a full url to the plugin, example: jsr:@pup/pup@$PUP_VERSION/plugins/splunk-hec */
       "url": "../../plugins/splunk-hec/mod.ts",
       "options": {
         /*

@@ -23,8 +23,7 @@ names and values represent their corresponding values.
 
 **Q: Can I run multiple instances simultaneously?**
 
-A: Yes, you can run multiple instances simultaneously. However, it is essential to ensure that each instance has a separate configuration file and that they do not conflict with each other in terms of
-process IDs or shared resources.
+A: Yes, you can run multiple instances simultaneously. By default, each instance will use a separate port for the internal Rest API used when issueing cli commands.
 
 **Q: Is there a limit to the number of processes Pup can manage?**
 

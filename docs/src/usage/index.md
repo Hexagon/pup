@@ -21,9 +21,9 @@ General flags are used to control the basic behavior of Pup and can be combined 
 - `-v, version`: Show the current version of Pup.
 - `upgrade <version>`: Upgrade pup to the latest, or specified, version.
 
-## Running pup with an Existing Configuration File
+## Running in foreground
 
-You can run Pup with an existing configuration file by using the `run` command, optionally followed by the `--config` option:
+To test your configuration, you can run Pup in the foreground using the `run` command, optionally followed by the `--config` option:
 
 ```bash
 # This will use pup.json or pup.jsonc in current directory
@@ -33,13 +33,31 @@ pup run
 pup run --config path/to/config-file
 ```
 
+## Running as a service
+
+You can run Pup in as a service by using the `enable-service` command, optionally followed by the `--config` option:
+
+```bash
+# This will install a system service and run pup in the background
+pup enable-service
+
+# or
+pup enable-service --config path/to/config-file
+```
+
 ## Viewing Logs
 
-Pup enables you to inspect its internally stored logs through the `logs` command. This command provides several options to help filter the logs and customize the output:
+Pup enables you to inspect its internally stored logs through the `logs` command, or live stream the logs using the `monitor` command. Both options supports arguments to help filter the logs and
+customize the output:
 
-- `-n`: (optional) Defines the number of log entries to display.
+### Arguments to both `logs` and `monitor`
+
 - `--id <process-id>`: (optional) Allows filtering of logs based on the process ID.
 - `--severity <severity>`: (optional) Enables filtering logs based on the severity level. The acceptable severity levels include error, warning, info, and log.
+
+### ´logs´ only
+
+- `-n`: (optional) Defines the number of log entries to display.
 - `--start <iso860-timestamp>`: (optional) Allows you to display logs that were generated after a specified timestamp. The timestamp should be in the ISO8601 format.
 - `--end <iso860-timestamp>`: (optional) Lets you display logs generated before a particular timestamp. The timestamp should be in the ISO8601 format.
 

@@ -121,7 +121,7 @@ async function main() {
   if (useConfigFile) {
     const configFileCwd = toResolvedAbsolutePath(checkedArgs?.get("cwd") || cwd())
     configFile = await findConfigFile(configFileCwd, useConfigFile, checkedArgs?.get("config"))
-  }  
+  }
   // Exit if a configuration file is expected, but not found
   if (useConfigFile && !configFile) {
     console.error("Configuration file not found.")
@@ -153,18 +153,18 @@ async function main() {
    *
    * Generate a new configuration file and exit
    */
-    if (baseArgument === "init") {
-      // Default new configuration file to pup.json
-      const fallbackedConfigFile = configFile ?? "pup.json"
-      if (await exists(fallbackedConfigFile)) {
-        console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
-        exit(1)
-      } else {
-        await createConfigurationFile(fallbackedConfigFile, checkedArgs!, cmd!)
-        console.log(`Configuration file '${fallbackedConfigFile}' created`)
-        exit(0)
-      }
-    }  
+  if (baseArgument === "init") {
+    // Default new configuration file to pup.json
+    const fallbackedConfigFile = configFile ?? "pup.json"
+    if (await exists(fallbackedConfigFile)) {
+      console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
+      exit(1)
+    } else {
+      await createConfigurationFile(fallbackedConfigFile, checkedArgs!, cmd!)
+      console.log(`Configuration file '${fallbackedConfigFile}' created`)
+      exit(0)
+    }
+  }
   // Read or generate configuration
   let configuration: Configuration
   if (configFile) {
@@ -190,13 +190,16 @@ async function main() {
   }
   // Prepare API port
   let port = configuration.api?.port
-  const portFile = `${await toTempPath(configFile as string)}/.main.port`
-  const portFileObj = new Prop(portFile)
-  if (!port) {
-    try {
-      const filePort = await portFileObj.load()
-      port = parseInt(filePort)
-    } catch (_e) { /* That's ok, there is no running instance. */ }
+  if (useConfigFile) {
+    port = configuration.api?.port
+    const portFile = `${await toTempPath(configFile as string)}/.main.port`
+    const portFileObj = new Prop(portFile)
+    if (!port) {
+      try {
+        const filePort = await portFileObj.load()
+        port = parseInt(filePort)
+      } catch (_e) { /* That's ok, there is no running instance. */ }
+    }
   }
 
   // Prepare secret file
