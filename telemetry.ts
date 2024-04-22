@@ -107,23 +107,26 @@ export class PupTelemetry {
 
     if (pupTempPath && (await isDir(pupTempPath)) && pupProcessId) {
       const ipcPath = `${pupTempPath}/.${pupProcessId}.ipc` // Process-specific IPC path
-      this.ipc = new FileIPC(ipcPath)
+      // Break out of the loop if aborted
+      if (!this.aborted) {
+        this.ipc = new FileIPC(ipcPath)
 
-      // Read incoming messages
-      for await (const messages of this.ipc.receiveData()) {
-        // Break out of the loop if aborted
-        if (this.aborted) break
+        // Read incoming messages
+        for await (const messages of this.ipc.receiveData()) {
+          // Break out of the loop if aborted
+          if (this.aborted) break
 
-        if (messages.length > 0) {
-          // Process messages and emit events
-          for (const message of messages) {
-            try {
-              if (message.data) {
-                const parsedMessage = JSON.parse(message.data)
-                this.events.emit(parsedMessage.event, parsedMessage.eventData)
+          if (messages.length > 0) {
+            // Process messages and emit events
+            for (const message of messages) {
+              try {
+                if (message.data) {
+                  const parsedMessage = JSON.parse(message.data)
+                  this.events.emit(parsedMessage.event, parsedMessage.eventData)
+                }
+              } catch (_e) {
+                // Ignore errors in message parsing and processing
               }
-            } catch (_e) {
-              // Ignore errors in message parsing and processing
             }
           }
         }

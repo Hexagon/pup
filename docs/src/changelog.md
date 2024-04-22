@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.31] - 2024-04-23
+
+- fix(telementry): Tear down in correct order
+
 ## [1.0.0-rc.30] - 2024-04-22
 
 - fix(rest): Add `/log` to the rest api
