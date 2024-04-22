@@ -9,22 +9,22 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.29] - Unreleased
+## [1.0.0-rc.29] - 2024-04-22
 
 - fix(docs): Update docs to include the latest features.
 - fix(core): Fix regression which caused an error when running without configuration.
 - fix(watcher): Fix an issue where the watcher prevented the main process to exit on termination.
 - fix(cli): Fix pup init
 
-## [1.0.0-rc.28] - 2023-04-22
+## [1.0.0-rc.28] - 2024-04-22
 
 - fix(core): Generate secret before starting main process.
 
-## [1.0.0-rc.27] - 2023-04-21
+## [1.0.0-rc.27] - 2024-04-21
 
 - fix(upgrader): Update upgrader. **If coming from a previous version, you'll have to run upgrade twice to make pup work**
 
-## [1.0.0-rc.26] - 2023-04-21
+## [1.0.0-rc.26] - 2024-04-21
 
 - fix(core): Remove stray console.log
 - fix(core): Fix working dir different from current dir
@@ -41,16 +41,16 @@ All notable changes to this project will be documented in this section.
 - change(core): Expose port in the application status
 - fix(core): Fix `enable-service` in Windows by updating dependency `@cross/service`
 
-## [1.0.0-rc.25] - 2023-04-17
+## [1.0.0-rc.25] - 2024-04-17
 
 - fix(plugins): Workaround for jsr bug affecting the web-interface plugin
 
-## [1.0.0-rc.24] - 2023-04-17
+## [1.0.0-rc.24] - 2024-04-17
 
 - chore(cli): Refactor of the cli entrypoint code
 - fix(plugins): Fix web-interface plugin by switching bundlee mode from import to fetch mode
 
-## [1.0.0-rc.23] - 2023-04-16
+## [1.0.0-rc.23] - 2024-04-16
 
 - fix(cli): Visual improvements for `--help`
 - fix(cli): Compacted and colorised output of `status`
