@@ -181,8 +181,8 @@ class Process {
       return
     }
 
-    // Do not restart if maximum number of restarts are exhausted
-    if (this.restarts >= (this.config.restartLimit ?? Infinity)) {
+    // Do not restart if maximum number of restarts are exhausted and reason is restart
+    if (this.restarts >= (this.config.restartLimit ?? Infinity) && restart) {
       logger.log("exhausted", `Maximum number of starts exhausted, refusing to start`, this.config)
       this.setStatus(ProcessState.EXHAUSTED)
       return

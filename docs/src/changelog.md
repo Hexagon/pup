@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this section.
 
 - fix(rest): Add `/log` to the rest api
 - chore(docs): Add Rest API docs.
+- fix(core): Reset restart count on any kind of manual start
 
 ## [1.0.0-rc.29] - 2024-04-22
 
