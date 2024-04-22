@@ -9,6 +9,11 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.30] - Unreleased
+
+- fix(rest): Add `/log` to the rest api
+- chore(docs): Add Rest API docs.
+
 ## [1.0.0-rc.29] - 2024-04-22
 
 - fix(docs): Update docs to include the latest features.

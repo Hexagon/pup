@@ -5,6 +5,12 @@ import { generateKey, JWTPayload } from "@cross/jwt"
 import { DEFAULT_REST_API_HOSTNAME, DEFAULT_SECRET_KEY_ALGORITHM } from "./configuration.ts"
 import { ValidateToken } from "../common/token.ts"
 
+const ALLOWED_SEVERITIES = ["log", "info", "warn", "error"]
+
+function isAllowedSeverity(severity: string): boolean {
+  return ALLOWED_SEVERITIES.includes(severity.toLowerCase())
+}
+
 const generateAuthMiddleware = (key: CryptoKey, revoked?: string[]) => {
   return async (ctx: Context, next: () => Promise<unknown>) => {
     const headers: Headers = ctx.request.headers
@@ -182,12 +188,35 @@ export class RestApi {
         }
         this.pupApi.terminate(forceQuitMs)
       })
-      /*.post("/log", async (ctx) => {
-        // Read severity, plugin, and message from request body
-        const body = await ctx.request.body().value
-        this.pupApi.log(body.severity, body.plugin, body.message)
-        ctx.response.status = Status.Created
-      })*/
+      .post("/log", async (ctx) => {
+        try {
+          // Read severity, plugin, and message from request body
+          const parsedBody = await ctx.request.body.json()
+          if (!parsedBody) {
+            ctx.response.status = Status.BadRequest
+            ctx.response.body = { error: "Log data is required." }
+            return
+          }
+
+          if (!parsedBody.severity || !parsedBody.consumer || !parsedBody.message) {
+            ctx.response.status = Status.BadRequest
+            ctx.response.body = { error: "Missing severity, plugin, or message." }
+            return
+          }
+
+          if (!isAllowedSeverity(parsedBody.severity)) {
+            ctx.response.status = Status.BadRequest
+            ctx.response.body = { error: "Invalid severity." }
+            return
+          }
+
+          this.pupApi.log(parsedBody.severity, parsedBody.plugin, parsedBody.message)
+          ctx.response.status = Status.Created
+        } catch (err) {
+          ctx.response.status = Status.InternalServerError
+          ctx.response.body = { error: err.message }
+        }
+      })
       .get("/logs", async (context) => {
         try {
           const params = context.request.url.searchParams

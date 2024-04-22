@@ -1,7 +1,7 @@
 ---
 title: "Run at boot"
 parent: Usage
-nav_order: 3
+nav_order: 4
 ---
 
 # Run pup at boot
