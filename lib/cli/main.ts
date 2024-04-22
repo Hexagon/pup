@@ -116,12 +116,12 @@ async function main() {
    * - Or generate configuration using (init)
    */
   const runWithoutConfig = baseArgument == "run" && (cmd !== undefined || checkedArgs.get("worker") !== undefined)
-  const useConfigFile = !runWithoutConfig
+  const useConfigFile = !runWithoutConfig && baseArgument !== "init"
   let configFile
   if (useConfigFile) {
     const configFileCwd = toResolvedAbsolutePath(checkedArgs?.get("cwd") || cwd())
     configFile = await findConfigFile(configFileCwd, useConfigFile, checkedArgs?.get("config"))
-  }
+  }  
   // Exit if a configuration file is expected, but not found
   if (useConfigFile && !configFile) {
     console.error("Configuration file not found.")
@@ -148,6 +148,23 @@ async function main() {
       return exit(1)
     }
   }
+  /**
+   * Base argument: init
+   *
+   * Generate a new configuration file and exit
+   */
+    if (baseArgument === "init") {
+      // Default new configuration file to pup.json
+      const fallbackedConfigFile = configFile ?? "pup.json"
+      if (await exists(fallbackedConfigFile)) {
+        console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
+        exit(1)
+      } else {
+        await createConfigurationFile(fallbackedConfigFile, checkedArgs!, cmd!)
+        console.log(`Configuration file '${fallbackedConfigFile}' created`)
+        exit(0)
+      }
+    }  
   // Read or generate configuration
   let configuration: Configuration
   if (configFile) {
@@ -210,27 +227,9 @@ async function main() {
   }
 
   /**
-   * Base argument: init
+   * Base argument: token
    *
-   * Generate a new configuration file and exit
-   */
-  if (baseArgument === "init") {
-    // Default new configuration file to pup.json
-    const fallbackedConfigFile = configFile ?? "pup.json"
-    if (await exists(fallbackedConfigFile)) {
-      console.error(`Configuration file '${fallbackedConfigFile}' already exists, exiting.`)
-      exit(1)
-    } else {
-      await createConfigurationFile(fallbackedConfigFile, checkedArgs!, cmd!)
-      console.log(`Configuration file '${fallbackedConfigFile}' created`)
-      exit(0)
-    }
-  }
-
-  /**
-   * Base argument: init
-   *
-   * Generate a new configuration file and exit
+   * Generate a new api token and exit
    */
   if (baseArgument === "token") {
     if (secret) {
