@@ -9,7 +9,6 @@ import {
   type Configuration,
   DEFAULT_INTERNAL_LOG_HOURS,
   DEFAULT_SECRET_FILE_PERMISSIONS,
-  DEFAULT_SECRET_LENGTH_BYTES,
   type GlobalLoggerConfiguration,
   MAINTENANCE_INTERVAL_MS,
   type ProcessConfiguration,
@@ -27,7 +26,6 @@ import { Prop } from "../common/prop.ts"
 import { TelemetryData } from "../../telemetry.ts"
 import { rm } from "@cross/fs"
 import { findFreePort } from "../common/port.ts"
-import { encodeBase64 } from "@std/encoding/base64"
 
 interface InstructionResponse {
   success: boolean
@@ -290,12 +288,7 @@ class Pup {
    * @private
    */
   private api = async () => {
-    // deno-lint-ignore require-await
-    const secret = await this.secret?.loadOrGenerate(async () => {
-      const secretArray = new Uint8Array(DEFAULT_SECRET_LENGTH_BYTES)
-      crypto.getRandomValues(secretArray)
-      return encodeBase64(secretArray)
-    })
+    const secret = await this.secret?.load()
     if (!secret) return
 
     const port = await this.port?.loadOrGenerate(async () => {

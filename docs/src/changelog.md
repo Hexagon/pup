@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.28] - 2023-04-22
+
+- fix(core): Generate secret before starting main process.
+
 ## [1.0.0-rc.27] - 2023-04-21
 
 - fix(upgrader): Update upgrader. **If coming from a previous version, you'll have to run upgrade twice to make pup work**

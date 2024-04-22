@@ -7,7 +7,7 @@
 
 // Import core dependencies
 import { Pup } from "../core/pup.ts"
-import { type Configuration, DEFAULT_REST_API_HOSTNAME, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
+import { type Configuration, DEFAULT_REST_API_HOSTNAME, DEFAULT_SECRET_LENGTH_BYTES, generateConfiguration, validateConfiguration } from "../core/configuration.ts"
 
 // Import CLI utilities
 import { printFlags, printHeader, printUsage } from "./output.ts"
@@ -35,6 +35,7 @@ import { RestClient } from "../common/restclient.ts"
 import { ApiApplicationState } from "../core/api.ts"
 import { CurrentRuntime, Runtime } from "@cross/runtime"
 import { Prop } from "../common/prop.ts"
+import { encodeBase64 } from "@std/encoding/base64"
 
 /**
  * Define the main entry point of the CLI application
@@ -190,18 +191,22 @@ async function main() {
     // Get secret
     const secretInstance = new Prop(secretFile)
     try {
-      secret = await secretInstance.load()
+      // deno-lint-ignore require-await
+      secret = await secretInstance.loadOrGenerate(async () => {
+        const secretArray = new Uint8Array(DEFAULT_SECRET_LENGTH_BYTES)
+        crypto.getRandomValues(secretArray)
+        return encodeBase64(secretArray)
+      })
+
+      // Generate a short lived (2 minute) cli token
+      token = await GenerateToken(secret, { consumer: "cli" }, new Date().getTime() + 120_000)
+
+      // Send api request
+      const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${port}`
+      client = new RestClient(apiBaseUrl, token!)
     } catch (_e) {
-      console.error("Could not connect to instance, secret could not be read.")
-      return exit(1)
+      /* Ignore */
     }
-
-    // Generate a short lived (2 minute) cli token
-    token = await GenerateToken(secret, { consumer: "cli" }, new Date().getTime() + 120_000)
-
-    // Send api request
-    const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${port}`
-    client = new RestClient(apiBaseUrl, token!)
   }
 
   /**

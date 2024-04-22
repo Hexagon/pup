@@ -46,6 +46,7 @@ export class Prop {
    */
   async generate(generatorFn: PropGenerator): Promise<string> {
     const resultString = await generatorFn()
+    this.cache = resultString
     await writeFile(this.path, resultString, { mode: this.filePermissions })
     return resultString
   }
