@@ -11,7 +11,7 @@ import JSON5 from "json5"
 import { join } from "@std/path"
 import { exists, readFile, writeFile } from "@cross/fs"
 import type { ArgsParser } from "@cross/utils"
-import { toResolvedAbsolutePath } from "../common/utils.ts"
+import { toResolvedAbsolutePath } from "@pup/common/path"
 import { exit } from "node:process"
 
 /**

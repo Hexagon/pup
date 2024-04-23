@@ -9,6 +9,18 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.32] - 2024-04-23
+
+**Breaking:** Any plugins or packages importing telemetry from `@pup/pup/telemetry.ts` needs to be updated to import from `@pup/telemetry` instead.
+
+## Changes
+
+- chore(core): Internal refactor, splitting several parts of pup into separate reusable libraries:
+  - `@pup/common` - <https://github.com/hexagon/pup-common>: Common utilities across Pup, Telemetry and Plug-ins.
+  - `@pup/api-definitions` - <https://github.com/hexagon/pup-api-definitions>: API definitions used by Pup and it's Rest API.
+  - `@pup/api-client` - <https://github.com/hexagon/pup-api-client>: The Pup Rest API, used by the cli interface, telemetry and plugins.
+  - `@pup/telemetry` - <https://github.com/hexagon/pup-api-definitions>: Runtime agnostic library for enabling Node, Deno and Bun process with Pup Telemetry and IPC capabilities.
+
 ## [1.0.0-rc.31] - 2024-04-23
 
 - fix(telementry): Tear down in correct order

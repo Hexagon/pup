@@ -1,12 +1,10 @@
 {
   "name": "@pup/pup",
-  "version": "1.0.0-rc.31",
+  "version": "1.0.0-rc.32",
 
   "exports": {
     ".": "./pup.ts",
-    "./mod.ts": "./mod.ts",
-    "./telemetry": "./telemetry.ts",
-    "./telemetry.ts": "./telemetry.ts"
+    "./lib": "./mod.ts"
   },
 
   "unstable": [
@@ -49,16 +47,17 @@
     "@cross/service": "jsr:@cross/service@^1.0.3",
     "@cross/test": "jsr:@cross/test@^0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.11.0",
-    "@hexagon/bundlee": "jsr:@hexagon/bundlee@^0.9.6/mod.ts",
     "@hexagon/croner": "jsr:@hexagon/croner@^8.0.1",
     "@oak/oak": "jsr:@oak/oak@^15.0.0",
+    "@pup/api-client": "jsr:@pup/api-client@^1.0.0",
+    "@pup/api-definitions": "jsr:@pup/api-definitions@^1.0.0",
+    "@pup/common": "jsr:@pup/common@^1.0.0",
     "@std/assert": "jsr:@std/assert@^0.223.0",
     "@std/async": "jsr:@std/async@^0.223.0",
     "@std/encoding": "jsr:@std/encoding@^0.223.0",
     "@std/io": "jsr:@std/io@^0.223.0",
     "@std/path": "jsr:@std/path@^0.223.0",
     "@std/semver": "jsr:@std/semver@^0.223.0",
-    "@std/testing": "jsr:@std/testing@^0.223.0",
     "@std/uuid": "jsr:@std/uuid@^0.223.0",
     "dax-sh": "npm:dax-sh@^0.40.0",
     "filesize": "npm:filesize@^10.1.1",

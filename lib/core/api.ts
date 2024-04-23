@@ -1,92 +1,15 @@
 /**
- * Classes and interfaces related to the programmatic api of Pup
- *
- * This is a DRAFT for api version 1
+ * A common programmatic interface to the pup core exposing selected features while allowing internal changes, to be used by the rest client and similar features.
  *
  * @file      lib/core/api.ts
  * @license   MIT
  */
 
-import type { EventEmitter } from "../common/eventemitter.ts"
+import type { EventEmitter } from "@pup/common/eventemitter"
 import type { LogEventData } from "./logger.ts"
 import type { Pup } from "./pup.ts"
-import type { Configuration, ProcessLoggerConfiguration } from "./configuration.ts"
-import type { ProcessState } from "./process.ts"
-import { TelemetryData } from "../../telemetry.ts"
-
-export interface ApiPaths {
-  temporaryStorage?: string
-  persistentStorage?: string
-  configFilePath?: string
-}
-
-export interface ApiProcessData {
-  status: ApiProcessInformation
-  config: ApiProcessConfiguration
-}
-
-/**
- * These interfaces are basically copies of the ones in pup core,
- * but specific to the api, to make any incompabilities between the
- * api and core apparent.
- */
-interface ApiProcessInformation {
-  id: string
-  status: ProcessState
-  code?: number
-  signal?: string
-  pid?: number
-  started?: Date
-  exited?: Date
-  blocked?: boolean
-  restarts?: number
-  updated: Date
-  pendingRestartReason?: string
-  type: "cluster" | "process" | "worker"
-}
-
-interface ApiClusterConfiguration {
-  instances?: number
-  commonPort?: number
-  startPort?: number
-  strategy?: string
-}
-
-interface ApiProcessConfiguration {
-  id: string
-  cmd?: string
-  worker?: string[]
-  env?: Record<string, string>
-  cwd?: string
-  cluster?: ApiClusterConfiguration
-  pidFile?: string
-  watch?: string[]
-  autostart?: boolean
-  cron?: string
-  timeout?: number
-  overrun?: boolean
-  logger?: ProcessLoggerConfiguration
-  restart?: string
-  restartDelayMs?: number
-  restartLimit?: number
-}
-
-export interface ApiApplicationState {
-  pid: number
-  version: string
-  status: string
-  updated: string
-  started: string
-  memory: Deno.MemoryUsage
-  port: number
-  systemMemory: Deno.SystemMemoryInfo
-  loadAvg: number[]
-  osUptime: number
-  osRelease: string
-  denoVersion: { deno: string; v8: string; typescript: string }
-  type: string
-  processes: ApiProcessInformation[]
-}
+import type { Configuration } from "./configuration.ts"
+import type { ApiApplicationState, ApiPaths, ApiProcessData, ApiTelemetryData } from "@pup/api-definitions"
 
 /**
  * Exposes selected features of pup to Plugins and APIs
@@ -104,6 +27,8 @@ export class PupApi {
       configFilePath: pup.configFilePath,
     }
   }
+
+  // State and configuration
   public getConfiguration(): Configuration {
     return this._pup.configuration
   }
@@ -117,29 +42,48 @@ export class PupApi {
     return statuses
   }
   public applicationState(): ApiApplicationState {
-    return this._pup.status.applicationState(this._pup.allProcesses(), this._pup.port)
+    return this._pup.status.applicationState(this._pup.allProcesses(), this._pup.port) as ApiApplicationState
   }
-  public terminate(forceQuitMs: number) {
+
+  // Global actions
+  public terminate(forceQuitMs: number): boolean {
     this._pup.terminate(forceQuitMs)
+    return true
   }
-  public start(id: string, reason: string) {
-    this._pup.start(id, reason)
+
+  // Process actions
+  // - Amending process "all"
+  public start(id: string, reason: string): boolean {
+    const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
+    const results = processesToStart.map((process) => this._pup.start(process!.status.id, reason))
+    return results.filter((r) => r).length > 0
   }
-  public restart(id: string, reason: string) {
-    this._pup.restart(id, reason)
+  public restart(id: string, reason: string): boolean {
+    const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
+    const results = processesToStart.map((process) => this._pup.restart(process!.status.id, reason))
+    return results.filter((r) => r).length > 0
   }
-  public stop(id: string, reason: string) {
-    this._pup.stop(id, reason)
+  public async stop(id: string, reason: string): Promise<boolean> {
+    const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
+    const results = await Promise.all([processesToStart.map((process) => this._pup.stop(process!.status.id, reason))])
+    return results.filter((r) => r).length > 0
   }
-  public block(id: string, reason: string) {
-    this._pup.block(id, reason)
+  public block(id: string, reason: string): boolean {
+    const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
+    const results = processesToStart.map((process) => this._pup.block(process!.status.id, reason))
+    return results.filter((r) => r).length > 0
   }
-  public unblock(id: string, reason: string) {
-    this._pup.unblock(id, reason)
+  public unblock(id: string, reason: string): boolean {
+    const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
+    const results = processesToStart.map((process) => this._pup.unblock(process!.status.id, reason))
+    return results.filter((r) => r).length > 0
   }
-  public telemetry(data: TelemetryData): boolean {
+
+  // Interface for Pup to receive telemetry data from processes
+  public telemetry(data: ApiTelemetryData): boolean {
     return this._pup.telemetry(data)
   }
+
   public log(severity: "log" | "error" | "info" | "warn", consumer: string, message: string) {
     this._pup.logger[severity](`api-${consumer}`, message)
   }

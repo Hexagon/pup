@@ -6,7 +6,7 @@
     "description": "Universal Process Manager"
   },
   "substitute": {
-    "$PUP_VERSION": "1.0.0-rc.31"
+    "$PUP_VERSION": "1.0.0-rc.32"
   },
   "top_links": [
     {

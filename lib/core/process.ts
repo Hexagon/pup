@@ -10,36 +10,21 @@ import { Runner } from "./runner.ts"
 import { WorkerRunner } from "./worker.ts"
 import type { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
-import type { TelemetryData } from "../../telemetry.ts"
+import type { ApiTelemetryData } from "@pup/api-definitions"
 
 import { Cron } from "@hexagon/croner"
 import { delay } from "@std/async"
 
-/**
- * Represents the state of a process in Pup.
- *
- * NEVER change or delete any existing mapping,
- * just add new ones.
- */
-enum ProcessState {
-  CREATED = 0,
-  STARTING = 100,
-  RUNNING = 200,
-  STOPPING = 250,
-  FINISHED = 300,
-  ERRORED = 400,
-  EXHAUSTED = 450,
-  MIXED = 500, // Used for clusters with instances of varying modes
-}
+import { ApiProcessState } from "@pup/api-definitions"
 
 interface ProcessStateChangedEvent {
-  old?: ProcessState
-  new?: ProcessState
+  old?: ApiProcessState
+  new?: ApiProcessState
   status: ProcessInformation
 }
 
 interface ProcessScheduledEvent {
-  next?: ProcessState
+  next?: ApiProcessState
   status: ProcessInformation
 }
 
@@ -50,7 +35,7 @@ interface ProcessWatchEvent {
 
 interface ProcessInformation {
   id: string
-  status: ProcessState
+  status: ApiProcessState
   code?: number
   signal?: string
   pid?: number
@@ -60,7 +45,7 @@ interface ProcessInformation {
   restarts?: number
   updated: Date
   pendingRestartReason?: string
-  telemetry?: TelemetryData
+  telemetry?: ApiTelemetryData
   type: "cluster" | "process" | "worker"
 }
 
@@ -81,7 +66,7 @@ class Process {
   private cronTerminateJob?: Cron
 
   // Status
-  private status: ProcessState = ProcessState.CREATED
+  private status: ApiProcessState = ApiProcessState.CREATED
   private pid?: number
   private code?: number
   private signal?: string
@@ -90,7 +75,7 @@ class Process {
   private restarts = 0
   private updated: Date = new Date()
   private pendingRestartReason?: string
-  private telemetry?: TelemetryData
+  private telemetry?: ApiTelemetryData
   private watcher?: Watcher
 
   constructor(pup: Pup, config: ProcessConfiguration) {
@@ -98,11 +83,11 @@ class Process {
     this.pup = pup
   }
 
-  public setTelemetry(t: TelemetryData) {
+  public setTelemetry(t: ApiTelemetryData) {
     this.telemetry = t
   }
 
-  private setStatus(s: ProcessState) {
+  private setStatus(s: ApiProcessState) {
     const oldVal = this.status
     this.status = s
     this.updated = new Date()
@@ -176,7 +161,7 @@ class Process {
     }
 
     // Do not start if running and overrun isn't enabled
-    if (this.status === ProcessState.RUNNING && !this.config.overrun) {
+    if (this.status === ApiProcessState.RUNNING && !this.config.overrun) {
       logger.log("blocked", `Process still running, refusing to start`, this.config)
       return
     }
@@ -184,14 +169,14 @@ class Process {
     // Do not restart if maximum number of restarts are exhausted and reason is restart
     if (this.restarts >= (this.config.restartLimit ?? Infinity) && restart) {
       logger.log("exhausted", `Maximum number of starts exhausted, refusing to start`, this.config)
-      this.setStatus(ProcessState.EXHAUSTED)
+      this.setStatus(ApiProcessState.EXHAUSTED)
       return
     }
 
     logger.log("starting", `Process starting, reason: ${reason}`, this.config)
 
     // Update status
-    this.setStatus(ProcessState.STARTING)
+    this.setStatus(ApiProcessState.STARTING)
     this.pid = undefined
     this.code = undefined
     this.signal = undefined
@@ -221,7 +206,7 @@ class Process {
       this.pendingRestartReason = undefined
       const result = await this.runner.run((pid?: number) => {
         // Process started
-        this.setStatus(ProcessState.RUNNING)
+        this.setStatus(ApiProcessState.RUNNING)
         this.pid = pid
         this.started = new Date()
       })
@@ -233,14 +218,14 @@ class Process {
        * Exited - Update status
        */
       if (result.code === 0) {
-        this.setStatus(ProcessState.FINISHED)
+        this.setStatus(ApiProcessState.FINISHED)
         logger.log("finished", `Process finished with code ${result.code}`, this.config)
 
         /**
          * Forcefully stopped
          */
       } else if (result.code === 124) {
-        this.setStatus(ProcessState.FINISHED)
+        this.setStatus(ApiProcessState.FINISHED)
         logger.log("finished", `Process manually stopped with code ${result.code}`, this.config)
 
         /**
@@ -249,13 +234,13 @@ class Process {
          * Treat all exit codes except 0 as errors
          */
       } else {
-        this.setStatus(ProcessState.ERRORED)
+        this.setStatus(ApiProcessState.ERRORED)
         logger.log("errored", `Process exited with code ${result.code}`, this.config)
       }
     } catch (e) {
       this.code = 1
       this.signal = undefined
-      this.setStatus(ProcessState.ERRORED)
+      this.setStatus(ApiProcessState.ERRORED)
       logger.log("errored", `Process exited with error: ${e}`, this.config)
     }
 
@@ -279,7 +264,7 @@ class Process {
       return false
     }
 
-    this.setStatus(ProcessState.STOPPING)
+    this.setStatus(ApiProcessState.STOPPING)
     const abortTimers = new AbortController()
 
     // Stop process after `terminateGracePeriod`
@@ -313,7 +298,7 @@ class Process {
       // Using `any` because event payload is not typed yet
       // deno-lint-ignore no-explicit-any
       const onFinish = (ev: any) => {
-        if (ev.status?.pid == this.getStatus().pid && [ProcessState.FINISHED, ProcessState.EXHAUSTED, ProcessState.ERRORED].includes(this.status)) {
+        if (ev.status?.pid == this.getStatus().pid && [ApiProcessState.FINISHED, ApiProcessState.EXHAUSTED, ApiProcessState.ERRORED].includes(this.status)) {
           abortTimers.abort()
           this.pup.events.off("process_status_changed", onFinish)
           // ToDo, resolve to whatever `killRunner()` returns, which is currently unavailable inside the `process_status_changed` event, so it's fixed to `true` by now
@@ -336,7 +321,7 @@ class Process {
     if (this.runner) {
       this.runner.kill(signal)
       this.pup.logger.log("stop", `Process stopped, reason: ${reason}`, this.config)
-      this.setStatus(ProcessState.STOPPING)
+      this.setStatus(ApiProcessState.STOPPING)
       this.restarts = 0
       return true
     }
@@ -447,5 +432,5 @@ class Process {
   public cleanup = () => {}
 }
 
-export { Process, ProcessState }
+export { ApiProcessState, Process }
 export type { ProcessInformation, ProcessScheduledEvent, ProcessStateChangedEvent, ProcessWatchEvent }

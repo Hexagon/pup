@@ -1,3 +1,9 @@
+/**
+ * Guidelines:
+ * - All routes should be wrapped in try/catch
+ * - All communication with Pup should go through the programmatic api (PupApi)
+ */
+
 import { Application, Context, Router, Status } from "@oak/oak"
 import { PupApi } from "./api.ts"
 import { Pup } from "./pup.ts"
@@ -6,6 +12,11 @@ import { DEFAULT_REST_API_HOSTNAME, DEFAULT_SECRET_KEY_ALGORITHM } from "./confi
 import { ValidateToken } from "../common/token.ts"
 
 const ALLOWED_SEVERITIES = ["log", "info", "warn", "error"]
+
+export interface ApiResponseBody {
+  error?: string
+  data?: unknown
+}
 
 function isAllowedSeverity(severity: string): boolean {
   return ALLOWED_SEVERITIES.includes(severity.toLowerCase())
@@ -17,13 +28,13 @@ const generateAuthMiddleware = (key: CryptoKey, revoked?: string[]) => {
     const authorization = headers.get("Authorization")
     if (!authorization) {
       ctx.response.status = Status.Unauthorized
-      ctx.response.body = { message: "Authorization header required" }
+      ctx.response.body = { error: "Authorization header required" }
       return
     }
     const parts = authorization.split(" ")
     if (parts.length !== 2 || parts[0] !== "Bearer") {
       ctx.response.status = Status.Unauthorized
-      ctx.response.body = { message: "Invalid authorization format" }
+      ctx.response.body = { error: "Invalid authorization format" }
       return
     }
     const token = parts[1]
@@ -33,21 +44,21 @@ const generateAuthMiddleware = (key: CryptoKey, revoked?: string[]) => {
         if (payload.data?.consumer) {
           if (revoked && revoked.find((r) => r.toLowerCase().trim() === payload.data?.consumer.toLowerCase().trim())) {
             ctx.response.status = Status.Unauthorized
-            ctx.response.body = { message: "Invalid token" }
+            ctx.response.body = { error: "Invalid token" }
           } else {
             await next()
           }
         } else {
           ctx.response.status = Status.Unauthorized
-          ctx.response.body = { message: "Invalid token" }
+          ctx.response.body = { error: "Invalid token" }
         }
       } else {
         ctx.response.status = Status.Unauthorized
-        ctx.response.body = { message: "Invalid/expired token" }
+        ctx.response.body = { error: "Invalid/expired token" }
       }
     } catch (_err) {
       ctx.response.status = Status.Unauthorized
-      ctx.response.body = { message: "Invalid token" }
+      ctx.response.body = { error: "Invalid token" }
     }
   }
 }
@@ -91,9 +102,6 @@ export class RestApi {
         ws.send(JSON.stringify({ t: "log", d: d }))
       }
       this.pupApi.events.on("log", proxyFn)
-      /*ws.onopen = () => {
-        ws.send("Hello from server!")
-      }*/
       ws.onmessage = (m) => {
         ws.send(m.data as string)
       }
@@ -105,25 +113,51 @@ export class RestApi {
     // Process related routes
     this.router
       .get("/processes", (ctx) => {
-        ctx.response.body = this.pupApi.allProcessStates()
-      })
-      .get("/state", (ctx) => {
-        ctx.response.body = this.pupApi.applicationState()
-      })
-      .post("/processes/:id/start", (ctx) => {
-        const id = ctx.params.id
         try {
-          this.pupApi.start(id, "REST API request")
+          ctx.response.body = {
+            data: this.pupApi.allProcessStates(),
+          }
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
           ctx.response.body = { error: err.message }
         }
       })
-      .post("/processes/:id/stop", (ctx) => {
+      .get("/state", (ctx) => {
+        try {
+          ctx.response.body = {
+            data: this.pupApi.applicationState(),
+          }
+          ctx.response.status = Status.OK
+        } catch (err) {
+          ctx.response.status = Status.InternalServerError
+          ctx.response.body = { error: err.message }
+        }
+      })
+      .post("/processes/:id/start", (ctx) => {
         const id = ctx.params.id
         try {
-          this.pupApi.stop(id, "REST API request")
+          if (this.pupApi.start(id, "REST API request")) {
+            ctx.response.status = Status.OK
+          } else {
+            ctx.response.status = Status.InternalServerError
+            ctx.response.body = { error: "Action could not be carried out, check the arguments." }
+          }
+          ctx.response.status = Status.OK
+        } catch (err) {
+          ctx.response.status = Status.InternalServerError
+          ctx.response.body = { error: err.message }
+        }
+      })
+      .post("/processes/:id/stop", async (ctx) => {
+        const id = ctx.params.id
+        try {
+          if (await this.pupApi.stop(id, "REST API request")) {
+            ctx.response.status = Status.OK
+          } else {
+            ctx.response.status = Status.InternalServerError
+            ctx.response.body = { error: "Action could not be carried out, check the arguments." }
+          }
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
@@ -133,7 +167,12 @@ export class RestApi {
       .post("/processes/:id/restart", (ctx) => {
         const id = ctx.params.id
         try {
-          this.pupApi.restart(id, "REST API request")
+          if (this.pupApi.restart(id, "REST API request")) {
+            ctx.response.status = Status.OK
+          } else {
+            ctx.response.status = Status.InternalServerError
+            ctx.response.body = { error: "Action could not be carried out, check the arguments." }
+          }
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
@@ -143,7 +182,12 @@ export class RestApi {
       .post("/processes/:id/block", (ctx) => {
         const id = ctx.params.id
         try {
-          this.pupApi.block(id, "REST API request")
+          if (this.pupApi.block(id, "REST API request")) {
+            ctx.response.status = Status.OK
+          } else {
+            ctx.response.status = Status.InternalServerError
+            ctx.response.body = { error: "Action could not be carried out, check the arguments." }
+          }
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
@@ -153,7 +197,12 @@ export class RestApi {
       .post("/processes/:id/unblock", (ctx) => {
         const id = ctx.params.id
         try {
-          this.pupApi.unblock(id, "REST API request")
+          if (this.pupApi.unblock(id, "REST API request")) {
+            ctx.response.status = Status.OK
+          } else {
+            ctx.response.status = Status.InternalServerError
+            ctx.response.body = { error: "Action could not be carried out, check the arguments." }
+          }
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
@@ -178,15 +227,13 @@ export class RestApi {
         }
       })
       .post("/terminate", (ctx) => {
-        // Add logic to read forceQuitMs from the request body if needed
-        const forceQuitMs = 3000 // Example value
         try {
+          this.pupApi.terminate(30000)
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
           ctx.response.body = { error: err.message }
         }
-        this.pupApi.terminate(forceQuitMs)
       })
       .post("/log", async (ctx) => {
         try {
@@ -264,7 +311,7 @@ export class RestApi {
             logContents = logContents.filter((log) => log.severity.toLowerCase() === severityLower)
           }
 
-          context.response.body = logContents
+          context.response.body = { data: logContents }
         } catch (error) {
           context.response.status = 500
           context.response.body = { error: "Internal Server Error", message: error.message }
@@ -273,14 +320,13 @@ export class RestApi {
   }
 
   public async start(): Promise<number> {
-    const port = this.port
     this.app.use(generateAuthMiddleware(await this.setupKey(), this.pupApi.getConfiguration().api?.revoked))
     this.app.use(this.router.routes())
     this.app.use(this.router.allowedMethods())
-    this.pupApi.log("info", "rest", `Starting the Rest API on ${this.hostname}:${this.port}`)
-    await this.app.listen({ port, hostname: this.hostname, signal: this.appAbortController.signal })
-    this.pupApi.log("info", "rest", `Rest API listening on port ${this.port}`)
-    return port
+    this.pupApi.log("info", "rest", `Starting the Rest API`)
+    await this.app.listen({ port: this.port, hostname: this.hostname, signal: this.appAbortController.signal })
+    this.pupApi.log("info", "rest", `Rest API running, available on ${this.hostname}:${this.port}`)
+    return this.port
   }
 
   public terminate() {

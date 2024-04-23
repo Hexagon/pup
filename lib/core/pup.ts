@@ -16,16 +16,17 @@ import {
   WATCHDOG_INTERVAL_MS,
 } from "./configuration.ts"
 import { Logger } from "./logger.ts"
-import { Process, ProcessState } from "./process.ts"
+import { Process } from "./process.ts"
+import { ApiProcessState } from "@pup/api-definitions"
 import { Status } from "./status.ts"
 import { Cluster } from "./cluster.ts"
 import { RestApi } from "./rest.ts"
-import { EventEmitter } from "../common/eventemitter.ts"
-import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
+import { EventEmitter } from "@pup/common/eventemitter"
+import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "@pup/common/path"
 import { Prop } from "../common/prop.ts"
-import { TelemetryData } from "../../telemetry.ts"
+import type { ApiTelemetryData } from "@pup/api-definitions"
 import { rm } from "@cross/fs"
-import { findFreePort } from "../common/port.ts"
+import { findFreePort } from "./port.ts"
 
 interface InstructionResponse {
   success: boolean
@@ -186,7 +187,7 @@ class Pup {
    *
    * @private
    */
-  public telemetry(data: TelemetryData): boolean {
+  public telemetry(data: ApiTelemetryData): boolean {
     let success = false
     if (data.sender && typeof data.sender === "string") {
       const cleanedId = data.sender.trim().toLocaleLowerCase()
@@ -216,17 +217,17 @@ class Pup {
         const config = process.getConfig()
 
         // Handle initial starts
-        if (config.autostart && status.status === ProcessState.CREATED) {
+        if (config.autostart && status.status === ApiProcessState.CREATED) {
           process.start("autostart")
         }
 
         // Handle pending restart
-        if (status.status !== ProcessState.STOPPING && process.isPendingRestart()) {
+        if (status.status !== ApiProcessState.STOPPING && process.isPendingRestart()) {
           process.start(process["pendingRestartReason"])
         }
 
         // Handle restarts
-        if (status.status === ProcessState.FINISHED || status.status === ProcessState.ERRORED) {
+        if (status.status === ApiProcessState.FINISHED || status.status === ApiProcessState.ERRORED) {
           const msSinceExited = status.exited ? (new Date().getTime() - status.exited?.getTime()) : Infinity
 
           // Default restart delay to 10000ms, except when watching
@@ -240,10 +241,10 @@ class Pup {
             if (restartPolicy === "always") {
               process.start("restart", true)
 
-              /* Restart on error if ProcessState is ERRORED */
+              /* Restart on error if ApiProcessState is ERRORED */
             } else if (
               restartPolicy === "error" &&
-              status.status === ProcessState.ERRORED
+              status.status === ApiProcessState.ERRORED
             ) {
               process.start("restart", true)
             }
@@ -251,7 +252,7 @@ class Pup {
         }
 
         // Handle timeouts
-        if (status.status === ProcessState.RUNNING && config.timeout && status.started) {
+        if (status.status === ApiProcessState.RUNNING && config.timeout && status.started) {
           const secondsSinceStart = (new Date().getTime() - status.started.getTime()) / 1000
           if (secondsSinceStart > config.timeout) {
             process.stop("timeout")
@@ -291,7 +292,7 @@ class Pup {
     const secret = await this.secret?.load()
     if (!secret) return
 
-    const port = await this.port?.loadOrGenerate(async () => {
+    const port = await this.port?.generate(async () => {
       const resultingPort = this.configuration.api?.port || await findFreePort()
       return resultingPort.toString()
     })

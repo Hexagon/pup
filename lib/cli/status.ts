@@ -6,7 +6,8 @@
  * @license   MIT
  */
 
-import { type ProcessInformation, ProcessState } from "../core/process.ts"
+import { type ProcessInformation } from "../core/process.ts"
+import { ApiProcessState } from "@pup/api-definitions"
 import { type Column, Columns, type Row } from "./columns.ts"
 import { Colors } from "@cross/utils"
 import { filesize } from "filesize"
@@ -14,7 +15,7 @@ import { blockedFormatter, codeFormatter, naFormatter, statusFormatter } from ".
 import { timeagoFormatter } from "./formatters/times.ts"
 import { Configuration, DEFAULT_REST_API_HOSTNAME } from "../core/configuration.ts"
 import { resolve } from "@std/path"
-import { ApiApplicationState } from "../core/api.ts"
+import { ApiApplicationState } from "@pup/api-definitions"
 
 /**
  * Helper which print the status of all running processes,
@@ -53,7 +54,7 @@ export function printStatus(configFile: string, configuration: Configuration, cw
     taskTable.push({
       Id: " " + currentTask.id,
       Type: currentTask.type.slice(0, 4) || "N/A",
-      Status: ProcessState[currentTask.status] || "N/A",
+      Status: ApiProcessState[currentTask.status] || "N/A",
       Blocked: currentTask.blocked ? "Yes" : "No",
       Started: timeagoFormatter(currentTask.started ? currentTask.started : "N/A"),
       Exited: timeagoFormatter(currentTask.exited ? currentTask.exited : "N/A"),

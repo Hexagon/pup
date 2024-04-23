@@ -5,7 +5,7 @@
  */
 
 import type { Configuration } from "../../lib/core/configuration.ts"
-import { ProcessState } from "../../lib/core/process.ts"
+import { ApiProcessState } from "@pup/api-definitions"
 import { Pup } from "../../lib/core/pup.ts"
 import { assertEquals, assertNotEquals } from "@std/assert"
 import { test } from "@cross/test"
@@ -28,17 +28,17 @@ test("Create test process. Test start, block, stop, start, unblock, start in seq
   // Find process, assert existance
   const testProcess = pup.processes.findLast((p) => p.getConfig().id === TEST_PROCESS_ID)
   assertNotEquals(testProcess, undefined)
-  assertEquals(testProcess?.getStatus().status, ProcessState.CREATED)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.CREATED)
 
   // Start process, assert started
   const startResult = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.STARTING)
 
   // Stop process, assert stopped
   const stopResult = await pup.stop(TEST_PROCESS_ID, "test")
   assertEquals(stopResult, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.ERRORED)
 
   // Block process, assert blocked
   const blockResult = pup.block(TEST_PROCESS_ID, "test")
@@ -48,7 +48,7 @@ test("Create test process. Test start, block, stop, start, unblock, start in seq
   // Start process, assert failed
   const startResult2 = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult2, false)
-  assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.ERRORED)
 
   // Unblock process, assert unblocked
   const unblockResult = pup.unblock(TEST_PROCESS_ID, "test")
@@ -58,7 +58,7 @@ test("Create test process. Test start, block, stop, start, unblock, start in seq
   // Start process, assert started
   const startResult3 = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult3, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.STARTING)
 
   // Terminate pup instantly
   await pup.terminate(0)
@@ -85,17 +85,17 @@ test("Create test cluster. Test start, block, stop, start, unblock, start in seq
   // Find process, assert existance
   const testProcess = pup.processes.findLast((p) => p.getConfig().id === TEST_PROCESS_ID)
   assertNotEquals(testProcess, undefined)
-  assertEquals(testProcess?.getStatus().status, ProcessState.CREATED)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.CREATED)
 
   // Start process, assert started
   const startResult = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.STARTING)
 
   // Stop process, assert finished
   const stopResult = await pup.stop(TEST_PROCESS_ID, "test")
   assertEquals(stopResult, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.ERRORED)
 
   // Block process, assert blocked
   const blockResult = pup.block(TEST_PROCESS_ID, "test")
@@ -105,7 +105,7 @@ test("Create test cluster. Test start, block, stop, start, unblock, start in seq
   // Start process, assert failed
   const startResult2 = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult2, false)
-  assertEquals(testProcess?.getStatus().status, ProcessState.ERRORED)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.ERRORED)
 
   // Unblock process, assert unblocked
   const unblockResult = pup.unblock(TEST_PROCESS_ID, "test")
@@ -115,7 +115,7 @@ test("Create test cluster. Test start, block, stop, start, unblock, start in seq
   // Start process, assert started
   const startResult3 = pup.start(TEST_PROCESS_ID, "test")
   assertEquals(startResult3, true)
-  assertEquals(testProcess?.getStatus().status, ProcessState.STARTING)
+  assertEquals(testProcess?.getStatus().status, ApiProcessState.STARTING)
 
   // Terminate pup instantly
   await pup.terminate(0)

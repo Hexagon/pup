@@ -8,7 +8,9 @@
 import { Application } from "../../application.meta.ts"
 import type { Cluster } from "./cluster.ts"
 import { APPLICATION_STATE_WRITE_LIMIT_MS } from "./configuration.ts"
-import { type Process, type ProcessInformation, ProcessState } from "./process.ts"
+import { type Process, type ProcessInformation } from "./process.ts"
+import { ApiProcessState } from "@pup/api-definitions"
+
 import { Prop } from "../common/prop.ts"
 
 const started = new Date()
@@ -141,7 +143,7 @@ class Status {
     return {
       pid: Deno.pid,
       version: Application.version,
-      status: ProcessState[ProcessState.RUNNING],
+      status: ApiProcessState[ApiProcessState.RUNNING],
       updated: new Date().toISOString(),
       started: started.toISOString(),
       memory: Deno.memoryUsage(),

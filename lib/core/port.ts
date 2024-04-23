@@ -30,12 +30,17 @@ interface FindFreePortOptions {
 // deno-lint-ignore require-await
 async function isPortAvailable(port: number) {
   return new Promise((resolve) => {
-    const server = createServer()
-    server.on("error", () => resolve(false))
-    server.listen(port, () => {
-      server.close()
-      resolve(true)
-    })
+    try {
+      const server = createServer()
+      server.on("error", () => resolve(false))
+      server.listen(port, () => {
+        server.close()
+        // Allow some time before returning that the port is free
+        setTimeout(() => resolve(true), 10)
+      })
+    } catch (_e) {
+      resolve(false)
+    }
   })
 }
 

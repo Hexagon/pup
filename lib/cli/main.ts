@@ -17,7 +17,7 @@ import { printStatus } from "./status.ts"
 import { upgrade } from "./upgrade.ts"
 
 // Import common utilities
-import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "../common/utils.ts"
+import { toPersistentPath, toResolvedAbsolutePath, toTempPath } from "@pup/common/path"
 import { exists, readFile } from "@cross/fs"
 
 // Import external dependencies
@@ -31,8 +31,7 @@ import { installService, uninstallService } from "@cross/service"
 import { Colors, exit } from "@cross/utils"
 import { chdir, cwd } from "@cross/fs"
 import { GenerateToken } from "../common/token.ts"
-import { RestClient } from "../common/restclient.ts"
-import { ApiApplicationState } from "../core/api.ts"
+import { PupRestClient } from "@pup/api-client"
 import { CurrentRuntime, Runtime } from "@cross/runtime"
 import { Prop } from "../common/prop.ts"
 import { encodeBase64 } from "@std/encoding/base64"
@@ -223,7 +222,7 @@ async function main() {
 
       // Send api request
       const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${port}`
-      client = new RestClient(apiBaseUrl, token!)
+      client = new PupRestClient(apiBaseUrl, token!)
     } catch (_e) {
       /* Ignore */
     }
@@ -475,17 +474,19 @@ async function main() {
       console.error("Can not print status, could not create api client.")
       return exit(1)
     }
-    const responseState = await client.get("/state")
-    if (responseState.ok) {
-      const dataState: ApiApplicationState = await responseState.json()
-      console.log("")
-      printHeader()
-      await printStatus(configFile!, configuration!, cwd(), dataState)
-      exit(0)
-      console.log("Action completed successfully")
-      exit(0)
-    } else {
-      console.error("Action failed: Invalid response received.")
+    try {
+      const responseState = await client.getState()
+      if (responseState.data) {
+        console.log("")
+        printHeader()
+        printStatus(configFile!, configuration!, cwd(), responseState.data)
+        exit(0)
+      } else {
+        console.error("Action failed: Invalid response received.")
+        exit(1)
+      }
+    } catch (_e) {
+      console.error("Action failed: Could not contact the Pup instance.")
       exit(1)
     }
   }
@@ -499,17 +500,45 @@ async function main() {
       exit(1)
     }
     if (baseArgument === op) {
-      let url = `/${op.toLowerCase().trim()}`
-      if (secondaryBaseArgument) {
-        url = `/processes/${secondaryBaseArgument.toLocaleLowerCase().trim()}${url}`
-      }
-      const result = await client!.post(url, undefined)
-      if (result.ok) {
-        console.log("Action completed successfully")
-        exit(0)
-      } else {
-        console.error("Action failed: Invalid response received.")
-        exit(1)
+      try {
+        let responseState // Declare responseState in the outer try/catch scope
+        switch (op) { // Use 'switch' instead of 'switch case'
+          case "restart":
+            if (secondaryBaseArgument) responseState = await client?.restartProcess(secondaryBaseArgument.toLocaleLowerCase().trim())
+            break
+          case "start":
+            // Implement the call to client?.startProcess(...)
+            if (secondaryBaseArgument) responseState = await client?.startProcess(secondaryBaseArgument.toLocaleLowerCase().trim())
+            break
+          case "stop":
+            // Implement the call to client?.stopProcess(...)
+            if (secondaryBaseArgument) responseState = await client?.stopProcess(secondaryBaseArgument.toLocaleLowerCase().trim())
+            break
+          case "block":
+            // Implement the call to client?.blockProcess(...)
+            if (secondaryBaseArgument) responseState = await client?.blockProcess(secondaryBaseArgument.toLocaleLowerCase().trim())
+            break
+          case "unblock":
+            // Implement the call to client?.unblockProcess(...)
+            if (secondaryBaseArgument) responseState = await client?.unblockProcess(secondaryBaseArgument.toLocaleLowerCase().trim())
+            break
+          case "terminate":
+            responseState = await client?.terminate()
+            break
+          default:
+            console.error(`Invalid operation: ${op}`)
+            return exit(1)
+        }
+        if (!responseState?.error) {
+          console.error("Success")
+          return exit(0)
+        } else {
+          console.error(`Error: ${responseState.error}`)
+          return exit(1)
+        }
+      } catch (e) {
+        console.error("Action failed:", e)
+        return exit(1)
       }
     }
   }
@@ -522,8 +551,8 @@ async function main() {
      * Error handling: Pup already running
      */
     try {
-      const response = await client?.get("/state")
-      if (response?.ok) {
+      const response = await client?.getState()
+      if (response) {
         console.warn(`Pup already running. Exiting.`)
         exit(1)
       }

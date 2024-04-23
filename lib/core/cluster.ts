@@ -7,7 +7,8 @@
  * @license   MIT
  */
 
-import { Process, type ProcessInformation, ProcessState } from "./process.ts"
+import { Process, type ProcessInformation } from "./process.ts"
+import { ApiProcessState } from "@pup/api-definitions"
 import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S, type ProcessConfiguration } from "./configuration.ts"
 import type { Pup } from "./pup.ts"
 import { BalancingStrategy, type LoadBalancerStartOperation } from "./loadbalancer.ts"
@@ -143,7 +144,7 @@ class Cluster extends Process {
   public getStatus(): ProcessInformation {
     const clusterStatus: ProcessInformation = {
       id: this.getConfig().id,
-      status: ProcessState.CREATED,
+      status: ApiProcessState.CREATED,
       blocked: false,
       updated: new Date(),
       type: "cluster",
@@ -160,7 +161,7 @@ class Cluster extends Process {
       clusterStatus.status = Array.from(uniqueStatuses)[0]
     } else {
       // Instances have varying statuses
-      clusterStatus.status = ProcessState.MIXED
+      clusterStatus.status = ApiProcessState.MIXED
     }
 
     // Set blocked flag if all children are blocked
