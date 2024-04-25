@@ -9,6 +9,14 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.35] - 2024-04-26
+
+## Added
+
+- fix(api): Make sure websocket is open before sending
+- add(status): Add Restarts to `pup status`
+- chore(docs): Update developer guide for writing plugins
+
 ## [1.0.0-rc.34] - 2024-04-25
 
 ## Added

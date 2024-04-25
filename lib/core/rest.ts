@@ -13,7 +13,18 @@ import { ValidateToken } from "../common/token.ts"
 import { EventHandler } from "@pup/common/eventemitter"
 
 const ALLOWED_SEVERITIES = ["log", "info", "warn", "error"]
-
+const EVENTS_TO_PROPAGATE = [
+  "log",
+  "process_status_changed",
+  "process_scheduled",
+  "process_scheduled_terminate",
+  "process_watch",
+  "init",
+  "process_telemetry",
+  "watchdog",
+  "application_state",
+  "terminating",
+]
 export interface ApiResponseBody {
   error?: string
   data?: unknown
@@ -95,37 +106,43 @@ export class RestApi {
     this.router.get("/wss", (ctx) => {
       // Upgrade
       if (!ctx.isUpgradable) {
-        ctx.throw(501)
+        return ctx.throw(501)
       }
-      const ws = ctx.upgrade()
-      if (!ctx.isUpgradable) {
-        ctx.throw(501)
-      }
-
-      /*
-      Handle incoming message
-      ws.onmessage = (m) => {
-        ws.send(m.data as string)
-      }
-      */
-
-      // Expose events to the API Consumer
-      const fnsToProxy = ["log", "process_status_changed"]
-      const proxyFns: Record<string, string | EventHandler<unknown>>[] = []
-      const proxyFnFactory = (evtName: string) => {
-        const proxyFn = (d: unknown) => {
-          ws.send(JSON.stringify({ t: evtName, d: d }))
+      try {
+        const ws = ctx.upgrade()
+        if (!ctx.isUpgradable) {
+          return ctx.throw(501)
         }
-        proxyFns.push({ evtName, proxyFn })
-        return proxyFn
-      }
-      for (const evtName of fnsToProxy) {
-        this.pupApi.events.on(evtName, proxyFnFactory(evtName))
-      }
-      ws.onclose = () => {
-        for (const evt of proxyFns) {
-          this.pupApi.events.off(evt.evtName as string, evt.proxyFn as EventHandler<unknown>)
+
+        // Handle incoming message, but y tho?
+        /*ws.onmessage = (m) => {
+          this.pupApi.events.on(evtName, proxyFnFactory(evtName))
+          ws.send(m.data as string)
+        }*/
+
+        // Expose events to the API Consumer
+        const proxyFns: Record<string, string | EventHandler<unknown>>[] = []
+        const proxyFnFactory = (evtName: string) => {
+          const proxyFn = (d: unknown) => {
+            if (ws.readyState === WebSocket.OPEN) {
+              try {
+                ws.send(JSON.stringify({ t: evtName, d: d }))
+              } catch (_e) { /* Silently ignore errors */ }
+            }
+          }
+          proxyFns.push({ evtName, proxyFn })
+          return proxyFn
         }
+        for (const evtName of EVENTS_TO_PROPAGATE) {
+          this.pupApi.events.on(evtName, proxyFnFactory(evtName))
+        }
+        ws.onclose = () => {
+          for (const evt of proxyFns) {
+            this.pupApi.events.off(evt.evtName as string, evt.proxyFn as EventHandler<unknown>)
+          }
+        }
+      } catch (_e) {
+        return ctx.throw(500)
       }
     })
 
@@ -259,12 +276,13 @@ export class RestApi {
           // Read severity, plugin, and message from request body
           const parsedBody = await ctx.request.body.json()
           if (!parsedBody) {
+            console.log("l1")
             ctx.response.status = Status.BadRequest
             ctx.response.body = { error: "Log data is required." }
             return
           }
 
-          if (!parsedBody.severity || !parsedBody.consumer || !parsedBody.message) {
+          if (!parsedBody.severity || !parsedBody.plugin || !parsedBody.message) {
             ctx.response.status = Status.BadRequest
             ctx.response.body = { error: "Missing severity, plugin, or message." }
             return

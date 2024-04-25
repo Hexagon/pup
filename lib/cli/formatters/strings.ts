@@ -39,3 +39,12 @@ export const blockedFormatter = (s: string) => {
     return naFormatter(s)
   }
 }
+export const restartsFormatter = (s: string): string => {
+  if (s.trim() === "N/A") {
+    return s
+  } else if (s.trim() === "0") {
+    return Colors.green(s)
+  } else {
+    return Colors.yellow(s)
+  }
+}

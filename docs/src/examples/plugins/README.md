@@ -6,41 +6,61 @@ nav_order: 2
 
 # Plugin development
 
-**Note! This is outdated, need to be updated asap.** Refer to <https://github.com/hexagon/pup-plugin> for up-to-date info.
-
 ---
 
 ### Getting started
 
-To create a custom plugin, developers should extend the `PluginImplementation` class and override its methods as necessary. This class is the main entry point for plugins to interact with Pup and
-provides various hooks and events to listen for.
+To create a custom plugin, developers should extend the `PluginImplementation` class from `@pup/plugin` and override its methods as necessary. This class is the main entry point for plugins.
+
+The plugin then communicates with Pup using `PupRestClient` from `@pup/api-client`. The url and credentials are passed to the plugin constructor.
 
 ```typescript
-import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation, PluginMetadata } from "jsr:@pup/pup@PUP_$VERSION/mod.ts"
+import { PupRestClient } from "jsr:@pup/api-client"
+import { type PluginConfiguration, PluginImplementation } from "jsr:@pup/plugin"
 
+// Set up the expected configuration
+interface Configuration {
+  threshold: string
+}
+
+// The main entrypoint of a Plugin is an exported class named PupPlugin
+// which should always extend PluginImplementation
 export class PupPlugin extends PluginImplementation {
-  constructor(pup: PluginApi, config: PluginConfiguration) {
-    super(pup, config)
-    this.meta = {
-      name: "MinimalPlugin",
-      version: "1.0.0",
-      api: "1",
-      repository: "https://github.com/hexagon/pup",
-    }
+  public meta = {
+    name: "ExamplePlugin",
+    version: "1.0.0",
+    api: "1.0.0",
+    repository: "https://github.com/user/my-repo",
+  }
+
+  private config: Configuration
+  private client: PupRestClient
+
+  constructor(
+    config: PluginConfiguration,
+    apiUrl: string,
+    apiToken: string,
+  ) {
+    super(config, apiUrl, apiToken)
+
+    this.config = config.options as Configuration
+
+    // Set up the rest client
+    // - api url and a token is supplied by Pup
+    this.client = new PupRestClient(
+      `http://${apiUrl}`,
+      apiToken,
+      true,
+    )
   }
 }
 ```
 
-Now, to communicate with pup, there are three concepts
-
-## Hooks
-
-Hooks are a way for plugins to intercept and modify the behavior of Pup. To use a hook, a plugin must implement the hook method and handle the relevant signals. Currently, only the `log` hook is
-supported.
+Now, to communicate with pup, there are two concepts
 
 ## Events
 
-Events allow plugins to listen for specific occurrences within Pup. Plugins can subscribe to events using the events property of the PluginApi class.
+Events allow plugins to listen for specific occurrences within Pup. Plugins can subscribe to events using the `.on` method of the Rest client
 
 The following events are available:
 
@@ -53,80 +73,63 @@ The following events are available:
 - **terminating:** Fired when Pup is terminating.
 - **ipc:** Fired when an IPC message is received.
 
-## PluginApi
+```ts
+// Listen for log messages from the API
+this.client.on("application_state", (pupState: unknown) => {
+  const tPupState = pupState as ApiApplicationState
+})
+```
 
-The PluginApi class is the main API for interacting with Pup from a plugin. It exposes methods for managing processes and listening to events, the class also exposes some paths that may be useful for
-plugins:
+## Rest Endpoints
 
-To use the PluginApi, access it through the pup parameter in your custom plugin's constructor:
+The Rest client exposes methods for managing processes.
+
+To use the Rest endponts, access it through client instance:
 
 ```ts
-class PupPlugin extends PluginImplementation {
-  constructor(pup: PluginApi, config: PluginConfiguration) {
-    // Use the pup PluginApi instance to interact with pup
-
-    // - Start, stop, restart, block, and unblock processes:
-    pup.start(id, reason)
-    pup.stop(id, reason)
-    pup.restart(id, reason)
-    pup.block(id, reason)
-    pup.unblock(id, reason)
-
-    // - Terminate Pup:
-    pup.terminate(forceQuitMs)
-
-    // - Get the status of all processes:
-    const ProcessStatees = pup.allProcessStatees()
-
-    // Listen to events using the pup.events property:
-    pup.events.on("process_status_changed", (eventData) => {
-      console.log("Process status changed:", eventData)
-    })
-
-    // Extract usable paths:
-    // - A path to temporary storage that can be used by the plugin.
-    const tempStoragePath = pup.paths.temporaryStorage
-    // - A path to persistent storage that can be used by the plugin to store data across Pup restarts.
-    const persistentStoragePath = pup.paths.persistentStorage //
-    // - The full path to Pup's current configuration file (usually pup.json).
-    const configFilePath = pup.paths.configFilePath
-  }
-}
+try {
+  await this.client.sendLog(
+    severity,
+    "example-plugin",
+    message,
+  )
+} catch (_e) { /* Could not send log */ }
 ```
 
-## Custom logger plugin
+Always wrap requests in try/catch, we do not want any unhandled errors in a Plugin.
 
-To sum it up, and create a custom plugin that intercepts the logger through hooks, you need to extend the `PluginImplementation` class and override the `hook` method to handle the `log` signal. In
-this example, the plugin will print all available log data when the log signal is received.
+### All endpoints
 
-```typescript
-import { LogEvent, PluginApi, PluginConfiguration, PluginImplementation } from "jsr:@pup/pup@PUP_$VERSION/mod.ts"
+1. **`/processes`:**
+   - **Purpose:** List configured processes and their statues.
 
-export class PupPlugin extends PluginImplementation {
-  constructor(pup: PluginApi, config: PluginConfiguration) {
-    super(pup, config)
-    this.meta = {
-      name: "LoggerInterceptorPlugin",
-      version: "1.0.0",
-      api: "1",
-      repository: "https://github.com/hexagon/pup",
-    }
-  }
+2. **Process action Endpoints (`/processes/:id/start`, etc.):**
+   - **Purpose:** Provide an interface for managing Pup processes.
+   - **Actions:**
+     - Retrieve process status (`/processes`) and application state (`/state`).
+     - Start, stop, restart, block, and unblock processes (`/processes/:id/...`).
 
-  public hook(signal: string, parameters: unknown): boolean {
-    if (signal === "log") {
-      this.handleLog(parameters as LogEvent)
-      // Block further processing by other log plugins, or built in logger
-      return true
-    }
-    return false
-  }
+3. **`/terminate`:**
+   - **Purpose:** Initiates a graceful termination of the Pup application.
 
-  private handleLog(p: LogEvent) {
-    console.log(p.severity, p.category, p.text)
-  }
-}
-```
+4. **`/log`:**
+   - **Purpose:** Allows sending log messages to Pup.
+   - **Behavior:**
+     - Extracts severity, plugin, and message from the request body.
+     - Validates severity.
+     - Logs the message.
+
+5. **`/logs`:**
+   - **Purpose:** Retrieves log entries from Pup.
+   - **Parameters:**
+     - `processId` (optional)
+     - `startTimeStamp` (optional)
+     - `endTimeStamp` (optional)
+     - `severity` (optional)
+     - `nRows` (optional)
+   - **Behavior:**
+     - Parses query parameters.
+     - Calls the `PupApi.getLogs` method to fetch logs based on provided criteria.
 
 ## End user configuration
 
@@ -139,14 +142,14 @@ The end user configuration for activating a plugin by `pup.json` is
   "plugins": [
     /* Remote plugin */
     {
-      "url": "jsr:@scope/pup-example-plugin@0.0.1/mod.ts",
+      "url": "jsr:@scope/pup-example-plugin",
       "options": {
         /* Plugin specific configuration */
       }
     },
     /* Local plugin */
     {
-      "url": "./plugins/app-plugin.ts",
+      "url": "file:///full/path/to/plugin/plugin.ts",
       "options": {
         /* Plugin specific configuration */
       }

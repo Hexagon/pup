@@ -50,7 +50,7 @@
   "plugins": [
     {
       // Use full uri to plugin, e.g. jsr:@pup/plugin-web-interface
-      "url": "jsr:@pup/plugin-web-interface",
+      "url": "@pup/plugin-web-interface",
       "options": {
         "port": 8002
       }

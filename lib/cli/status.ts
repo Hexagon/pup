@@ -11,7 +11,7 @@ import { ApiProcessState } from "@pup/api-definitions"
 import { type Column, Columns, type Row } from "./columns.ts"
 import { Colors } from "@cross/utils"
 import { filesize } from "filesize"
-import { blockedFormatter, codeFormatter, naFormatter, statusFormatter } from "./formatters/strings.ts"
+import { blockedFormatter, codeFormatter, naFormatter, restartsFormatter, statusFormatter } from "./formatters/strings.ts"
 import { timeagoFormatter } from "./formatters/times.ts"
 import { Configuration, DEFAULT_REST_API_HOSTNAME } from "../core/configuration.ts"
 import { resolve } from "@std/path"
@@ -44,6 +44,7 @@ export function printStatus(configFile: string, configuration: Configuration, cw
     Blocked: "N/A",
     Started: timeagoFormatter(status!.started ? status!.started : "N/A"),
     Exited: "N/A",
+    Restarts: "N/A",
     RSS: status!.memory?.rss ? filesize(status!.memory?.rss, { round: 0 }) : "N/A",
     Signal: "N/A",
   })
@@ -58,6 +59,7 @@ export function printStatus(configFile: string, configuration: Configuration, cw
       Blocked: currentTask.blocked ? "Yes" : "No",
       Started: timeagoFormatter(currentTask.started ? currentTask.started : "N/A"),
       Exited: timeagoFormatter(currentTask.exited ? currentTask.exited : "N/A"),
+      Restarts: currentTask.restarts !== undefined ? currentTask.restarts.toString() : "N/A",
       RSS: currentTask.telemetry?.memory?.rss ? filesize(currentTask.telemetry?.memory?.rss, { round: 0 }) : "N/A",
       Signal: `${(currentTask.code ?? "N/A")}${currentTask.signal ? (" " + currentTask.signal) : ""}`,
     })
@@ -70,6 +72,7 @@ export function printStatus(configFile: string, configuration: Configuration, cw
     { key: "Blocked", header: "Blocked", minWidth: 8, formatter: blockedFormatter },
     { key: "Started", header: "Started", minWidth: 10, formatter: naFormatter },
     { key: "Exited", header: "Exited", minWidth: 10, formatter: naFormatter },
+    { key: "Restarts", header: "Restarts", minWidth: 6, formatter: restartsFormatter },
     { key: "RSS", header: "RSS", minWidth: 6, formatter: naFormatter },
     { key: "Signal", header: "Code", minWidth: 10, formatter: codeFormatter },
   ]
