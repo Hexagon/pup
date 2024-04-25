@@ -257,6 +257,22 @@
             ],
             "additionalProperties": false
           }
+        },
+        "plugins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "options": {}
+            },
+            "required": [
+              "url"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [

@@ -27,7 +27,7 @@ To activate the web interface plugin, set up the `plugins:`-section of your `pup
   "processes": [/* ... */],
   "plugins": [
     {
-      "url": "jsr:@pup/pup@$PUP_VERSION/plugins/web-interface",
+      "url": "jsr:@pup/plugin-web-interface",
       "options": {
         "port": 5000
       }

@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.34] - 2024-04-25
+
+## Added
+
+- Fix version numbers in release
+
 ## [1.0.0-rc.33] - 2024-04-25
 
 ## Added
