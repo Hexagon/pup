@@ -10,6 +10,7 @@ import { Pup } from "./pup.ts"
 import { generateKey, JWTPayload } from "@cross/jwt"
 import { DEFAULT_REST_API_HOSTNAME, DEFAULT_SECRET_KEY_ALGORITHM } from "./configuration.ts"
 import { ValidateToken } from "../common/token.ts"
+import { EventHandler } from "@pup/common/eventemitter"
 
 const ALLOWED_SEVERITIES = ["log", "info", "warn", "error"]
 
@@ -90,7 +91,9 @@ export class RestApi {
   }
 
   private setupRoutes() {
+    // New websocket connection
     this.router.get("/wss", (ctx) => {
+      // Upgrade
       if (!ctx.isUpgradable) {
         ctx.throw(501)
       }
@@ -98,15 +101,31 @@ export class RestApi {
       if (!ctx.isUpgradable) {
         ctx.throw(501)
       }
-      const proxyFn = (d: unknown) => {
-        ws.send(JSON.stringify({ t: "log", d: d }))
-      }
-      this.pupApi.events.on("log", proxyFn)
+
+      /*
+      Handle incoming message
       ws.onmessage = (m) => {
         ws.send(m.data as string)
       }
-      ws.onclose = (_e) => {
-        this.pupApi.events.off("log", proxyFn)
+      */
+
+      // Expose events to the API Consumer
+      const fnsToProxy = ["log", "process_status_changed"]
+      const proxyFns: Record<string, string | EventHandler<unknown>>[] = []
+      const proxyFnFactory = (evtName: string) => {
+        const proxyFn = (d: unknown) => {
+          ws.send(JSON.stringify({ t: evtName, d: d }))
+        }
+        proxyFns.push({ evtName, proxyFn })
+        return proxyFn
+      }
+      for (const evtName of fnsToProxy) {
+        this.pupApi.events.on(evtName, proxyFnFactory(evtName))
+      }
+      ws.onclose = () => {
+        for (const evt of proxyFns) {
+          this.pupApi.events.off(evt.evtName as string, evt.proxyFn as EventHandler<unknown>)
+        }
       }
     })
 
@@ -257,7 +276,11 @@ export class RestApi {
             return
           }
 
-          this.pupApi.log(parsedBody.severity, parsedBody.plugin, parsedBody.message)
+          this.pupApi.log(
+            parsedBody.severity,
+            parsedBody.plugin,
+            parsedBody.message,
+          )
           ctx.response.status = Status.Created
         } catch (err) {
           ctx.response.status = Status.InternalServerError
@@ -304,7 +327,12 @@ export class RestApi {
           }
           const nRowsCapped = (!nRows || (nRows && nRows > 100)) ? 100 : nRows
 
-          let logContents = await this.pupApi.getLogs(processId || undefined, startTimeStamp, endTimeStamp, nRowsCapped)
+          let logContents = await this.pupApi.getLogs(
+            processId || undefined,
+            startTimeStamp,
+            endTimeStamp,
+            nRowsCapped,
+          )
 
           if (severity) {
             const severityLower = severity.toLowerCase()
@@ -314,18 +342,34 @@ export class RestApi {
           context.response.body = { data: logContents }
         } catch (error) {
           context.response.status = 500
-          context.response.body = { error: "Internal Server Error", message: error.message }
+          context.response.body = {
+            error: "Internal Server Error",
+            message: error.message,
+          }
         }
       })
   }
 
   public async start(): Promise<number> {
-    this.app.use(generateAuthMiddleware(await this.setupKey(), this.pupApi.getConfiguration().api?.revoked))
+    this.app.use(
+      generateAuthMiddleware(
+        await this.setupKey(),
+        this.pupApi.getConfiguration().api?.revoked,
+      ),
+    )
     this.app.use(this.router.routes())
     this.app.use(this.router.allowedMethods())
     this.pupApi.log("info", "rest", `Starting the Rest API`)
-    await this.app.listen({ port: this.port, hostname: this.hostname, signal: this.appAbortController.signal })
-    this.pupApi.log("info", "rest", `Rest API running, available on ${this.hostname}:${this.port}`)
+    await this.app.listen({
+      port: this.port,
+      hostname: this.hostname,
+      signal: this.appAbortController.signal,
+    })
+    this.pupApi.log(
+      "info",
+      "rest",
+      `Rest API running, available on ${this.hostname}:${this.port}`,
+    )
     return this.port
   }
 

@@ -15,10 +15,3 @@ export type { Configuration, GlobalLoggerConfiguration, ProcessConfiguration } f
 
 /** Exports types for Logger */
 export type { AttachedLogger } from "./lib/core/logger.ts"
-
-/** Export everything needed for Plugins */
-export { PupApi } from "./lib/core/api.ts"
-export { Process } from "./lib/core/process.ts"
-export type { ProcessScheduledEvent, ProcessStateChangedEvent, ProcessWatchEvent } from "./lib/core/process.ts"
-
-export type { LogEvent } from "./lib/core/logger.ts"

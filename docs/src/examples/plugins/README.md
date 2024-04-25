@@ -6,6 +6,8 @@ nav_order: 2
 
 # Plugin development
 
+**Note! This is outdated, need to be updated asap.** Refer to <https://github.com/hexagon/pup-plugin> for up-to-date info.
+
 ---
 
 ### Getting started

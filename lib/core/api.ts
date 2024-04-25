@@ -42,7 +42,10 @@ export class PupApi {
     return statuses
   }
   public applicationState(): ApiApplicationState {
-    return this._pup.status.applicationState(this._pup.allProcesses(), this._pup.port) as ApiApplicationState
+    return this._pup.status.applicationState(
+      this._pup.allProcesses(),
+      this._pup.port,
+    ) as ApiApplicationState
   }
 
   // Global actions
@@ -65,7 +68,9 @@ export class PupApi {
   }
   public async stop(id: string, reason: string): Promise<boolean> {
     const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
-    const results = await Promise.all([processesToStart.map((process) => this._pup.stop(process!.status.id, reason))])
+    const results = await Promise.all([
+      processesToStart.map((process) => this._pup.stop(process!.status.id, reason)),
+    ])
     return results.filter((r) => r).length > 0
   }
   public block(id: string, reason: string): boolean {

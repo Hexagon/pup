@@ -6,6 +6,7 @@
  */
 
 import { z } from "zod"
+import { PluginConfiguration } from "@pup/plugin"
 
 // Logger constants
 export const DEFAULT_INTERNAL_LOG_HOURS = 48
@@ -32,6 +33,7 @@ interface Configuration {
   logger?: GlobalLoggerConfiguration
   watcher?: GlobalWatcherConfiguration
   processes: ProcessConfiguration[]
+  plugins?: PluginConfiguration[]
   terminateTimeout?: number
   terminateGracePeriod?: number
 }
@@ -164,6 +166,14 @@ const ConfigurationSchema = z.object({
         }).strict(),
       ),
     }).strict(),
+  ),
+  plugins: z.optional(
+    z.array(
+      z.object({
+        url: z.string(),
+        options: z.optional(z.any()),
+      }),
+    ),
   ),
 }).strict()
 

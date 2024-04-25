@@ -1,4 +1,4 @@
-FROM denoland/deno:debian-1.31.1
+FROM denoland/deno:debian-1.42.4
 
 # Copy application
 RUN mkdir /app

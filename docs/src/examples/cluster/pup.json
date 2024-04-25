@@ -17,13 +17,5 @@
       "cron": "*/20 * * * * *",
       "restartDelayMs": 3000
     }
-  ],
-  "plugins": [
-    {
-      "url": "../../plugins/web-interface/mod.ts",
-      "options": {
-        "port": 5000
-      }
-    }
   ]
 }

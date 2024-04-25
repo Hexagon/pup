@@ -49,8 +49,8 @@
   ],
   "plugins": [
     {
-      // Use full uri to plugin, e.g. jsr:@pup/pup@$VERSION/plugins/web-interface
-      "url": "../../plugins/web-interface/mod.ts",
+      // Use full uri to plugin, e.g. jsr:@pup/plugin-web-interface
+      "url": "../../../pup-plugin-web-interface/mod.ts",
       "options": {
         "port": 8002
       }

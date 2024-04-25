@@ -1,18 +1,18 @@
 // See docs/examples/telemetry/README.md for full documentation on telemetry, including using the IPC
 // - Pin this to the latest version of pup, or include in import map
-import { PupTelemetry } from "jsr:@pup/telemetry";
-const telemetry = new PupTelemetry(1);
+import { PupTelemetry } from "jsr:@pup/telemetry"
+const telemetry = new PupTelemetry(1)
 
 // The task
-console.log("Process running");
+console.log("Process running")
 
 // Receive data
 // deno-lint-ignore no-explicit-any
 telemetry.on("message", (data: any) => {
-  console.log(`task-2 received: ${data}`);
-});
+  console.log(`task-2 received: ${data}`)
+})
 
 // Wait 5 minutes
 setTimeout(() => {
-  console.log("Done!");
-}, 300_000);
+  console.log("Done!")
+}, 300_000)

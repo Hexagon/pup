@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.33] - 2024-04-25
+
+## Added
+
+- Added support for Plugins based on <https://github.com/hexagon/pup-plugin>
+
 ## [1.0.0-rc.32] - 2024-04-23
 
 **Breaking:** Any plugins or packages importing telemetry from `@pup/pup/telemetry.ts` needs to be updated to import from `@pup/telemetry` instead.

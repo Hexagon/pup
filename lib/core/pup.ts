@@ -27,6 +27,8 @@ import { Prop } from "../common/prop.ts"
 import type { ApiTelemetryData } from "@pup/api-definitions"
 import { rm } from "@cross/fs"
 import { findFreePort } from "./port.ts"
+import { Plugin } from "./plugin.ts"
+import { GenerateToken } from "../common/token.ts"
 
 interface InstructionResponse {
   success: boolean
@@ -42,7 +44,7 @@ class Pup {
   public restApi?: RestApi
 
   public processes: (Process | Cluster)[] = []
-
+  public plugins: Plugin[] = []
   private requestTerminate = false
 
   private watchdogTimer?: number
@@ -99,7 +101,9 @@ class Pup {
     this.status = new Status(statusFile)
 
     // Initialize API secret
-    if (secretFile) this.secret = new Prop(secretFile, DEFAULT_SECRET_FILE_PERMISSIONS)
+    if (secretFile) {
+      this.secret = new Prop(secretFile, DEFAULT_SECRET_FILE_PERMISSIONS)
+    }
 
     // Initialize API port
     if (portFile) this.port = new Prop(portFile)
@@ -127,17 +131,53 @@ class Pup {
     // Initialize api
     await this.api()
 
+    // Initialize plugins
+    if (this.configuration.plugins) {
+      const secret = await this.secret?.load()
+      const pluginToken = await GenerateToken(secret!, { consumer: "plugin" }, Date.now() + 100000)
+      for (const plugin of this.configuration.plugins) {
+        const newPlugin = new Plugin(plugin, `${this.restApi?.hostname}:${this.restApi?.port}`, pluginToken)
+        let success = true
+        try {
+          this.logger.log("plugins", `Loading plugin from '${plugin.url}'`)
+          await newPlugin.load()
+        } catch (e) {
+          this.logger.error("plugins", `Failed to load plugin '${plugin.url}: ${e.message}'`)
+          success = false
+        }
+        try {
+          this.logger.log("plugins", `Verifying plugin from '${plugin.url}'`)
+          newPlugin.verify()
+        } catch (e) {
+          this.logger.error("plugins", `Failed to verify plugin '${plugin.url}': ${e.message}`)
+          success = false
+        }
+
+        if (success) {
+          this.plugins.push(newPlugin)
+          this.logger.log("plugins", `Plugin '${newPlugin.impl?.meta.name}@${newPlugin.impl?.meta.version}' loaded from '${plugin.url}'`)
+        }
+      }
+    }
+
     // Attach logger to events
-    this.logger.attach((severity: string, category: string, text: string, process?: ProcessConfiguration): boolean => {
-      this.events.emit("log", {
-        timeStamp: Date.now(),
-        severity,
-        category,
-        text,
-        processId: process?.id,
-      })
-      return false
-    })
+    this.logger.attach(
+      (
+        severity: string,
+        category: string,
+        text: string,
+        process?: ProcessConfiguration,
+      ): boolean => {
+        this.events.emit("log", {
+          timeStamp: Date.now(),
+          severity,
+          category,
+          text,
+          processId: process?.id,
+        })
+        return false
+      },
+    )
 
     // Create processes
     if (this.configuration.processes) {
@@ -305,7 +345,10 @@ class Pup {
       this.restApi = new RestApi(this, this.configuration.api?.hostname, parseInt(port!, 10), secret)
       this.restApi.start()
     } catch (e) {
-      this.logger.error("rest", `An error occured while inizializing the rest api: ${e.message}`)
+      this.logger.error(
+        "rest",
+        `An error occured while inizializing the rest api: ${e.message}`,
+      )
     }
   }
 
@@ -411,6 +454,11 @@ class Pup {
       return
     }
 
+    // Terminate all plugins
+    for (const plugin of this.plugins) {
+      await plugin.terminate()
+    }
+
     // Stop watchdog
     this.requestTerminate = true
 
@@ -447,7 +495,10 @@ class Pup {
 
   private registerGlobalErrorHandler() {
     addEventListener("error", (event) => {
-      this.logger.error("fatal", `Unhandled error caught by core: ${event.error.message}`)
+      this.logger.error(
+        "fatal",
+        `Unhandled error caught by core: ${event.error.message}`,
+      )
       event.preventDefault()
     })
   }

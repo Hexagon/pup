@@ -6,6 +6,8 @@ nav_order: 6
 
 # Server with Splunk Logging
 
+**Note! This is outdated, need to be updated asap.**
+
 ---
 
 The example at [/docs/src/examples/splunk](https://github.com/Hexagon/pup/tree/main/docs/src/examples/splunk) runs a Deno server script as a continuously monitored and restarted process, logging all

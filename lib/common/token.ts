@@ -13,7 +13,7 @@ export interface PupTokenPayload {
   exp: number | undefined
 }
 
-export async function GenerateToken(secret: string, data: unknown, expMs: number | undefined) {
+export async function GenerateToken(secret: string, data: unknown, expMs: number | undefined): Promise<string> {
   const key = await generateKey(secret, DEFAULT_SECRET_KEY_ALGORITHM)
 
   // Require a consumer
