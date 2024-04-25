@@ -14,6 +14,8 @@ To create a custom plugin, developers should extend the `PluginImplementation` c
 
 The plugin then communicates with Pup using `PupRestClient` from `@pup/api-client`. The url and credentials are passed to the plugin constructor.
 
+Example (full example available at <https://github.com/Hexagon/pup/tree/main/docs/src/examples/plugins>):
+
 ```typescript
 import { PupRestClient } from "jsr:@pup/api-client"
 import { type PluginConfiguration, PluginImplementation } from "jsr:@pup/plugin"
@@ -157,3 +159,5 @@ The end user configuration for activating a plugin by `pup.json` is
   ]
 }
 ```
+
+Full example available at <https://github.com/Hexagon/pup/tree/main/docs/src/examples/plugins>.
