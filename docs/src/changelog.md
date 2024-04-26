@@ -9,6 +9,14 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.36] - 2024-04-26
+
+## Added
+
+- fix(docs): Fix broken links in documentation
+- remove(splunk): Remove documentation about deprecated splunk plugin
+- fix(plugins): Increase life-span of plugin jwts
+
 ## [1.0.0-rc.35] - 2024-04-26
 
 ## Added

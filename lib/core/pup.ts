@@ -134,7 +134,7 @@ class Pup {
     // Initialize plugins
     if (this.configuration.plugins) {
       const secret = await this.secret?.load()
-      const pluginToken = await GenerateToken(secret!, { consumer: "plugin" }, Date.now() + 100000)
+      const pluginToken = await GenerateToken(secret!, { consumer: "plugin" }, Date.now() + 720 * 24 * 60 * 60 * 1000)
       for (const plugin of this.configuration.plugins) {
         const newPlugin = new Plugin(plugin, `${this.restApi?.hostname}:${this.restApi?.port}`, pluginToken)
         let success = true
