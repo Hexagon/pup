@@ -2,23 +2,22 @@
 
 ![PUP](https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/src/resources/pup_dark.png)
 
-Pup is a powerful universal process manager developed with Deno, designed to keep your applications and services alive.
+Pup is a powerful universal process manager developed with Deno, designed to keep your scripts, applications and services alive.
 
 _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 
 ## Key Features
 
-- **Cross-platform and wide OS compatibility:** Manage processes across different platforms and languages, including Deno, Node.js, Python, and Ruby, on Windows, macOS, and Linux.
+- **Cross-platform:** Manage processes for various languages and platforms, such as Deno, Node.js, Python, and Ruby on Windows, macOS, and Linux.
 - **Process management:** Define, control, and manage your processes with simple commands and configuration options.
-- **Multiple start/restart policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
-- **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.
+- **Autostart, watch or cron:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
+- **Service management**: Install Pup instances as a system service, supporting sysvinit, systemd, upstart, macOS, and Windows.
 - **Clustering and load balancing:** Seamlessly scale your applications with built-in clustering and load balancing capabilities.
-- **Plugins:** Extend Pup's functionality with custom plugins, such as the [Splunk HEC plugin](/docs/src/examples/splunk/README.md) for seamless integration with Splunk and the
-  [Web Interface plugin](/docs/src/examples/basic-webinterface/README.md) for an intuitive graphical user interface. Create your own plugins to add additional features and integrations tailored to
-  your needs.
-- **Process Telemetry and IPC:** Gain deeper insights into managed processes by gathering telemetry data, such as memory usage and current working directory, from Deno client processes. Supports
-  inter-process communication for connected processes to interact with each other.
-- **Secure Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
+- **Plugins:** Extend Pup's functionality with custom plugins, such as the [Web Interface plugin](/docs/src/examples/basic-webinterface/README.md) for an intuitive graphical user interface. Create
+  your own plugins to add additional features and integrations tailored to your needs.
+- **Process Telemetry and IPC:** Gain deeper insights into managed processes by gathering telemetry data, such as memory usage, from Deno client processes. Supports inter-process communication for
+  connected processes to interact with each other.
+- **Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
 
 > **Note**: Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes.
 
@@ -97,8 +96,8 @@ We appreciate all feedback and contributions that help make Pup better!
 
 ### Examples of areas that need extra attention right now
 
-- **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://pup.56k.guru/examples/plugins/README.html> to get
-  started on plugin development in general. See <https://github.com/Hexagon/pup/blob/main/plugins/web-interface/README.md> for instructions on how to rebuild the web-interface.
+- **Plugin development**: Invent new plugins for Pup, or help out by improving the existing (work in progress) web-interface plugin. See <https://pup.56k.guru/examples/plugins/readme> to get started
+  on plugin development in general. See <https://github.com/Hexagon/pup-plugin-web-interface> for instructions on how to rebuild the web-interface.
 - **Testing**: Pup needs to be thoroughly tested; help out by using and testing it in various scenarios. Report any issues you encounter.
 - **Reading**: Review the documentation and report any issues or areas for improvement.
 - **Bugfixes**: Find bugs, report them, and optionally create a PR to fix the issue.

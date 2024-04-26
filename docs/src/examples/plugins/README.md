@@ -10,11 +10,16 @@ nav_order: 2
 
 ### Getting started
 
-To create a custom plugin, developers should extend the `PluginImplementation` class from `@pup/plugin` and override its methods as necessary. This class is the main entry point for plugins.
+To create a custom plugin, developers should extend the `PluginImplementation` class from `@pup/plugin`, overriding its methods as necessary. This class serves as the main entry point for plugins.
 
-The plugin then communicates with Pup using `PupRestClient` from `@pup/api-client`. The url and credentials are passed to the plugin constructor.
+The plugin then communicates with Pup using `PupRestClient` from `@pup/api-client`. The URL and credentials are passed to the plugin constructor.
 
-Example (full example available at <https://github.com/Hexagon/pup/tree/main/docs/src/examples/plugins>):
+### Examples
+
+A full example available at <https://github.com/Hexagon/pup/tree/main/docs/src/examples/plugins>, the official web interface plugin available at <https://github.com/hexagon/pup-plugin-web-interface>
+could also be used as a reference implementation.
+
+A minimal example which injects logs indicating if current memory usage is ok or high:
 
 ```typescript
 import { PupRestClient } from "jsr:@pup/api-client"
@@ -48,7 +53,7 @@ export class PupPlugin extends PluginImplementation {
     this.config = config.options as Configuration
 
     // Set up the rest client
-    // - api url and a token is supplied by Pup
+    // - API URL and token are supplied by Pup
     this.client = new PupRestClient(
       `http://${apiUrl}`,
       apiToken,
@@ -76,9 +81,12 @@ The following events are available:
 - **ipc:** Fired when an IPC message is received.
 
 ```ts
-// Listen for log messages from the API
-this.client.on("application_state", (pupState: unknown) => {
-  const tPupState = pupState as ApiApplicationState
+// Listen for process status changes
+this.client.on("process_status_changed", (eventData) => {
+  // ... and take custom actions
+  if (eventData.processId === "my-important-process" && eventData.newState === "failed") {
+    // Send an alert or attempt to restart the process
+  }
 })
 ```
 
@@ -86,7 +94,7 @@ this.client.on("application_state", (pupState: unknown) => {
 
 The Rest client exposes methods for managing processes.
 
-To use the Rest endponts, access it through client instance:
+To use the REST endpoints, access them through the client instance:
 
 ```ts
 try {
@@ -98,44 +106,33 @@ try {
 } catch (_e) { /* Could not send log */ }
 ```
 
-Always wrap requests in try/catch, we do not want any unhandled errors in a Plugin.
+Always wrap requests in try/catch blocks; we do not want any unhandled errors in a plugin.
 
 ### All endpoints
 
-1. **`/processes`:**
-   - **Purpose:** List configured processes and their statues.
+1. **`/processes`:** List configured processes and their statues.
 
-2. **Process action Endpoints (`/processes/:id/start`, etc.):**
-   - **Purpose:** Provide an interface for managing Pup processes.
-   - **Actions:**
-     - Retrieve process status (`/processes`) and application state (`/state`).
-     - Start, stop, restart, block, and unblock processes (`/processes/:id/...`).
+2. **(`/processes/<id>/<action>>`):** Controls processes. `<action>` is one of `start`, `stop`, `restart`, `block` or `unblock`. `<id>` could be `all` or a configured process id.
 
-3. **`/terminate`:**
-   - **Purpose:** Initiates a graceful termination of the Pup application.
+3. **`/terminate`:** Initiate a graceful termination of the Pup application, when Pup is running as a system service, this effectively restarts Pup.
 
-4. **`/log`:**
-   - **Purpose:** Allows sending log messages to Pup.
-   - **Behavior:**
-     - Extracts severity, plugin, and message from the request body.
-     - Validates severity.
-     - Logs the message.
+4. **`/log`:** Inject logs into Pup
 
-5. **`/logs`:**
-   - **Purpose:** Retrieves log entries from Pup.
+- Extracts `severity`, `plugin`, and `message` from the request body.
+- Validates severity.
+- Logs the message.
+
+5. **`/logs`:** Retrieves log entries from Pup.
    - **Parameters:**
      - `processId` (optional)
      - `startTimeStamp` (optional)
      - `endTimeStamp` (optional)
      - `severity` (optional)
      - `nRows` (optional)
-   - **Behavior:**
-     - Parses query parameters.
-     - Calls the `PupApi.getLogs` method to fetch logs based on provided criteria.
 
 ## End user configuration
 
-The end user configuration for activating a plugin by `pup.json` is
+The end user configuration for activating a plugin through `pup.json` is:
 
 ```json
 {
@@ -159,5 +156,7 @@ The end user configuration for activating a plugin by `pup.json` is
   ]
 }
 ```
+
+The official plugins are published on jsr.io, but Pup will work just as well with plugins from other sources, including local imports, provided that an absolute URL including `file://` is used.
 
 Full example available at <https://github.com/Hexagon/pup/tree/main/docs/src/examples/plugins>.

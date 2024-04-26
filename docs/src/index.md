@@ -3,21 +3,21 @@ title: "Overview"
 nav_order: 1
 ---
 
-# Overview
+# Pup
 
 ---
 
-Pup is a powerful process manager for Deno, designed to simplify the management of your applications and services. Here are some of the key features:
+Pup is a powerful universal process manager developed with Deno, designed to keep your scripts, applications and services alive.
 
-- **Cross-platform and wide OS compatibility:** Manage processes for various languages and platforms, such as Deno, Node.js, Python, and Ruby on Windows, macOS, and Linux.
+- **Cross-platform:** Manage processes for various languages and platforms, such as Deno, Node.js, Python, and Ruby on Windows, macOS, and Linux.
 - **Process management:** Define, control, and manage your processes with simple commands and configuration options.
-- **Multiple start/restart policies:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
-- **Service management**: Built-in installer for Linux (sysvinit, systemd, upstart), macOS, and Windows services.
+- **Autostart, watch or cron:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
+- **Service management**: Install Pup instances as a system service, supporting sysvinit, systemd, upstart, macOS, and Windows.
 - **Clustering and load balancing:** Scale your application seamlessly with built-in clustering and load balancing capabilities.
 - **Plugins:** Extend Pup's functionality with custom plugins for additional features and integrations.
 - **Process Telemetry and IPC:** Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
   telemetry feature also enables inter-process communication, allowing connected processes to interact with one another.
-- **Secure Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
+- **Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
 
 > **Note** Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes. { .note }
 
