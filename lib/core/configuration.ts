@@ -27,6 +27,10 @@ export const DEFAULT_REST_API_HOSTNAME = "127.0.0.1"
 // Prop file constants
 export const DEFAULT_PROP_FILE_PERMISSIONS = 0o600
 
+// Plugin constants
+export const PLUGIN_TOKEN_EXPIRE_S = 300 // Expire API tokens after 5 minutes
+export const PLUGIN_TOKEN_REFRESH_ADVANCE_S = 10 // Renew Plugin API token automatically 10 seconds before expiry
+
 interface Configuration {
   name?: string
   api?: ApiConfiguration

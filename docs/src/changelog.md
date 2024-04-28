@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.37] - 2024-04-28
+
+- fix(plugins): Automatically refresh plugin API tokens prior to expiry
+
 ## [1.0.0-rc.36] - 2024-04-26
 
 ## Added

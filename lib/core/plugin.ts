@@ -35,6 +35,13 @@ export class Plugin {
       throw new Error("Plugin missing meta.api")
     }
   }
+  async refreshToken(token: string): Promise<void> {
+    this.apiToken = token
+    await this.impl?.refreshApiToken(token)
+  }
+  getToken(): string {
+    return this.apiToken
+  }
   async terminate() {
     if (this.impl?.cleanup) await this.impl?.cleanup()
   }

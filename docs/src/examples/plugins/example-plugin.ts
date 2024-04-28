@@ -55,6 +55,11 @@ export class PupPlugin extends PluginImplementation {
     })
   }
 
+  // deno-lint-ignore require-await
+  public async refreshApiToken(apiToken: string): Promise<void> {
+    this.client.refreshApiToken(apiToken)
+  }
+
   // Helper function to send logs via the Rest API
   public async sendLog(severity: string, message: string) {
     // Wrap all API calls in try/catch

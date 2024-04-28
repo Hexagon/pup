@@ -11,6 +11,8 @@ import {
   DEFAULT_SECRET_FILE_PERMISSIONS,
   type GlobalLoggerConfiguration,
   MAINTENANCE_INTERVAL_MS,
+  PLUGIN_TOKEN_EXPIRE_S,
+  PLUGIN_TOKEN_REFRESH_ADVANCE_S,
   type ProcessConfiguration,
   validateConfiguration,
   WATCHDOG_INTERVAL_MS,
@@ -28,8 +30,7 @@ import type { ApiTelemetryData } from "@pup/api-definitions"
 import { rm } from "@cross/fs"
 import { findFreePort } from "./port.ts"
 import { Plugin } from "./plugin.ts"
-import { GenerateToken } from "../common/token.ts"
-
+import { GenerateToken, SecondsToExpiry } from "../common/token.ts"
 interface InstructionResponse {
   success: boolean
   action?: string
@@ -134,7 +135,7 @@ class Pup {
     // Initialize plugins
     if (this.configuration.plugins) {
       const secret = await this.secret?.load()
-      const pluginToken = await GenerateToken(secret!, { consumer: "plugin" }, Date.now() + 720 * 24 * 60 * 60 * 1000)
+      const pluginToken = await GenerateToken(secret!, { consumer: "plugin" }, Date.now() + PLUGIN_TOKEN_EXPIRE_S * 1000)
       for (const plugin of this.configuration.plugins) {
         const newPlugin = new Plugin(plugin, `${this.restApi?.hostname}:${this.restApi?.port}`, pluginToken)
         let success = true
@@ -152,7 +153,6 @@ class Pup {
           this.logger.error("plugins", `Failed to verify plugin '${plugin.url}': ${e.message}`)
           success = false
         }
-
         if (success) {
           this.plugins.push(newPlugin)
           this.logger.log("plugins", `Plugin '${newPlugin.impl?.meta.name}@${newPlugin.impl?.meta.version}' loaded from '${plugin.url}'`)
@@ -247,7 +247,7 @@ class Pup {
    *
    * @private
    */
-  private watchdog = () => {
+  private watchdog = async () => {
     this.events.emit("watchdog")
     // Wrap watchdog operation in a catch to prevent it from ever stopping
     try {
@@ -315,6 +315,25 @@ class Pup {
       this.logger.error("watchdog", `Heartbeat update failed: ${e}`)
     }
 
+    // Refresh plugin tokens if needed
+    try {
+      for (const plugin of this.plugins) {
+        // Parse token and check seconds left to expiry
+        const secondsLeft = await SecondsToExpiry(plugin.getToken())
+        if (secondsLeft !== undefined && secondsLeft < PLUGIN_TOKEN_REFRESH_ADVANCE_S) {
+          this.logger.log("plugins", `API token for plugin '${plugin.impl?.meta.name} is about to expire in ${secondsLeft}s. Refreshing token.`)
+          const secret = this.secret?.fromCache()
+          if (secret) {
+            // Send a fresh token to the plugin
+            const newPluginToken = await GenerateToken(secret!, { consumer: "plugin" }, Date.now() + PLUGIN_TOKEN_EXPIRE_S * 1000)
+            plugin.refreshToken(newPluginToken)
+          }
+        }
+      }
+    } catch (e) {
+      this.logger.error("watchdog", `API Token refresh failed: ${e}`)
+    }
+
     // Reschedule watchdog
     if (!this.requestTerminate) {
       this.watchdogTimer = setTimeout(() => {
@@ -337,7 +356,7 @@ class Pup {
       return resultingPort.toString()
     })
 
-    // Initializing rest a
+    // Initializing rest api
     this.logger.info("rest", "Initializing rest api")
 
     // Initialize rest api

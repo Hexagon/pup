@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-import { createJWT, generateKey, JWTPayload, validateJWT } from "@cross/jwt"
+import { createJWT, generateKey, JWTPayload, unsafeParseJWT, validateJWT } from "@cross/jwt"
 import { DEFAULT_SECRET_KEY_ALGORITHM } from "../core/configuration.ts"
 
 export interface PupTokenPayload {
@@ -35,5 +35,18 @@ export function ValidateToken(token: string, key: CryptoKey): unknown | null {
     return decoded as unknown
   } catch (_err) {
     return null // Token invalid
+  }
+}
+
+export function SecondsToExpiry(token: string): number | undefined {
+  try {
+    const decoded = unsafeParseJWT(token)
+    if (decoded && decoded.exp) {
+      return decoded.exp - Math.round(Date.now() / 1000)
+    } else {
+      return undefined
+    }
+  } catch (_err) {
+    return undefined
   }
 }

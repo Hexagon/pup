@@ -60,6 +60,11 @@ export class PupPlugin extends PluginImplementation {
       true,
     )
   }
+
+  // Forward api token refreshes to the api client
+  public async refreshApiToken(apiToken: string): Promise<void> {
+    this.client.refreshApiToken(apiToken)
+  }
 }
 ```
 

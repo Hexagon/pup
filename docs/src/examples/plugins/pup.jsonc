@@ -12,7 +12,7 @@
     {
       // Normally, you would use full uri to plugin, e.g. jsr:@pup/plugin-web-interface
       // But when developing locally, you'll have to use the full absolute local path
-      "url": "file:///path/to/pup/docs/src/examples/plugins/example-plugin.ts",
+      "url": "file:///config/workspace/pup/docs/src/examples/plugins/example-plugin.ts",
 
       // It is possible to pass options to a plugin, like this:
       "options": {
