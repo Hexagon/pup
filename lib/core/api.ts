@@ -10,6 +10,7 @@ import type { LogEventData } from "./logger.ts"
 import type { Pup } from "./pup.ts"
 import type { Configuration } from "./configuration.ts"
 import type { ApiApplicationState, ApiPaths, ApiProcessData, ApiTelemetryData } from "@pup/api-definitions"
+import { ApiIpcData } from "@pup/api-definitions"
 
 /**
  * Exposes selected features of pup to Plugins and APIs
@@ -87,6 +88,12 @@ export class PupApi {
   // Interface for Pup to receive telemetry data from processes
   public telemetry(data: ApiTelemetryData): boolean {
     return this._pup.telemetry(data)
+  }
+
+  // Interface for forwarding ipc data from processes
+  public ipc(data: ApiIpcData): boolean {
+    this._pup.events.emit("ipc", data)
+    return true
   }
 
   public log(severity: "log" | "error" | "info" | "warn", consumer: string, message: string) {

@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.38] - 2024-04-28
+
+- chore(core): Dependency update
+- fix(core): Drop dependency on --unstable-net by replacing websocketstream with regular websockets
+- fix(core): Add `/ipc` endpoint to the Rest API
+
 ## [1.0.0-rc.37] - 2024-04-28
 
 - fix(plugins): Automatically refresh plugin API tokens prior to expiry

@@ -49,6 +49,7 @@ _site
 .npmrc
 package-lock.json
 package.json
+node_modules
 
 # VSCode files
 .vscode

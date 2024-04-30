@@ -11,6 +11,7 @@ import { generateKey, JWTPayload } from "@cross/jwt"
 import { DEFAULT_REST_API_HOSTNAME, DEFAULT_SECRET_KEY_ALGORITHM } from "./configuration.ts"
 import { ValidateToken } from "../common/token.ts"
 import { EventHandler } from "@pup/common/eventemitter"
+import { ApiIpcData } from "@pup/api-definitions"
 
 const ALLOWED_SEVERITIES = ["log", "info", "warn", "error"]
 const EVENTS_TO_PROPAGATE = [
@@ -24,6 +25,7 @@ const EVENTS_TO_PROPAGATE = [
   "watchdog",
   "application_state",
   "terminating",
+  "ipc",
 ]
 export interface ApiResponseBody {
   error?: string
@@ -58,6 +60,7 @@ const generateAuthMiddleware = (key: CryptoKey, revoked?: string[]) => {
             ctx.response.status = Status.Unauthorized
             ctx.response.body = { error: "Invalid token" }
           } else {
+            ctx.state.consumer = payload.data?.consumer
             await next()
           }
         } else {
@@ -262,6 +265,36 @@ export class RestApi {
           }
         }
       })
+      .post("/ipc", async (ctx) => {
+        if (ctx.request.hasBody) {
+          try {
+            const parsedBody: ApiIpcData = await ctx.request.body.json()
+            if (!parsedBody.target) {
+              ctx.response.status = Status.InternalServerError
+              return ctx.response.body = { error: "Missing target" }
+            } else if (!parsedBody.event) {
+              ctx.response.status = Status.InternalServerError
+              return ctx.response.body = { error: "Missing event" }
+            } else if (!parsedBody.eventData) {
+              ctx.response.status = Status.InternalServerError
+              return ctx.response.body = { error: "Missing event data" }
+            } else {
+              // Append sender
+              parsedBody.sender = ctx.state.consumer
+              const success = this.pupApi.ipc(parsedBody)
+              if (success) {
+                ctx.response.status = Status.OK
+              } else {
+                ctx.response.status = Status.InternalServerError
+                ctx.response.body = { error: "Invalid data" }
+              }
+            }
+          } catch (err) {
+            ctx.response.status = Status.InternalServerError
+            ctx.response.body = { error: err.message }
+          }
+        }
+      })
       .post("/terminate", (ctx) => {
         try {
           this.pupApi.terminate(30000)
@@ -276,7 +309,6 @@ export class RestApi {
           // Read severity, plugin, and message from request body
           const parsedBody = await ctx.request.body.json()
           if (!parsedBody) {
-            console.log("l1")
             ctx.response.status = Status.BadRequest
             ctx.response.body = { error: "Log data is required." }
             return
