@@ -6,7 +6,6 @@
  */
 
 import { Application } from "../../application.meta.ts"
-import type { Cluster } from "./cluster.ts"
 import { APPLICATION_STATE_WRITE_LIMIT_MS } from "./configuration.ts"
 import { type Process, type ProcessInformation } from "./process.ts"
 import { ApiProcessState } from "@pup/api-definitions"
