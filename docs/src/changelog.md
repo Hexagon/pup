@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.39] - Unstable
+
+- fix(core): Clustered processes were duplicated in API and `pup status`
+
 ## [1.0.0-rc.38] - 2024-05-01
 
 - chore(core): Dependency update

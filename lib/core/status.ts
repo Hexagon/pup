@@ -134,11 +134,6 @@ class Status {
     const processStates: ProcessInformation[] = []
     for (const p of processes) {
       processStates.push(p.getStatus())
-      if (p.isCluster()) {
-        for (const subP of (p as Cluster).processes) {
-          processStates.push(subP.getStatus())
-        }
-      }
     }
     return {
       pid: Deno.pid,

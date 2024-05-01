@@ -209,15 +209,15 @@ class Pup {
   public allProcesses(): Process[] {
     const allProcesses = []
     for (const process of this.processes) {
+      // Always add current process (even clusters)
+      allProcesses.push(process)
+
       // Add all subprocesses if current process is a cluster
       if (process instanceof Cluster) {
         for (const cProcess of process.processes) {
           allProcesses.push(cProcess)
         }
       }
-
-      // Always add current process (even clusters)
-      allProcesses.push(process)
     }
     return allProcesses
   }
