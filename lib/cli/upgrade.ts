@@ -167,9 +167,9 @@ export async function upgrade(
   const installCmd = []
 
   installCmd.push("install")
-  installCmd.push("-qfr") // Quite, Reload
+  installCmd.push("-qfrg") // Quite, Reload, Force reinstall, Global
   if (allPermissions || !requestedVersion?.default_permissions) {
-    installCmd.push("-A")
+    installCmd.push("-A") // All permissions
   } else {
     installCmd.push(...requestedVersion!.default_permissions)
   }
@@ -179,7 +179,7 @@ export async function upgrade(
   if (unstableInstall) {
     installCmd.push("--unstable-kv")
   }
-  installCmd.push("-n", "pup")
+  installCmd.push("-n", "pup") // Installed command name = pup
   installCmd.push(canaryInstall ? versions.canary_url : (requestedVersion as Version).url)
 
   console.info(`\nRunning: deno ${installCmd.join(" ")}`)

@@ -28,7 +28,7 @@ Pup is centered on a single configuration file, `pup.json`, which manages all as
 
 ### Installation
 
-To install Pup, open your terminal and execute the following command:
+To install Pup, make sure you run the latest version of Deno (`deno upgrade`), then open your terminal and execute the following command:
 
 ```bash
 deno run -Ar jsr:@pup/pup@$PUP_VERSION setup --channel prerelease

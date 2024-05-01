@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this section.
 - chore(core): Dependency update
 - fix(core): Drop dependency on --unstable-net by replacing websocketstream with regular websockets
 - fix(core): Add `/ipc` endpoint to the Rest API
+- fix(deps): Remove unused dependency `@std/uuid`
+- fix(cli): Add flag `-g` for global install when installing/upgrading
 
 ## [1.0.0-rc.37] - 2024-04-28
 
