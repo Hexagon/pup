@@ -9,9 +9,16 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.39] - Unstable
+## [1.0.0-rc.39] - 2024-05-04
 
 - fix(core): Clustered processes were duplicated in API and `pup status`
+- fix(core): Fix regression with `pup monitor`
+- fix(core): Add API connection timeout
+- chore(deps): Full dependency update
+- fix(api): Log host and port when starting the Rest API Server
+- fix(api): Clarify error messages
+- fix(api): Remove unused (commented out) code
+- fix(cli): Require `--expire-in` when generating tokens on the CLI
 
 ## [1.0.0-rc.38] - 2024-05-01
 

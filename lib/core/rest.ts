@@ -58,14 +58,14 @@ const generateAuthMiddleware = (key: CryptoKey, revoked?: string[]) => {
         if (payload.data?.consumer) {
           if (revoked && revoked.find((r) => r.toLowerCase().trim() === payload.data?.consumer.toLowerCase().trim())) {
             ctx.response.status = Status.Unauthorized
-            ctx.response.body = { error: "Invalid token" }
+            ctx.response.body = { error: "Revoked token" }
           } else {
             ctx.state.consumer = payload.data?.consumer
             await next()
           }
         } else {
           ctx.response.status = Status.Unauthorized
-          ctx.response.body = { error: "Invalid token" }
+          ctx.response.body = { error: "Token missing consumer" }
         }
       } else {
         ctx.response.status = Status.Unauthorized
@@ -116,12 +116,6 @@ export class RestApi {
         if (!ctx.isUpgradable) {
           return ctx.throw(501)
         }
-
-        // Handle incoming message, but y tho?
-        /*ws.onmessage = (m) => {
-          this.pupApi.events.on(evtName, proxyFnFactory(evtName))
-          ws.send(m.data as string)
-        }*/
 
         // Expose events to the API Consumer
         const proxyFns: Record<string, string | EventHandler<unknown>>[] = []
@@ -409,17 +403,12 @@ export class RestApi {
     )
     this.app.use(this.router.routes())
     this.app.use(this.router.allowedMethods())
-    this.pupApi.log("info", "rest", `Starting the Rest API`)
+    this.pupApi.log("info", "rest", `Starting the Rest API on ${this.hostname}:${this.port}`)
     await this.app.listen({
       port: this.port,
       hostname: this.hostname,
       signal: this.appAbortController.signal,
     })
-    this.pupApi.log(
-      "info",
-      "rest",
-      `Rest API running, available on ${this.hostname}:${this.port}`,
-    )
     return this.port
   }
 

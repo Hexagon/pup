@@ -35,6 +35,8 @@ import { PupRestClient } from "@pup/api-client"
 import { CurrentRuntime, Runtime } from "@cross/runtime"
 import { Prop } from "../common/prop.ts"
 import { encodeBase64 } from "@std/encoding/base64"
+import { ApiLogItem } from "@pup/api-definitions"
+import { EventHandler } from "@pup/common/eventemitter"
 
 /**
  * Define the main entry point of the CLI application
@@ -222,7 +224,7 @@ async function main() {
 
       // Send api request
       const apiBaseUrl = `http://${configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME}:${port}`
-      client = new PupRestClient(apiBaseUrl, token!)
+      client = new PupRestClient(apiBaseUrl, token!, baseArgument === "monitor", 3000, 1)
     } catch (_e) {
       /* Ignore */
     }
@@ -240,6 +242,9 @@ async function main() {
       const expiresInSeconds = checkedArgs.get("expire-in")
       if (expiresInSeconds) {
         expiresAt = Date.now() + (parseInt(expiresInSeconds, 10) * 1000)
+      } else {
+        console.error("Error: You need to specify expiry time using --expire-in <seconds>")
+        exit(1)
       }
       const token = await GenerateToken(
         secret,
@@ -360,59 +365,64 @@ async function main() {
    * using websockets, and prints all received messages
    */
   if (baseArgument === "monitor") {
-    const apiHostname = configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME
-    const apiPort = port
-    const wsUrl = `ws://${apiHostname}:${apiPort}/wss`
-    const wss = new WebSocketStream(wsUrl, {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-    })
-    const { readable } = await wss.opened
-    const reader = readable.getReader()
-    while (true) {
-      const { value, done } = await reader.read()
-      if (done) {
-        break
-      }
+    const logHandler = (e: ApiLogItem) => {
       try {
-        const v = JSON.parse(value.toString())
-        if (v.t === "log") {
-          const logWithColors = configuration!.logger?.colors ?? true
+        const logWithColors = configuration!.logger?.colors ?? true
+        const { processId, severity, category, timeStamp, text } = e
+        const severityFilter = !checkedArgs.get("severity") || checkedArgs.get("severity") === "" || checkedArgs.get("severity")!.toLowerCase() === severity.toLowerCase()
+        const processFilter = !checkedArgs.get("id") || checkedArgs.get("id") === "" || !processId || checkedArgs.get("id")!.toLowerCase() === processId.toLowerCase()
 
-          const { processId, severity, category, timeStamp, text } = v.d
+        if (!severityFilter) return
+        if (!processFilter) return
 
-          const severityFilter = !checkedArgs.get("severity") || checkedArgs.get("severity") === "" || checkedArgs.get("severity")!.toLowerCase() === severity.toLowerCase()
-          const processFilter = !checkedArgs.get("id") || checkedArgs.get("id") === "" || !processId || checkedArgs.get("id")!.toLowerCase() === processId.toLowerCase()
-
-          if (!severityFilter) continue
-          if (!processFilter) continue
-
-          const isStdErr = severity === "error" || category === "stderr"
-          const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${processId || "core"}:${category}] ${text}`
-          let color = null
-          // Apply coloring rules
-          if (logWithColors) {
-            if (processId === "core") color = "gray"
-            if (category === "starting") color = "green"
-            if (category === "finished") color = "yellow"
-            if (isStdErr) color = "red"
-          }
-          let logFn = console.log
-          if (severity === "warn") logFn = console.warn
-          if (severity === "info") logFn = console.info
-          if (severity === "error") logFn = console.error
-          if (color !== null) {
-            logFn(`%c${decoratedLogText}`, `color: ${color}`)
-          } else {
-            logFn(decoratedLogText)
-          }
+        const isStdErr = severity === "error" || category === "stderr"
+        const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${processId || "core"}:${category}] ${text}`
+        let color = null
+        // Apply coloring rules
+        if (logWithColors) {
+          if (processId === "core") color = "gray"
+          if (category === "starting") color = "green"
+          if (category === "finished") color = "yellow"
+          if (isStdErr) color = "red"
+        }
+        let logFn = console.log
+        if (severity === "warn") logFn = console.warn
+        if (severity === "info") logFn = console.info
+        if (severity === "error") logFn = console.error
+        if (color !== null) {
+          logFn(`%c${decoratedLogText}`, `color: ${color}`)
+        } else {
+          logFn(decoratedLogText)
         }
       } catch (_e) {
         console.error("Error in log streamer: " + _e)
       }
     }
-    return
+
+    // Test the client
+    let responseState
+    try {
+      responseState = await client?.getState()
+      if (!responseState?.data) {
+        console.error("Could not contact the Pup instance.")
+        exit(1)
+      }
+    } catch (_e) {
+      console.error("Action failed: Could not contact the Pup instance.")
+      exit(1)
+    }
+
+    // Output status
+    console.log(`Connected to Pup, streaming logs. Abort with CTRL+C.`)
+
+    // Start streaming logs
+    client?.on("log", logHandler as EventHandler<unknown>)
+
+    // Wait a year or so
+    await new Promise((resolve) => setTimeout(resolve, 365 * 24 * 60 * 60 * 1000))
+
+    // Exit
+    exit(0)
   }
 
   /**
@@ -537,7 +547,7 @@ async function main() {
           return exit(1)
         }
       } catch (e) {
-        console.error("Action failed:", e)
+        console.error("Action failed:", e.name)
         return exit(1)
       }
     }
@@ -556,7 +566,11 @@ async function main() {
         console.warn(`Pup already running. Exiting.`)
         exit(1)
       }
-    } catch (_e) { /* Expected! ^*/ }
+    } catch (_e) {
+      /* Expected! ^*/
+    } finally {
+      client?.close()
+    }
 
     /**
      * Error handling: Require at least one configured process
