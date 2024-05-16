@@ -431,6 +431,7 @@ async function main() {
   if (baseArgument === "logs") {
     const logStore = `${await toPersistentPath(configFile as string)}/.main.log`
     const logger = new Logger(configuration!.logger || {}, logStore)
+    await logger.init()
     const startTimestamp = checkedArgs.get("start") ? new Date(Date.parse(checkedArgs.get("start")!)).getTime() : undefined
     const endTimestamp = checkedArgs.get("end") ? new Date(Date.parse(checkedArgs.get("end")!)).getTime() : undefined
     const numberOfRows = checkedArgs.get("n") ? parseInt(checkedArgs.get("n")!, 10) : undefined
@@ -496,7 +497,7 @@ async function main() {
         exit(1)
       }
     } catch (_e) {
-      console.error("Action failed: Could not contact the Pup instance.")
+      console.error("Action failed: Could not contact the Pup instance.", _e)
       exit(1)
     }
   }
@@ -587,14 +588,16 @@ async function main() {
       pup.init()
 
       // Register for running pup.terminate() if not already run on clean exit
-      let hasRunShutdownCode = false
-      globalThis.addEventListener("beforeunload", (evt) => {
-        if (!hasRunShutdownCode) {
-          evt.preventDefault()
-          hasRunShutdownCode = true
-          ;(async () => await pup.terminate(30000))()
-        }
-      })
+      if (globalThis.addEventListener) {
+        let hasRunShutdownCode = false
+        globalThis.addEventListener("beforeunload", (evt) => {
+          if (!hasRunShutdownCode) {
+            evt.preventDefault()
+            hasRunShutdownCode = true
+            ;(async () => await pup.terminate(30000))()
+          }
+        })
+      }
 
       if (CurrentRuntime === Runtime.Deno) {
         // This is needed to trigger termination in Deno

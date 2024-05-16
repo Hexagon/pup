@@ -7,10 +7,6 @@
     "./lib": "./mod.ts"
   },
 
-  "unstable": [
-    "kv"
-  ],
-
   "fmt": {
     "lineWidth": 200,
     "semiColons": false,
@@ -30,7 +26,7 @@
 
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-net=jsr.io,registry.npmjs.org jsr:@check/deps",
-    "check": "deno fmt --check && deno lint && deno check --unstable-kv pup.ts && deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --unstable-kv --coverage=cov_profile && echo \"Generating coverage\" && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",
+    "check": "deno fmt --check && deno lint && deno check pup.ts && deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --coverage=cov_profile && echo \"Generating coverage\" && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",
     "check-coverage": "deno task check && genhtml cov_profile.lcov --output-directory cov_profile/html && lcov --list cov_profile.lcov && deno run --allow-net --allow-read https://deno.land/std/http/file_server.ts cov_profile/html",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env tools/release.ts && deno fmt",
@@ -42,12 +38,13 @@
     "@cross/env": "jsr:@cross/env@^1.0.2",
     "@cross/fs": "jsr:@cross/fs@^0.1.11",
     "@cross/jwt": "jsr:@cross/jwt@^0.4.7",
+    "@cross/kv": "jsr:@cross/kv@^0.0.13",
     "@cross/runtime": "jsr:@cross/runtime@^1.0.0",
     "@cross/service": "jsr:@cross/service@^1.0.3",
     "@cross/test": "jsr:@cross/test@^0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.12.0",
     "@hexagon/croner": "jsr:@hexagon/croner@^8.0.2",
-    "@oak/oak": "jsr:@oak/oak@^15.0.0",
+    "@oak/oak": "jsr:@oak/oak@^16.0.0",
     "@pup/api-client": "jsr:@pup/api-client@^1.0.6",
     "@pup/api-definitions": "jsr:@pup/api-definitions@^1.0.2",
     "@pup/common": "jsr:@pup/common@^1.0.3",

@@ -8,9 +8,13 @@
 import { Application } from "../../application.meta.ts"
 import { APPLICATION_STATE_WRITE_LIMIT_MS } from "./configuration.ts"
 import { type Process, type ProcessInformation } from "./process.ts"
-import { ApiProcessState } from "@pup/api-definitions"
+import { ApiMemoryUsage, ApiProcessState, ApiSystemMemory } from "@pup/api-definitions"
+import { KV } from "@cross/kv"
 
 import { Prop } from "../common/prop.ts"
+import { loadAvg, memoryUsage, systemMemoryInfo, uptime } from "../common/sysinfo.ts"
+import { getCurrentOS, getCurrentRuntime, getCurrentVersion } from "@cross/runtime"
+import { pid } from "@cross/utils"
 
 const started = new Date()
 
@@ -24,12 +28,12 @@ export interface ApplicationState {
   updated: string
   started: string
   port: number
-  memory: Deno.MemoryUsage
-  systemMemory: Deno.SystemMemoryInfo
+  memory: ApiMemoryUsage
+  systemMemory: ApiSystemMemory
   loadAvg: number[]
   osUptime: number
   osRelease: string
-  denoVersion: { deno: string; v8: string; typescript: string }
+  runtime: string
   type: string
   processes: ProcessInformation[]
 }
@@ -58,7 +62,8 @@ class Status {
    */
   public async writeToStore(applicationState: ApplicationState) {
     try {
-      const kv = await Deno.openKv(this.storeName)
+      const kv = new KV({ autoSync: false })
+      await kv.open(this.storeName!)
 
       // Initialize lastWrite if it's not set
       if (!this.lastWrite) {
@@ -73,7 +78,7 @@ class Status {
 
       // Always write last_application_state
       await kv.set(["last_application_state"], applicationState)
-      kv.close()
+      await kv.close()
     } catch (e) {
       console.error("Error while writing status to kv store: " + e.message)
     }
@@ -85,9 +90,10 @@ class Status {
    */
   public async cleanup() {
     try {
-      const kv = await Deno.openKv(this.storeName)
+      const kv = new KV({ autoSync: false })
+      await kv.open(this.storeName!)
       await kv.delete(["last_application_state"])
-      kv.close()
+      await kv.close()
     } catch (e) {
       console.error("Error while writing status to kv store: " + e.message)
     }
@@ -104,19 +110,18 @@ class Status {
       return 0
     }
     try {
-      const store = await Deno.openKv(this.storeName)
+      const kv = new KV({ autoSync: false })
+      await kv.open(this.storeName)
       const now = Date.now()
       const startTime = now - keepHours * 60 * 60 * 1000
-      const logsByTimeSelector = {
-        prefix: ["application_state"],
-        end: ["application_state", startTime],
-      }
+      const logsByTimeSelector = ["application_state", { to: startTime }]
       let rowsDeleted = 0
-      for await (const entry of store.list(logsByTimeSelector)) {
+      for await (const entry of kv.iterate(logsByTimeSelector)) {
         rowsDeleted++
-        await store.delete(entry.key)
+        await kv.delete(entry.key)
       }
-      store.close()
+      await kv.vacuum()
+      await kv.close()
       return rowsDeleted
     } catch (error) {
       console.error(`Failed to purge logs from store '${this.storeName}': ${error.message}`)
@@ -134,19 +139,25 @@ class Status {
     for (const p of processes) {
       processStates.push(p.getStatus())
     }
+    const memory = memoryUsage()
+    const systemMemory = systemMemoryInfo()
+    const loadAverage = loadAvg()
+    const osUptime = uptime()
+    const osRelease = getCurrentOS().toString()
+    const runtime = getCurrentRuntime().toString() + " " + getCurrentVersion()
     return {
-      pid: Deno.pid,
+      pid: pid(),
       version: Application.version,
       status: ApiProcessState[ApiProcessState.RUNNING],
       updated: new Date().toISOString(),
       started: started.toISOString(),
-      memory: Deno.memoryUsage(),
+      memory,
       port: port ? parseInt(port.fromCache()!, 10) : 0,
-      systemMemory: Deno.systemMemoryInfo(),
-      loadAvg: Deno.loadavg(),
-      osUptime: Deno.osUptime(),
-      osRelease: Deno.osRelease(),
-      denoVersion: Deno.version,
+      systemMemory,
+      loadAvg: loadAverage,
+      osUptime,
+      osRelease,
+      runtime,
       type: "main",
       processes: processStates,
     }

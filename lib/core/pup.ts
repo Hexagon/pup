@@ -31,6 +31,7 @@ import { rm } from "@cross/fs"
 import { findFreePort } from "./port.ts"
 import { Plugin } from "./plugin.ts"
 import { GenerateToken, SecondsToExpiry } from "../common/token.ts"
+import { CurrentRuntime, Runtime } from "@cross/runtime"
 interface InstructionResponse {
   success: boolean
   action?: string
@@ -90,7 +91,7 @@ class Pup {
     this.configuration = validateConfiguration(unvalidatedConfiguration)
 
     // Initialise core logger
-    this.logger = new Logger(this.configuration.logger ?? {}, logStore)
+    this.logger = new Logger(this.configuration.logger ?? {}, logStore || "./main.log")
 
     // Global error handler
     this.registerGlobalErrorHandler()
@@ -129,6 +130,9 @@ class Pup {
   }
 
   public init = async () => {
+    // Intialize logging
+    await this.logger.init()
+
     // Initialize api
     await this.api()
 
@@ -398,7 +402,13 @@ class Pup {
     this.maintenanceTimer = setTimeout(() => {
       this.maintenance()
     }, MAINTENANCE_INTERVAL_MS)
-    Deno.unrefTimer(this.maintenanceTimer)
+    if (CurrentRuntime === Runtime.Deno) {
+      Deno.unrefTimer(this.maintenanceTimer)
+      // @ts-ignore unref exists in node and bun
+    } else if (this.maintenanceTimer?.unref) {
+      // @ts-ignore unref exists in node and bun
+      this.maintenanceTimer.unref()
+    }
   }
 
   public restart(id: string, requestor: string): boolean {
@@ -513,13 +523,15 @@ class Pup {
   }
 
   private registerGlobalErrorHandler() {
-    addEventListener("error", (event) => {
-      this.logger.error(
-        "fatal",
-        `Unhandled error caught by core: ${event.error.message}`,
-      )
-      event.preventDefault()
-    })
+    if (globalThis.addEventListener) {
+      addEventListener("error", (event) => {
+        this.logger.error(
+          "fatal",
+          `Unhandled error caught by core: ${event.error.message}`,
+        )
+        event.preventDefault()
+      })
+    }
   }
 }
 

@@ -7,7 +7,9 @@
  */
 
 import { stripAnsi } from "@cross/utils"
-import { type GlobalLoggerConfiguration, KV_SIZE_LIMIT_BYTES, type ProcessConfiguration } from "./configuration.ts"
+import { type GlobalLoggerConfiguration, KV_LIMIT_STRING_LENGTH_BYTES, type ProcessConfiguration } from "./configuration.ts"
+import { KV, KVKeyRange, KVQuery } from "@cross/kv"
+import { writeFile } from "@cross/fs"
 
 export interface LogEvent {
   severity: string
@@ -29,11 +31,17 @@ type AttachedLogger = (severity: string, category: string, text: string, process
 class Logger {
   private config: GlobalLoggerConfiguration = {}
   private attachedLogger?: AttachedLogger
-  private storeName?: string
+  private storeName: string
+  private kv: KV
 
-  constructor(globalConfiguration: GlobalLoggerConfiguration, storeName?: string) {
+  constructor(globalConfiguration: GlobalLoggerConfiguration, storeName: string) {
     this.config = globalConfiguration
     this.storeName = storeName
+    this.kv = new KV({ autoSync: false })
+  }
+
+  public async init(): Promise<void> {
+    await this.kv.open(this.storeName)
   }
 
   // Used for attaching the logger hook
@@ -42,27 +50,32 @@ class Logger {
   }
 
   // Prepare log event selector
-  private prepareSelector(processId?: string, startTimeStamp?: number, endTimeStamp?: number): { prefix: Deno.KvKey } | { start: Deno.KvKey; end: Deno.KvKey } {
-    const key = processId ? ["logs_by_process", processId] : ["logs_by_time"]
+  private prepareSelector(processId?: string, startTimeStamp?: number, endTimeStamp?: number): KVQuery {
+    const key: KVQuery = processId ? ["logs_by_time", {}, processId] : ["logs_by_time"]
     if (startTimeStamp || endTimeStamp) {
-      const startKey: (string | number)[] = [...key, startTimeStamp || 0]
-      const endKey: (string | number)[] = [...key, endTimeStamp || Infinity]
-      return { start: startKey, end: endKey }
+      const rangeSelector: KVKeyRange = {}
+      if (startTimeStamp) {
+        rangeSelector.from = startTimeStamp
+      }
+      if (endTimeStamp) {
+        rangeSelector.to = endTimeStamp
+      }
+      key.push(rangeSelector)
     }
-    return { prefix: key }
+    return key
   }
 
   // Fetch logs from store
-  private async fetchLogsFromStore(selector: { prefix: Deno.KvKey } | { start: Deno.KvKey; end: Deno.KvKey }, nRows?: number): Promise<LogEventData[]> {
-    const store = await Deno.openKv(this.storeName)
-    const result = await store.list(selector)
+  private async fetchLogsFromStore(selector: KVQuery, nRows?: number): Promise<LogEventData[]> {
+    const result = await this.kv.listAll(selector)
     const resultArray: LogEventData[] = []
-    for await (const res of result) resultArray.push(res.value as LogEventData)
+    for await (const res of result) {
+      resultArray.push(res.data as LogEventData)
+    }
     if (nRows) {
       const spliceNumber = Math.max(0, resultArray.length - nRows)
       resultArray.splice(0, spliceNumber)
     }
-    store.close()
     return resultArray
   }
 
@@ -84,7 +97,7 @@ class Logger {
   }
 
   private async internalLog(severity: string, category: string, text: string, process?: ProcessConfiguration, timeStamp?: number) {
-    // Default initiator to
+    // Default initiator to core
     const initiator = process?.id || "core"
 
     timeStamp = timeStamp || Date.now()
@@ -92,31 +105,19 @@ class Logger {
     // Write to persistent log store (if a name is supplied and internal logging is enabled)
     const logHours = this.config.internalLogHours === undefined ? 72 : this.config.internalLogHours
     if (this.storeName && logHours > 0) {
-      const textBytes = new TextEncoder().encode(text)
-      const store = await Deno.openKv(this.storeName)
-      let i = 0, offset = 0
-      while (offset < textBytes.length) {
-        // Give 6000 bytes margin to make it less likely that the full serialized object exceeds the KV limit
-        const slice = textBytes.subarray(offset, offset + KV_SIZE_LIMIT_BYTES - 6000)
-        // Ignore errors when writing to log store
-        try {
-          const logObj: LogEventData = {
-            severity,
-            category,
-            text: new TextDecoder().decode(slice),
-            processId: initiator,
-            timeStamp: timeStamp + i,
-          }
-          await store.set(["logs_by_time", timeStamp + i], logObj)
-          await store.set(["logs_by_process", initiator, timeStamp + i], logObj)
-          await store.set(["logs_by_process_lookup", timeStamp + i], ["logs_by_process", initiator, timeStamp + i])
-          i++
-        } catch (error) {
-          console.error(`Failed to write log to store '${this.storeName}' due to '${error.message}'. The following message was not logged: ${text}.`)
+      // Ignore errors when writing to log store
+      try {
+        const logObj: LogEventData = {
+          severity,
+          category,
+          text: text.length > KV_LIMIT_STRING_LENGTH_BYTES ? text.substring(0, KV_LIMIT_STRING_LENGTH_BYTES) + "..." : text,
+          processId: initiator,
+          timeStamp: timeStamp,
         }
-        offset += KV_SIZE_LIMIT_BYTES - 6000
+        await this.kv.set(["logs_by_time", timeStamp, initiator], logObj)
+      } catch (e) {
+        console.error("Error while writing to log store", e)
       }
-      store.close()
     }
 
     // Delegate to attached logger if there is one
@@ -199,7 +200,7 @@ class Logger {
     // Strip colors
     text = stripAnsi(text)
     try {
-      await Deno.writeTextFile(fileName, `${text}\n`, { append: true })
+      await writeFile(fileName, `${text}\n`, { append: true })
     } catch (_e) {
       if (!quiet) console.error(`Failed to write log '${fileName}'. The following message were not logged: ${text}.`)
     }
@@ -229,32 +230,18 @@ class Logger {
     if (!this.storeName) {
       return 0
     }
+
     try {
-      const store = await Deno.openKv(this.storeName)
       const now = Date.now()
       const startTime = now - keepHours * 60 * 60 * 1000
-      const logsByTimeSelector = {
-        prefix: ["logs_by_time"],
-        end: ["logs_by_time", startTime],
-      }
+      const logsByTimeSelector: KVQuery = ["logs_by_time", { to: startTime }]
       let rowsDeleted = 0
-      for await (const entry of store.list(logsByTimeSelector)) {
-        await store.delete(entry.key)
+      for await (const entry of this.kv.iterate(logsByTimeSelector)) {
+        await this.kv.delete(entry.key)
         rowsDeleted++
       }
-      const logsByProcessSelector = {
-        prefix: ["logs_by_process_lookup"],
-        end: ["logs_by_process_lookup", startTime],
-      }
-      let rowsDeletedProcess = 0
-      for await (const entry of store.list(logsByProcessSelector)) {
-        // Delete both the lookup key and the actual key
-        await store.delete(entry.value as Deno.KvKey)
-        await store.delete(entry.key)
-        rowsDeletedProcess++
-      }
-      store.close()
-      return rowsDeleted + rowsDeletedProcess
+      await this.kv.vacuum()
+      return rowsDeleted
     } catch (error) {
       this.log("error", `Failed to purge logs from store '${this.storeName}': ${error.message}`)
       return 0

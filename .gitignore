@@ -46,9 +46,7 @@ coverage
 _site
 
 # Node files
-.npmrc
 package-lock.json
-package.json
 node_modules
 
 # VSCode files
