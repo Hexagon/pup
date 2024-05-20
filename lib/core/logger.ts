@@ -200,7 +200,7 @@ class Logger {
     // Strip colors
     text = stripAnsi(text)
     try {
-      await writeFile(fileName, `${text}\n`, { append: true })
+      await writeFile(fileName, `${text}\n`, { mode: "a+" })
     } catch (_e) {
       if (!quiet) console.error(`Failed to write log '${fileName}'. The following message were not logged: ${text}.`)
     }

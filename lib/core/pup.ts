@@ -523,6 +523,7 @@ class Pup {
   }
 
   private registerGlobalErrorHandler() {
+    // @ts-ignore Cross Runtime
     if (globalThis.addEventListener) {
       addEventListener("error", (event) => {
         this.logger.error(

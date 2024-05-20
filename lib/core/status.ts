@@ -8,7 +8,7 @@
 import { Application } from "../../application.meta.ts"
 import { APPLICATION_STATE_WRITE_LIMIT_MS } from "./configuration.ts"
 import { type Process, type ProcessInformation } from "./process.ts"
-import { ApiMemoryUsage, ApiProcessState, ApiSystemMemory } from "@pup/api-definitions"
+import { ApiApplicationState, ApiProcessState } from "@pup/api-definitions"
 import { KV } from "@cross/kv"
 
 import { Prop } from "../common/prop.ts"
@@ -17,26 +17,6 @@ import { getCurrentOS, getCurrentRuntime, getCurrentVersion } from "@cross/runti
 import { pid } from "@cross/utils"
 
 const started = new Date()
-
-/**
- * Represents the current status of the application.
- */
-export interface ApplicationState {
-  pid: number
-  version: string
-  status: string
-  updated: string
-  started: string
-  port: number
-  memory: ApiMemoryUsage
-  systemMemory: ApiSystemMemory
-  loadAvg: number[]
-  osUptime: number
-  osRelease: string
-  runtime: string
-  type: string
-  processes: ProcessInformation[]
-}
 
 /**
  * Represents the status of the application and provides methods to write the status to disk or store.
@@ -60,7 +40,7 @@ class Status {
    * Key ["application_state", <timestamp>] is written at most once per 20 seconds.
    * @param applicationState The application state to be stored.
    */
-  public async writeToStore(applicationState: ApplicationState) {
+  public async writeToStore(applicationState: ApiApplicationState) {
     try {
       const kv = new KV({ autoSync: false })
       await kv.open(this.storeName!)
@@ -134,7 +114,7 @@ class Status {
    * @param processes The list of processes to retrieve the statuses from.
    * @returns The application state object.
    */
-  public applicationState(processes: Process[], port?: Prop): ApplicationState {
+  public applicationState(processes: Process[], port?: Prop): ApiApplicationState {
     const processStates: ProcessInformation[] = []
     for (const p of processes) {
       processStates.push(p.getStatus())
