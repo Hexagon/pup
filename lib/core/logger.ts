@@ -8,7 +8,7 @@
 
 import { stripAnsi } from "@cross/utils"
 import { type GlobalLoggerConfiguration, KV_LIMIT_STRING_LENGTH_BYTES, type ProcessConfiguration } from "./configuration.ts"
-import { KV, KVKeyRange, KVQuery } from "@cross/kv"
+import { KV, KVQuery, KVQueryRange } from "@cross/kv"
 import { writeFile } from "@cross/fs"
 
 export interface LogEvent {
@@ -53,7 +53,7 @@ class Logger {
   private prepareSelector(processId?: string, startTimeStamp?: number, endTimeStamp?: number): KVQuery {
     const key: KVQuery = processId ? ["logs_by_time", {}, processId] : ["logs_by_time"]
     if (startTimeStamp || endTimeStamp) {
-      const rangeSelector: KVKeyRange = {}
+      const rangeSelector: KVQueryRange = {}
       if (startTimeStamp) {
         rangeSelector.from = startTimeStamp
       }
