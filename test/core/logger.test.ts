@@ -2,8 +2,9 @@ import { assertEquals, assertGreater } from "@std/assert"
 import { type AttachedLogger, type LogEventData, Logger } from "../../lib/core/logger.ts"
 import type { ProcessConfiguration } from "../../mod.ts"
 import { test } from "@cross/test"
+import { tempfile } from "@cross/fs"
 
-test("Logger - Creation with Global Configuration", () => {
+test("Logger - Creation with Global Configuration", async () => {
   const globalConfig = {
     console: false,
     colors: true,
@@ -12,12 +13,12 @@ test("Logger - Creation with Global Configuration", () => {
     stderr: "test_stderr.log",
   }
 
-  const logger = new Logger(globalConfig)
+  const logger = new Logger(globalConfig, await tempfile())
 
   assertEquals(logger instanceof Logger, true)
 })
 
-test("Logger - Attachment of External Logger", () => {
+test("Logger - Attachment of External Logger", async () => {
   let externalLoggerCalled = false
   let externalLoggerText = ""
   const expectedExteralLoggerText = "Testing attached logger"
@@ -32,7 +33,7 @@ test("Logger - Attachment of External Logger", () => {
     return false
   }
 
-  const logger = new Logger({})
+  const logger = new Logger({}, await tempfile())
   logger.attach(externalLogger)
   logger.log("test", expectedExteralLoggerText)
 
@@ -40,8 +41,8 @@ test("Logger - Attachment of External Logger", () => {
   assertEquals(externalLoggerText, expectedExteralLoggerText)
 })
 
-test("Logger - Logging with Different Methods", () => {
-  const logger = new Logger({ console: false })
+test("Logger - Logging with Different Methods", async () => {
+  const logger = new Logger({ console: false }, await tempfile())
 
   logger.log("test", "Testing log method")
   logger.info("test", "Testing info method")
@@ -52,8 +53,9 @@ test("Logger - Logging with Different Methods", () => {
 })
 
 test("Logger - Logging Line Larger than KV Limit", async () => {
-  const tempStore = Deno.makeTempFileSync()
+  const tempStore = await tempfile()
   const logger = new Logger({ console: false }, tempStore)
+  await logger.init()
 
   let chars = 60000
   let data = ""
@@ -83,7 +85,7 @@ test("Logger - Logging Line Larger than KV Limit", async () => {
 })
 
 test("Logger - File Writing with writeFile Method", async () => {
-  const logger = new Logger({ console: false })
+  const logger = new Logger({ console: false }, await tempfile())
   const testFileName = "test_writeFile.log"
   const testText = "Testing writeFile"
   await logger["writeFile"](testFileName, testText)
@@ -95,8 +97,8 @@ test("Logger - File Writing with writeFile Method", async () => {
 })
 
 test("Logger - getLogContents: Fetch all logs", async () => {
-  const tempStore = await Deno.makeTempDir() + "/.store"
-  const logger = new Logger({}, tempStore)
+  const logger = new Logger({}, await tempfile())
+  await logger.init()
 
   const expectedLogs: LogEventData[] = [
     { severity: "info", category: "test1", text: "Log 1", processId: "process-1", timeStamp: 1623626400000 },
@@ -116,6 +118,7 @@ test("Logger - getLogContents: Fetch all logs", async () => {
 test("Logger - getLogContents: Fetch logs by process ID", async () => {
   const tempStore = await Deno.makeTempDir() + "/.store"
   const logger = new Logger({}, tempStore)
+  await logger.init()
 
   const processId = "process-1"
 
@@ -136,6 +139,7 @@ test("Logger - getLogContents: Fetch logs by process ID", async () => {
 test("Logger - getLogContents: Fetch logs by time range", async () => {
   const tempStore = await Deno.makeTempDir() + "/.store"
   const logger = new Logger({}, tempStore)
+  await logger.init()
 
   const startTimeStamp = 1623626400000 // 2023-06-13T12:00:00.000Z
   const endTimeStamp = 1623626500000 // 2023-06-13T12:01:40.000Z
@@ -155,8 +159,8 @@ test("Logger - getLogContents: Fetch logs by time range", async () => {
 })
 
 test("Logger - getLogContents: Fetch logs by process ID and time range", async () => {
-  const tempStore = await Deno.makeTempDir() + "/.store"
-  const logger = new Logger({}, tempStore)
+  const logger = new Logger({}, await tempfile())
+  await logger.init()
 
   const processId = "process-1"
   const startTimeStamp = 1623626400000 // 2023-06-13T12:00:00.000Z
