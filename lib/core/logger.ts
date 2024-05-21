@@ -31,17 +31,17 @@ type AttachedLogger = (severity: string, category: string, text: string, process
 class Logger {
   private config: GlobalLoggerConfiguration = {}
   private attachedLogger?: AttachedLogger
-  private storeName: string
+  private storeName?: string
   private kv: KV
 
-  constructor(globalConfiguration: GlobalLoggerConfiguration, storeName: string) {
+  constructor(globalConfiguration: GlobalLoggerConfiguration, storeName?: string) {
     this.config = globalConfiguration
     this.storeName = storeName
     this.kv = new KV({ autoSync: false })
   }
 
   public async init(): Promise<void> {
-    await this.kv.open(this.storeName)
+    await this.kv.open(this.storeName!)
   }
 
   // Used for attaching the logger hook
@@ -51,7 +51,7 @@ class Logger {
 
   // Prepare log event selector
   private prepareSelector(processId?: string, startTimeStamp?: number, endTimeStamp?: number): KVQuery {
-    const key: KVQuery = processId ? ["logs_by_time", {}, processId] : ["logs_by_time"]
+    const key: KVQuery = ["logs_by_time"]
     if (startTimeStamp || endTimeStamp) {
       const rangeSelector: KVQueryRange = {}
       if (startTimeStamp) {
@@ -61,6 +61,11 @@ class Logger {
         rangeSelector.to = endTimeStamp
       }
       key.push(rangeSelector)
+    } else if (processId) {
+      key.push({})
+    }
+    if (processId) {
+      key.push(processId)
     }
     return key
   }
@@ -200,7 +205,7 @@ class Logger {
     // Strip colors
     text = stripAnsi(text)
     try {
-      await writeFile(fileName, `${text}\n`, { mode: "a+" })
+      await writeFile(fileName, `${text}\n`, { flag: "a+" })
     } catch (_e) {
       if (!quiet) console.error(`Failed to write log '${fileName}'. The following message were not logged: ${text}.`)
     }
