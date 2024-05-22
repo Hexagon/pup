@@ -109,7 +109,7 @@ class Logger {
 
     // Write to persistent log store (if a name is supplied and internal logging is enabled)
     const logHours = this.config.internalLogHours === undefined ? 72 : this.config.internalLogHours
-    if (this.storeName && logHours > 0) {
+    if (this.kv.isOpen() && logHours > 0) {
       // Ignore errors when writing to log store
       try {
         const logObj: LogEventData = {
@@ -232,7 +232,7 @@ class Logger {
     await this.internalLog("error", category, text, process, timestamp)
   }
   public async purge(keepHours: number): Promise<number> {
-    if (!this.storeName) {
+    if (!this.kv?.isOpen()) {
       return 0
     }
 
@@ -250,6 +250,16 @@ class Logger {
     } catch (error) {
       this.log("error", `Failed to purge logs from store '${this.storeName}': ${error.message}`)
       return 0
+    }
+  }
+  /**
+   * Gracefully shut down the logger
+   */
+  public async cleanup() {
+    try {
+      await this.kv?.close()
+    } catch (e) {
+      console.error("Error while closing kv store: " + e.message)
     }
   }
 }

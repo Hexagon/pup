@@ -127,6 +127,9 @@ class Pup {
 
     // Unset last application state
     await this.status.cleanup()
+
+    // Close logger
+    await this.logger.cleanup()
   }
 
   public init = async () => {
@@ -514,10 +517,10 @@ class Pup {
     // Terminate api
     if (this.restApi) this.restApi.terminate()
 
+    await Promise.allSettled(stoppingProcesses)
+
     // Cleanup
     await this.cleanup()
-
-    await Promise.allSettled(stoppingProcesses)
 
     // Deno should exit gracefully now
   }

@@ -5,7 +5,7 @@
     "@cross/env": "npm:@jsr/cross__env@~1.0.2",
     "@cross/fs": "npm:@jsr/cross__fs@~0.1.11",
     "@cross/jwt": "npm:@jsr/cross__jwt@~0.4.7",
-    "@cross/kv": "npm:@jsr/cross__kv@~0.12.0",
+    "@cross/kv": "npm:@jsr/cross__kv@^0.13.2",
     "@cross/runtime": "npm:@jsr/cross__runtime@~1.0.0",
     "@cross/service": "npm:@jsr/cross__service@~1.0.3",
     "@cross/test": "npm:@jsr/cross__test@~0.0.9",
