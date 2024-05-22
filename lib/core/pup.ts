@@ -32,6 +32,7 @@ import { findFreePort } from "./port.ts"
 import { Plugin } from "./plugin.ts"
 import { GenerateToken, SecondsToExpiry } from "../common/token.ts"
 import { CurrentRuntime, Runtime } from "@cross/runtime"
+import { delay } from "@std/async"
 interface InstructionResponse {
   success: boolean
   action?: string
@@ -521,6 +522,11 @@ class Pup {
 
     // Cleanup
     await this.cleanup()
+
+    // Allow some extra time to pass to allow untracked async tasks
+    // (such as logs about closing down) to finish
+    // - But only if at least 500ms were used as grace period
+    if (forceQuitMs >= 500) await delay(500)
 
     // Deno should exit gracefully now
   }
