@@ -81,10 +81,10 @@ class Pup {
 
       this.persistentStoragePath = persistentStoragePath
 
-      statusFile = `${this.persistentStoragePath}/.main.status` // Deno KV store
+      statusFile = `${this.persistentStoragePath}/.main.log.ckvdb` // Cross/KV store
       secretFile = `${this.persistentStoragePath}/.main.secret` // Plain text file containing the JWT secret for the rest api
       portFile = `${this.temporaryStoragePath}/.main.port` // Plain text file containing the port number for the API
-      logStore = `${this.persistentStoragePath}/.main.log` // Deno KV store
+      logStore = `${this.persistentStoragePath}/.main.log.ckvdb` // Cross/KV store
     }
 
     // Throw on invalid configuration
