@@ -100,6 +100,6 @@ export class PupApi {
     this._pup.logger[severity](`api-${consumer}`, message)
   }
   public async getLogs(processId?: string, startTimeStamp?: number, endTimeStamp?: number, nRows?: number): Promise<LogEventData[]> {
-    return await this._pup.logger.getLogContents(processId, startTimeStamp, endTimeStamp, nRows)
+    return await this._pup.logger.getLogContents(processId, startTimeStamp, endTimeStamp, undefined, nRows)
   }
 }

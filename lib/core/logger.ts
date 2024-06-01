@@ -50,7 +50,7 @@ class Logger {
   }
 
   // Prepare log event selector
-  private prepareSelector(processId?: string, startTimeStamp?: number, endTimeStamp?: number): KVQuery {
+  private prepareSelector(processId?: string, startTimeStamp?: number, endTimeStamp?: number, severity?: string): KVQuery {
     const key: KVQuery = ["logs_by_time"]
     if (startTimeStamp || endTimeStamp) {
       const rangeSelector: KVQueryRange = {}
@@ -61,44 +61,46 @@ class Logger {
         rangeSelector.to = endTimeStamp
       }
       key.push(rangeSelector)
-    } else if (processId) {
+    } else if (processId || severity) {
       key.push({})
     }
     if (processId) {
       key.push(processId)
+    } else {
+      key.push({})
+    }
+    if (severity) {
+      key.push(severity)
     }
     return key
   }
 
   // Fetch logs from store
   private async fetchLogsFromStore(selector: KVQuery, nRows?: number): Promise<LogEventData[]> {
-    const result = await this.kv.listAll(selector)
     const resultArray: LogEventData[] = []
-    for await (const res of result) {
-      resultArray.push(res.data as LogEventData)
-    }
-    if (nRows) {
-      const spliceNumber = Math.max(0, resultArray.length - nRows)
-      resultArray.splice(0, spliceNumber)
+
+    // Use the generator for efficient iteration
+    for await (const { data } of this.kv.iterate<LogEventData>(selector, nRows, true)) {
+      resultArray.unshift(data)
     }
     return resultArray
   }
 
-  public async getLogContents(processId?: string, startTimeStamp?: number, endTimeStamp?: number, nRows?: number): Promise<LogEventData[]> {
-    const selector = this.prepareSelector(processId, startTimeStamp, endTimeStamp)
+  public async getLogContents(processId?: string, startTimeStamp?: number, endTimeStamp?: number, severity?: string, nRows?: number): Promise<LogEventData[]> {
+    const selector = this.prepareSelector(processId, startTimeStamp, endTimeStamp, severity)
     return await this.fetchLogsFromStore(selector, nRows)
   }
 
   public async getLogsByProcess(processId: string, nRows?: number): Promise<LogEventData[]> {
-    return await this.getLogContents(processId, undefined, undefined, nRows)
+    return await this.getLogContents(processId, undefined, undefined, undefined, nRows)
   }
 
   public async getLogsByTime(startTimeStamp: number, endTimeStamp: number, nRows?: number): Promise<LogEventData[]> {
-    return await this.getLogContents(undefined, startTimeStamp, endTimeStamp, nRows)
+    return await this.getLogContents(undefined, startTimeStamp, endTimeStamp, undefined, nRows)
   }
 
   public async getLogsByProcessAndTime(processId: string, startTimeStamp: number, endTimeStamp: number, nRows?: number): Promise<LogEventData[]> {
-    return await this.getLogContents(processId, startTimeStamp, endTimeStamp, nRows)
+    return await this.getLogContents(processId, startTimeStamp, endTimeStamp, undefined, nRows)
   }
 
   private async internalLog(severity: string, category: string, text: string, process?: ProcessConfiguration, timeStamp?: number) {
@@ -119,7 +121,8 @@ class Logger {
           processId: initiator,
           timeStamp: timeStamp,
         }
-        await this.kv.set(["logs_by_time", timeStamp, initiator], logObj)
+        // Append a random uuid to the key, in case two logs should arrive at the same time
+        await this.kv.set<LogEventData>(["logs_by_time", timeStamp, initiator, severity, crypto.randomUUID()], logObj)
       } catch (e) {
         console.error("Error while writing to log store", e)
       }

@@ -429,22 +429,19 @@ async function main() {
    * Base argument: logs
    */
   if (baseArgument === "logs") {
-    const logStore = `${await toPersistentPath(configFile as string)}/.main.log`
+    const logStore = `${await toPersistentPath(configFile as string)}/.main.log.ckvdb`
     const logger = new Logger(configuration!.logger || {}, logStore)
     await logger.init()
     const startTimestamp = checkedArgs.get("start") ? new Date(Date.parse(checkedArgs.get("start")!)).getTime() : undefined
     const endTimestamp = checkedArgs.get("end") ? new Date(Date.parse(checkedArgs.get("end")!)).getTime() : undefined
     const numberOfRows = checkedArgs.get("n") ? parseInt(checkedArgs.get("n")!, 10) : undefined
-    let logs = await logger.getLogContents(checkedArgs.get("id"), startTimestamp, endTimestamp)
-    logs = logs.filter((log) => {
-      const { processId, severity } = log
-      const severityFilter = !checkedArgs.get("severity") || checkedArgs.get("severity") === "" || checkedArgs.get("severity")!.toLowerCase() === severity.toLowerCase()
-      const processFilter = !checkedArgs.get("id") || checkedArgs.get("id") === "" || checkedArgs.get("id")!.toLowerCase() === processId.toLowerCase()
-      return severityFilter && processFilter
-    })
-    if (numberOfRows) {
-      logs = logs.slice(-numberOfRows)
-    }
+    const logs = await logger.getLogContents(
+      (!checkedArgs.get("id") || checkedArgs.get("id") === "") ? undefined : checkedArgs.get("id")!.toLowerCase(),
+      startTimestamp,
+      endTimestamp,
+      (!checkedArgs.get("severity") || checkedArgs.get("severity") === "") ? undefined : checkedArgs.get("severity")!.toLowerCase(),
+      numberOfRows,
+    )
     if (logs && logs.length > 0) {
       const logWithColors = configuration!.logger?.colors ?? true
       for (const log of logs) {
