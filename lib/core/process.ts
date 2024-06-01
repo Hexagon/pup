@@ -333,7 +333,7 @@ class Process {
    * Stops the process.
    * @param {string} reason - The reason for stopping the process.
    */
-  public restart = (reason: string) => {
+  public restart = (reason: string): void => {
     this.stop(reason)
     this.pendingRestartReason = reason
   }
@@ -342,7 +342,7 @@ class Process {
    * Blocks the process.
    * @param {string} reason - The reason for blocking the process.
    */
-  public block = (reason: string) => {
+  public block = (reason: string): void => {
     this.blocked = true
     this.pup.logger.log("block", `Process blocked, reason: ${reason}`, this.config)
   }
@@ -351,7 +351,7 @@ class Process {
    * Unblocks the process.
    * @param {string} reason - The reason for unblocking the process.
    */
-  public unblock = (reason: string) => {
+  public unblock = (reason: string): void => {
     this.blocked = false
     this.pup.logger.log("unblock", `Process unblocked, reason: ${reason}`, this.config)
   }

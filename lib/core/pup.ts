@@ -116,7 +116,7 @@ class Pup {
    * This is intended to be called by global unload event
    * and clears any stray files
    */
-  public cleanup = async () => {
+  public cleanup = async (): Promise<void> => {
     for (const cleanupFilePath of this.cleanupQueue) {
       try {
         await rm(cleanupFilePath, { recursive: true })
@@ -133,7 +133,7 @@ class Pup {
     await this.logger.cleanup()
   }
 
-  public init = async () => {
+  public init = async (): Promise<void> => {
     // Intialize logging
     await this.logger.init()
 
