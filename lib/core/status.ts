@@ -12,7 +12,7 @@ import { ApiApplicationState, ApiProcessState } from "@pup/api-definitions"
 import { KV } from "@cross/kv"
 
 import { Prop } from "../common/prop.ts"
-import { loadAvg, memoryUsage, systemMemoryInfo, uptime } from "../common/sysinfo.ts"
+import { loadAvg, memoryUsage, systemMemoryInfo, uptime } from "@cross/utils/sysinfo"
 import { getCurrentOS, getCurrentRuntime, getCurrentVersion } from "@cross/runtime"
 import { pid } from "@cross/utils"
 
