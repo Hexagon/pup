@@ -12,7 +12,7 @@ import type { ProcessConfiguration } from "./configuration.ts"
 import { Watcher } from "./watcher.ts"
 import type { ApiTelemetryData } from "@pup/api-definitions"
 
-import { Cron } from "croner"
+import { Cron } from "@hexagon/croner"
 import { delay } from "@std/async"
 
 import { ApiProcessState } from "@pup/api-definitions"
