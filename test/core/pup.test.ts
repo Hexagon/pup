@@ -60,8 +60,8 @@ test("Create test process. Test start, block, stop, start, unblock, start in seq
   assertEquals(startResult3, true)
   assertEquals(testProcess?.getStatus().status, ApiProcessState.STARTING)
 
-  // Terminate pup instantly
-  await pup.terminate(0)
+  // Terminate pup, allow 2.5 seconds for graceful shutdown
+  await pup.terminate(2500)
 })
 
 test("Create test cluster. Test start, block, stop, start, unblock, start in sequence.", async () => {
@@ -117,6 +117,6 @@ test("Create test cluster. Test start, block, stop, start, unblock, start in seq
   assertEquals(startResult3, true)
   assertEquals(testProcess?.getStatus().status, ApiProcessState.STARTING)
 
-  // Terminate pup instantly
-  await pup.terminate(0)
+  // Terminate pup, allow 2.5 seconds for graceful shutdown
+  await pup.terminate(2500)
 })

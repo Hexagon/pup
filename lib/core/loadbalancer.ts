@@ -5,6 +5,7 @@
  * @license   MIT
  */
 
+import { CurrentRuntime, Runtime } from "@cross/runtime"
 import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S } from "./configuration.ts"
 
 export enum BalancingStrategy {
@@ -77,7 +78,13 @@ export class LoadBalancer {
   private setupValidationTimer(): number {
     const timer = setInterval(() => this.validateBackends(), this.validationInterval * 1000)
     // Make the timer non-blocking
-    Deno.unrefTimer(timer)
+    if (CurrentRuntime === Runtime.Deno) {
+      Deno.unrefTimer(timer)
+      // @ts-ignore unref exists in node and bun
+    } else if (timer.unref) {
+      // @ts-ignore unref exists in node and bun
+      timer.unref()
+    }
     return timer
   }
 

@@ -25,7 +25,7 @@ class Cluster extends Process {
     this.setInstances(this.config.cluster?.instances || 1)
   }
 
-  public override start = async (reason?: string, restart?: boolean) => {
+  public override start = async (reason?: string, restart?: boolean): Promise<void> => {
     await Promise.all(
       this.processes.map((process) => process.start(reason, restart)),
     )
@@ -35,7 +35,7 @@ class Cluster extends Process {
     return true
   }
 
-  public setInstances = (nInstances: number) => {
+  public setInstances = (nInstances: number): void => {
     const backends = []
 
     // ToDo: If there already are processes, reuse, stop or add
@@ -125,15 +125,15 @@ class Cluster extends Process {
     return Promise.allSettled(results).then((results) => results.every((result) => result))
   }
 
-  public override restart = (reason: string) => {
+  public override restart = (reason: string): void => {
     this.processes.forEach((process) => process.restart(reason))
   }
 
-  public override block = (reason: string) => {
+  public override block = (reason: string): void => {
     this.processes.forEach((process) => process.block(reason))
   }
 
-  public override unblock = (reason: string) => {
+  public override unblock = (reason: string): void => {
     this.processes.forEach((process) => process.unblock(reason))
   }
 
@@ -175,7 +175,7 @@ class Cluster extends Process {
     return clusterStatus
   }
 
-  public cleanup = () => {
+  public cleanup = (): void => {
     this.loadBalancerWorker?.terminate()
     this.loadBalancerWorker = null
   }

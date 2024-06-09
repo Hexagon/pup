@@ -176,9 +176,6 @@ export async function upgrade(
   if (ignoreCertificateErrorsString && ignoreCertificateErrorsString !== "") {
     installCmd.push(ignoreCertificateErrorsString)
   }
-  if (unstableInstall) {
-    installCmd.push("--unstable-kv")
-  }
   installCmd.push("-n", "pup") // Installed command name = pup
   installCmd.push(canaryInstall ? versions.canary_url : (requestedVersion as Version).url)
 

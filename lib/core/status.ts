@@ -8,31 +8,15 @@
 import { Application } from "../../application.meta.ts"
 import { APPLICATION_STATE_WRITE_LIMIT_MS } from "./configuration.ts"
 import { type Process, type ProcessInformation } from "./process.ts"
-import { ApiProcessState } from "@pup/api-definitions"
+import { ApiApplicationState, ApiProcessState } from "@pup/api-definitions"
+import { KV } from "@cross/kv"
 
 import { Prop } from "../common/prop.ts"
+import { loadAvg, memoryUsage, systemMemoryInfo, uptime } from "@cross/utils/sysinfo"
+import { getCurrentOS, getCurrentRuntime, getCurrentVersion } from "@cross/runtime"
+import { pid } from "@cross/utils"
 
 const started = new Date()
-
-/**
- * Represents the current status of the application.
- */
-export interface ApplicationState {
-  pid: number
-  version: string
-  status: string
-  updated: string
-  started: string
-  port: number
-  memory: Deno.MemoryUsage
-  systemMemory: Deno.SystemMemoryInfo
-  loadAvg: number[]
-  osUptime: number
-  osRelease: string
-  denoVersion: { deno: string; v8: string; typescript: string }
-  type: string
-  processes: ProcessInformation[]
-}
 
 /**
  * Represents the status of the application and provides methods to write the status to disk or store.
@@ -56,26 +40,29 @@ class Status {
    * Key ["application_state", <timestamp>] is written at most once per 20 seconds.
    * @param applicationState The application state to be stored.
    */
-  public async writeToStore(applicationState: ApplicationState) {
-    try {
-      const kv = await Deno.openKv(this.storeName)
+  public async writeToStore(applicationState: ApiApplicationState) {
+    if (this.storeName) {
+      try {
+        const kv = new KV({ autoSync: false, disableIndex: true })
+        await kv.open(this.storeName)
 
-      // Initialize lastWrite if it's not set
-      if (!this.lastWrite) {
-        this.lastWrite = 0
+        // Initialize lastWrite if it's not set
+        if (!this.lastWrite) {
+          this.lastWrite = 0
+        }
+
+        // Write application_state at most once per APPLICATION_STATE_WRITE_LIMIT_MS
+        if (Date.now() - this.lastWrite > APPLICATION_STATE_WRITE_LIMIT_MS) {
+          this.lastWrite = Date.now()
+          await kv.set(["application_state", Date.now()], applicationState)
+        }
+
+        // Always write last_application_state
+        await kv.set(["last_application_state"], applicationState)
+        await kv.close()
+      } catch (e) {
+        console.error("Error while writing status to kv store: " + e.message)
       }
-
-      // Write application_state at most once per APPLICATION_STATE_WRITE_LIMIT_MS
-      if (Date.now() - this.lastWrite > APPLICATION_STATE_WRITE_LIMIT_MS) {
-        this.lastWrite = Date.now()
-        await kv.set(["application_state", Date.now()], applicationState)
-      }
-
-      // Always write last_application_state
-      await kv.set(["last_application_state"], applicationState)
-      kv.close()
-    } catch (e) {
-      console.error("Error while writing status to kv store: " + e.message)
     }
   }
 
@@ -84,12 +71,15 @@ class Status {
    * unsetting last_application_state in the kv store.
    */
   public async cleanup() {
-    try {
-      const kv = await Deno.openKv(this.storeName)
-      await kv.delete(["last_application_state"])
-      kv.close()
-    } catch (e) {
-      console.error("Error while writing status to kv store: " + e.message)
+    if (this.storeName) {
+      try {
+        const kv = new KV({ autoSync: false, disableIndex: true })
+        await kv.open(this.storeName)
+        await kv.delete(["last_application_state"])
+        await kv.close()
+      } catch (e) {
+        console.error("Error while writing status to kv store: " + e.message)
+      }
     }
   }
 
@@ -104,19 +94,18 @@ class Status {
       return 0
     }
     try {
-      const store = await Deno.openKv(this.storeName)
+      const kv = new KV({ autoSync: false })
+      await kv.open(this.storeName)
       const now = Date.now()
       const startTime = now - keepHours * 60 * 60 * 1000
-      const logsByTimeSelector = {
-        prefix: ["application_state"],
-        end: ["application_state", startTime],
-      }
+      const logsByTimeSelector = ["application_state", { to: startTime }]
       let rowsDeleted = 0
-      for await (const entry of store.list(logsByTimeSelector)) {
+      for await (const entry of kv.iterate(logsByTimeSelector)) {
         rowsDeleted++
-        await store.delete(entry.key)
+        await kv.delete(entry.key)
       }
-      store.close()
+      await kv.vacuum()
+      await kv.close()
       return rowsDeleted
     } catch (error) {
       console.error(`Failed to purge logs from store '${this.storeName}': ${error.message}`)
@@ -129,24 +118,30 @@ class Status {
    * @param processes The list of processes to retrieve the statuses from.
    * @returns The application state object.
    */
-  public applicationState(processes: Process[], port?: Prop): ApplicationState {
+  public applicationState(processes: Process[], port?: Prop): ApiApplicationState {
     const processStates: ProcessInformation[] = []
     for (const p of processes) {
       processStates.push(p.getStatus())
     }
+    const memory = memoryUsage()
+    const systemMemory = systemMemoryInfo()
+    const loadAverage = loadAvg()
+    const osUptime = uptime()
+    const osRelease = getCurrentOS().toString()
+    const runtime = getCurrentRuntime().toString() + " " + getCurrentVersion()
     return {
-      pid: Deno.pid,
+      pid: pid(),
       version: Application.version,
       status: ApiProcessState[ApiProcessState.RUNNING],
       updated: new Date().toISOString(),
       started: started.toISOString(),
-      memory: Deno.memoryUsage(),
+      memory,
       port: port ? parseInt(port.fromCache()!, 10) : 0,
-      systemMemory: Deno.systemMemoryInfo(),
-      loadAvg: Deno.loadavg(),
-      osUptime: Deno.osUptime(),
-      osRelease: Deno.osRelease(),
-      denoVersion: Deno.version,
+      systemMemory,
+      loadAvg: loadAverage,
+      osUptime,
+      osRelease,
+      runtime,
       type: "main",
       processes: processStates,
     }

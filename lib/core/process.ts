@@ -16,6 +16,7 @@ import { Cron } from "@hexagon/croner"
 import { delay } from "@std/async"
 
 import { ApiProcessState } from "@pup/api-definitions"
+import { CurrentOS, OperatingSystem } from "@cross/runtime"
 
 interface ProcessStateChangedEvent {
   old?: ApiProcessState
@@ -274,7 +275,7 @@ class Process {
       persistent: true,
     }
     delay((this.config.terminateGracePeriod ?? this.pup.configuration.terminateGracePeriod ?? 0) * 1000, graceDelayOptions).then(() => {
-      if (Deno.build.os == "windows") {
+      if (CurrentOS == OperatingSystem.Windows) {
         // On Windows, SIGTERM kills the process because Windows can't handle signals without cumbersome workarounds: https://stackoverflow.com/questions/35772001/how-to-handle-a-signal-sigint-on-a-windows-os-machine#35792192
         this.pup.logger.log("stopping", `Killing process, reason: ${reason}`, this.config)
       } else {
@@ -332,7 +333,7 @@ class Process {
    * Stops the process.
    * @param {string} reason - The reason for stopping the process.
    */
-  public restart = (reason: string) => {
+  public restart = (reason: string): void => {
     this.stop(reason)
     this.pendingRestartReason = reason
   }
@@ -341,7 +342,7 @@ class Process {
    * Blocks the process.
    * @param {string} reason - The reason for blocking the process.
    */
-  public block = (reason: string) => {
+  public block = (reason: string): void => {
     this.blocked = true
     this.pup.logger.log("block", `Process blocked, reason: ${reason}`, this.config)
   }
@@ -350,7 +351,7 @@ class Process {
    * Unblocks the process.
    * @param {string} reason - The reason for unblocking the process.
    */
-  public unblock = (reason: string) => {
+  public unblock = (reason: string): void => {
     this.blocked = false
     this.pup.logger.log("unblock", `Process unblocked, reason: ${reason}`, this.config)
   }

@@ -13,7 +13,7 @@ export type RunnerCallback = (pid?: number) => void
 export interface RunnerResult {
   success: boolean
   code?: number
-  signal?: Deno.Signal | null
+  signal?: unknown
 }
 export abstract class BaseRunner {
   protected readonly processConfig: ProcessConfiguration
@@ -25,5 +25,5 @@ export abstract class BaseRunner {
   }
 
   abstract run(runningCallback: RunnerCallback): Promise<RunnerResult>
-  abstract kill(signal?: Deno.Signal): void
+  abstract kill(signal?: unknown): void
 }
