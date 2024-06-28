@@ -79,6 +79,7 @@ export class LoadBalancer {
     const timer = setInterval(() => this.validateBackends(), this.validationInterval * 1000)
     // Make the timer non-blocking
     if (CurrentRuntime === Runtime.Deno) {
+      // @ts-ignore unref exists in node and bun
       Deno.unrefTimer(timer)
       // @ts-ignore unref exists in node and bun
     } else if (timer.unref) {
