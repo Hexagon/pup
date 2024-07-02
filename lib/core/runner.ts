@@ -68,6 +68,7 @@ class Runner extends BaseRunner {
    */
   public kill(signal: Deno.Signal = "SIGTERM") {
     try {
+      // @ts-ignore Wierd complaint about "SIGPOLL"
       this.process?.kill(signal)
     } catch (_e) {
       // Ignore

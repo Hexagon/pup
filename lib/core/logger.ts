@@ -42,6 +42,9 @@ class Logger {
 
   public async init(): Promise<void> {
     await this.kv.open(this.storeName!)
+
+    // Forcefully unlock ledger in case of a stale lock, this can be done as there is other means of preventing multiple running instances
+    await this.kv.forceUnlockLedger()
   }
 
   // Used for attaching the logger hook
@@ -122,9 +125,9 @@ class Logger {
           timeStamp: timeStamp,
         }
         // Append a random uuid to the key, in case two logs should arrive at the same time
-        await this.kv.set<LogEventData>(["logs_by_time", timeStamp, initiator, severity, crypto.randomUUID()], logObj)
-      } catch (e) {
-        console.error("Error while writing to log store", e)
+        await this.kv.defer(this.kv.set<LogEventData>(["logs_by_time", timeStamp, initiator, severity, crypto.randomUUID()], logObj))
+      } catch (_e) {
+        // console.error("Error while writing to log store", e)
       }
     }
 
@@ -256,11 +259,11 @@ class Logger {
     }
   }
   /**
-   * Gracefully shut down the logger
+   * Gracefully shut down the logger, allowing an optional timeout
    */
-  public async cleanup() {
+  public async cleanup(timeoutMs = 5000) {
     try {
-      await this.kv?.close()
+      await this.kv?.close(timeoutMs)
     } catch (e) {
       console.error("Error while closing kv store: " + e.message)
     }

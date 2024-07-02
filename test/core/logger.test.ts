@@ -39,6 +39,8 @@ test("Logger - Attachment of External Logger", async () => {
 
   assertEquals(externalLoggerCalled, true)
   assertEquals(externalLoggerText, expectedExteralLoggerText)
+
+  await logger.cleanup()
 })
 
 test("Logger - Logging with Different Methods", async () => {
@@ -50,6 +52,8 @@ test("Logger - Logging with Different Methods", async () => {
   await logger.error("test", "Testing error method")
 
   assertEquals(true, true) // This is just to assert that the test passed if no errors are thrown
+
+  await logger.cleanup()
 })
 
 test("Logger - File Writing with writeFile Method", async () => {
@@ -82,6 +86,8 @@ test("Logger - getLogContents: Fetch all logs", async () => {
 
   const logs = await logger.getLogContents()
   assertEquals(logs, expectedLogs)
+
+  await logger.cleanup()
 })
 
 test("Logger - getLogContents: Fetch logs by process ID", async () => {
@@ -102,6 +108,8 @@ test("Logger - getLogContents: Fetch logs by process ID", async () => {
 
   const logs = await logger.getLogContents(processId)
   assertEquals(logs, expectedLogs)
+
+  await logger.cleanup()
 })
 
 test("Logger - getLogContents: Fetch logs by time range", async () => {
@@ -123,6 +131,8 @@ test("Logger - getLogContents: Fetch logs by time range", async () => {
 
   const logs = await logger.getLogContents(undefined, startTimeStamp, endTimeStamp)
   assertEquals(logs, expectedLogs)
+
+  await logger.cleanup()
 })
 
 test("Logger - getLogContents: Fetch logs by process ID and time range", async () => {
@@ -145,4 +155,6 @@ test("Logger - getLogContents: Fetch logs by process ID and time range", async (
 
   const logs = await logger.getLogContents(processId, startTimeStamp, endTimeStamp)
   assertEquals(logs, expectedLogs)
+
+  await logger.cleanup()
 })
