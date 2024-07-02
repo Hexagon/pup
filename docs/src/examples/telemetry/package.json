@@ -1,6 +1,0 @@
-{
-  "type": "module",
-  "dependencies": {
-    "@pup/telemetry": "npm:@jsr/pup__telemetry@^1.0.5"
-  }
-}

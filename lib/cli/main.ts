@@ -429,7 +429,7 @@ async function main() {
    * Base argument: logs
    */
   if (baseArgument === "logs") {
-    const logStore = `${await toPersistentPath(configFile as string)}/.main.log.ckvdb`
+    const logStore = `${await toPersistentPath(configFile as string)}/.main.db`
     const logger = new Logger(configuration!.logger || {}, logStore)
     await logger.init()
     const startTimestamp = checkedArgs.get("start") ? new Date(Date.parse(checkedArgs.get("start")!)).getTime() : undefined

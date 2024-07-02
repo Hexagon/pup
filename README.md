@@ -33,12 +33,6 @@ To install Pup, make sure you run the latest version of your runtime environment
 deno run -Ar jsr:@pup/pup@1.0.0-rc.40 setup --channel prerelease
 ```
 
-**Bun**:
-
-```bash
-bun run @hexagon/pup setup --channel prerelease
-```
-
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
 channels [here](https://hexagon.github.io/pup/installation.html#release-channels).
 

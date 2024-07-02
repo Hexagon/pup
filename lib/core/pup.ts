@@ -82,17 +82,17 @@ class Pup {
 
       this.persistentStoragePath = persistentStoragePath
 
-      statusFile = `${this.persistentStoragePath}/.main.status.ckvdb` // Cross/KV store
+      statusFile = `${this.persistentStoragePath}/.main.status.db` // Cross/KV store
       secretFile = `${this.persistentStoragePath}/.main.secret` // Plain text file containing the JWT secret for the rest api
       portFile = `${this.temporaryStoragePath}/.main.port` // Plain text file containing the port number for the API
-      logStore = `${this.persistentStoragePath}/.main.log.ckvdb` // Cross/KV store
+      logStore = `${this.persistentStoragePath}/.main.db` // Cross/KV store
     }
 
     // Throw on invalid configuration
     this.configuration = validateConfiguration(unvalidatedConfiguration)
 
     // Initialise core logger
-    this.logger = new Logger(this.configuration.logger ?? {}, logStore || "./main.log")
+    this.logger = new Logger(this.configuration.logger ?? {}, logStore || "./main.db")
 
     // Global error handler
     this.registerGlobalErrorHandler()
