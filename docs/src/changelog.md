@@ -9,7 +9,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.40] - Unreleased
+## [1.0.0-rc.40] - 2024-07-03
 
 - fix(core): Replace `Deno.Kv` with `@cross/kv` for cross-runtime compatibility, more compact logs and avoiding `--unstable`
 - fix(core): Internal changes to support Node and Bun
