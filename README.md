@@ -2,7 +2,7 @@
 
 ![PUP](https://cdn.jsdelivr.net/gh/hexagon/pup@master/docs/src/resources/pup_dark.png)
 
-Pup is a powerful universal process manager developed with Deno, designed to keep your scripts, applications and services alive.
+Pup is a powerful universal process manager developed with JavaScript, designed to keep your scripts, applications and services alive.
 
 _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 
@@ -25,10 +25,12 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 
 ### Installation
 
-To install Pup, make sure you run the latest version of Deno (`deno upgrade`), then open your terminal and execute the following command:
+To install Pup, make sure you run the latest version of your runtime environment, then open your terminal and execute the following command:
+
+**Deno**:
 
 ```bash
-deno run -Ar jsr:@pup/pup@1.0.0-rc.39 setup --channel prerelease
+deno run -Ar jsr:@pup/pup@1.0.0-rc.40 setup --channel prerelease
 ```
 
 This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release

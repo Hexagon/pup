@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.40] - Unreleased
+
+- fix(core): Replace `Deno.Kv` with `@cross/kv` for cross-runtime compatibility, more compact logs and avoiding `--unstable`
+- fix(core): Internal changes to support Node and Bun
+- fix(core): Removes the `sysinfo.ts`-module in favor of `@cross/utils/sysinfo`
+
 ## [1.0.0-rc.39] - 2024-05-04
 
 - fix(core): Clustered processes were duplicated in API and `pup status`

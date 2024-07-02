@@ -10,7 +10,7 @@ import { PluginConfiguration } from "@pup/plugin"
 
 // Logger constants
 export const DEFAULT_INTERNAL_LOG_HOURS = 48
-export const KV_SIZE_LIMIT_BYTES = 65_536
+export const KV_LIMIT_STRING_LENGTH_BYTES = 65_536
 
 // Core constants
 export const MAINTENANCE_INTERVAL_MS = 900_000

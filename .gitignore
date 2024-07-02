@@ -45,11 +45,15 @@ coverage
 # Lumocs generated site
 _site
 
-# Node files
-.npmrc
+# Node/npm files
 package-lock.json
-package.json
 node_modules
+.npmrc
+package.json
+*.tgz
+
+# Bun files
+.bun.lockb
 
 # VSCode files
 .vscode

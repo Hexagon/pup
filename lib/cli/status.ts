@@ -14,8 +14,8 @@ import { filesize } from "filesize"
 import { blockedFormatter, codeFormatter, naFormatter, restartsFormatter, statusFormatter } from "./formatters/strings.ts"
 import { timeagoFormatter } from "./formatters/times.ts"
 import { Configuration, DEFAULT_REST_API_HOSTNAME } from "../core/configuration.ts"
-import { resolve } from "@std/path"
 import { ApiApplicationState } from "@pup/api-definitions"
+import { toResolvedAbsolutePath } from "@pup/common/path"
 
 /**
  * Helper which print the status of all running processes,
@@ -29,8 +29,8 @@ import { ApiApplicationState } from "@pup/api-definitions"
 export function printStatus(configFile: string, configuration: Configuration, cwd: string | undefined, status: ApiApplicationState) {
   // Print configuration
   console.log("")
-  console.log(Colors.bold("Configuration:") + "\t" + resolve(configFile))
-  console.log(Colors.bold("Working dir:") + "\t" + cwd || "Not set (default: pup)")
+  console.log(Colors.bold("Configuration:") + "\t" + toResolvedAbsolutePath(configFile))
+  console.log(Colors.bold("Working dir:") + "\t" + (cwd ? toResolvedAbsolutePath(cwd as string) : "Not set (default: pup)"))
   console.log(Colors.bold("Instance name:") + "\t" + (configuration.name || "Not set"))
   console.log(Colors.bold("Rest API URL:") + "\thttp://" + (configuration.api?.hostname || DEFAULT_REST_API_HOSTNAME) + ":" + status.port)
 

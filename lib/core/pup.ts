@@ -31,6 +31,8 @@ import { rm } from "@cross/fs"
 import { findFreePort } from "./port.ts"
 import { Plugin } from "./plugin.ts"
 import { GenerateToken, SecondsToExpiry } from "../common/token.ts"
+import { CurrentRuntime, Runtime } from "@cross/runtime"
+import { delay } from "@std/async"
 interface InstructionResponse {
   success: boolean
   action?: string
@@ -80,17 +82,17 @@ class Pup {
 
       this.persistentStoragePath = persistentStoragePath
 
-      statusFile = `${this.persistentStoragePath}/.main.status` // Deno KV store
+      statusFile = `${this.persistentStoragePath}/.main.status.db` // Cross/KV store
       secretFile = `${this.persistentStoragePath}/.main.secret` // Plain text file containing the JWT secret for the rest api
       portFile = `${this.temporaryStoragePath}/.main.port` // Plain text file containing the port number for the API
-      logStore = `${this.persistentStoragePath}/.main.log` // Deno KV store
+      logStore = `${this.persistentStoragePath}/.main.db` // Cross/KV store
     }
 
     // Throw on invalid configuration
     this.configuration = validateConfiguration(unvalidatedConfiguration)
 
     // Initialise core logger
-    this.logger = new Logger(this.configuration.logger ?? {}, logStore)
+    this.logger = new Logger(this.configuration.logger ?? {}, logStore || "./main.db")
 
     // Global error handler
     this.registerGlobalErrorHandler()
@@ -114,7 +116,7 @@ class Pup {
    * This is intended to be called by global unload event
    * and clears any stray files
    */
-  public cleanup = async () => {
+  public cleanup = async (): Promise<void> => {
     for (const cleanupFilePath of this.cleanupQueue) {
       try {
         await rm(cleanupFilePath, { recursive: true })
@@ -126,9 +128,15 @@ class Pup {
 
     // Unset last application state
     await this.status.cleanup()
+
+    // Close logger
+    await this.logger.cleanup()
   }
 
-  public init = async () => {
+  public init = async (): Promise<void> => {
+    // Intialize logging
+    await this.logger.init()
+
     // Initialize api
     await this.api()
 
@@ -398,7 +406,13 @@ class Pup {
     this.maintenanceTimer = setTimeout(() => {
       this.maintenance()
     }, MAINTENANCE_INTERVAL_MS)
-    Deno.unrefTimer(this.maintenanceTimer)
+    if (CurrentRuntime === Runtime.Deno) {
+      Deno.unrefTimer(this.maintenanceTimer)
+      // @ts-ignore unref exists in node and bun
+    } else if (this.maintenanceTimer?.unref) {
+      // @ts-ignore unref exists in node and bun
+      this.maintenanceTimer.unref()
+    }
   }
 
   public restart(id: string, requestor: string): boolean {
@@ -493,33 +507,41 @@ class Pup {
     // Block and stop all processes
     for (const process of this.processes) {
       process.block("terminating")
-      stoppingProcesses.push(
-        process.stop("terminating").then((result) => {
-          process.cleanup()
-          return result
-        }),
-      )
+      const terminationPromise = process.stop("terminating")
+      stoppingProcesses.push(terminationPromise)
+      terminationPromise.then((result) => {
+        process.cleanup()
+        return result
+      })
     }
 
     // Terminate api
     if (this.restApi) this.restApi.terminate()
 
+    await Promise.allSettled(stoppingProcesses)
+
+    // Allow some extra time to pass to allow untracked async tasks
+    // (such as logs after killing a process) to finish
+    // - But only if at least 500ms were used as grace period
+    if (forceQuitMs >= 500) await delay(500)
+
     // Cleanup
     await this.cleanup()
 
-    await Promise.allSettled(stoppingProcesses)
-
-    // Deno should exit gracefully now
+    // Pup should exit gracefully now
   }
 
   private registerGlobalErrorHandler() {
-    addEventListener("error", (event) => {
-      this.logger.error(
-        "fatal",
-        `Unhandled error caught by core: ${event.error.message}`,
-      )
-      event.preventDefault()
-    })
+    // @ts-ignore Cross Runtime
+    if (globalThis.addEventListener) {
+      addEventListener("error", (event) => {
+        this.logger.error(
+          "fatal",
+          `Unhandled error caught by core: ${event.error.message}`,
+        )
+        event.preventDefault()
+      })
+    }
   }
 }
 
