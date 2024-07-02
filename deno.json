@@ -1,6 +1,6 @@
 {
   "name": "@pup/pup",
-  "version": "1.0.0-rc.41",
+  "version": "1.0.0-rc.42",
 
   "exports": {
     ".": "./pup.ts",
