@@ -4,7 +4,7 @@ import type { ProcessConfiguration } from "../../mod.ts"
 import { test } from "@cross/test"
 import { readFile, tempfile, unlink } from "@cross/fs"
 
-test("Logger - Creation with Global Configuration", () => {
+test("Logger - Creation with Global Configuration", async () => {
   const globalConfig = {
     console: false,
     colors: true,
@@ -16,6 +16,8 @@ test("Logger - Creation with Global Configuration", () => {
   const logger = new Logger(globalConfig)
 
   assertEquals(logger instanceof Logger, true)
+
+  await logger.cleanup()
 })
 
 test("Logger - Attachment of External Logger", async () => {
@@ -67,6 +69,8 @@ test("Logger - File Writing with writeFile Method", async () => {
   assertEquals(fileContent, `${testText}\n`)
 
   await unlink(testFileName)
+
+  await logger.cleanup()
 })
 
 test("Logger - getLogContents: Fetch all logs", async () => {

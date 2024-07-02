@@ -126,8 +126,8 @@ class Logger {
         }
         // Append a random uuid to the key, in case two logs should arrive at the same time
         await this.kv.defer(this.kv.set<LogEventData>(["logs_by_time", timeStamp, initiator, severity, crypto.randomUUID()], logObj))
-      } catch (_e) {
-        // console.error("Error while writing to log store", e)
+      } catch (e) {
+        console.error("Error while writing to log store", e)
       }
     }
 
@@ -248,10 +248,10 @@ class Logger {
       const logsByTimeSelector: KVQuery = ["logs_by_time", { to: startTime }]
       let rowsDeleted = 0
       for await (const entry of this.kv.iterate(logsByTimeSelector)) {
-        await this.kv.delete(entry.key)
+        await this.kv.defer(this.kv.delete(entry.key))
         rowsDeleted++
       }
-      await this.kv.vacuum()
+      await this.kv.defer(this.kv.vacuum())
       return rowsDeleted
     } catch (error) {
       this.log("error", `Failed to purge logs from store '${this.storeName}': ${error.message}`)

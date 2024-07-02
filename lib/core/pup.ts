@@ -507,12 +507,12 @@ class Pup {
     // Block and stop all processes
     for (const process of this.processes) {
       process.block("terminating")
-      stoppingProcesses.push(
-        process.stop("terminating").then((result) => {
-          process.cleanup()
-          return result
-        }),
-      )
+      const terminationPromise = process.stop("terminating")
+      stoppingProcesses.push(terminationPromise)
+      terminationPromise.then((result) => {
+        process.cleanup()
+        return result
+      })
     }
 
     // Terminate api
@@ -520,15 +520,15 @@ class Pup {
 
     await Promise.allSettled(stoppingProcesses)
 
-    // Cleanup
-    await this.cleanup()
-
     // Allow some extra time to pass to allow untracked async tasks
-    // (such as logs about closing down) to finish
+    // (such as logs after killing a process) to finish
     // - But only if at least 500ms were used as grace period
     if (forceQuitMs >= 500) await delay(500)
 
-    // Deno should exit gracefully now
+    // Cleanup
+    await this.cleanup()
+
+    // Pup should exit gracefully now
   }
 
   private registerGlobalErrorHandler() {
