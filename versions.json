@@ -3,6 +3,34 @@
   "stable": [],
   "prerelease": [
     {
+      "version": "1.0.0-rc.41",
+      "url": "jsr:@pup/pup@1.0.0-rc.41",
+      "deno": "1.43.0",
+      "deno_unstable": "1.43.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease,uid,gid",
+        "--allow-net",
+        "--allow-run"
+      ]
+    },
+    {
+      "version": "1.0.0-rc.40",
+      "url": "jsr:@pup/pup@1.0.0-rc.40",
+      "deno": "1.43.0",
+      "deno_unstable": "1.43.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease,uid,gid",
+        "--allow-net",
+        "--allow-run"
+      ]
+    },
+    {
       "version": "1.0.0-rc.39",
       "url": "jsr:@pup/pup@1.0.0-rc.39",
       "deno": null,

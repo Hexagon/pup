@@ -18,6 +18,7 @@ test.jsonc
 .*-tmp
 test.sh
 .pup
+*.db
 
 # Pup test files
 test_data_*.*

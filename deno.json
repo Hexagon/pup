@@ -1,6 +1,6 @@
 {
   "name": "@pup/pup",
-  "version": "1.0.0-rc.40",
+  "version": "1.0.0-rc.41",
 
   "exports": {
     ".": "./pup.ts",
@@ -31,7 +31,7 @@
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env tools/release.ts && deno fmt",
     "generate-package-json": "deno run -A tools/generate-package-json.ts",
-    "build": "deno task check && deno task build-schema && deno task build-versions && deno task build-package-json && npm pack",
+    "build": "deno task check && deno task build-schema && deno task build-versions && deno task generate-package-json && npm pack",
     "publish-npm": "deno task build && npm publish"
   },
 
