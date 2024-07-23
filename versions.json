@@ -3,6 +3,21 @@
   "stable": [],
   "prerelease": [
     {
+      "version": "1.0.0-rc.43",
+      "url": "jsr:@pup/pup@1.0.0-rc.43",
+      "deno": "1.43.0",
+      "deno_unstable": "1.43.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease,uid,gid",
+        "--allow-net",
+        "--allow-run",
+        "--allow-ffi"
+      ]
+    },
+    {
       "version": "1.0.0-rc.42",
       "url": "jsr:@pup/pup@1.0.0-rc.42",
       "deno": "1.43.0",
