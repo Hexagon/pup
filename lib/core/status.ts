@@ -43,23 +43,23 @@ class Status {
   public async writeToStore(applicationState: ApiApplicationState) {
     if (this.storeName) {
       try {
-        const kv = new KV({ autoSync: false, disableIndex: true })
-        await kv.open(this.storeName)
-
-        // Initialize lastWrite if it's not set
-        if (!this.lastWrite) {
-          this.lastWrite = 0
-        }
-
         // Write application_state at most once per APPLICATION_STATE_WRITE_LIMIT_MS
         if (Date.now() - this.lastWrite > APPLICATION_STATE_WRITE_LIMIT_MS) {
+          const kv = new KV({ autoSync: false, disableIndex: true })
+          await kv.open(this.storeName)
+
+          // Initialize lastWrite if it's not set
+          if (!this.lastWrite) {
+            this.lastWrite = 0
+          }
+
           this.lastWrite = Date.now()
           await kv.set(["application_state", Date.now()], applicationState)
-        }
 
-        // Always write last_application_state
-        await kv.set(["last_application_state"], applicationState)
-        await kv.close()
+          // Always write last_application_state
+          await kv.set(["last_application_state"], applicationState)
+          await kv.close()
+        }
       } catch (e) {
         console.error("Error while writing status to kv store: " + e.message)
       }

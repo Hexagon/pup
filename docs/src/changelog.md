@@ -9,6 +9,11 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.0-rc.44] - 2024-09-04
+
+- fix(core): Fix limit of application state writes
+- chore(deps): Full dependency update
+
 ## [1.0.0-rc.43] - 2024-07-23
 
 - fix(core): Fix child process API token expiration

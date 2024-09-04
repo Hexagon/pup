@@ -9,7 +9,7 @@
 import { globToRegExp, relative } from "@std/path"
 import { delay } from "@std/async"
 
-type FileAction = "any" | "access" | "create" | "modify" | "remove" | "other"
+type FileAction = "any" | "access" | "create" | "modify" | "remove" | "other" | "rename"
 
 export interface FileEvent {
   path: string

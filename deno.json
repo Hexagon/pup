@@ -1,6 +1,6 @@
 {
   "name": "@pup/pup",
-  "version": "1.0.0-rc.43",
+  "version": "1.0.0-rc.44",
 
   "exports": {
     ".": "./pup.ts",
@@ -16,7 +16,7 @@
   "lint": {
     "exclude": ["cov_profile", "docs/_site"],
     "rules": {
-      "exclude": ["verbatim-module-syntax"]
+      "exclude": ["verbatim-module-syntax", "no-node-globals"]
     }
   },
 
@@ -40,11 +40,11 @@
     "@cross/env": "jsr:@cross/env@~1.0.2",
     "@cross/fs": "jsr:@cross/fs@~0.1.11",
     "@cross/jwt": "jsr:@cross/jwt@~0.5.0",
-    "@cross/kv": "jsr:@cross/kv@~0.16.3",
-    "@cross/runtime": "jsr:@cross/runtime@~1.0.0",
+    "@cross/kv": "jsr:@cross/kv@^0.16.4",
+    "@cross/runtime": "jsr:@cross/runtime@^1.1.0",
     "@cross/service": "jsr:@cross/service@~1.0.3",
     "@cross/test": "jsr:@cross/test@~0.0.9",
-    "@cross/utils": "jsr:@cross/utils@~0.13.0",
+    "@cross/utils": "jsr:@cross/utils@^0.14.0",
     "@hexagon/croner": "jsr:@hexagon/croner@~8.1.0",
     "@oak/oak": "jsr:@oak/oak@~16.1.0",
     "@pup/api-client": "jsr:@pup/api-client@~2.0.0",
@@ -56,7 +56,7 @@
     "@std/encoding": "jsr:@std/encoding@~1.0.0",
     "@std/io": "jsr:@std/io@~0.224.0",
     "@std/path": "jsr:@std/path@~1.0.1",
-    "@std/semver": "jsr:@std/semver@~0.224.0",
+    "@std/semver": "jsr:@std/semver@^1.0.3",
     "dax-sh": "npm:dax-sh@~0.41.0",
     "filesize": "npm:filesize@~10.1.1",
     "json5": "npm:json5@~2.2.3",
