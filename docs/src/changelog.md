@@ -9,7 +9,28 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0-rc.45] - 2024-09-04
+## [1.0.0] - Unreleased
+
+🎉 Initial Stable Release! 🎉
+
+This release marks the initial stable release of Pup - a powerful universal process manager developed with JavaScript.
+
+## Key Features
+
+- **Cross-platform:** Manage processes for various languages and platforms, such as Deno, Node.js, Python, and Ruby on Windows, macOS, and Linux.
+- **Process management:** Define, control, and manage your processes with simple commands and configuration options.
+- **Autostart, watch or cron:** Set up processes to start automatically, on a schedule (using cron expressions), or when files change.
+- **Service management**: Install Pup instances as a system service, supporting sysvinit, systemd, upstart, macOS, and Windows.
+- **Clustering and load balancing:** Seamlessly scale your applications with built-in clustering and load balancing capabilities.
+- **Plugins:** Extend Pup's functionality with custom plugins, such as the [Web Interface plugin](/docs/src/examples/basic-webinterface/README.md) for an intuitive graphical user interface. Create
+  your own plugins to add additional features and integrations tailored to your needs.
+- **Process Telemetry and IPC:** Gain deeper insights into managed processes by gathering telemetry data, such as memory usage, from Deno client processes. Supports inter-process communication for
+  connected processes to interact with each other.
+- **Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
+
+_For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
+
+## [1.0.0-rc.45] - 2024-09-18
 
 - chore(deps): Full dependency update
 

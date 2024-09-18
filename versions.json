@@ -1,6 +1,22 @@
 {
   "canary_url": "https://raw.githubusercontent.com/Hexagon/pup/main/pup.ts",
-  "stable": [],
+  "stable": [
+    {
+      "version": "1.0.0",
+      "url": "jsr:@pup/pup@1.0.0",
+      "deno": "1.44.0",
+      "deno_unstable": "1.44.0",
+      "default_permissions": [
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "--allow-sys=loadavg,systemMemoryInfo,osUptime,osRelease,uid,gid",
+        "--allow-net",
+        "--allow-run",
+        "--allow-ffi"
+      ]
+    }
+  ],
   "prerelease": [
     {
       "version": "1.0.0-rc.45",

@@ -30,11 +30,10 @@ To install Pup, make sure you run the latest version of your runtime environment
 **Deno**:
 
 ```bash
-deno run -Ar jsr:@pup/pup@1.0.0-rc.45 setup --channel prerelease
+deno run -Ar jsr:@pup/pup setup
 ```
 
-This command downloads the latest version of Pup and installs it on your system. The `--channel prerelease` option is included as there is no stable version of Pup yet. Read more abour release
-channels [here](https://hexagon.github.io/pup/installation.html#release-channels).
+This command downloads the latest version of Pup and installs it on your system. Read more about release channels [here](https://pup.56k.guru/installation/#release-channels).
 
 ### Configuration and Usage
 
@@ -92,7 +91,7 @@ Each channel serves different purposes, so choose the one that best fits your ne
 
 ## Contributions and Development
 
-Contributions to Pup are very welcome! Please read [the contributing section](https://pup.56k.guru/contributing.html) of the manual, fork the repository, make your changes, and submit a pull request.
+Contributions to Pup are very welcome! Please read [the contributing section](https://pup.56k.guru/contributing/) of the manual, fork the repository, make your changes, and submit a pull request.
 
 We appreciate all feedback and contributions that help make Pup better!
 

@@ -13,26 +13,26 @@ This section will guide you through the installation process of Pup.
 
 Before proceeding with the installation, ensure that you have the following installed on your system:
 
-- Deno (version `1.43.x` or higher): You can install Deno by following the official Deno [instructions](https://deno.com/manual/getting_started/installation).
+- Deno (version `1.44.x` or higher): You can install Deno by following the official Deno [instructions](https://deno.com/manual/getting_started/installation).
 
 ## Installing or upgrading Pup
 
 To install Pup, open your terminal and execute the following command:
 
 ```bash
-deno run -Ar jsr:@pup/pup@$PUP_VERSION setup --channel prerelease
+deno run -Ar jsr:@pup/pup setup
 ```
 
 This command downloads the latest version of Pup and installs it on your system.
 
 - The `-A` flag grants all permissions.
 - The `-r` flag ensures no cache is used.
-- The `--channel prerelease` option installs the pre-release version of Pup, as no stable version has been released yet.
+- Adding `--channel prerelease` installs the latest pre-release version of Pup.
 
 If you already have Pup installed and want to upgrade to the latest version, you can use:
 
 ```bash
-pup upgrade --channel prerelease
+pup upgrade
 ```
 
 The `upgrade` command support the following parameters:
@@ -54,13 +54,10 @@ installation path is added to your system's PATH environment variable.
 
 The available channels are:
 
-- `stable`: This channel is currently empty, but will provide stable releases of Pup in the future. It is recommended for production environments where stability is a priority.
+- `stable`: The latest stable release of Pup. This is recommended for production environments where stability is a priority.
 
 - `prerelease`: This channel offers pre-release versions of Pup that include new features and improvements. It is suitable for users who want to test the latest enhancements before they are officially
   released.
-
-- `canary`: The canary channel provides the most up-to-date and cutting-edge versions of Pup. It includes the latest changes and may not be as stable as the other channels. It is primarily intended
-  for developers and early adopters who want to stay on the bleeding edge of Pup's development. Based on the current state of the `main` repo of the github repository.
 
 Each channel serves different purposes, so choose the one that best fits your needs and requirements.
 
