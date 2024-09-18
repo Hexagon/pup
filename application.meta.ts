@@ -21,7 +21,7 @@
 
 const Application = {
   name: "pup",
-  version: "1.0.0-rc.44",
+  version: "1.0.0-rc.45",
   url: "jsr:@pup/pup@$VERSION",
   description: "Powerful universal process manager, designed to keep your scripts, applications and services alive.",
   canary_url: "https://raw.githubusercontent.com/Hexagon/pup/main/pup.ts",
