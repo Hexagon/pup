@@ -165,36 +165,6 @@ To change default behavior of the global watcher, use the following properties w
 }
 ```
 
-### Plugins
-
-> **Note**: If you are interested in developing a custom plugin, there is a [guide](/pup/examples/plugins/README.html) and
-> [example](https://github.com/Hexagon/pup/blob/main/docs/src/examples/plugins/log-interceptor.ts) available. { .note }
-
-To activate plugins, add your plugins to the configuration using this pattern:
-
-```json
-{
-  /* ... */
-  "processes": [/* ... */],
-  "plugins": [
-    /* Remote plugin ... */
-    {
-      "url": "jsr:@scope/pup-example-plugin@0.0.1/mod.ts",
-      "options": {
-        /* Plugin specific configuration */
-      }
-    },
-    /* ... or local plugin. */
-    {
-      "url": "./plugins/app-plugin.ts",
-      "options": {
-        /* Plugin specific configuration */
-      }
-    }
-  ]
-}
-```
-
 ### API
 
 The API configuration object is optional, and is used to customize the Rest API used to interact with Pup. Here's a breakdown of the available properties:
@@ -207,8 +177,8 @@ The API configuration object is optional, and is used to customize the Rest API 
 
 By default, the API is only exposed to localhost, and will listen on a random port.
 
-If you want to use the API remotely, you can supply a specific port (one per instance) and set hostname to `0.0.0.0`. It is highly recommended to use a proxy such as nginx to expose the API to the
-internet.
+If you want to use the API remotely, you can supply a specific port (one per instance) and set hostname to `0.0.0.0`. It is highly recommended to use a proxy such as nginx, and applying additional
+security measures, if exposing the API to the internet.
 
 **Example, listening on port 9000 of all interfaces:**
 

@@ -13,7 +13,7 @@ If you have experience with software packaging, your contribution can greatly en
   - Pup must be packaged to run using the command `pup`.
 
   - Pup can be compiled into an executable prior to packaging using `deno compile`. The procedure is described at
-    [https://deno.com/manual@v1.34.3/tools/compiler](https://deno.com/manual@v1.34.3/tools/compiler). The command should be similar to
+    [https://docs.deno.com/runtime/reference/cli/compiler/](https://docs.deno.com/runtime/reference/cli/compiler/). The command should be similar to
     `deno compile --allow-all --reload --output pup pup.ts --external-installer`.
 
   - The `--external-installer` argument to the Pup script disables the built-in installer, hiding `setup` and `upgrade` options from `--help`.
