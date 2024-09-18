@@ -9,7 +9,7 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2024-09-18
 
 🎉 Initial Stable Release! 🎉
 
