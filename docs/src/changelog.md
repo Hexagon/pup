@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.2] - 2024-09-25
+
+- fix(core): Fix `--canary` install base url
+
 ## [1.0.1] - 2024-09-25
 
 - fix(core): Fix `--canary` install/upgrade option

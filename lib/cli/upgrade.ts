@@ -197,6 +197,7 @@ export async function upgrade(
   }
   if (canaryInstall) {
     installCmd.push("-c", temporaryDenoJsonFilePath)
+    installCmd.push("--no-lock")
   }
   installCmd.push("-n", "pup") // Installed command name = pup
   installCmd.push(canaryInstall ? versions.canary_url : (requestedVersion as Version).url)

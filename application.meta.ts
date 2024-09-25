@@ -21,10 +21,10 @@
 
 const Application = {
   name: "pup",
-  version: "1.0.1",
+  version: "1.0.2",
   url: "jsr:@pup/pup@$VERSION",
   description: "Powerful universal process manager, designed to keep your scripts, applications and services alive.",
-  canary_url: "https://raw.githubusercontent.com/Hexagon/pup/dev/pup.ts",
+  canary_url: "https://raw.githubusercontent.com/Hexagon/pup/refs/heads/dev/pup.ts",
   deno: "1.44.0", /* Minimum stable version of Deno required to run Pup (without --unstable-* flags)  */
   deno_unstable: "1.44.0", /* Minimum version of Deno required to run Pup (with --unstable-* flags) */
   repository: "https://github.com/hexagon/pup",
