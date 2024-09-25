@@ -59,6 +59,11 @@ The available channels are:
 - `prerelease`: This channel offers pre-release versions of Pup that include new features and improvements. It is suitable for users who want to test the latest enhancements before they are officially
   released.
 
+- `canary`: The canary channel provides the most up-to-date and cutting-edge versions of Pup. It includes the latest changes and may not be as stable as the other channels. It is primarily intended
+  for developers and early adopters who want to stay on the bleeding edge of Pup's development. Based on the current state of the `dev` repo of the github repository.
+
+> **Note** Built-in plugins, such as splunk-hec and webinterace does not work with canary versions right now.
+
 Each channel serves different purposes, so choose the one that best fits your needs and requirements.
 
 ## Verifying the Installation

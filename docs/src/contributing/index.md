@@ -19,7 +19,7 @@ Pup is an open-source project, and we welcome contributions from the community. 
 ## Submitting code changes
 
 - Fork the Pup repository on GitHub.
-- Create a new branch for your changes and implement the desired feature or bug fix.
+- Create a new branch for your changes based on the `dev` branch, and implement the desired feature or bug fix.
 - Write tests to ensure your changes are reliable and maintainable.
 - Update the documentation as needed to reflect your changes.
 - Run `deno task build` to check format, lint and test the code.

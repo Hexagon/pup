@@ -11,7 +11,8 @@
 import { Application } from "../../application.meta.ts"
 import { greaterThan, lessThan, parse } from "@std/semver"
 import { exit } from "@cross/utils"
-import { readFile } from "@cross/fs"
+import { mktempdir, readFile } from "@cross/fs"
+import { join } from "@std/path/join"
 
 // The deno.land/x-url has to be used until first stable release, or until jsr.io fixes issue
 // https://github.com/jsr-io/jsr/issues/382
@@ -163,6 +164,24 @@ export async function upgrade(
     }
   }
 
+  let temporaryDenoJsonFilePath = ""
+  if (canaryInstall) {
+    const canaryDenoJsonUrl = versions.canary_url.replace("pup.ts", "deno.json")
+
+    // Create a temporary directory
+    const canaryDenoJsonLocation = await mktempdir("pup")
+
+    // Download the canary deno.json file to the temporary directory
+    const response = await fetch(canaryDenoJsonUrl)
+    const data = await response.text()
+    temporaryDenoJsonFilePath = await join(canaryDenoJsonLocation, "deno.json")
+
+    // Write the file to the temporary location
+    await Deno.writeTextFile(temporaryDenoJsonFilePath, data)
+
+    console.log(`Downloaded canary deno.json to ${temporaryDenoJsonFilePath}`)
+  }
+
   // Install
   const installCmd = []
 
@@ -175,6 +194,9 @@ export async function upgrade(
   }
   if (ignoreCertificateErrorsString && ignoreCertificateErrorsString !== "") {
     installCmd.push(ignoreCertificateErrorsString)
+  }
+  if (canaryInstall) {
+    installCmd.push("-c", temporaryDenoJsonFilePath)
   }
   installCmd.push("-n", "pup") // Installed command name = pup
   installCmd.push(canaryInstall ? versions.canary_url : (requestedVersion as Version).url)
