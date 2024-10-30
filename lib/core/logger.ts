@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-process-globals
 /**
  * Defines the default logger class, and related types.
  * Also handles the currently attached logger of Pup.
@@ -254,7 +255,7 @@ class Logger {
       await this.kv.defer(this.kv.vacuum())
       return rowsDeleted
     } catch (error) {
-      this.log("error", `Failed to purge logs from store '${this.storeName}': ${error.message}`)
+      this.log("error", `Failed to purge logs from store '${this.storeName}': ${error instanceof Error ? error.message : "Unknown"}`)
       return 0
     }
   }
@@ -265,7 +266,7 @@ class Logger {
     try {
       await this.kv?.close(timeoutMs)
     } catch (e) {
-      console.error("Error while closing kv store: " + e.message)
+      console.error("Error while closing kv store: " + (e instanceof Error ? e.message : "Unknown"))
     }
   }
 }

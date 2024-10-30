@@ -37,7 +37,7 @@ class MockConn implements Deno.Conn {
     return Promise.resolve()
   }
   upgrade(): Promise<Deno.FsFile> {
-    return Promise.resolve(new Deno.FsFile(this.rid))
+    return Promise.resolve(new Deno.FsFile())
   }
   [Symbol.dispose](): void {
     this.close()

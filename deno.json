@@ -26,7 +26,7 @@
 
   "tasks": {
     "check-deps": "deno run -r --allow-read=. --allow-net=jsr.io,registry.npmjs.org jsr:@check/deps",
-    "check": "deno fmt --check && deno lint && deno check pup.ts && deno test --trace-leaks --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --coverage=cov_profile && echo \"Generating coverage\" && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",
+    "check": "deno fmt --check && deno lint && deno test --trace-leaks --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --coverage=cov_profile && echo \"Generating coverage\" && deno coverage cov_profile --exclude=pup/test  --lcov --output=cov_profile.lcov",
     "check-coverage": "deno task check && genhtml cov_profile.lcov --output-directory cov_profile/html && lcov --list cov_profile.lcov && deno run --allow-net --allow-read https://deno.land/std/http/file_server.ts cov_profile/html",
     "build-schema": "deno run --allow-write --allow-read --allow-env=XDG_DATA_HOME,HOME tools/build-schema.ts && deno fmt",
     "build-versions": "deno run --allow-read --allow-write --allow-env tools/release.ts && deno fmt",

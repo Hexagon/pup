@@ -173,7 +173,7 @@ class Runner extends BaseRunner {
     try {
       result = await this.process
     } catch (e) {
-      if (e.message.includes("124")) {
+      if (e instanceof Error && e.message.includes("124")) {
         result = {
           code: 124,
           signal: null,

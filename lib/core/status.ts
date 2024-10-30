@@ -61,7 +61,7 @@ class Status {
           await kv.close()
         }
       } catch (e) {
-        console.error("Error while writing status to kv store: " + e.message)
+        console.error("Error while writing status to kv store: " + (e instanceof Error ? e.message : "Unknown"))
       }
     }
   }
@@ -78,7 +78,7 @@ class Status {
         await kv.delete(["last_application_state"])
         await kv.close()
       } catch (e) {
-        console.error("Error while writing status to kv store: " + e.message)
+        console.error("Error while writing status to kv store: " + (e instanceof Error ? e.message : "Unknown"))
       }
     }
   }
@@ -108,7 +108,7 @@ class Status {
       await kv.close()
       return rowsDeleted
     } catch (error) {
-      console.error(`Failed to purge logs from store '${this.storeName}': ${error.message}`)
+      console.error(`Failed to purge logs from store '${this.storeName}': ${error instanceof Error ? error.message : "Unknown"}`)
       return 0
     }
   }

@@ -184,7 +184,8 @@ const ConfigurationSchema = z.object({
 function validateConfiguration(unsafeConfiguration: unknown): Configuration {
   try {
     ConfigurationSchema.parse(unsafeConfiguration)
-  } catch (e) {
+    // deno-lint-ignore no-explicit-any
+  } catch (e: any) {
     throw new Error(e.errors[0]?.message)
   }
   return unsafeConfiguration as Configuration

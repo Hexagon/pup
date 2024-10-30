@@ -151,14 +151,14 @@ class Pup {
           this.logger.log("plugins", `Loading plugin from '${plugin.url}'`)
           await newPlugin.load()
         } catch (e) {
-          this.logger.error("plugins", `Failed to load plugin '${plugin.url}: ${e.message}'`)
+          this.logger.error("plugins", `Failed to load plugin '${plugin.url}: ${e instanceof Error ? e.message : "Unknown"}'`)
           success = false
         }
         try {
           this.logger.log("plugins", `Verifying plugin from '${plugin.url}'`)
           newPlugin.verify()
         } catch (e) {
-          this.logger.error("plugins", `Failed to verify plugin '${plugin.url}': ${e.message}`)
+          this.logger.error("plugins", `Failed to verify plugin '${plugin.url}': ${e instanceof Error ? e.message : "Unknown"}`)
           success = false
         }
         if (success) {
@@ -308,7 +308,7 @@ class Pup {
         }
       }
     } catch (e) {
-      this.logger.error("watchdog", "Watchdog error: ", e)
+      this.logger.error("watchdog", "Watchdog error: " + (e instanceof Error ? e.message : "Unknown"))
     }
 
     // Update process status
@@ -374,7 +374,7 @@ class Pup {
     } catch (e) {
       this.logger.error(
         "rest",
-        `An error occured while inizializing the rest api: ${e.message}`,
+        `An error occured while inizializing the rest api: ${e instanceof Error ? e.message : "Unknown"}`,
       )
     }
   }

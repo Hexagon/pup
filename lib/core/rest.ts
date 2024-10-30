@@ -153,7 +153,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .get("/state", (ctx) => {
@@ -164,7 +164,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .post("/processes/:id/start", (ctx) => {
@@ -179,7 +179,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .post("/processes/:id/stop", async (ctx) => {
@@ -194,7 +194,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .post("/processes/:id/restart", (ctx) => {
@@ -209,7 +209,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .post("/processes/:id/block", (ctx) => {
@@ -224,7 +224,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .post("/processes/:id/unblock", (ctx) => {
@@ -239,7 +239,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .post("/telemetry", async (ctx) => {
@@ -255,7 +255,7 @@ export class RestApi {
             }
           } catch (err) {
             ctx.response.status = Status.InternalServerError
-            ctx.response.body = { error: err.message }
+            ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
           }
         }
       })
@@ -285,7 +285,7 @@ export class RestApi {
             }
           } catch (err) {
             ctx.response.status = Status.InternalServerError
-            ctx.response.body = { error: err.message }
+            ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
           }
         }
       })
@@ -295,7 +295,7 @@ export class RestApi {
           ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .post("/log", async (ctx) => {
@@ -328,7 +328,7 @@ export class RestApi {
           ctx.response.status = Status.Created
         } catch (err) {
           ctx.response.status = Status.InternalServerError
-          ctx.response.body = { error: err.message }
+          ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
         }
       })
       .get("/logs", async (context) => {
@@ -388,7 +388,7 @@ export class RestApi {
           context.response.status = 500
           context.response.body = {
             error: "Internal Server Error",
-            message: error.message,
+            message: error instanceof Error ? error.message : "Unknown",
           }
         }
       })
