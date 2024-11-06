@@ -35,6 +35,8 @@ deno run -Ar jsr:@pup/pup setup
 
 This command downloads the latest version of Pup and installs it on your system. Read more about release channels [here](https://pup.56k.guru/installation/#release-channels).
 
+> **Note** If you're using Windows, automated setup may fail. If so, follow the instructions at the command line.
+
 ### Configuration and Usage
 
 Pup revolves around instance configuration files, where each managed process belongs to an instance defined by a `pup.json`. This file can either be created manually, or by the command line helpers

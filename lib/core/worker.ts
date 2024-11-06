@@ -75,14 +75,14 @@ class WorkerRunner extends BaseRunner {
       })
 
       this.worker.onmessageerror = (error) => {
-        this.pup.logger.error("error", `Worker message error: ${error}`, this.processConfig)
+        this.pup.logger.error("error", `Worker message error: ${error instanceof Error ? error.message : "Unknown"}`, this.processConfig)
       }
 
       this.worker.onerror = (error) => {
-        this.pup.logger.error("error", `Worker error: ${error.message}`, this.processConfig)
+        this.pup.logger.error("error", `Worker error: ${error instanceof Error ? error.message : "Unknown"}`, this.processConfig)
       }
     } catch (error) {
-      this.pup.logger.error("error", `Fatal worker error: ${error.message}`, this.processConfig)
+      this.pup.logger.error("error", `Fatal worker error: ${error instanceof Error ? error.message : "Unknown"}`, this.processConfig)
     }
 
     return await new Promise((resolve) => {

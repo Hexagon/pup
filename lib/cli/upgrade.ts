@@ -224,7 +224,7 @@ export async function upgrade(
     }
     exit(0)
   } else {
-    console.log(`\n${upgradeOrDowngradingAction} failed.\n`)
+    console.log(`\n${upgradeOrDowngradingAction} automatically failed! Try running the installation command manually: \n\ndeno ${installCmd.join(" ")}\n`)
     exit(1)
   }
 }

@@ -9,6 +9,12 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.3] - 2024-11-06
+
+- fix(core): Fix service installation on Windows by upgrading dependency @cross/service
+- fix(cli): Add notes on how to recover from a failed install on Windows
+- chore(deps): Fixes for Deno 2
+
 ## [1.0.2] - 2024-09-25
 
 - fix(core): Fix `--canary` install base url

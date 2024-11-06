@@ -26,7 +26,7 @@ export interface LogEventData {
   timeStamp: number
 }
 
-type AttachedLogger = (severity: string, category: string, text: string, process?: ProcessConfiguration, timeStamp?: number) => boolean
+type AttachedLogger = (severity: string, category: string, text: string, processConf?: ProcessConfiguration, timeStamp?: number) => boolean
 
 class Logger {
   private config: GlobalLoggerConfiguration = {}
@@ -106,9 +106,9 @@ class Logger {
     return await this.getLogContents(processId, startTimeStamp, endTimeStamp, undefined, nRows)
   }
 
-  private async internalLog(severity: string, category: string, text: string, process?: ProcessConfiguration, timeStamp?: number) {
+  private async internalLog(severity: string, category: string, text: string, processConf?: ProcessConfiguration, timeStamp?: number) {
     // Default initiator to core
-    const initiator = process?.id || "core"
+    const initiator = processConf?.id || "core"
 
     timeStamp = timeStamp || Date.now()
 
@@ -136,7 +136,7 @@ class Logger {
     if (this.attachedLogger) {
       // Do not trust the attached logger
       try {
-        blockedByAttachedLogger = this.attachedLogger(severity, category, text, process, timeStamp)
+        blockedByAttachedLogger = this.attachedLogger(severity, category, text, processConf, timeStamp)
       } catch (e) {
         console.error("Error in attached logger: ", e)
       }
@@ -146,7 +146,7 @@ class Logger {
     if (blockedByAttachedLogger) return
 
     // Log to console
-    const logToConsoleProcess = (process?.logger?.console ?? true) === false
+    const logToConsoleProcess = (processConf?.logger?.console ?? true) === false
     const logToConsoleGlobal = (this.config?.console ?? true) === false
     const logToConsole = !logToConsoleGlobal && !logToConsoleProcess
     const isStdErr = severity === "error" || category === "stderr"
@@ -196,14 +196,14 @@ class Logger {
     }
 
     // Write process log file(s)
-    const decorateProcessFiles = process?.logger?.decorateFiles ?? false
+    const decorateProcessFiles = processConf?.logger?.decorateFiles ?? false
     // If stderr is not defined but stdout is, use the stdout file
-    const stderrProcessFileName = process?.logger?.stderr ?? process?.logger?.stdout
+    const stderrProcessFileName = processConf?.logger?.stderr ?? processConf?.logger?.stdout
     if (isStdErr && stderrProcessFileName) {
       this.writeFile(stderrProcessFileName, decorateProcessFiles ? decoratedLogText : text)
     }
-    if (!isStdErr && process?.logger?.stdout) {
-      this.writeFile(process?.logger?.stdout, decorateProcessFiles ? decoratedLogText : text)
+    if (!isStdErr && processConf?.logger?.stdout) {
+      this.writeFile(processConf?.logger?.stdout, decorateProcessFiles ? decoratedLogText : text)
     }
   }
 
@@ -217,25 +217,25 @@ class Logger {
     }
   }
 
-  public async generic(severity: string, category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
+  public async generic(severity: string, category: string, text: string, processConf?: ProcessConfiguration, timestamp?: number) {
     if (severity === "log" || severity === "info" || severity === "warn" || severity === "error") {
-      await this.internalLog(severity, category, text, process, timestamp)
+      await this.internalLog(severity, category, text, processConf, timestamp)
     } else {
       this.warn("logger", "Log with invalid severity received, text: ${text}")
     }
   }
 
-  public async log(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    await this.internalLog("log", category, text, process, timestamp)
+  public async log(category: string, text: string, processConf?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("log", category, text, processConf, timestamp)
   }
-  public async info(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    await this.internalLog("info", category, text, process, timestamp)
+  public async info(category: string, text: string, processConf?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("info", category, text, processConf, timestamp)
   }
-  public async warn(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    await this.internalLog("warn", category, text, process, timestamp)
+  public async warn(category: string, text: string, processConf?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("warn", category, text, processConf, timestamp)
   }
-  public async error(category: string, text: string, process?: ProcessConfiguration, timestamp?: number) {
-    await this.internalLog("error", category, text, process, timestamp)
+  public async error(category: string, text: string, processConf?: ProcessConfiguration, timestamp?: number) {
+    await this.internalLog("error", category, text, processConf, timestamp)
   }
   public async purge(keepHours: number): Promise<number> {
     if (!this.kv?.isOpen()) {
@@ -254,7 +254,7 @@ class Logger {
       await this.kv.defer(this.kv.vacuum())
       return rowsDeleted
     } catch (error) {
-      this.log("error", `Failed to purge logs from store '${this.storeName}': ${error.message}`)
+      this.log("error", `Failed to purge logs from store '${this.storeName}': ${error instanceof Error ? error.message : "Unknown"}`)
       return 0
     }
   }
@@ -265,7 +265,7 @@ class Logger {
     try {
       await this.kv?.close(timeoutMs)
     } catch (e) {
-      console.error("Error while closing kv store: " + e.message)
+      console.error("Error while closing kv store: " + (e instanceof Error ? e.message : "Unknown"))
     }
   }
 }

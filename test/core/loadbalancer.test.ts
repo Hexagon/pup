@@ -36,8 +36,8 @@ class MockConn implements Deno.Conn {
   closeRead(): Promise<void> {
     return Promise.resolve()
   }
-  upgrade(): Promise<Deno.FsFile> {
-    return Promise.resolve(new Deno.FsFile(this.rid))
+  async upgrade(): Promise<Deno.FsFile> {
+    return Promise.resolve(await Deno.open(await Deno.makeTempFile()))
   }
   [Symbol.dispose](): void {
     this.close()

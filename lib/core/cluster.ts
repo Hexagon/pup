@@ -31,7 +31,7 @@ class Cluster extends Process {
     )
   }
 
-  public isCluster = (): boolean => {
+  public override isCluster = (): boolean => {
     return true
   }
 
@@ -141,7 +141,7 @@ class Cluster extends Process {
     return this.processes.map((process) => process.getStatus())
   }
 
-  public getStatus(): ProcessInformation {
+  public override getStatus(): ProcessInformation {
     const clusterStatus: ProcessInformation = {
       id: this.getConfig().id,
       status: ApiProcessState.CREATED,
@@ -175,7 +175,7 @@ class Cluster extends Process {
     return clusterStatus
   }
 
-  public cleanup = (): void => {
+  public override cleanup = (): void => {
     this.loadBalancerWorker?.terminate()
     this.loadBalancerWorker = null
   }
