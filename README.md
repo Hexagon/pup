@@ -33,9 +33,9 @@ To install Pup, make sure you run the latest version of your runtime environment
 deno run -Ar jsr:@pup/pup setup
 ```
 
-If you're using Windows, automated setup may fail. If so, follow the instructions printed at the command line.
-
 This command downloads the latest version of Pup and installs it on your system. Read more about release channels [here](https://pup.56k.guru/installation/#release-channels).
+
+> **Note** If you're using Windows, automated setup may fail. If so, follow the instructions at the command line.
 
 ### Configuration and Usage
 
