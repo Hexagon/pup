@@ -56,7 +56,7 @@ async function main() {
     checkedArgsError = e
   }
   if (!checkedArgs || checkedArgsError) {
-    console.error(`Invalid combination of arguments: ${checkedArgsError.message}`)
+    console.error(`Invalid combination of arguments: ${checkedArgsError instanceof Error ? checkedArgsError.message : "Unknown"}`)
     return exit(1)
   }
   // Handle that cmd can be specified using both `--cmd <command>` and `-- <command>`
@@ -86,7 +86,7 @@ async function main() {
         setupCondition as boolean,
       )
     } catch (e) {
-      console.error(`Could not ${setupCondition ? "enable-service" : "upgrade"} pup, error: ${e.message}`)
+      console.error(`Could not ${setupCondition ? "enable-service" : "upgrade"} pup, error: ${e instanceof Error ? e.message : "Unknown"}`)
     }
     // upgrader(...) will normally handle exiting with signal 0, so we exit with code 1 if getting here
     exit(1)
@@ -135,7 +135,7 @@ async function main() {
       chdir(resolvedPath.dir)
       configFile = `${resolvedPath.name}${resolvedPath.ext}`
     } catch (e) {
-      console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e.message)
+      console.error(`Could not change working directory to path of '${configFile}, exiting. Message: `, e instanceof Error ? e.message : "Unknown")
       exit(1)
     }
     // Change working directory to configured directory
@@ -145,7 +145,7 @@ async function main() {
       const resolvedPath = path.parse(path.resolve(checkedArgs.get("cwd")!))
       chdir(resolvedPath.dir)
     } catch (e) {
-      console.error(`Could not change working directory to path specified by --cwd ${checkedArgs.get("cwd")}, exiting. Message: `, e.message)
+      console.error(`Could not change working directory to path specified by --cwd ${checkedArgs.get("cwd")}, exiting. Message: `, e instanceof Error ? e.message : "Unknown")
       return exit(1)
     }
   }
@@ -174,7 +174,7 @@ async function main() {
       const rawConfigText = new TextDecoder().decode(rawConfig)
       configuration = validateConfiguration(JSON5.parse(rawConfigText))
     } catch (e) {
-      console.error(`Could not start, error reading or parsing configuration file '${configFile}': ${e.message}`)
+      console.error(`Could not start, error reading or parsing configuration file '${configFile}': ${e instanceof Error ? e.message : "Unknown"}`)
       return exit(1)
     }
   } else {
@@ -327,7 +327,7 @@ async function main() {
       }
       exit(0)
     } catch (e) {
-      console.error(`Could not install service, error: ${e.message}`)
+      console.error(`Could not install service, error: ${e instanceof Error ? e.message : "Unknown"}`)
       exit(1)
     }
   }
@@ -353,7 +353,7 @@ async function main() {
       }
       return exit(0)
     } catch (e) {
-      console.error(`Could not uninstall service, error: ${e.message}`)
+      console.error(`Could not uninstall service, error: ${e instanceof Error ? e.message : "Unknown"}`)
       return exit(1)
     }
   }
@@ -545,7 +545,7 @@ async function main() {
           return exit(1)
         }
       } catch (e) {
-        console.error("Action failed:", e.name)
+        console.error("Action failed:", e instanceof Error ? e.name : "Unknown")
         return exit(1)
       }
     }
@@ -607,7 +607,7 @@ async function main() {
 
       // Let program end gracefully, no exit here
     } catch (e) {
-      console.error("Could not start pup, invalid configuration:", e.message)
+      console.error("Could not start pup, invalid configuration:", e instanceof Error ? e.name : "Unknown")
       return exit(1)
     }
   } else {
