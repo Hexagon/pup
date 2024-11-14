@@ -60,7 +60,7 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
       const existingConfigurationText = new TextDecoder().decode(existingConfiguration)
       existingConfigurationObject = JSON5.parse(existingConfigurationText) as unknown as Configuration
     } catch (e) {
-      throw new Error("Could not read configuration file: " + e.message)
+      throw new Error("Could not read configuration file: " + (e instanceof Error ? e.message : "Unknown"))
     }
 
     // Check for valid parse
@@ -96,8 +96,8 @@ export async function appendConfigurationFile(configFile: string, checkedArgs: A
     // Append new process, and write configuration file
     existingConfigurationObject.processes.push(newConfiguration.processes[0])
     await writeFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
-  } catch (e) {
-    console.error(`Could not modify configuration file '${configFile}': `, e.message)
+  } catch (_e) {
+    console.error(`Could not modify configuration file '${configFile}'`)
     exit(1)
   }
 }
@@ -115,8 +115,8 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
       const existingConfiguration = await readFile(configFile)
       const existingConfigurationText = new TextDecoder().decode(existingConfiguration)
       existingConfigurationObject = JSON5.parse(existingConfigurationText) as unknown as Configuration
-    } catch (e) {
-      throw new Error("Could not read configuration file.", e.message)
+    } catch (_e) {
+      throw new Error("Could not read configuration file.")
     }
 
     if (!existingConfigurationObject) {
@@ -135,7 +135,7 @@ export async function removeFromConfigurationFile(configFile: string, checkedArg
     // Append new process, and write configuration file
     await writeFile(configFile, JSON.stringify(existingConfigurationObject, null, 2))
   } catch (e) {
-    console.error(`Could not modify configuration file ${configFile}: `, e.message)
+    console.error(`Could not modify configuration file ${configFile}: `, e instanceof Error ? e.message : "Unknown")
     exit(1)
   }
 }
