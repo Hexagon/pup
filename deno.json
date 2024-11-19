@@ -1,6 +1,6 @@
 {
   "name": "@pup/pup",
-  "version": "1.0.3",
+  "version": "1.0.4",
 
   "exports": {
     ".": "./pup.ts",
@@ -42,7 +42,7 @@
     "@cross/jwt": "jsr:@cross/jwt@~0.5.0",
     "@cross/kv": "jsr:@cross/kv@~0.17.1",
     "@cross/runtime": "jsr:@cross/runtime@~1.1.0",
-    "@cross/service": "jsr:@cross/service@~1.0.5",
+    "@cross/service": "jsr:@cross/service@^1.0.6",
     "@cross/test": "jsr:@cross/test@~0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.16.0",
     "@hexagon/croner": "jsr:@hexagon/croner@~9.0.0",

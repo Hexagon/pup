@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [1.0.4] - 2024-11-19
+
+- fix(core): Fix service auto start after install on Windows by upgrading dependency @cross/service
+
 ## [1.0.3] - 2024-11-06
 
 - fix(core): Fix service installation on Windows by upgrading dependency @cross/service
