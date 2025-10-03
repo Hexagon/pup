@@ -7,7 +7,8 @@
 import type { Configuration } from "../../lib/core/configuration.ts"
 import { ApiProcessState } from "@pup/api-definitions"
 import { Pup } from "../../lib/core/pup.ts"
-import { assertEquals, assertNotEquals } from "@std/assert"
+import { Cluster } from "../../lib/core/cluster.ts"
+import { assertEquals, assertNotEquals, assert } from "@std/assert"
 import { test } from "@cross/test"
 
 test("Create test process. Test start, block, stop, start, unblock, start in sequence.", async () => {
@@ -118,5 +119,36 @@ test("Create test cluster. Test start, block, stop, start, unblock, start in seq
   assertEquals(testProcess?.getStatus().status, ApiProcessState.STARTING)
 
   // Terminate pup, allow 2.5 seconds for graceful shutdown
+  await pup.terminate(2500)
+})
+
+test("Cluster sets PUP_CLUSTER_PORT for each instance without common port", async () => {
+  const TEST_PROCESS_ID = "test-3"
+  const TEST_PROCESS_COMMAND = "deno run -A lib/test/core/test-data/test_process.ts"
+
+  const config: Configuration = {
+    processes: [
+      {
+        "id": TEST_PROCESS_ID,
+        "cmd": TEST_PROCESS_COMMAND,
+        "cluster": {
+          "instances": 2,
+          "startPort": 8000,
+        },
+      },
+    ],
+  }
+  const pup = new Pup(config)
+  await pup.init()
+
+  const testProcess = pup.processes.findLast((p) => p.getConfig().id === TEST_PROCESS_ID)
+  assert(testProcess instanceof Cluster)
+
+  const [instance0, instance1] = testProcess.processes
+  assertEquals(instance0.getConfig().env?.PUP_CLUSTER_INSTANCE, "0")
+  assertEquals(instance0.getConfig().env?.PUP_CLUSTER_PORT, "8000")
+  assertEquals(instance1.getConfig().env?.PUP_CLUSTER_INSTANCE, "1")
+  assertEquals(instance1.getConfig().env?.PUP_CLUSTER_PORT, "8001")
+
   await pup.terminate(2500)
 })
