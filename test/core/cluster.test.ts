@@ -6,6 +6,7 @@
 
 import type { Configuration } from "../../lib/core/configuration.ts"
 import { Pup } from "../../lib/core/pup.ts"
+import { Cluster } from "../../lib/core/cluster.ts"
 import { assertEquals, assertExists } from "@std/assert"
 import { test } from "@cross/test"
 
@@ -37,7 +38,7 @@ test("Cluster with startPort but without commonPort should set PUP_CLUSTER_PORT"
   assertEquals(clusterProcess.isCluster(), true)
 
   // Get all child processes
-  const cluster = clusterProcess as any // Access internal processes property
+  const cluster = clusterProcess as Cluster
   assertEquals(cluster.processes.length, 3)
 
   // Verify each instance has the correct PUP_CLUSTER_PORT set
@@ -81,7 +82,7 @@ test("Cluster with both commonPort and startPort should set PUP_CLUSTER_PORT", a
   assertExists(clusterProcess)
 
   // Get all child processes
-  const cluster = clusterProcess as any
+  const cluster = clusterProcess as Cluster
   assertEquals(cluster.processes.length, 2)
 
   // Verify each instance has the correct PUP_CLUSTER_PORT set
@@ -121,7 +122,7 @@ test("Cluster without startPort should not set PUP_CLUSTER_PORT", async () => {
   assertExists(clusterProcess)
 
   // Get all child processes
-  const cluster = clusterProcess as any
+  const cluster = clusterProcess as Cluster
   assertEquals(cluster.processes.length, 2)
 
   // Verify PUP_CLUSTER_PORT is not set, but PUP_CLUSTER_INSTANCE is
