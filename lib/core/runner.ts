@@ -157,11 +157,7 @@ class Runner extends BaseRunner {
    * @returns The command to be executed.
    */
   private prepareCommand(env?: Record<string, string | undefined>) {
-    // Execute command through the platform shell to properly handle multi-word commands
-    // like "deno task xyz", pipes, redirects, and environment variable expansions
-    let child = CurrentOS === OperatingSystem.Windows
-      ? $.raw`cmd /c ${this.processConfig.cmd!}`.stdout("piped").stderr("piped")
-      : $.raw`/bin/sh -c ${this.processConfig.cmd!}`.stdout("piped").stderr("piped")
+    let child = $.raw`${this.processConfig.cmd!}`.stdout("piped").stderr("piped")
 
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
     if (env) child = child.env(env)
