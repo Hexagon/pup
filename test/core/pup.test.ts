@@ -8,7 +8,7 @@ import type { Configuration } from "../../lib/core/configuration.ts"
 import { ApiProcessState } from "@pup/api-definitions"
 import { Pup } from "../../lib/core/pup.ts"
 import { Cluster } from "../../lib/core/cluster.ts"
-import { assertEquals, assertNotEquals, assert } from "@std/assert"
+import { assert, assertEquals, assertNotEquals } from "@std/assert"
 import { test } from "@cross/test"
 
 test("Create test process. Test start, block, stop, start, unblock, start in sequence.", async () => {
