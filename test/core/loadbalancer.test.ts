@@ -18,7 +18,7 @@ class MockConn implements Deno.Conn {
   }
   ref(): void {/* Implement as needed */}
   unref(): void {/* Implement as needed */}
-  readable = new ReadableStream<Uint8Array>()
+  readable = new ReadableStream<Uint8Array<ArrayBuffer>>()
   writable = new WritableStream<Uint8Array>()
 
   closeWrite(): Promise<void> {

@@ -6,7 +6,7 @@
  */
 
 import type { ProcessConfiguration, Pup } from "./pup.ts"
-import { readLines, StringReader } from "@std/io"
+import { TextLineStream } from "@std/streams"
 import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
 import { $, type CommandChild } from "dax-sh"
 import { getAllEnv } from "@cross/env"
@@ -85,14 +85,15 @@ class Runner extends BaseRunner {
     const logger = this.pup.logger
 
     try {
-      for await (const chunk of reader) {
-        const r = new StringReader(new TextDecoder().decode(chunk))
-        for await (const line of readLines(r)) {
-          if (category === "stderr") {
-            await logger.error(category, line, this.processConfig)
-          } else {
-            await logger.log(category, line, this.processConfig)
-          }
+      const lineStream = reader
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new TextLineStream())
+
+      for await (const line of lineStream) {
+        if (category === "stderr") {
+          await logger.error(category, line, this.processConfig)
+        } else {
+          await logger.log(category, line, this.processConfig)
         }
       }
     } catch (_e) {
@@ -157,6 +158,7 @@ class Runner extends BaseRunner {
    */
   private prepareCommand(env?: Record<string, string | undefined>) {
     let child = $.raw`${this.processConfig.cmd!}`.stdout("piped").stderr("piped")
+
     if (this.processConfig.cwd) child = child.cwd(this.processConfig.cwd)
     if (env) child = child.env(env)
 

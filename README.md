@@ -57,11 +57,11 @@ used below:
 
 4. To make your instance run at boot, enable it using `pup enable-service`.
 
-   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `-n my-custom-name`.
+   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `--name my-custom-name`.
 
 5. To stream the logs from a running instance, use the command `pup monitor`. To show historic logs, use `pup logs`.
 
-   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `-n my-custom-name`.
+   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `--name my-custom-name`.
 
 For the full manual, see <https://pup.56k.guru>
 
