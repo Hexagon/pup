@@ -322,7 +322,7 @@ export class LoadBalancer {
         method: req.method,
         headers: headers,
         body: req.body,
-        // @ts-ignore - duplex is a valid Request option for streaming but not in TypeScript's lib.dom.d.ts yet
+        // @ts-expect-error - duplex is a valid Request option for streaming but not in TypeScript's lib.dom.d.ts yet
         duplex: req.body ? "half" : undefined,
       })
 
