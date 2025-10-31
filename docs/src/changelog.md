@@ -44,7 +44,7 @@ This release marks the initial stable release of Pup - a powerful universal proc
   your own plugins to add additional features and integrations tailored to your needs.
 - **Process Telemetry and IPC:** Gain deeper insights into managed processes by gathering telemetry data, such as memory usage, from Deno client processes. Supports inter-process communication for
   connected processes to interact with each other.
-- **Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
+- **Rest API:** Control and monitor Pup from third party solutions using the built-in Rest API.
 
 _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
 

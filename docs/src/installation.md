@@ -43,7 +43,7 @@ The `upgrade` command support the following parameters:
   implications. It's important to note that this setting is exclusive to Pup; every child process initiated retains its own distinct permissions as configured, respecting their individual least
   privilege settings.
 - `--unsafely-ignore-certificate-errors[=list,of,hosts]`: **Should almost never be used, and certainly not in production.** This parameter is passed along to Deno as-is, and makes Pup and all Deno
-  subprocess ignore certificate errors. Has to be speficied on both setup and upgrade. It is better to pass this parameter to selected processes using the command in `pup.json` if you really need it.
+  subprocess ignore certificate errors. Has to be specified on both setup and upgrade. It is better to pass this parameter to selected processes using the command in `pup.json` if you really need it.
 
 The upgrader will check if your currently installed version of Deno is compatible with Pup and suggest an upgrade if necessary.
 
@@ -62,7 +62,7 @@ The available channels are:
 - `canary`: The canary channel provides the most up-to-date and cutting-edge versions of Pup. It includes the latest changes and may not be as stable as the other channels. It is primarily intended
   for developers and early adopters who want to stay on the bleeding edge of Pup's development. Based on the current state of the `dev` repo of the github repository.
 
-> **Note** Built-in plugins, such as splunk-hec and webinterace does not work with canary versions right now.
+> **Note** Built-in plugins, such as splunk-hec and webinterface do not work with canary versions right now.
 
 Each channel serves different purposes, so choose the one that best fits your needs and requirements.
 
