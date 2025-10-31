@@ -284,6 +284,8 @@ export class LoadBalancer {
 
   private createMockConn(remoteAddr: Deno.NetAddr): Deno.Conn {
     // Create a minimal mock connection object for strategy selection
+    // Only remoteAddr is used by selectBackend() for IP hash strategy
+    // Type assertion is safe here as we only access remoteAddr in the selection logic
     return {
       remoteAddr,
       localAddr: { transport: "tcp", hostname: "127.0.0.1", port: 0 },
@@ -320,7 +322,7 @@ export class LoadBalancer {
         method: req.method,
         headers: headers,
         body: req.body,
-        // @ts-ignore - duplex is needed for streaming
+        // @ts-ignore - duplex is a valid Request option for streaming but not in TypeScript's lib.dom.d.ts yet
         duplex: req.body ? "half" : undefined,
       })
 

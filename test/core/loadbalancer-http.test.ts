@@ -10,13 +10,11 @@ const loggerCallback = (severity: string, category: string, text: string) => {
 test("LoadBalancer HTTP - X-Forwarded-For header is added", async () => {
   // Create a simple backend HTTP server that echoes headers
   const backendPort = 8095
-  let receivedHeaders: Headers | null = null
 
   const backendServer = Deno.serve({
     port: backendPort,
     hostname: "127.0.0.1",
     handler: (req) => {
-      receivedHeaders = req.headers
       return new Response(
         JSON.stringify({
           forwardedFor: req.headers.get("X-Forwarded-For"),
@@ -44,7 +42,7 @@ test("LoadBalancer HTTP - X-Forwarded-For header is added", async () => {
   )
 
   // Start load balancer in background
-  const lbPromise = loadBalancer.start(lbPort)
+  loadBalancer.start(lbPort)
 
   // Give the load balancer time to start
   await new Promise((resolve) => setTimeout(resolve, 100))
@@ -83,13 +81,11 @@ test("LoadBalancer HTTP - X-Forwarded-For header is added", async () => {
 test("LoadBalancer HTTP - X-Forwarded-For header is appended to existing header", async () => {
   // Create a simple backend HTTP server that echoes headers
   const backendPort = 8097
-  let receivedHeaders: Headers | null = null
 
   const backendServer = Deno.serve({
     port: backendPort,
     hostname: "127.0.0.1",
     handler: (req) => {
-      receivedHeaders = req.headers
       return new Response(
         JSON.stringify({
           forwardedFor: req.headers.get("X-Forwarded-For"),
@@ -116,7 +112,7 @@ test("LoadBalancer HTTP - X-Forwarded-For header is appended to existing header"
   )
 
   // Start load balancer in background
-  const lbPromise = loadBalancer.start(lbPort)
+  loadBalancer.start(lbPort)
 
   // Give the load balancer time to start
   await new Promise((resolve) => setTimeout(resolve, 100))
