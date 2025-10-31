@@ -1,0 +1,18 @@
+{
+  "$schema": "https://pup.56k.guru/schema.json",
+  "name": "http-cluster-example",
+  "processes": [
+    {
+      "id": "http-server-cluster",
+      "cmd": "deno run --allow-net server.ts",
+      "autostart": true,
+      "cluster": {
+        "instances": 3,
+        "startPort": 8080,
+        "commonPort": 3000,
+        "strategy": "round-robin",
+        "balancerType": "http"
+      }
+    }
+  ]
+}
