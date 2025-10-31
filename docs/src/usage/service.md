@@ -120,7 +120,7 @@ This will start a Docker container named my-pup-container using the my-pup-image
 ### Installing a systemd user service
 
 Systemd is a system and service manager for Linux. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the systemd user mode, which
-will keep all configuration withing your home directory.
+will keep all configuration within your home directory.
 
 ### Steps
 
@@ -204,7 +204,7 @@ systemctl --user enable pup
 ## Manual guide using launchd
 
 Launchd is a system and service manager for macOS. It provides a way to manage system services and daemons. As Deno and Pup are installed per-user, we will make use of the launchd user mode, which
-will keep all configuration withing your home directory, and avoid any need for root privileges.
+will keep all configuration within your home directory, and avoid any need for root privileges.
 
 ### Steps
 
