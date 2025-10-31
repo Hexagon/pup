@@ -11,7 +11,7 @@ import { Process, type ProcessInformation } from "./process.ts"
 import { ApiProcessState } from "@pup/api-definitions"
 import { LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S, type ProcessConfiguration } from "./configuration.ts"
 import type { Pup } from "./pup.ts"
-import { BalancingStrategy, type LoadBalancerStartOperation } from "./loadbalancer.ts"
+import { BalancingStrategy, type LoadBalancerStartOperation, LoadBalancerType } from "./loadbalancer.ts"
 
 class Cluster extends Process {
   public processes: Process[] = []
@@ -87,9 +87,16 @@ class Cluster extends Process {
         strategy = BalancingStrategy.ROUND_ROBIN
       }
 
+      let type: LoadBalancerType
+      if (this.config.cluster.balancerType === "http") {
+        type = LoadBalancerType.HTTP
+      } else {
+        type = LoadBalancerType.TCP
+      }
+
       this.pup.logger.log(
         "cluster",
-        `Setting up load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort} and strategy ${BalancingStrategy[strategy]}`,
+        `Setting up ${LoadBalancerType[type]} load balancer for ${nInstances} instances with common port ${this.config.cluster.commonPort} and strategy ${BalancingStrategy[strategy]}`,
         this.config,
       )
 
@@ -103,6 +110,7 @@ class Cluster extends Process {
         strategy,
         validationInterval: LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S,
         commonPort: this.config.cluster.commonPort,
+        type,
       }
 
       this.loadBalancerWorker = new Worker(new URL("../workers/loadbalancer.js", import.meta.url).href, { type: "module" })

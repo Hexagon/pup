@@ -71,6 +71,7 @@ interface ClusterConfiguration {
   commonPort?: number
   startPort?: number
   strategy?: string
+  balancerType?: string
 }
 
 interface GlobalWatcherConfiguration {
@@ -146,6 +147,7 @@ const ConfigurationSchema = z.object({
         commonPort: z.number().min(1).max(65535).optional(),
         startPort: z.number().min(1).max(65535).optional(),
         strategy: z.enum(["ip-hash", "round-robin", "least-connections"]).default("round-robin"),
+        balancerType: z.enum(["tcp", "http"]).default("tcp"),
       })),
       pidFile: z.optional(z.string()),
       path: z.optional(z.string()),
