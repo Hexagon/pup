@@ -1,23 +1,17 @@
 # HTTP Cluster Example with X-Forwarded-For Support
 
-This example demonstrates how to use Pup's HTTP load balancer with clustering to
-properly forward client IP addresses through the `X-Forwarded-For` and
-`X-Real-IP` headers.
+This example demonstrates how to use Pup's HTTP load balancer with clustering to properly forward client IP addresses through the `X-Forwarded-For` and `X-Real-IP` headers.
 
 ## Problem
 
-When using Pup's cluster mode with `commonPort`, the default TCP-based load
-balancer proxies connections at the TCP level. This means that the backend
-servers always see the connection coming from `127.0.0.1` (localhost), losing
-the actual client IP address.
+When using Pup's cluster mode with `commonPort`, the default TCP-based load balancer proxies connections at the TCP level. This means that the backend servers always see the connection coming from
+`127.0.0.1` (localhost), losing the actual client IP address.
 
 ## Solution
 
-The HTTP load balancer (`balancerType: "http"`) operates at the HTTP protocol
-level and automatically adds the following headers to forwarded requests:
+The HTTP load balancer (`balancerType: "http"`) operates at the HTTP protocol level and automatically adds the following headers to forwarded requests:
 
-- **`X-Forwarded-For`**: Contains the client IP address. If the header already
-  exists, the client IP is appended to the list.
+- **`X-Forwarded-For`**: Contains the client IP address. If the header already exists, the client IP is appended to the list.
 - **`X-Real-IP`**: Contains the client IP address (single value).
 
 ## Configuration
@@ -57,10 +51,8 @@ In your `pup.json`, set the `balancerType` to `"http"`:
 
 Pup supports two types of load balancers:
 
-- **`tcp`** (default): Simple TCP proxy. Fast and protocol-agnostic, but doesn't
-  preserve client IP.
-- **`http`**: HTTP-aware proxy. Adds `X-Forwarded-For` and `X-Real-IP` headers
-  to preserve client IP. Only works with HTTP/HTTPS traffic.
+- **`tcp`** (default): Simple TCP proxy. Fast and protocol-agnostic, but doesn't preserve client IP.
+- **`http`**: HTTP-aware proxy. Adds `X-Forwarded-For` and `X-Real-IP` headers to preserve client IP. Only works with HTTP/HTTPS traffic.
 
 ## When to Use HTTP Load Balancer
 
@@ -68,8 +60,7 @@ Use the HTTP load balancer when:
 
 - Your application needs to know the real client IP address
 - You're serving HTTP/HTTPS traffic
-- You need to implement rate limiting, access control, or logging based on
-  client IP
+- You need to implement rate limiting, access control, or logging based on client IP
 - Your application reads the `X-Forwarded-For` or `X-Real-IP` headers
 
 Use the TCP load balancer when:
@@ -82,5 +73,4 @@ Use the TCP load balancer when:
 
 - The HTTP load balancer only works with HTTP/HTTPS traffic
 - For other protocols, use an external load balancer like NGINX or HAProxy
-- The `X-Forwarded-For` header can contain multiple IPs if the request passed
-  through multiple proxies
+- The `X-Forwarded-For` header can contain multiple IPs if the request passed through multiple proxies

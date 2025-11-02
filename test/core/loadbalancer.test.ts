@@ -152,7 +152,7 @@ test("LoadBalancer - HTTP Type Initialization", () => {
   loadBalancer.close()
 })
 
-test("LoadBalancer - HTTP forwards X-Forwarded-For header", async () => {
+test("LoadBalancer - HTTP forwards X-Forwarded-For header", () => {
   // This is an integration test that requires a real backend server
   // For now, we just verify the load balancer can be created with HTTP type
   const backends: Backend[] = [
