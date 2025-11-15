@@ -9,6 +9,10 @@ nav_order: 13
 
 All notable changes to this project will be documented in this section.
 
+## [Unreleased]
+
+- feat(core): Add exponential backoff for process restarts via `restartBackoffMs` configuration option to prevent rapid restart loops
+
 ## [1.0.4] - 2024-11-19
 
 - fix(core): Fix service auto start after install on Windows by upgrading dependency @cross/service
