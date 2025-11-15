@@ -32,6 +32,7 @@ pup/
 Pup is built with Deno. Key commands are defined in `deno.json`:
 
 ### Formatting and Linting
+
 ```bash
 deno fmt                   # Format code
 deno fmt --check          # Check formatting
@@ -39,11 +40,13 @@ deno lint                 # Lint code
 ```
 
 ### Testing
+
 ```bash
 deno test --allow-read --allow-write --allow-env --allow-net --allow-sys --allow-run --coverage=cov_profile
 ```
 
 ### Build Tasks
+
 ```bash
 deno task check           # Run format, lint, and tests
 deno task build-schema    # Generate JSON schema
@@ -54,6 +57,7 @@ deno task build           # Complete build process
 ## Pre-commit Checks
 
 The project uses GitHub Actions for CI (`.github/workflows/deno.yaml`):
+
 - Format checking (`deno fmt --check`)
 - Linting (`deno lint`)
 - Full test suite with coverage
@@ -66,6 +70,7 @@ Before submitting PRs, run `deno task check` locally to ensure all checks pass.
 Pup is part of an ecosystem of packages available on JSR:
 
 ### Core Dependencies
+
 - **[@pup/api-definitions](https://github.com/hexagon/pup-api-definitions)** - API type definitions shared across the ecosystem
 - **[@pup/api-client](https://github.com/hexagon/pup-api-client)** - REST API client for CLI, plugins, and telemetry
 - **[@pup/telemetry](https://github.com/hexagon/pup-telemetry)** - Runtime-agnostic library for process telemetry and IPC
@@ -73,6 +78,7 @@ Pup is part of an ecosystem of packages available on JSR:
 - **[@pup/plugin](https://github.com/hexagon/pup-plugin)** - Base library for creating Pup plugins
 
 ### Official Plugins
+
 - **[pup-plugin-web-interface](https://github.com/hexagon/pup-plugin-web-interface)** - Web-based UI for managing Pup
 
 ## Key Concepts
