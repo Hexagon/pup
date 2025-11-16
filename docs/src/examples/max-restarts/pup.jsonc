@@ -7,6 +7,15 @@
       "restart": "always",
       "restartLimit": 3,
       "restartDelayMs": 3000
+    },
+    {
+      "id": "with-exponential-backoff",
+      "cmd": "deno run server.js",
+      "autostart": true,
+      "restart": "always",
+      "restartLimit": 5,
+      "restartDelayMs": 1000,
+      "restartBackoffMs": 30000
     }
   ]
 }

@@ -100,6 +100,7 @@ interface ProcessConfiguration {
   logger?: ProcessLoggerConfiguration
   restart?: string
   restartDelayMs?: number
+  restartBackoffMs?: number
   restartLimit?: number
 }
 
@@ -157,6 +158,7 @@ const ConfigurationSchema = z.object({
       terminateGracePeriod: z.number().min(0).default(0),
       restart: z.optional(z.enum(["always", "error"])),
       restartDelayMs: z.number().min(0).max(24 * 60 * 60 * 1000 * 1).default(10000), // Max one day
+      restartBackoffMs: z.optional(z.number().min(0).max(24 * 60 * 60 * 1000 * 1)), // Max one day - exponential backoff cap
       overrun: z.optional(z.boolean()),
       restartLimit: z.optional(z.number().min(0)),
       timeout: z.optional(z.number().min(1)),

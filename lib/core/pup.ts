@@ -279,7 +279,15 @@ class Pup {
           const msSinceExited = status.exited ? (new Date().getTime() - status.exited?.getTime()) : Infinity
 
           // Default restart delay to 10000ms, except when watching
-          const restartDelay = config.restartDelayMs ?? config.watch ? 500 : 10000
+          const baseRestartDelay = config.restartDelayMs ?? config.watch ? 500 : 10000
+
+          // Calculate exponential backoff if restartBackoffMs is configured
+          let restartDelay = baseRestartDelay
+          if (config.restartBackoffMs !== undefined && status.restarts && status.restarts > 0) {
+            // Exponential backoff: delay = baseDelay * (2 ^ restarts), capped at restartBackoffMs
+            const exponentialDelay = baseRestartDelay * Math.pow(2, status.restarts - 1)
+            restartDelay = Math.min(exponentialDelay, config.restartBackoffMs)
+          }
 
           // Always restart if restartpolicy is undefined and autostart is true
           const restartPolicy = config.restart ?? ((config.autostart || config.watch) ? "always" : undefined)
