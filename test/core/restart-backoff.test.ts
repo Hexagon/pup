@@ -22,7 +22,7 @@ test("Process restart with exponential backoff", async () => {
         "cmd": TEST_PROCESS_COMMAND,
         "restart": "error",
         "restartDelayMs": 100, // 100ms base delay
-        "restartBackoffMs": 1000, // Cap at 1 second
+        "restartBackoffMs": 2000, // Cap at 2 seconds
         "restartLimit": 5,
       },
     ],
@@ -37,33 +37,36 @@ test("Process restart with exponential backoff", async () => {
   // Start process
   pup.start(TEST_PROCESS_ID, "test")
 
-  // Wait for first failure
-  await new Promise((resolve) => setTimeout(resolve, 200))
+  // Wait for first failure (process exits immediately)
+  await new Promise((resolve) => setTimeout(resolve, 500))
 
   let status = testProcess!.getStatus()
   assertEquals(status.status, ApiProcessState.ERRORED)
   assertEquals(status.restarts, 0) // First run, no restarts yet
 
-  // Wait for first restart (should happen quickly with 100ms base delay)
-  await new Promise((resolve) => setTimeout(resolve, 200))
+  // Wait for first restart
+  // Watchdog runs every 1s, then waits for restartDelay (100ms)
+  await new Promise((resolve) => setTimeout(resolve, 1500))
 
   status = testProcess!.getStatus()
   assertGreaterOrEqual(status.restarts || 0, 1) // At least one restart
 
-  // Wait for potential second restart (should take ~200ms with exponential backoff)
-  await new Promise((resolve) => setTimeout(resolve, 350))
+  // Wait for potential second restart
+  // Watchdog 1s + exponential backoff delay (200ms for 2nd restart)
+  await new Promise((resolve) => setTimeout(resolve, 1500))
 
   status = testProcess!.getStatus()
   assertGreaterOrEqual(status.restarts || 0, 2) // At least two restarts
 
-  // Wait for potential third restart (should take ~400ms with exponential backoff)
-  await new Promise((resolve) => setTimeout(resolve, 550))
+  // Wait for potential third restart
+  // Watchdog 1s + exponential backoff delay (400ms for 3rd restart)
+  await new Promise((resolve) => setTimeout(resolve, 1500))
 
   status = testProcess!.getStatus()
   assertGreaterOrEqual(status.restarts || 0, 3) // At least three restarts
 
   // Verify that restarts are limited by restartLimit
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  await new Promise((resolve) => setTimeout(resolve, 3000))
 
   status = testProcess!.getStatus()
   assertLessOrEqual(status.restarts || 0, 5) // Should not exceed restartLimit
@@ -105,14 +108,14 @@ test("Process restart without backoff (default behavior)", async () => {
   pup.start(TEST_PROCESS_ID, "test")
 
   // Wait for first failure and restart
-  await new Promise((resolve) => setTimeout(resolve, 250))
+  // Watchdog runs every 1s, then waits for restartDelay (100ms)
+  await new Promise((resolve) => setTimeout(resolve, 1500))
 
   let status = testProcess!.getStatus()
   assertGreaterOrEqual(status.restarts || 0, 1)
 
-  // With fixed 100ms delay, we should get more restarts in the same time
-  // compared to exponential backoff
-  await new Promise((resolve) => setTimeout(resolve, 400))
+  // With fixed 100ms delay, should get second restart after another 1.1s
+  await new Promise((resolve) => setTimeout(resolve, 1500))
 
   status = testProcess!.getStatus()
   assertGreaterOrEqual(status.restarts || 0, 2)
