@@ -501,10 +501,13 @@ async function main() {
 
       // Set up log handler for streaming
       const processFilter = checkedArgs.get("id")?.toLowerCase()
+      const severityFilter = checkedArgs.get("severity")?.toLowerCase()
       const logHandler = (logEntry: ApiLogItem) => {
         try {
           const { processId, severity, category, timeStamp, text } = logEntry
 
+          // Filter by severity if specified
+          if (severityFilter && severity.toLowerCase() !== severityFilter) return
           // Filter by processId if specified
           if (processFilter && processId !== processFilter) return
 
