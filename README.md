@@ -59,7 +59,7 @@ used below:
 
    Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `--name my-custom-name`.
 
-5. To stream the logs from a running instance, use the command `pup monitor`. To show historic logs, use `pup logs`.
+5. To view logs from a running instance, use the command `pup logs`, which shows historical logs and then streams new ones in real-time. To show only historical logs, use `pup logs --no-follow`.
 
    Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `--name my-custom-name`.
 

@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this section.
 
 ## [Unreleased]
 
+- feat(cli): `pup logs` now streams logs by default (shows historical logs then streams new ones), matching behavior of similar tools like pm2. Use `--no-follow` to show only historical logs without
+  streaming.
 - feat(core): Add exponential backoff for process restarts via `restartBackoffMs` configuration option to prevent rapid restart loops
 
 ## [1.0.4] - 2024-11-19

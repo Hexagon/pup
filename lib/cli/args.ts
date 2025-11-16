@@ -28,8 +28,9 @@ function parseArguments(args: string[]): ArgsParser {
     "d": "cwd",
     "upgrade": "update",
     "e": "env",
+    "f": "follow",
   }
-  const boolean = ["setup", "upgrade", "help", "version", "autostart", "dry-run"]
+  const boolean = ["setup", "upgrade", "help", "version", "autostart", "dry-run", "follow", "no-follow"]
   return new ArgsParser(args, { aliases, boolean })
 }
 

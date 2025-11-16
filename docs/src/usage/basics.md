@@ -43,19 +43,36 @@ pup enable-service --config path/to/config-file
 
 ## Viewing Logs
 
-Pup enables you to inspect its internally stored logs through the `logs` command, or live stream the logs using the `monitor` command. Both options supports arguments to help filter the logs and
-customize the output:
+Pup enables you to inspect its internally stored logs and stream real-time logs using the `logs` command, or use the `monitor` command for live streaming only. Both options support arguments to help
+filter the logs and customize the output:
 
-### Arguments to both `logs` and `monitor`
+### The `logs` command
+
+By default, the `logs` command displays historical logs and then streams new logs in real-time (similar to `pm2 logs`). This is useful for monitoring your processes during development or debugging
+production issues.
+
+```bash
+# Show historical logs and stream new ones
+pup logs
+
+# Show logs for a specific process
+pup logs --id my-process
+
+# Show only historical logs without streaming
+pup logs --no-follow
+```
+
+### Arguments for `logs` and `monitor`
 
 - `--id <process-id>`: (optional) Allows filtering of logs based on the process ID.
 - `--severity <severity>`: (optional) Enables filtering logs based on the severity level. The acceptable severity levels include error, warning, info, and log.
 
-### ´logs´ only
+### Additional arguments for `logs` only
 
-- `-n`: (optional) Defines the number of log entries to display.
+- `-n <number>`: (optional) Defines the number of historical log entries to display before streaming.
 - `--start <iso860-timestamp>`: (optional) Allows you to display logs that were generated after a specified timestamp. The timestamp should be in the ISO8601 format.
 - `--end <iso860-timestamp>`: (optional) Lets you display logs generated before a particular timestamp. The timestamp should be in the ISO8601 format.
+- `--no-follow`: (optional) Display only historical logs without streaming new ones.
 
 > **Note**: The internal logger keeps logs for a default period of 24 hours. You can modify this setting via the global logger configuration. { .note }
 
@@ -70,6 +87,9 @@ pup logs --config path/to/config-file
 
 # or
 pup logs --cwd path/where/config/file/is
+
+# Show only the last 50 historical logs without streaming
+pup logs -n 50 --no-follow
 ```
 
 ## Controlling running instances
