@@ -71,7 +71,7 @@ class Cluster extends Process {
       if (this.config.cluster?.commonPort && this.config.cluster.startPort) {
         backends.push({
           host: "127.0.0.1",
-          port: (this.config.cluster.startPort + i),
+          port: this.config.cluster.startPort + i,
         })
       }
     }
