@@ -23,7 +23,7 @@ const started = new Date()
  */
 class Status {
   private storeName?: string
-  private lastWrite = Date.now()
+  private lastWrite = 0
 
   /**
    * Constructs a new `Status` instance.
@@ -36,8 +36,9 @@ class Status {
   /**
    * Writes the application status to the KV store with a timestamp as part of the key.
    *
-   * Key ["last_application_state"] is written every iteration.
-   * Key ["application_state", <timestamp>] is written at most once per 20 seconds.
+   * Both keys are written at most once per APPLICATION_STATE_WRITE_LIMIT_MS milliseconds.
+   * Key ["last_application_state"] stores the most recent state (deleted on clean shutdown).
+   * Key ["application_state", <timestamp>] stores the historical state log.
    * @param applicationState The application state to be stored.
    */
   public async writeToStore(applicationState: ApiApplicationState) {
@@ -47,11 +48,6 @@ class Status {
         if (Date.now() - this.lastWrite > APPLICATION_STATE_WRITE_LIMIT_MS) {
           const kv = new KV({ autoSync: false, disableIndex: true })
           await kv.open(this.storeName)
-
-          // Initialize lastWrite if it's not set
-          if (!this.lastWrite) {
-            this.lastWrite = 0
-          }
 
           this.lastWrite = Date.now()
           await kv.set(["application_state", Date.now()], applicationState)
