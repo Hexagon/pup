@@ -55,7 +55,7 @@ class Cluster extends Process {
       modConfig.env = structuredClone(this.config.env || {})
       modConfig.env.PUP_CLUSTER_INSTANCE = i.toString()
 
-      // Expose PUP_CLUSTER_PORT whenever a start port is configured
+      // Add PUP_CLUSTER_PORT if startPort is defined (regardless of whether the built-in load balancer is activated via commonPort)
       if (this.config.cluster?.startPort !== undefined) {
         modConfig.env.PUP_CLUSTER_PORT = (this.config.cluster.startPort + i).toString()
       }
@@ -71,7 +71,7 @@ class Cluster extends Process {
       if (this.config.cluster?.commonPort && this.config.cluster.startPort) {
         backends.push({
           host: "127.0.0.1",
-          port: (this.config.cluster.startPort + i),
+          port: this.config.cluster.startPort + i,
         })
       }
     }
