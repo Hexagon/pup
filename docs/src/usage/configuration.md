@@ -62,7 +62,9 @@ You need to specify one of these for each process, else the process will never s
 ### Restart policy
 
 - `restart` (optional): A string specifying when the process should be restarted. Allowed values: "always" or "error".
-- `restartDelayMs` (optional): A number specifying the delay (in milliseconds) before restarting the process.
+- `restartDelayMs` (optional): A number specifying the initial delay (in milliseconds) before restarting the process. Default: 10000ms (10 seconds), or 500ms when watching files.
+- `restartBackoffMs` (optional): A number specifying the maximum delay (in milliseconds) for exponential backoff when a process fails repeatedly. When set, the restart delay will double after each
+  consecutive failure, starting from `restartDelayMs` and capping at `restartBackoffMs`. This prevents rapid restart loops that can exhaust system resources. If not set, restarts use a fixed delay.
 - `restartLimit` (optional): A number specifying the maximum number of restarts allowed for the process.
 
 ### Stop/restart policy

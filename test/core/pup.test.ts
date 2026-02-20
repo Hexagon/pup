@@ -8,7 +8,7 @@ import type { Configuration } from "../../lib/core/configuration.ts"
 import { ApiProcessState } from "@pup/api-definitions"
 import { Pup } from "../../lib/core/pup.ts"
 import { Cluster } from "../../lib/core/cluster.ts"
-import { assertEquals, assertNotEquals } from "@std/assert"
+import { assert, assertEquals, assertNotEquals } from "@std/assert"
 import { test } from "@cross/test"
 
 test("Create test process. Test start, block, stop, start, unblock, start in sequence.", async () => {
@@ -153,6 +153,14 @@ test("Create cluster with startPort but no commonPort. Verify PUP_CLUSTER_PORT i
   assertEquals(cluster.processes.length, 2)
   assertEquals(cluster.processes[0].getConfig().env?.PUP_CLUSTER_PORT, String(START_PORT))
   assertEquals(cluster.processes[1].getConfig().env?.PUP_CLUSTER_PORT, String(START_PORT + 1))
+  const testProcess = pup.processes.findLast((p) => p.getConfig().id === TEST_PROCESS_ID)
+  assert(testProcess instanceof Cluster)
+
+  const [instance0, instance1] = testProcess.processes
+  assertEquals(instance0.getConfig().env?.PUP_CLUSTER_INSTANCE, "0")
+  assertEquals(instance0.getConfig().env?.PUP_CLUSTER_PORT, "8000")
+  assertEquals(instance1.getConfig().env?.PUP_CLUSTER_INSTANCE, "1")
+  assertEquals(instance1.getConfig().env?.PUP_CLUSTER_PORT, "8001")
 
   await pup.terminate(2500)
 })

@@ -17,7 +17,7 @@ Pup is a powerful universal process manager developed with Deno, designed to kee
 - **Plugins:** Extend Pup's functionality with custom plugins for additional features and integrations.
 - **Process Telemetry and IPC:** Pup can gather telemetry data from Deno client processes, such as memory usage and current working directory, providing deeper insights into managed processes. The
   telemetry feature also enables inter-process communication, allowing connected processes to interact with one another.
-- **Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
+- **Rest API:** Control and monitor Pup from third party solutions using the built-in Rest API.
 
 > **Note** Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes. { .note }
 
@@ -34,7 +34,7 @@ To install Pup, make sure you run the latest version of Deno (`deno upgrade`), t
 deno run -Ar jsr:@pup/pup setup
 ```
 
-This command downloads the latest version of Pup and installs it on your system. Read more abour release channels [here](https://pup.56k.guru/installation/#release-channels).
+This command downloads the latest version of Pup and installs it on your system. Read more about release channels [here](https://pup.56k.guru/installation/#release-channels).
 
 ### Configuration and Usage
 
@@ -74,6 +74,6 @@ To keep a process alive temporary, use `pup run` with `--cmd` and a start policy
 
 **Restarting a process on filesystem changes**
 
-To restart if any file changes withing the current directory, add `--watch <watched-path>`:
+To restart if any file changes within the current directory, add `--watch <watched-path>`:
 
 `pup run --autostart --cmd "deno run server.ts" --watch .`

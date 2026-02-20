@@ -100,6 +100,7 @@ interface ProcessConfiguration {
   logger?: ProcessLoggerConfiguration
   restart?: string
   restartDelayMs?: number
+  restartBackoffMs?: number
   restartLimit?: number
 }
 
@@ -140,7 +141,7 @@ const ConfigurationSchema = z.object({
       cmd: z.optional(z.string()),
       worker: z.optional(z.array(z.string())),
       cwd: z.optional(z.string()),
-      env: z.optional(z.record(z.string())),
+      env: z.optional(z.record(z.string(), z.string())),
       cluster: z.optional(z.object({
         instances: z.number().min(0).max(65535).default(1),
         commonPort: z.number().min(1).max(65535).optional(),
@@ -157,6 +158,7 @@ const ConfigurationSchema = z.object({
       terminateGracePeriod: z.number().min(0).default(0),
       restart: z.optional(z.enum(["always", "error"])),
       restartDelayMs: z.number().min(0).max(24 * 60 * 60 * 1000 * 1).default(10000), // Max one day
+      restartBackoffMs: z.optional(z.number().min(0).max(24 * 60 * 60 * 1000 * 1)), // Max one day - exponential backoff cap
       overrun: z.optional(z.boolean()),
       restartLimit: z.optional(z.number().min(0)),
       timeout: z.optional(z.number().min(1)),

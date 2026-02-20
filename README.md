@@ -17,7 +17,7 @@ _For detailed documentation, visit [pup.56k.guru](https://pup.56k.guru)._
   your own plugins to add additional features and integrations tailored to your needs.
 - **Process Telemetry and IPC:** Gain deeper insights into managed processes by gathering telemetry data, such as memory usage, from Deno client processes. Supports inter-process communication for
   connected processes to interact with each other.
-- **Rest API:** Control and monitor Pup from third party solutions using the build in Rest API.
+- **Rest API:** Control and monitor Pup from third party solutions using the built-in Rest API.
 
 > **Note**: Programmatic usage, process telemetry, and IPC are currently available only when running Deno client processes.
 
@@ -57,11 +57,11 @@ used below:
 
 4. To make your instance run at boot, enable it using `pup enable-service`.
 
-   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `-n my-custom-name`.
+   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `--name my-custom-name`.
 
 5. To stream the logs from a running instance, use the command `pup monitor`. To show historic logs, use `pup logs`.
 
-   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `-n my-custom-name`.
+   Will by default use the instance name for service name, which defaults to `pup`. You can override by passing `--name my-custom-name`.
 
 For the full manual, see <https://pup.56k.guru>
 
@@ -87,7 +87,7 @@ Full examples available at [/docs/src/examples](/docs/src/examples)
 - `canary`: The canary channel provides the most up-to-date and cutting-edge versions of Pup. It includes the latest changes and may not be as stable as the other channels. It is primarily intended
   for developers and early adopters who want to stay on the bleeding edge of Pup's development. Based on the current state of the `dev` repo of the github repository.
 
-> **Note** Built-in plugins, such as splunk-hec and webinterace does not work with canary versions right now.
+> **Note** Built-in plugins, such as splunk-hec and webinterface do not work with canary versions right now.
 
 Each channel serves different purposes, so choose the one that best fits your needs and requirements.
 

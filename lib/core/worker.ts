@@ -6,7 +6,7 @@
  */
 
 import type { ProcessConfiguration, Pup } from "./pup.ts"
-import { readLines, StringReader } from "@std/io"
+import { TextLineStream } from "@std/streams"
 import { resolve } from "@std/path"
 import { BaseRunner, type RunnerCallback, type RunnerResult } from "../types/runner.ts"
 import { cwd } from "@cross/fs"
@@ -27,8 +27,10 @@ class WorkerRunner extends BaseRunner {
   private async pipeToLogger(category: string, message: string) {
     const logger = this.pup.logger
     try {
-      const r = new StringReader(message)
-      for await (const line of readLines(r)) {
+      const stream = ReadableStream.from([message])
+        .pipeThrough(new TextLineStream())
+
+      for await (const line of stream) {
         if (category === "stderr") {
           logger.error(category, line, this.processConfig)
         } else {
