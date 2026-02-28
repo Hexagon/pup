@@ -427,8 +427,16 @@ async function main() {
 
   /**
    * Base argument: logs
+   *
+   * By default, shows historical logs and then streams new logs (like pm2 logs).
+   * Use --no-follow to show only historical logs without streaming.
    */
   if (baseArgument === "logs") {
+    // Determine if we should follow (stream) logs
+    // Default to true unless --no-follow is explicitly set
+    const shouldFollow = !checkedArgs.getBoolean("no-follow")
+
+    // Display historical logs first
     const logStore = `${await toPersistentPath(configFile as string)}/.main.db`
     const logger = new Logger(configuration!.logger || {}, logStore)
     await logger.init()
@@ -442,8 +450,10 @@ async function main() {
       (!checkedArgs.get("severity") || checkedArgs.get("severity") === "") ? undefined : checkedArgs.get("severity")!.toLowerCase(),
       numberOfRows,
     )
+
+    const logWithColors = configuration!.logger?.colors ?? true
+
     if (logs && logs.length > 0) {
-      const logWithColors = configuration!.logger?.colors ?? true
       for (const log of logs) {
         const { processId, severity, category, timeStamp, text } = log
         const isStdErr = severity === "error" || category === "stderr"
@@ -466,9 +476,77 @@ async function main() {
           logFn(decoratedLogText)
         }
       }
-    } else {
+    } else if (!shouldFollow) {
       console.error("No logs found.")
     }
+
+    // If we should follow, stream new logs
+    if (shouldFollow) {
+      if (!client) {
+        console.error("Could not create API client for log streaming.")
+        return exit(1)
+      }
+
+      // Test the client connection
+      try {
+        const responseState = await client.getState()
+        if (!responseState?.data) {
+          console.error("Could not contact the Pup instance for log streaming.")
+          exit(1)
+        }
+      } catch (_e) {
+        console.error("Could not contact the Pup instance for log streaming.")
+        exit(1)
+      }
+
+      // Set up log handler for streaming
+      const processFilter = checkedArgs.get("id")?.toLowerCase()
+      const severityFilter = checkedArgs.get("severity")?.toLowerCase()
+      const logHandler = (logEntry: ApiLogItem) => {
+        try {
+          const { processId, severity, category, timeStamp, text } = logEntry
+
+          // Filter by severity if specified
+          if (severityFilter && severity.toLowerCase() !== severityFilter) return
+          // Filter by processId if specified
+          if (processFilter && processId !== processFilter) return
+
+          const isStdErr = severity === "error" || category === "stderr"
+          const decoratedLogText = `${new Date(timeStamp).toISOString()} [${severity.toUpperCase()}] [${processId || "core"}:${category}] ${text}`
+          let color = null
+          // Apply coloring rules
+          if (logWithColors) {
+            if (processId === "core") color = "gray"
+            if (category === "starting") color = "green"
+            if (category === "finished") color = "yellow"
+            if (isStdErr) color = "red"
+          }
+          let logFn = console.log
+          if (severity === "warn") logFn = console.warn
+          if (severity === "info") logFn = console.info
+          if (severity === "error") logFn = console.error
+          if (color !== null) {
+            logFn(`%c${decoratedLogText}`, `color: ${color}`)
+          } else {
+            logFn(decoratedLogText)
+          }
+        } catch (_e) {
+          console.error("Error in log streamer: " + _e)
+        }
+      }
+
+      // Output status
+      console.log(`\nStreaming logs... Abort with CTRL+C.`)
+
+      // Start streaming logs
+      client.on("log", logHandler as EventHandler<unknown>)
+
+      // Wait indefinitely
+      await new Promise((resolve) => setTimeout(resolve, 365 * 24 * 60 * 60 * 1000))
+
+      exit(0)
+    }
+
     return exit(0)
   }
 

@@ -142,3 +142,23 @@ test("checkArguments should throw error when both --cmd and -- is specified", ()
     "'--cmd', '--worker' and '--' cannot be used at the same time.",
   )
 })
+
+test("Boolean option --no-follow is parsed correctly", () => {
+  const inputArgs = ["logs", "--no-follow"]
+  const parsedArgs = parseArguments(inputArgs)
+  assertEquals(parsedArgs.getBoolean("no-follow"), true)
+  assertEquals(parsedArgs.getLoose().includes("logs"), true)
+})
+
+test("Boolean option --follow/-f is parsed correctly", () => {
+  const inputArgs = ["logs", "-f"]
+  const parsedArgs = parseArguments(inputArgs)
+  assertEquals(parsedArgs.getBoolean("follow"), true)
+  assertEquals(parsedArgs.getLoose().includes("logs"), true)
+})
+
+test("logs command with --no-follow flag should be valid", () => {
+  const args = new ArgsParser(["logs", "--no-follow"], { boolean: ["no-follow"] })
+  // Should not throw
+  checkArguments(args)
+})
