@@ -14,6 +14,11 @@ export enum BalancingStrategy {
   LEAST_CONNECTIONS,
 }
 
+export enum LoadBalancerType {
+  TCP,
+  HTTP,
+}
+
 export interface Backend {
   host: string
   port: number
@@ -31,18 +36,21 @@ export interface LoadBalancerStartOperation {
   strategy: BalancingStrategy
   validationInterval: number
   commonPort: number
+  type?: LoadBalancerType
 }
 
 export class LoadBalancer {
   //public readonly pup: Pup
 
   private listener: Deno.Listener | null = null
+  private httpServer: Deno.HttpServer | null = null
 
   public backends: InternalBackend[]
   private strategy: BalancingStrategy
   private currentIndex: number
   private validationInterval: number
   private validationTimer: number
+  private type: LoadBalancerType
 
   private loggerCallback: (severity: string, category: string, text: string) => void
 
@@ -51,6 +59,7 @@ export class LoadBalancer {
     strategy: BalancingStrategy = BalancingStrategy.ROUND_ROBIN,
     validationInterval: number = LOAD_BALANCER_DEFAULT_VALIDATION_INTERVAL_S,
     loggerCallback: (severity: string, category: string, text: string) => void,
+    type: LoadBalancerType = LoadBalancerType.TCP,
   ) {
     // Deep copy of incoming backend object, with additional properties
     this.backends = this.initializeBackends(backends)
@@ -60,6 +69,7 @@ export class LoadBalancer {
     this.strategy = strategy
     this.currentIndex = 0
     this.validationInterval = validationInterval
+    this.type = type
     // Validate backends every 120 seconds
     this.validationTimer = this.setupValidationTimer() // Continuously validate
 
@@ -223,6 +233,14 @@ export class LoadBalancer {
       throw new Error("No backends defined")
     }
 
+    if (this.type === LoadBalancerType.HTTP) {
+      await this.startHttpServer(port)
+    } else {
+      await this.startTcpServer(port)
+    }
+  }
+
+  private async startTcpServer(port: number): Promise<void> {
     this.listener = Deno.listen({ port })
     for await (const client of this.listener) {
       const backend = this.selectBackend(client)
@@ -235,11 +253,99 @@ export class LoadBalancer {
     }
   }
 
+  private async startHttpServer(port: number): Promise<void> {
+    this.httpServer = Deno.serve({
+      port,
+      handler: (req, info) => this.handleHttpRequest(req, info),
+    })
+    await this.httpServer.finished
+  }
+
+  private async handleHttpRequest(req: Request, info: Deno.ServeHandlerInfo): Promise<Response> {
+    // Select backend using round-robin or other strategy
+    // For HTTP, we need to create a mock connection object for IP hash strategy
+    const mockConn = this.createMockConn(info.remoteAddr)
+    const backend = this.selectBackend(mockConn)
+
+    if (!backend) {
+      this.loggerCallback("warn", "loadbalancer", "No available backend for HTTP request")
+      return new Response("Service Unavailable", { status: 503 })
+    }
+
+    try {
+      // Forward the request to the backend
+      return await this.forwardHttpRequest(req, backend, info.remoteAddr)
+    } catch (error) {
+      this.handleConnectionFailure(backend)
+      this.loggerCallback("error", "loadbalancer", `HTTP proxy error: ${error}`)
+      return new Response("Bad Gateway", { status: 502 })
+    }
+  }
+
+  private createMockConn(remoteAddr: Deno.NetAddr): Deno.Conn {
+    // Create a minimal mock connection object for strategy selection
+    // Only remoteAddr is used by selectBackend() for IP hash strategy
+    // Type assertion is safe here as we only access remoteAddr in the selection logic
+    return {
+      remoteAddr,
+      localAddr: { transport: "tcp", hostname: "127.0.0.1", port: 0 },
+    } as Deno.Conn
+  }
+
+  private async forwardHttpRequest(req: Request, backend: InternalBackend, clientAddr: Deno.NetAddr): Promise<Response> {
+    this.updateBackendConnectionStatus(backend, true)
+
+    try {
+      // Build the backend URL
+      const url = new URL(req.url)
+      const backendUrl = `http://${backend.host}:${backend.port}${url.pathname}${url.search}`
+
+      // Clone headers and add X-Forwarded-For
+      const headers = new Headers(req.headers)
+
+      // Get the client IP address
+      const clientIp = clientAddr.transport === "tcp" || clientAddr.transport === "udp" ? clientAddr.hostname : "unknown"
+
+      // Add or append to X-Forwarded-For header
+      const existingForwarded = headers.get("X-Forwarded-For")
+      if (existingForwarded) {
+        headers.set("X-Forwarded-For", `${existingForwarded}, ${clientIp}`)
+      } else {
+        headers.set("X-Forwarded-For", clientIp)
+      }
+
+      // Add X-Real-IP header (commonly used)
+      headers.set("X-Real-IP", clientIp)
+
+      // Forward the request to the backend
+      const backendReq = new Request(backendUrl, {
+        method: req.method,
+        headers: headers,
+        body: req.body,
+        // @ts-expect-error - duplex is a valid Request option for streaming but not in TypeScript's lib.dom.d.ts yet
+        duplex: req.body ? "half" : undefined,
+      })
+
+      const backendRes = await fetch(backendReq)
+
+      // Reset failed transmissions on success
+      backend.failedTransmissions = 0
+
+      return backendRes
+    } finally {
+      this.updateBackendConnectionStatus(backend, false)
+    }
+  }
+
   close(): void {
     clearInterval(this.validationTimer)
     if (this.listener) {
       this.listener.close()
       this.listener = null
+    }
+    if (this.httpServer) {
+      this.httpServer.shutdown()
+      this.httpServer = null
     }
   }
 }

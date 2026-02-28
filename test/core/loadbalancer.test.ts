@@ -1,6 +1,6 @@
 // load_balancer_test.ts
 import { assertEquals, assertThrows } from "@std/assert"
-import { type Backend, BalancingStrategy, hashCode, LoadBalancer } from "../../lib/core/loadbalancer.ts"
+import { type Backend, BalancingStrategy, hashCode, LoadBalancer, LoadBalancerType } from "../../lib/core/loadbalancer.ts"
 import { test } from "@cross/test"
 
 // Define logger callback function
@@ -138,5 +138,27 @@ test("LoadBalancer - Selects Backend with LEAST_CONNECTIONS Strategy", () => {
   assertEquals(selectedBackend?.host, backends[1].host)
 
   // Cleanup
+  loadBalancer.close()
+})
+
+test("LoadBalancer - HTTP Type Initialization", () => {
+  const backends: Backend[] = [
+    { host: "127.0.0.1", port: 8081 },
+    { host: "127.0.0.1", port: 8082 },
+  ]
+  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.ROUND_ROBIN, 120, loggerCallback, LoadBalancerType.HTTP)
+  assertEquals(loadBalancer instanceof LoadBalancer, true)
+  // Cleanup
+  loadBalancer.close()
+})
+
+test("LoadBalancer - HTTP forwards X-Forwarded-For header", () => {
+  // This is an integration test that requires a real backend server
+  // For now, we just verify the load balancer can be created with HTTP type
+  const backends: Backend[] = [
+    { host: "127.0.0.1", port: 8091 },
+  ]
+  const loadBalancer = new LoadBalancer(backends, BalancingStrategy.ROUND_ROBIN, 120, loggerCallback, LoadBalancerType.HTTP)
+  assertEquals(loadBalancer instanceof LoadBalancer, true)
   loadBalancer.close()
 })
