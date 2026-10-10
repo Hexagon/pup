@@ -6,8 +6,8 @@ nav_order: 7
 
 # Migrating from PM2
 
-Pup can manage Node.js applications as well as Deno programs. The main change when
-moving from PM2 is that Pup keeps process definitions in a `pup.json` or
+Pup can manage Node.js applications as well as Deno programs. The main change
+when moving from PM2 is that Pup keeps process definitions in a `pup.json` or
 `pup.jsonc` file and runs them as a named instance.
 
 ## Convert an ecosystem file
@@ -23,7 +23,7 @@ module.exports = {
     watch: false,
     env: { NODE_ENV: "production" },
   }],
-}
+};
 ```
 
 can be represented in `pup.json` as:
@@ -44,13 +44,15 @@ can be represented in `pup.json` as:
 }
 ```
 
-Use the command you would normally run for `script`, including any runtime flags.
-Omit `watch` when you do not want file watching; when enabled in Pup, `watch`
-takes an array of paths. Pup's `restart` accepts `"always"` or `"error"`.
+Use the command you would normally run for `script`, including any runtime
+flags. Omit `watch` when you do not want file watching; when enabled in Pup,
+`watch` takes an array of paths. Pup's `restart` accepts `"always"` or
+`"error"`.
 
 ## Start and control the instance
 
-From the directory containing `pup.json`, validate and run the configuration in the foreground:
+From the directory containing `pup.json`, validate and run the configuration in
+the foreground:
 
 ```sh
 pup run
@@ -83,4 +85,5 @@ process a distinct port using `cluster.startPort`; the application must read
 `PUP_CLUSTER_PORT` and listen on that port. See [Scaling](scaling.md) before
 moving a clustered PM2 application.
 
-Review the [configuration reference](configuration.md) for options that do not have a direct PM2 equivalent.
+Review the [configuration reference](configuration.md) for options that do not
+have a direct PM2 equivalent.
