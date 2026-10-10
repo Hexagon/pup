@@ -14,3 +14,4 @@ Explore the sub sections to learn more about Pup's capabilities:
 - **[REST API](rest-api.md)**: How to use Pup remotely through the RESTful API.
 - **[Scaling](scaling.md)**: Explore strategies for effectively scaling Pup deployments.
 - **[Service](service.md)**: Run Pup as a system service.
+- **[Migrating from PM2](migrating-from-pm2.md)**: Translate a basic PM2 process definition and workflow to Pup.
