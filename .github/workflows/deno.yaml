@@ -23,5 +23,9 @@ jobs:
         with:
           deno-version: ${{ matrix.deno-version }}
 
-      - name: Run all checks
-        run: deno task check
+      - name: Check formatting
+        if: matrix.deno-version == 'v2.x'
+        run: deno fmt --check
+
+      - name: Run lint and tests
+        run: deno task check-code
