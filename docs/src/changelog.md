@@ -11,7 +11,21 @@ All notable changes to this project will be documented in this section.
 
 ## [Unreleased]
 
+## [1.0.5-dev.0] - Unreleased
+
 - feat(core): Add exponential backoff for process restarts via `restartBackoffMs` configuration option to prevent rapid restart loops
+- fix(core): Expose `PUP_CLUSTER_PORT` to cluster instances whenever `startPort` is set, even without `commonPort` ([#71](https://github.com/Hexagon/pup/issues/71))
+- fix(core): Fix operator precedence in restart delay calculation, and initialization of status KV writes
+- fix(core): Fix multi-word commands such as `deno task ...` and commands with pipes/redirects
+- fix(core): Fix worker processes hanging in `stopping` state when stopped or restarted, and never being restarted after an uncaught error
+- fix(core): Fix processes occasionally being started twice on manual restart when `restartDelayMs` is shorter than one second (including the default for `watch`)
+- fix(core): Fix file watchers leaking when a watched process crashes and is restarted
+- fix(core): Fix stop requests being ignored if issued while a process is being prepared for start
+- fix(api): Return an error status for process actions that could not be carried out, so the CLI no longer reports `Success` for failed actions
+- fix(api): Fix `stop` always reporting success and `stop all` not awaiting the processes
+- chore(core): Fix type checking with recent Deno 2 releases
+- chore(deps): Dependency updates, drop Deno 1 support in CI
+- docs: Update Lume/Lumocs, fix documentation typos, update JSON schema with `restartBackoffMs`
 
 ## [1.0.4] - 2024-11-19
 
