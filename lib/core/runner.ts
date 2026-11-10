@@ -21,6 +21,7 @@ import { DEFAULT_REST_API_HOSTNAME } from "./configuration.ts"
  */
 class Runner extends BaseRunner {
   private process?: CommandChild
+  private killSignal?: Deno.Signal
 
   constructor(pup: Pup, processConfig: ProcessConfiguration) {
     super(pup, processConfig)
@@ -38,6 +39,12 @@ class Runner extends BaseRunner {
     }
 
     const env = await this.createEnvironmentConfig()
+
+    // A kill may have been requested while preparing, before there was anything to signal
+    if (this.killSignal) {
+      return { code: 124, signal: this.killSignal, success: false }
+    }
+
     const child = this.prepareCommand(env)
 
     this.process = child.spawn()
@@ -67,6 +74,7 @@ class Runner extends BaseRunner {
    * @param signal The signal to use when killing the process.
    */
   public kill(signal: Deno.Signal = "SIGTERM") {
+    this.killSignal = signal
     try {
       // @ts-ignore Wierd complaint about "SIGPOLL"
       this.process?.kill(signal)

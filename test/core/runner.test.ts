@@ -6,6 +6,8 @@
 
 import type { Configuration } from "../../lib/core/configuration.ts"
 import { Pup } from "../../lib/core/pup.ts"
+import { Runner } from "../../lib/core/runner.ts"
+import { delay } from "@std/async"
 import { assertEquals } from "@std/assert"
 import { test } from "@cross/test"
 
@@ -69,4 +71,24 @@ test("Runner handles commands with pipes and redirects", async () => {
 
   // Stop and cleanup
   await pup.terminate(2500)
+})
+
+test("Runner honours a kill requested before the command is spawned", async () => {
+  const config: Configuration = {
+    processes: [{ id: "test-early-kill", cmd: 'deno eval "setInterval(() => {}, 1000)"' }],
+  }
+  const pup = new Pup(config)
+  await pup.init()
+  try {
+    const runner = new Runner(pup, config.processes[0])
+    let spawned = false
+    // run() is still preparing the environment when kill() is called
+    const running = runner.run(() => spawned = true)
+    runner.kill("SIGTERM")
+    const result = await Promise.race([running, delay(5000).then(() => undefined)])
+    assertEquals(result?.code, 124)
+    assertEquals(spawned, false)
+  } finally {
+    await pup.terminate(0)
+  }
 })
