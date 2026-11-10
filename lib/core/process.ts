@@ -412,9 +412,12 @@ class Process {
   }
 
   private setupWatch = async (paths: string[]) => {
+    // Stop any previous watcher, start() is called on every (re)start, including after crashes
+    this.watcher?.stop()
     const config = this.pup.configuration.watcher
-    this.watcher = new Watcher({ ...config, paths })
-    for await (const watchEvent of this.watcher) {
+    const watcher = new Watcher({ ...config, paths })
+    this.watcher = watcher
+    for await (const watchEvent of watcher) {
       if (watchEvent.some((_) => _.type.includes("modify"))) {
         this.pup.logger.log("watcher", "File change detected", this.config)
         this.pup.events.emit("process_watch", {
