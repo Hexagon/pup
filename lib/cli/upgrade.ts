@@ -14,9 +14,14 @@ import { exit } from "@cross/utils"
 import { mktempdir, readFile } from "@cross/fs"
 import { join } from "@std/path/join"
 
-// The deno.land/x-url has to be used until first stable release, or until jsr.io fixes issue
-// https://github.com/jsr-io/jsr/issues/382
-const VERSION_INVENTORY_URL = "https://deno.land/x/pup/versions.json"
+// Version inventory sources, tried in order
+// - The dev branch on GitHub is updated as part of every release (stable and pre-release)
+// - deno.land/x is kept as a fallback, it only updates if tags are mirrored there
+//   (jsr.io can not be used until https://github.com/jsr-io/jsr/issues/382 is resolved)
+const VERSION_INVENTORY_URLS = [
+  "https://raw.githubusercontent.com/Hexagon/pup/refs/heads/dev/versions.json",
+  "https://deno.land/x/pup/versions.json",
+]
 const LOCAL_VERSION_INVENTORY_FILE = "./versions.json"
 
 type Versions = {
@@ -33,18 +38,34 @@ type Version = {
   default_permissions: string[]
 }
 
+function isVersions(data: unknown): data is Versions {
+  const v = data as Versions
+  return typeof v === "object" && v !== null && Array.isArray(v.stable) && Array.isArray(v.prerelease)
+}
+
 // Fetch and return application versions
-async function getVersions(local = false): Promise<Versions> {
-  let versions: Versions
+export async function getVersions(local = false, urls: string[] = VERSION_INVENTORY_URLS): Promise<Versions> {
   if (local) {
     const data = await readFile(LOCAL_VERSION_INVENTORY_FILE)
     const dataText = new TextDecoder().decode(data)
-    versions = JSON.parse(dataText)
-  } else {
-    const response = await fetch(VERSION_INVENTORY_URL)
-    versions = await response.json()
+    return JSON.parse(dataText)
   }
-  return versions
+  const errors: string[] = []
+  for (const url of urls) {
+    try {
+      const response = await fetch(url)
+      if (!response.ok) {
+        await response.body?.cancel()
+        throw new Error(`HTTP ${response.status}`)
+      }
+      const versions = await response.json()
+      if (!isVersions(versions)) throw new Error("Invalid version inventory")
+      return versions
+    } catch (e) {
+      errors.push(`${url}: ${e instanceof Error ? e.message : "Unknown"}`)
+    }
+  }
+  throw new Error(`Could not fetch version inventory.\n${errors.join("\n")}`)
 }
 
 // Determine if the current Deno version meets the required version
