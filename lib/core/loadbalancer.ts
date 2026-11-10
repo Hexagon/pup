@@ -42,7 +42,7 @@ export class LoadBalancer {
   private strategy: BalancingStrategy
   private currentIndex: number
   private validationInterval: number
-  private validationTimer: number
+  private validationTimer: ReturnType<typeof setInterval>
 
   private loggerCallback: (severity: string, category: string, text: string) => void
 
@@ -75,7 +75,7 @@ export class LoadBalancer {
     }))
   }
 
-  private setupValidationTimer(): number {
+  private setupValidationTimer(): ReturnType<typeof setInterval> {
     const timer = setInterval(() => this.validateBackends(), this.validationInterval * 1000)
     // Make the timer non-blocking
     if (CurrentRuntime === Runtime.Deno) {

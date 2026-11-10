@@ -50,9 +50,9 @@ class Pup {
   public plugins: Plugin[] = []
   private requestTerminate = false
 
-  private watchdogTimer?: number
+  private watchdogTimer?: ReturnType<typeof setTimeout>
 
-  private maintenanceTimer?: number
+  private maintenanceTimer?: ReturnType<typeof setTimeout>
 
   public temporaryStoragePath?: string
   public persistentStoragePath?: string
@@ -411,15 +411,16 @@ class Pup {
 
     // Schedule next maintenance
     // - also make maintenance timer non-blocking using Deno.unrefTimer
-    this.maintenanceTimer = setTimeout(() => {
+    const maintenanceTimer = setTimeout(() => {
       this.maintenance()
     }, MAINTENANCE_INTERVAL_MS)
+    this.maintenanceTimer = maintenanceTimer
     if (CurrentRuntime === Runtime.Deno) {
-      Deno.unrefTimer(this.maintenanceTimer)
+      Deno.unrefTimer(maintenanceTimer)
       // @ts-ignore unref exists in node and bun
-    } else if (this.maintenanceTimer?.unref) {
+    } else if (maintenanceTimer?.unref) {
       // @ts-ignore unref exists in node and bun
-      this.maintenanceTimer.unref()
+      maintenanceTimer.unref()
     }
   }
 
