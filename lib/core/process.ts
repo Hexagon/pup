@@ -161,8 +161,8 @@ class Process {
       return
     }
 
-    // Do not start if running and overrun isn't enabled
-    if (this.status === ApiProcessState.RUNNING && !this.config.overrun) {
+    // Do not start if starting/running and overrun isn't enabled
+    if ((this.status === ApiProcessState.RUNNING || this.status === ApiProcessState.STARTING) && !this.config.overrun) {
       logger.log("blocked", `Process still running, refusing to start`, this.config)
       return
     }
