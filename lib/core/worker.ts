@@ -13,6 +13,7 @@ import { cwd } from "@cross/fs"
 
 class WorkerRunner extends BaseRunner {
   private worker?: Worker
+  private resolveRun?: (result: RunnerResult) => void
 
   constructor(pup: Pup, processConfig: ProcessConfiguration) {
     super(pup, processConfig)
@@ -79,10 +80,6 @@ class WorkerRunner extends BaseRunner {
       this.worker.onmessageerror = (error) => {
         this.pup.logger.error("error", `Worker message error: ${error instanceof Error ? error.message : "Unknown"}`, this.processConfig)
       }
-
-      this.worker.onerror = (error) => {
-        this.pup.logger.error("error", `Worker error: ${error instanceof Error ? error.message : "Unknown"}`, this.processConfig)
-      }
     } catch (error) {
       this.pup.logger.error("error", `Fatal worker error: ${error instanceof Error ? error.message : "Unknown"}`, this.processConfig)
     }
@@ -90,17 +87,35 @@ class WorkerRunner extends BaseRunner {
     return await new Promise((resolve) => {
       if (!this.worker) throw new Error("No worker")
 
+      // Make sure the run promise settles exactly once, whatever ends the worker
+      let settled = false
+      this.resolveRun = (result: RunnerResult) => {
+        if (settled) return
+        settled = true
+        this.resolveRun = undefined
+        try {
+          this.worker?.terminate()
+        } catch (_e) {
+          // Ignore
+        }
+        resolve(result)
+      }
+
+      // An uncaught error inside the worker ends it, report as errored
+      this.worker.onerror = (error) => {
+        this.pup.logger.error("error", `Worker error: ${error.message ?? "Unknown"}`, this.processConfig)
+        error.preventDefault()
+        this.resolveRun?.({ code: 1, signal: null, success: false })
+      }
+
       // All messages from the worker are handled here
       this.worker.onmessage = (event) => {
         if (event.data.type === "exit") {
-          // Create a RunnerResult
-          const runnerResult: RunnerResult = {
+          this.resolveRun?.({
             code: event.data.code,
             signal: event.data.signal,
             success: event.data.success,
-          }
-          resolve(runnerResult)
-          this.worker?.terminate()
+          })
         } else if (event.data.type === "stdout") {
           this.pipeToLogger("stdout", event.data.message)
         } else if (event.data.type === "stderr") {
@@ -116,10 +131,16 @@ class WorkerRunner extends BaseRunner {
    * @param _signal The signal to use when killing the process.
    */
   public kill(_signal?: Deno.Signal) {
-    try {
-      this.worker?.terminate() // Note: the abort method does not accept a signal parameter.
-    } catch (_e) {
-      // Ignore
+    // Workers can not receive signals, terminate and report as manually stopped (code 124)
+    // so that the pending run() resolves and the process can transition out of STOPPING
+    if (this.resolveRun) {
+      this.resolveRun({ code: 124, signal: null, success: false })
+    } else {
+      try {
+        this.worker?.terminate()
+      } catch (_e) {
+        // Ignore
+      }
     }
   }
 }
