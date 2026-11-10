@@ -59,29 +59,29 @@ export class PupApi {
   // - Amending process "all"
   public start(id: string, reason: string): boolean {
     const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
-    const results = processesToStart.map((process) => this._pup.start(process!.status.id, reason))
+    const results = processesToStart.map((process) => process ? this._pup.start(process.status.id, reason) : false)
     return results.filter((r) => r).length > 0
   }
   public restart(id: string, reason: string): boolean {
     const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
-    const results = processesToStart.map((process) => this._pup.restart(process!.status.id, reason))
+    const results = processesToStart.map((process) => process ? this._pup.restart(process.status.id, reason) : false)
     return results.filter((r) => r).length > 0
   }
   public async stop(id: string, reason: string): Promise<boolean> {
     const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
-    const results = await Promise.all([
-      processesToStart.map((process) => this._pup.stop(process!.status.id, reason)),
-    ])
+    const results = await Promise.all(
+      processesToStart.map((process) => process ? this._pup.stop(process.status.id, reason) : false),
+    )
     return results.filter((r) => r).length > 0
   }
   public block(id: string, reason: string): boolean {
     const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
-    const results = processesToStart.map((process) => this._pup.block(process!.status.id, reason))
+    const results = processesToStart.map((process) => process ? this._pup.block(process.status.id, reason) : false)
     return results.filter((r) => r).length > 0
   }
   public unblock(id: string, reason: string): boolean {
     const processesToStart = (id === "all") ? this.allProcessStates() : [this.allProcessStates().find((p) => p.status.id === id)]
-    const results = processesToStart.map((process) => this._pup.unblock(process!.status.id, reason))
+    const results = processesToStart.map((process) => process ? this._pup.unblock(process.status.id, reason) : false)
     return results.filter((r) => r).length > 0
   }
 

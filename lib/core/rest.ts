@@ -176,7 +176,6 @@ export class RestApi {
             ctx.response.status = Status.InternalServerError
             ctx.response.body = { error: "Action could not be carried out, check the arguments." }
           }
-          ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
           ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
@@ -191,7 +190,6 @@ export class RestApi {
             ctx.response.status = Status.InternalServerError
             ctx.response.body = { error: "Action could not be carried out, check the arguments." }
           }
-          ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
           ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
@@ -206,7 +204,6 @@ export class RestApi {
             ctx.response.status = Status.InternalServerError
             ctx.response.body = { error: "Action could not be carried out, check the arguments." }
           }
-          ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
           ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
@@ -221,7 +218,6 @@ export class RestApi {
             ctx.response.status = Status.InternalServerError
             ctx.response.body = { error: "Action could not be carried out, check the arguments." }
           }
-          ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
           ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
@@ -236,7 +232,6 @@ export class RestApi {
             ctx.response.status = Status.InternalServerError
             ctx.response.body = { error: "Action could not be carried out, check the arguments." }
           }
-          ctx.response.status = Status.OK
         } catch (err) {
           ctx.response.status = Status.InternalServerError
           ctx.response.body = { error: err instanceof Error ? err.message : "Unknown" }
