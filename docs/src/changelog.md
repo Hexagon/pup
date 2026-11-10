@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this section.
 - fix(api): Fix `stop` always reporting success and `stop all` not awaiting the processes
 - chore(core): Fix type checking with recent Deno 2 releases
 - chore(deps): Dependency updates, drop Deno 1 support in CI
-- docs: Update Lume/Lumocs, fix documentation typos, update JSON schema with `restartBackoffMs`
+- docs: Add PM2 migration guide, update Lume/Lumocs, fix documentation typos, update JSON schema with `restartBackoffMs`
 
 ## [1.0.4] - 2024-11-19
 
