@@ -93,6 +93,7 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
     this.watch()
     while (!this.stopWatching) {
       await this.signal
+      if (this.stopWatching) break
       yield Array.from(this.changes.entries()).map(([path, type]) => ({
         path,
         type,
@@ -140,10 +141,17 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
       debounce()
       await delay(this.interval)
     }
+    clearTimeout(timer)
   }
 
   public stop() {
     this.stopWatching = true
-    this.watcher?.close()
+    try {
+      this.watcher?.close()
+    } catch (_e) {
+      // Already closed
+    }
+    // Release anyone waiting for changes, so that iteration ends
+    this.signalResolver()
   }
 }
