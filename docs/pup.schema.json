@@ -219,6 +219,11 @@
                 "maximum": 86400000,
                 "default": 10000
               },
+              "restartBackoffMs": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 86400000
+              },
               "overrun": {
                 "type": "boolean"
               },
