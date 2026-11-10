@@ -267,11 +267,14 @@ class Pup {
         // Handle initial starts
         if (config.autostart && status.status === ApiProcessState.CREATED) {
           process.start("autostart")
+          continue
         }
 
         // Handle pending restart
+        // - skip the remaining checks for this process, as `status` is stale after starting
         if (status.status !== ApiProcessState.STOPPING && process.isPendingRestart()) {
           process.start(process["pendingRestartReason"])
+          continue
         }
 
         // Handle restarts
