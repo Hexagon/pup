@@ -108,7 +108,7 @@ export class Watcher implements AsyncIterable<FileEvent[]> {
   private async watch(): Promise<void> {
     this.stopWatching = false
 
-    let timer = 0
+    let timer: ReturnType<typeof setTimeout> | undefined
     const debounce = () => {
       clearTimeout(timer)
       timer = setTimeout(() => {
